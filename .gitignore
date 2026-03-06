@@ -1,13 +1,14 @@
-# Python
-__pycache__/
+# Python / virtual env
 *.pyc
-*.pyo
-*.pyd
-
-# Virtual environment
+__pycache__/
 .venv/
 
-# HuggingFace models
+# HuggingFace / training results
+results/
 models/
-datasets/
-*.pt
+logs/
+checkpoints/
+
+# Other temp files
+*.tmp
+*.cache

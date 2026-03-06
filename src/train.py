@@ -12,6 +12,7 @@ from transformers import (
     DataCollatorForTokenClassification
 )
 from huggingface_hub import snapshot_download
+from yaml_parser import VMAI_YamlParser
 
 print("Starting training script...")
 
@@ -31,25 +32,16 @@ def main():
         print(f"Model already exists at {local_model_path}")
 
     print("Generating synthetic training data...")
-    label_list = ["O", "B-TASK", "I-TASK", "B-DURATION", "I-DURATION", "B-DEADLINE", "I-DEADLINE"]
-    label2id = {label: i for i, label in enumerate(label_list)}
-    id2label = {i: label for label, i in label2id.items()}
-
-    templates = [
-        "I need to [TASK] for [DURATION] [DEADLINE]",
-        "Remind me to [TASK] at [DEADLINE]",
-        "Schedule [TASK] for [DURATION] before [DEADLINE]",
-    ]
-    tasks = ["buy milk", "study math", "call mom", "finish report", "workout", "read a book"]
-    durations = ["2 hours", "30 minutes", "1 hour", "90 minutes", "3 hours"]
-    deadlines = ["tomorrow", "at 5pm", "next Monday", "by Friday", "today at noon", "this evening"]
+    parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
+    parser.load_yaml()
+    training_data = parser.parse()
 
     data = {"tokens": [], "labels": []}
     for _ in range(1000):
-        template = random.choice(templates)
-        task = random.choice(tasks)
-        duration = random.choice(durations)
-        deadline = random.choice(deadlines)
+        template = random.choice(training_data.templates)
+        task = random.choice(training_data.tasks)
+        duration = random.choice(training_data.durations)
+        deadline = random.choice(training_data.deadlines)
 
         sentence = template.replace("[TASK]", task).replace("[DURATION]", duration).replace("[DEADLINE]", deadline)
         tokens = sentence.split()
@@ -70,7 +62,7 @@ def main():
         assign_labels(deadline, "DEADLINE")
 
         data["tokens"].append(tokens)
-        data["labels"].append([label2id[l] for l in labels])
+        data["labels"].append([training_data.label2id[l] for l in labels])
 
     dataset = Dataset.from_dict(data)
     split_dataset = dataset.train_test_split(test_size=0.1, seed=42)
@@ -107,9 +99,9 @@ def main():
 
     model = AutoModelForTokenClassification.from_pretrained(
         local_model_path,
-        num_labels=len(label_list),
-        id2label=id2label,
-        label2id=label2id
+        num_labels=len(training_data.label_list),
+        id2label=training_data.id2label,
+        label2id=training_data.label2id
     )
     model.to(device)
 
@@ -148,7 +140,7 @@ def main():
     model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
     with open(os.path.join(output_dir, "label_mapping.json"), "w") as f:
-        json.dump({"label_list": label_list, "label2id": label2id, "id2label": id2label}, f)
+        json.dump({"label_list": training_data.label_list, "label2id": training_data.label2id, "id2label": training_data.id2label}, f)
 
     print(f"Fine-tuned model saved to {output_dir}")
     print("Training completed successfully!")

@@ -1,0 +1,36 @@
+labels:
+  - O
+  - B-TASK
+  - I-TASK
+  - B-DURATION
+  - I-DURATION
+  - B-DEADLINE
+  - I-DEADLINE
+
+templates:
+  - "I need to [TASK] for [DURATION] [DEADLINE]"
+  - "Remind me to [TASK] at [DEADLINE]"
+  - "Schedule [TASK] for [DURATION] before [DEADLINE]"
+
+tasks:
+  - buy milk
+  - study math
+  - call mom
+  - finish report
+  - workout
+  - read a book
+
+durations:
+  - 2 hours
+  - 30 minutes
+  - 1 hour
+  - 90 minutes
+  - 3 hours
+
+deadlines:
+  - tomorrow
+  - at 5pm
+  - next Monday
+  - by Friday
+  - today at noon
+  - this evening
