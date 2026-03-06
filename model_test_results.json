@@ -1,0 +1,28 @@
+[
+  {
+    "sentence": "I need to buy milk tomorrow",
+    "model_output": {
+      "task": [
+        "buy milk"
+      ],
+      "duration": [],
+      "deadline": [
+        "tomorrow"
+      ],
+      "other": []
+    },
+    "verified_output": {
+      "task": [
+        "n"
+      ],
+      "duration": [],
+      "deadline": [
+        "n"
+      ],
+      "other": []
+    },
+    "accuracy_score": 3,
+    "comments": "n",
+    "timestamp": "2026-03-06T13:33:36.199243"
+  }
+]
