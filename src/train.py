@@ -14,89 +14,10 @@ from transformers import (
 from huggingface_hub import snapshot_download
 from yaml_parser import VMAI_YamlParser
 import numpy as np
+from data_generator import VMAI_DataGenerator
 
-# -------------------------------
-# GLOBAL SETTINGS
-# -------------------------------
-MAX_LIMIT = 50000  # Max number of synthetic examples
+MAX_LIMIT = 1000  
 
-# -------------------------------
-# Synthetic data generation
-# -------------------------------
-def generate_synthetic_data(training_data, max_examples=MAX_LIMIT):
-    all_placeholders = {
-        "TASK": training_data.tasks,
-        "DURATION": training_data.durations,
-        "DEADLINE": training_data.deadlines,
-        "PERSON": training_data.persons,
-        "LOCATION": training_data.locations,
-        "DATE": training_data.dates,
-        "TIME": training_data.times,
-        "PRIORITY": training_data.priorities,
-        "PROJECT": training_data.projects,
-        "MEETING": training_data.meetings,
-        "COST": training_data.costs,
-        "QUANTITY": training_data.quantities,
-        "CONTACT": training_data.contacts,
-        "EMAIL": training_data.emails,
-        "PHONE": training_data.phones,
-        "RECURRENCE": training_data.recurrences
-    }
-
-    templates = training_data.templates
-    num_examples = min(max_examples, 999999999)  # will limit below
-
-    # estimate total possible combinations
-# estimate total possible combinations
-    total_combinations = len(templates) * np.prod([len(opts) if opts else 1 for opts in all_placeholders.values()])
-    total_combinations = int(total_combinations)
-
-    if total_combinations < max_examples:
-        print(f"Total possible combinations: {total_combinations}, generating: {total_combinations}")
-        num_examples = total_combinations
-    else:
-        print(f"Total possible combinations: {total_combinations}, generating: {max_examples}")
-        num_examples = max_examples
-
-    data = {"tokens": [], "labels": []}
-
-    for i in range(num_examples):
-        if i % 10000 == 0 and i > 0:
-            print(f"Generated {i}/{num_examples} examples")
-
-        # pick random template
-        template = random.choice(templates)
-        sentence = template
-        placeholder_map = {}
-
-        # replace placeholders
-        for ph, options in all_placeholders.items():
-            if f"[{ph}]" in sentence and options:
-                value = str(random.choice(options))
-                sentence = sentence.replace(f"[{ph}]", value)
-                placeholder_map[value] = ph
-
-        # tokenize and assign labels
-        tokens = sentence.split()
-        labels = ["O"] * len(tokens)
-
-        for entity_text, entity_type in placeholder_map.items():
-            entity_tokens = entity_text.split()
-            for j in range(len(tokens) - len(entity_tokens) + 1):
-                if tokens[j:j + len(entity_tokens)] == entity_tokens:
-                    labels[j] = f"B-{entity_type}"
-                    for k in range(1, len(entity_tokens)):
-                        labels[j + k] = f"I-{entity_type}"
-                    break
-
-        data["tokens"].append(tokens)
-        data["labels"].append([training_data.label2id.get(l, 0) for l in labels])
-
-    return Dataset.from_dict(data)
-
-# -------------------------------
-# Main training
-# -------------------------------
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
@@ -105,23 +26,18 @@ def main():
     local_model_path = f"./models/{model_name}"
     os.makedirs("./models", exist_ok=True)
 
-    # download Hugging Face model if not exists
     if not os.path.exists(local_model_path) or not os.listdir(local_model_path):
         print(f"Downloading {model_name}...")
         snapshot_download(repo_id=model_name, local_dir=local_model_path)
     else:
         print(f"Model already exists at {local_model_path}")
 
-    # load YAML data
-    print("Loading YAML training data...")
     parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
     parser.load_yaml()
     training_data = parser.parse()
 
-    # generate synthetic dataset
-    synthetic_dataset = generate_synthetic_data(training_data, max_examples=MAX_LIMIT)
+    synthetic_dataset = VMAI_DataGenerator(training_data).generate(1000)
 
-    # optional: load additional real NER datasets
     try:
         conll = load_dataset("conll2003", split="train[:5000]")
         print(f"Loaded CoNLL-2003: {len(conll)} examples")

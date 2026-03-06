@@ -1,4 +1,11 @@
-# yaml_parser.py
+"""
+    The VM.AI YAML Training Data Parser
+    This class is responsible for parsing the YAML training data into a structured format
+
+    Written for testing purposes but also to be used in the main training code
+    Written by: Vanea @ 06-03-2026
+"""
+
 import yaml
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict
@@ -26,10 +33,33 @@ class VMAI_YamlTrainingParsedData:
     emails: List[str] = field(default_factory=list)
     phones: List[str] = field(default_factory=list)
     recurrences: List[str] = field(default_factory=list)
+    teams: List[str] = field(default_factory=list)
 
     # AUTOGEN
     label2id: Dict[str, int] = field(init=False)
     id2label: Dict[int, str] = field(init=False)
+
+    def get_placeholder_map(self) -> Dict[str, List[str]]:
+        mapping = {
+            "TASK": self.tasks,
+            "DURATION": self.durations,
+            "DEADLINE": self.deadlines,
+            "PERSON": self.persons,
+            "LOCATION": self.locations,
+            "DATE": self.dates,
+            "TIME": self.times,
+            "PRIORITY": self.priorities,
+            "PROJECT": self.projects,
+            "MEETING": self.meetings,
+            "COST": self.costs,
+            "QUANTITY": self.quantities,
+            "CONTACT": self.contacts,
+            "EMAIL": self.emails,
+            "PHONE": self.phones,
+            "RECURRENCE": self.recurrences,
+            "TEAM": self.teams
+        }
+        return {k: v for k, v in mapping.items() if v}
 
     def __post_init__(self):
         self.label2id = {label: i for i, label in enumerate(self.label_list)}
@@ -39,30 +69,23 @@ class VMAI_YamlTrainingParsedData:
         print("\n" + "="*60)
         print("VMAI TRAINING CONFIGURATION")
         print("="*60)
-        print(f"\n📋 LABELS ({len(self.label_list)}):")
-        for i, label in enumerate(self.label_list, 1):
-            print(f"  {i}. {label}")
+        
+        fields_to_print = [
+            'templates', 'tasks', 'durations', 'deadlines', 'persons', 
+            'locations', 'dates', 'times', 'priorities', 'projects', 
+            'meetings', 'costs', 'quantities', 'contacts', 'emails', 
+            'phones', 'recurrences', 'teams' 
+        ]
 
-        for field_name in ['templates', 'tasks', 'durations', 'deadlines', 
-                           'persons', 'locations', 'dates', 'times', 'priorities',
-                           'projects', 'meetings', 'costs', 'quantities', 'contacts',
-                           'emails', 'phones', 'recurrences']:
-            values = getattr(self, field_name)
-            if values:
-                icon = "📝" if field_name == "templates" else "✅"
-                print(f"\n{icon} {field_name.upper()} ({len(values)} items):")
-                for i, v in enumerate(values, 1):
-                    print(f"  {i}. {v}")
+        for field_name in fields_to_print:
+            if hasattr(self, field_name):
+                values = getattr(self, field_name)
+                if values:
+                    icon = "📝" if field_name == "templates" else "✅"
+                    print(f"\n{icon} {field_name.upper()} ({len(values)} items):")
+                    for i, v in enumerate(values, 1):
+                        print(f"  {i}. {v}")
         print("\n" + "="*60)
-
-    def print_json_like(self):
-        print("\n" + "="*60)
-        print("VMAI TRAINING CONFIGURATION (JSON-like)")
-        print("="*60)
-        data_dict = asdict(self)
-        pp = pprint.PrettyPrinter(indent=2, width=80)
-        pp.pprint(data_dict)
-        print("="*60)
 
 class VMAI_YamlParser:
     def __init__(self, yaml_file: str):
@@ -70,12 +93,10 @@ class VMAI_YamlParser:
         self.data = None
 
     def load_yaml(self):
-        """Load the YAML file into memory"""
         with open(self.yaml_file, 'r', encoding='utf-8') as file:
             self.data = yaml.safe_load(file)
 
     def parse(self) -> VMAI_YamlTrainingParsedData:
-        """Parse YAML data into the dataclass"""
         if not self.data:
             raise ValueError("YAML data not loaded")
 
@@ -97,11 +118,13 @@ class VMAI_YamlParser:
             contacts=self.data.get("contacts", []),
             emails=self.data.get("emails", []),
             phones=self.data.get("phones", []),
-            recurrences=self.data.get("recurrences", [])
+            recurrences=self.data.get("recurrences", []),
+            teams=self.data.get("teams", []) 
         )
 
 if __name__ == "__main__":
     parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
     parser.load_yaml()
     parsed_data = parser.parse()
+
     parsed_data.print_nice()
