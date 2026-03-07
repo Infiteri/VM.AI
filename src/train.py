@@ -1,4 +1,10 @@
-# train.py
+"""
+    The VM.AI Training Script
+    This script trains the AI for detecting tasks and other fields from a user input
+
+    Written by (1): Vanea @ 07-03-2026
+"""
+
 import os
 import random
 import json
@@ -16,7 +22,7 @@ from yaml_parser import VMAI_YamlParser
 import numpy as np
 from data_generator import VMAI_DataGenerator
 
-MAX_LIMIT = 1000  
+MAX_LIMIT = 100000  
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,7 +42,7 @@ def main():
     parser.load_yaml()
     training_data = parser.parse()
 
-    synthetic_dataset = VMAI_DataGenerator(training_data).generate(1000)
+    synthetic_dataset = VMAI_DataGenerator(training_data).generate(MAX_LIMIT)
 
     try:
         conll = load_dataset("conll2003", split="train[:5000]")

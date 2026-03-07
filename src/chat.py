@@ -1,297 +1,285 @@
-# interactive_task_planner.py (fixed duplicate detection)
+"""
+VM.AI chat testing interface
+"""
+
 import torch
 import json
 import os
 import re
 from transformers import AutoTokenizer, AutoModelForTokenClassification
-from typing import Dict, List
+from typing import Dict
+
 
 class TaskPlannerPredictor:
+
     def __init__(self, model_path="./models/my_finetuned_task_planner"):
-        """Initialize the predictor with a fine-tuned model"""
-        print(f"Loading model...")
-        
-        # Load label mapping
+
+        print("Loading model...")
+
         label_mapping_path = os.path.join(model_path, "label_mapping.json")
+
         if os.path.exists(label_mapping_path):
+
             with open(label_mapping_path, "r") as f:
                 mapping = json.load(f)
-                self.label_list = mapping["label_list"]
-                self.label2id = mapping["label2id"]
-                self.id2label = {int(k): v for k, v in mapping["id2label"].items()}
+
+            self.label_list = mapping["label_list"]
+            self.label2id = mapping["label2id"]
+            self.id2label = {int(k): v for k, v in mapping["id2label"].items()}
+
         else:
-            self.label_list = ["O", "B-TASK", "I-TASK", "B-DURATION", "I-DURATION", 
-                              "B-DEADLINE", "I-DEADLINE", "B-PERSON", "I-PERSON", 
-                              "B-TIME", "I-TIME", "B-DATE", "I-DATE"]
-            self.label2id = {label: i for i, label in enumerate(self.label_list)}
-            self.id2label = {i: label for label, i in self.label2id.items()}
-        
-        # Load model and tokenizer
+            raise RuntimeError("label_mapping.json missing")
+
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
+
         self.model = AutoModelForTokenClassification.from_pretrained(
             model_path,
             num_labels=len(self.label_list),
             id2label=self.id2label,
             label2id=self.label2id
         )
+
         self.model.to(self.device)
         self.model.eval()
+
         print("✓ Model ready")
-    
+
+
+    def normalize(self, text: str):
+
+        text = text.lower().strip()
+
+        text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
+
+        return text
+
+
     def predict(self, sentence: str) -> Dict:
-        """Predict entities in a sentence and return structured output"""
+
+        sentence = self.normalize(sentence)
+
         tokens = sentence.split()
-        
-        # Prepare input
-        inputs = self.tokenizer(
+
+        encoding = self.tokenizer(
             tokens,
-            truncation=True,
             is_split_into_words=True,
+            truncation=True,
             return_tensors="pt",
             padding="max_length",
             max_length=128
-        ).to(self.device)
-        
-        # Get predictions
+        )
+
+        word_ids = encoding.word_ids()
+
+        inputs = {k: v.to(self.device) for k, v in encoding.items()}
+
         with torch.no_grad():
             outputs = self.model(**inputs)
-            predictions = torch.argmax(outputs.logits, dim=-1)[0].cpu().numpy()
-        
-        # First pass: collect all entity spans
-        raw_entities = []
+
+        predictions = torch.argmax(outputs.logits, dim=-1)[0].cpu().numpy()
+
+        entities = []
+
         current_entity = None
-        current_text = []
-        current_start = -1
-        current_end = -1
-        
-        word_ids = self.tokenizer(sentence.split(), is_split_into_words=True).word_ids()
-        
+        current_tokens = []
+
+        seen_words = set()
+
         for i, word_idx in enumerate(word_ids):
-            if word_idx is not None:
-                label = self.id2label[predictions[i]]
-                
-                if label != "O":
-                    if label.startswith("B-"):
-                        # Save previous entity if exists
-                        if current_entity and current_text:
-                            raw_entities.append({
-                                "entity": current_entity,
-                                "text": " ".join(current_text),
-                                "start": current_start,
-                                "end": current_end,
-                                "length": current_end - current_start + 1
-                            })
-                        # Start new entity
-                        current_entity = label[2:]
-                        current_text = [tokens[word_idx]]
-                        current_start = word_idx
-                        current_end = word_idx
-                    elif label.startswith("I-") and current_entity == label[2:]:
-                        # Continue current entity
-                        current_text.append(tokens[word_idx])
-                        current_end = word_idx
-                else:
-                    # Save current entity if exists
-                    if current_entity and current_text:
-                        raw_entities.append({
-                            "entity": current_entity,
-                            "text": " ".join(current_text),
-                            "start": current_start,
-                            "end": current_end,
-                            "length": current_end - current_start + 1
-                        })
-                        current_entity = None
-                        current_text = []
-                        current_start = -1
-                        current_end = -1
-        
-        # Don't forget the last entity
-        if current_entity and current_text:
-            raw_entities.append({
-                "entity": current_entity,
-                "text": " ".join(current_text),
-                "start": current_start,
-                "end": current_end,
-                "length": current_end - current_start + 1
-            })
-        
-        # Second pass: resolve overlaps (keep the longest entity for overlapping spans)
-        # Sort by start position, then by length (descending)
-        raw_entities.sort(key=lambda x: (x['start'], -x['length']))
-        
-        merged_entities = []
-        used_indices = set()
-        
-        for i, entity in enumerate(raw_entities):
-            if i in used_indices:
+
+            if word_idx is None:
                 continue
-            
-            # Check if this entity overlaps with any longer entity that starts at same position
-            overlapping = False
-            for j, other in enumerate(raw_entities):
-                if j != i and j not in used_indices:
-                    # Check if other entity completely contains this one
-                    if (other['start'] <= entity['start'] and 
-                        other['end'] >= entity['end'] and
-                        other['length'] > entity['length']):
-                        overlapping = True
-                        break
-                    # Check if this is a subspan of a longer entity
-                    if (entity['start'] >= other['start'] and 
-                        entity['end'] <= other['end'] and
-                        other['length'] > entity['length']):
-                        overlapping = True
-                        break
-            
-            if not overlapping:
-                merged_entities.append(entity)
-                # Mark any entities that are fully contained within this one as used
-                for j, other in enumerate(raw_entities):
-                    if j != i and entity['start'] <= other['start'] and entity['end'] >= other['end']:
-                        used_indices.add(j)
-        
-        # Third pass: group by entity type and clean up
-        output = {"task": [], "duration": [], "deadline": [], "date": [], "time": [], "person": [], "other": []}
-        
-        # Define entity type mappings
+
+            if word_idx in seen_words:
+                continue
+
+            seen_words.add(word_idx)
+
+            label = self.id2label[predictions[i]]
+
+            word = tokens[word_idx]
+
+            if label.startswith("B-"):
+
+                if current_entity:
+                    entities.append((current_entity, " ".join(current_tokens)))
+
+                current_entity = label[2:]
+                current_tokens = [word]
+
+            elif label.startswith("I-") and current_entity == label[2:]:
+
+                current_tokens.append(word)
+
+            else:
+
+                if current_entity:
+                    entities.append((current_entity, " ".join(current_tokens)))
+
+                current_entity = None
+                current_tokens = []
+
+        if current_entity:
+            entities.append((current_entity, " ".join(current_tokens)))
+
+        output = {
+            "task": [],
+            "duration": [],
+            "deadline": [],
+            "date": [],
+            "time": [],
+            "person": [],
+            "location": [],
+            "priority": [],
+            "project": [],
+            "meeting": [],
+            "cost": [],
+            "quantity": [],
+            "contact": [],
+            "email": [],
+            "phone": [],
+            "recurrence": [],
+            "other": []
+        }
+
         type_mapping = {
             "TASK": "task",
-            "DURATION": "duration", 
+            "DURATION": "duration",
             "DEADLINE": "deadline",
             "DATE": "date",
             "TIME": "time",
-            "PERSON": "person"
+            "PERSON": "person",
+            "LOCATION": "location",
+            "PRIORITY": "priority",
+            "PROJECT": "project",
+            "MEETING": "meeting",
+            "COST": "cost",
+            "QUANTITY": "quantity",
+            "CONTACT": "contact",
+            "EMAIL": "email",
+            "PHONE": "phone",
+            "RECURRENCE": "recurrence"
         }
-        
-        for entity in merged_entities:
-            entity_type = entity["entity"].upper()
-            text = entity["text"]
-            
-            # Map to output category
-            if entity_type in type_mapping:
-                category = type_mapping[entity_type]
-                # Avoid duplicates within the same category
+
+        for ent_type, text in entities:
+
+            ent_type = ent_type.upper()
+
+            if ent_type in type_mapping:
+
+                category = type_mapping[ent_type]
+
                 if text not in output[category]:
                     output[category].append(text)
+
             else:
-                # Handle unknown entity types
-                other_entry = f"{entity_type.lower()}:{text}"
-                if other_entry not in output["other"]:
-                    output["other"].append(other_entry)
-        
-        # Special handling: if deadline contains time, don't also extract time separately
-        if output["deadline"] and output["time"]:
-            # Check if any time is part of a deadline
-            times_to_remove = []
-            for time_val in output["time"]:
-                for deadline_val in output["deadline"]:
-                    if time_val in deadline_val:
-                        times_to_remove.append(time_val)
-                        break
-            
-            for time_val in times_to_remove:
-                output["time"].remove(time_val)
-        
-        # Special handling: if deadline contains date, don't also extract date separately
-        if output["deadline"] and output["date"]:
-            dates_to_remove = []
-            for date_val in output["date"]:
-                for deadline_val in output["deadline"]:
-                    if date_val in deadline_val:
-                        dates_to_remove.append(date_val)
-                        break
-            
-            for date_val in dates_to_remove:
-                output["date"].remove(date_val)
-        
+
+                entry = f"{ent_type.lower()}:{text}"
+
+                if entry not in output["other"]:
+                    output["other"].append(entry)
+
         return output
 
-def format_compact_output(results: Dict) -> str:
-    """Format results in a compact, readable way"""
-    output_parts = []
-    
-    # Tasks
+
+def format_output(results: Dict):
+
+    parts = []
+
     if results["task"]:
-        tasks = ",".join(results["task"])
-        output_parts.append(f"📋{tasks}")
-    
-    # Duration (simplify)
+        parts.append(f"📋{','.join(results['task'])}")
+
     if results["duration"]:
-        durations = []
-        for d in results["duration"]:
-            # Try to simplify duration (e.g., "2 hours" -> "2h")
-            nums = re.findall(r'\d+', d)
-            if nums and ("hour" in d or "hr" in d):
-                durations.append(f"{nums[0]}h")
-            elif nums and ("min" in d):
-                durations.append(f"{nums[0]}m")
-            else:
-                durations.append(d)
-        output_parts.append(f"⏱️{','.join(durations)}")
-    
-    # Deadline
+        parts.append(f"⏱️{','.join(results['duration'])}")
+
     if results["deadline"]:
-        output_parts.append(f"📅{','.join(results['deadline'])}")
-    
-    # Date (if not in deadline)
+        parts.append(f"📅{','.join(results['deadline'])}")
+
     if results["date"]:
-        output_parts.append(f"📆{','.join(results['date'])}")
-    
-    # Time (if not in deadline)
+        parts.append(f"📆{','.join(results['date'])}")
+
     if results["time"]:
-        # Clean up time format
-        times = []
-        for t in results["time"]:
-            # Remove "at" if present
-            t = re.sub(r'^at\s+', '', t)
-            times.append(t)
-        output_parts.append(f"⏰{','.join(times)}")
-    
-    # Person
+        parts.append(f"⏰{','.join(results['time'])}")
+
     if results["person"]:
-        output_parts.append(f"👤{','.join(results['person'])}")
-    
-    # Other
+        parts.append(f"👤{','.join(results['person'])}")
+
+    if results["location"]:
+        parts.append(f"📍{','.join(results['location'])}")
+
+    if results["priority"]:
+        parts.append(f"⚡{','.join(results['priority'])}")
+
+    if results["project"]:
+        parts.append(f"📂{','.join(results['project'])}")
+
+    if results["meeting"]:
+        parts.append(f"📅{','.join(results['meeting'])}")
+
+    if results["quantity"]:
+        parts.append(f"🔢{','.join(results['quantity'])}")
+
+    if results["cost"]:
+        parts.append(f"💰{','.join(results['cost'])}")
+
+    if results["contact"]:
+        parts.append(f"📇{','.join(results['contact'])}")
+
+    if results["email"]:
+        parts.append(f"📧{','.join(results['email'])}")
+
+    if results["phone"]:
+        parts.append(f"📞{','.join(results['phone'])}")
+
+    if results["recurrence"]:
+        parts.append(f"🔁{','.join(results['recurrence'])}")
+
     if results["other"]:
-        output_parts.append(f"🔍{','.join(results['other'])}")
-    
-    return " → " + " | ".join(output_parts) if output_parts else " → ❌ None"
+        parts.append(f"🔍{','.join(results['other'])}")
+
+    if not parts:
+        return " → ❌ None"
+
+    return " → " + " | ".join(parts)
+
 
 def main():
-    print("\n" + "=" * 50)
-    print("🗓️  TASK PLANNER")
-    print("=" * 50)
-    
-    try:
-        predictor = TaskPlannerPredictor()
-    except Exception as e:
-        print(f"Error: {e}")
-        return
-    
-    print("\nCommands: [type 'end' to exit]")
-    print("-" * 50)
-    
+
+    print("\n" + "=" * 60)
+    print("🗓️ TASK PLANNER CHAT")
+    print("=" * 60)
+
+    predictor = TaskPlannerPredictor()
+
+    print("\nType 'end' to exit")
+
     count = 0
+
     while True:
+
         user_input = input(f"\n{count+1:2d} > ").strip()
-        
-        if user_input.upper() == "END":
-            print("\n" + "=" * 50)
-            print(f"Goodbye! Processed {count} sentences")
-            print("=" * 50)
+
+        if user_input.lower() == "end":
+            print("\nProcessed", count, "sentences")
             break
-        
+
         if not user_input:
             continue
-        
+
         try:
+
             results = predictor.predict(user_input)
-            print(format_compact_output(results))
+
+            print(format_output(results))
+
             count += 1
-            
+
         except Exception as e:
-            print(f"   ❌ Error: {e}")
+
+            print("Prediction error:", e)
+
 
 if __name__ == "__main__":
     main()
