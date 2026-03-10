@@ -1,1 +1,11 @@
-.venv
+models/
+logs/
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
+.env
+.DS_Store
+Thumbs.db
