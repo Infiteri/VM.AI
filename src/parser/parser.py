@@ -1,15 +1,12 @@
 """
-    The VM.AI chat testing interface
+    The VM.AI parser module responsible for training and parsing user input into neat code-defined structure
+
+    Module: parser
+    Main dev: Vanea
+    Written by: Vanea @ 10-03-2026
 """
 
-import torch
-import json
-import os
-import re
-from transformers import AutoTokenizer, AutoModelForTokenClassification
-from typing import Dict
-
-
+# parser, todo: ENSURE MODEL GETS LOADED ONCE WHEN BACKEND IS STARTED
 class TaskPlannerPredictor:
     def __init__(self, model_path="./models/my_finetuned_task_planner"):
         print("Loading model...")
@@ -27,9 +24,7 @@ class TaskPlannerPredictor:
             raise RuntimeError("label_mapping.json missing")
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-
         self.model = AutoModelForTokenClassification.from_pretrained(
             model_path,
             num_labels=len(self.label_list),
@@ -40,24 +35,15 @@ class TaskPlannerPredictor:
         self.model.to(self.device)
         self.model.eval()
 
-        print("✓ Model ready")
-
-
     def normalize(self, text: str):
-
         text = text.lower().strip()
-
         text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
-
         return text
 
 
     def predict(self, sentence: str) -> Dict:
-
         sentence = self.normalize(sentence)
-
         tokens = sentence.split()
-
         encoding = self.tokenizer(
             tokens,
             is_split_into_words=True,
@@ -68,23 +54,19 @@ class TaskPlannerPredictor:
         )
 
         word_ids = encoding.word_ids()
-
         inputs = {k: v.to(self.device) for k, v in encoding.items()}
 
         with torch.no_grad():
             outputs = self.model(**inputs)
 
         predictions = torch.argmax(outputs.logits, dim=-1)[0].cpu().numpy()
-
         entities = []
-
         current_entity = None
         current_tokens = []
 
         seen_words = set()
 
         for i, word_idx in enumerate(word_ids):
-
             if word_idx is None:
                 continue
 
@@ -92,23 +74,17 @@ class TaskPlannerPredictor:
                 continue
 
             seen_words.add(word_idx)
-
             label = self.id2label[predictions[i]]
-
             word = tokens[word_idx]
 
             if label.startswith("B-"):
-
                 if current_entity:
                     entities.append((current_entity, " ".join(current_tokens)))
-
                 current_entity = label[2:]
                 current_tokens = [word]
 
             elif label.startswith("I-") and current_entity == label[2:]:
-
                 current_tokens.append(word)
-
             else:
                 if current_entity:
                     entities.append((current_entity, " ".join(current_tokens)))
@@ -158,122 +134,19 @@ class TaskPlannerPredictor:
         }
 
         for ent_type, text in entities:
-
             ent_type = ent_type.upper()
-
             if ent_type in type_mapping:
-
                 category = type_mapping[ent_type]
-
                 if text not in output[category]:
                     output[category].append(text)
-
             else:
-
                 entry = f"{ent_type.lower()}:{text}"
-
                 if entry not in output["other"]:
                     output["other"].append(entry)
 
         return output
 
-
-def format_output(results: Dict):
-
-    parts = []
-
-    if results["task"]:
-        parts.append(f"📋{','.join(results['task'])}")
-
-    if results["duration"]:
-        parts.append(f"⏱️{','.join(results['duration'])}")
-
-    if results["deadline"]:
-        parts.append(f"📅{','.join(results['deadline'])}")
-
-    if results["date"]:
-        parts.append(f"📆{','.join(results['date'])}")
-
-    if results["time"]:
-        parts.append(f"⏰{','.join(results['time'])}")
-
-    if results["person"]:
-        parts.append(f"👤{','.join(results['person'])}")
-
-    if results["location"]:
-        parts.append(f"📍{','.join(results['location'])}")
-
-    if results["priority"]:
-        parts.append(f"⚡{','.join(results['priority'])}")
-
-    if results["project"]:
-        parts.append(f"📂{','.join(results['project'])}")
-
-    if results["meeting"]:
-        parts.append(f"📅{','.join(results['meeting'])}")
-
-    if results["quantity"]:
-        parts.append(f"🔢{','.join(results['quantity'])}")
-
-    if results["cost"]:
-        parts.append(f"💰{','.join(results['cost'])}")
-
-    if results["contact"]:
-        parts.append(f"📇{','.join(results['contact'])}")
-
-    if results["email"]:
-        parts.append(f"📧{','.join(results['email'])}")
-
-    if results["phone"]:
-        parts.append(f"📞{','.join(results['phone'])}")
-
-    if results["recurrence"]:
-        parts.append(f"🔁{','.join(results['recurrence'])}")
-
-    if results["other"]:
-        parts.append(f"🔍{','.join(results['other'])}")
-
-    if not parts:
-        return " → ❌ None"
-
-    return " → " + " | ".join(parts)
-
-
-def main():
-
-    print("\n" + "=" * 60)
-    print("🗓️ TASK PLANNER CHAT")
-    print("=" * 60)
-
-    predictor = TaskPlannerPredictor()
-
-    print("\nType 'end' to exit")
-
-    count = 0
-
-    while True:
-
-        user_input = input(f"\n{count+1:2d} > ").strip()
-
-        if user_input.lower() == "end":
-            print("\nProcessed", count, "sentences")
-            break
-
-        if not user_input:
-            continue
-
-        try:
-
-            results = predictor.predict(user_input)
-
-            print(format_output(results))
-
-            count += 1
-
-        except Exception as e:
-
-            print("Prediction error:", e)
-
-
-if __name__ == "__main__":
-    main()
+# todo: TEST
+def parse_input_to_json(input):
+    pr = TaskPlannerPredictor()
+    return pr.predict(input)

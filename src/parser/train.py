@@ -1,12 +1,13 @@
 """
-    The VM.AI Training Script
+    The VM.AI parser model training scripts
     This script trains the AI for detecting tasks and other fields from a user input
 
+    Module: parser
+    Main dev: Vanea
     Written by (1): Vanea @ 07-03-2026
 """
 
 import os
-import random
 import json
 import torch
 from datasets import Dataset, concatenate_datasets, load_dataset
@@ -22,7 +23,7 @@ from yaml_parser import VMAI_YamlParser
 import numpy as np
 from data_generator import VMAI_DataGenerator
 
-MAX_LIMIT = 100000  
+MAX_LIMIT = 100
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,16 +44,7 @@ def main():
     training_data = parser.parse()
 
     synthetic_dataset = VMAI_DataGenerator(training_data).generate(MAX_LIMIT)
-
-    try:
-        conll = load_dataset("conll2003", split="train[:5000]")
-        print(f"Loaded CoNLL-2003: {len(conll)} examples")
-        dataset = concatenate_datasets([synthetic_dataset, conll])
-    except Exception as e:
-        print("Couldn't load CoNLL-2003:", e)
-        dataset = synthetic_dataset
-
-    # train/test split
+    dataset = synthetic_dataset
     split_dataset = dataset.train_test_split(test_size=0.1, seed=42)
     train_dataset = split_dataset["train"]
     test_dataset = split_dataset["test"]
@@ -108,8 +100,8 @@ def main():
         eval_strategy="epoch",
         save_strategy="epoch",
         learning_rate=2e-5,
-        per_device_train_batch_size=16,
-        per_device_eval_batch_size=16,
+        per_device_train_batch_size=128,
+        per_device_eval_batch_size=128,
         num_train_epochs=3,
         weight_decay=0.01,
         logging_dir="./logs",

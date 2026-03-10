@@ -1,8 +1,10 @@
 """
     The VM.AI YAML Training Data Parser
     This class is responsible for parsing the YAML training data into a structured format
-
     Written for testing purposes but also to be used in the main training code
+
+    Module: parser
+    Main dev: Vanea
     Written by: Vanea @ 06-03-2026
 """
 
