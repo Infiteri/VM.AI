@@ -8,6 +8,7 @@
 """
 
 import os
+import vars
 import json
 import torch
 from datasets import Dataset, concatenate_datasets, load_dataset
@@ -39,7 +40,7 @@ def main():
     else:
         print(f"Model already exists at {local_model_path}")
 
-    parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
+    parser = VMAI_YamlParser(f'./data/{vars.SYNTHETIC_DATASET_PATH}')
     parser.load_yaml()
     training_data = parser.parse()
 
@@ -80,7 +81,7 @@ def main():
     tokenized_test.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 
     # Load model or resume training if checkpoint exists
-    output_dir = "./models/my_finetuned_task_planner"
+    output_dir = f"./models/{vars.PARSER_MODEL_NAME}"
     model = None
     if os.path.exists(output_dir) and os.listdir(output_dir):
         print("Resuming training from checkpoint...")

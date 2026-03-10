@@ -6,9 +6,12 @@
     Written by: Vanea @ 10-03-2026
 """
 
+import vars
+from typing import Dict
+
 # parser, todo: ENSURE MODEL GETS LOADED ONCE WHEN BACKEND IS STARTED
 class TaskPlannerPredictor:
-    def __init__(self, model_path="./models/my_finetuned_task_planner"):
+    def __init__(self, model_path=f"./models/{vars.PARSER_MODEL_NAME}"):
         print("Loading model...")
         label_mapping_path = os.path.join(model_path, "label_mapping.json")
         if os.path.exists(label_mapping_path):

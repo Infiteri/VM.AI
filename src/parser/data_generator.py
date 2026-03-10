@@ -6,6 +6,7 @@
     Written by: Vanea @ 06-03-2026
 """
 
+import vars
 import random
 import argparse
 from datasets import Dataset
@@ -53,10 +54,8 @@ class VMAI_DataGenerator:
 if __name__ == "__main__":
     from yaml_parser import VMAI_YamlParser
 
-    # 1. Setup Argument Parser
     parser_arg = argparse.ArgumentParser(description="VM.AI Data Generator")
     
-    # Add the sentences argument with a default value
     parser_arg.add_argument(
         '--sentences', 
         type=int, 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     
     args = parser_arg.parse_args()
 
-    yaml_parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
+    yaml_parser = VMAI_YamlParser(f'./data/{vars.PARSER_MODEL_NAME}')
     yaml_parser.load_yaml()
     training_data = yaml_parser.parse()
 

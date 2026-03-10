@@ -12,6 +12,7 @@ import yaml
 from dataclasses import dataclass, asdict, field
 from typing import List, Dict
 import pprint
+import vars
 
 @dataclass
 class VMAI_YamlTrainingParsedData:
@@ -125,7 +126,7 @@ class VMAI_YamlParser:
         )
 
 if __name__ == "__main__":
-    parser = VMAI_YamlParser('data/VMAI_DataMain.yaml')
+    parser = VMAI_YamlParser(f'./data/{vars.SYNTHETIC_DATASET_PATH}')
     parser.load_yaml()
     parsed_data = parser.parse()
 
