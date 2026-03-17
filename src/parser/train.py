@@ -14,10 +14,10 @@ import torch
 from datasets import Dataset, concatenate_datasets, load_dataset
 from transformers import (
     AutoTokenizer,
-    AutoModelForTokenClassification,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForTokenClassification
+    T5ForConditionalGeneration,
+    Seq2SeqTrainingArguments,
+    Seq2SeqTrainer,
+    DataCollatorForSeq2Seq
 )
 from huggingface_hub import snapshot_download
 from yaml_parser import VMAI_YamlParser
@@ -30,7 +30,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    model_name = "distilbert-base-uncased"
+    model_name = "google-t5/t5-small"
     local_model_path = f"./models/{model_name}"
     os.makedirs("./models", exist_ok=True)
 
@@ -52,69 +52,68 @@ def main():
 
     print(f"Training examples: {len(train_dataset)}")
     print(f"Test examples: {len(test_dataset)}")
-    print(f"Labels: {training_data.label_list}")
 
     tokenizer = AutoTokenizer.from_pretrained(local_model_path)
 
-    # tokenization function
     def tokenize_function(examples):
-        tokenized_inputs = tokenizer(
-            examples["tokens"],
+        inputs = tokenizer(
+            examples["input_text"],
             truncation=True,
-            is_split_into_words=True,
             padding="max_length",
             max_length=128
         )
-        labels = []
-        for i, label in enumerate(examples["labels"]):
-            word_ids = tokenized_inputs.word_ids(batch_index=i)
-            labels.append([
-                -100 if word_idx is None else label[word_idx]
-                for word_idx in word_ids
-            ])
-        tokenized_inputs["labels"] = labels
-        return tokenized_inputs
+        targets = tokenizer(
+            examples["target_text"],
+            truncation=True,
+            padding="max_length",
+            max_length=128
+        )
+        labels = targets["input_ids"]
+        labels = [
+            [(token if token != tokenizer.pad_token_id else -100) for token in label]
+            for label in labels
+        ]
+        inputs["labels"] = np.array(labels, dtype=np.int64)  # add this line, was just labels
+        return inputs
 
     tokenized_train = train_dataset.map(tokenize_function, batched=True)
     tokenized_test = test_dataset.map(tokenize_function, batched=True)
     tokenized_train.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
     tokenized_test.set_format(type='torch', columns=['input_ids', 'attention_mask', 'labels'])
 
-    # Load model or resume training if checkpoint exists
     output_dir = f"./models/{vars.PARSER_MODEL_NAME}"
     model = None
     if os.path.exists(output_dir) and os.listdir(output_dir):
         print("Resuming training from checkpoint...")
-        model = AutoModelForTokenClassification.from_pretrained(output_dir)
+        model = T5ForConditionalGeneration.from_pretrained(output_dir)
     else:
-        model = AutoModelForTokenClassification.from_pretrained(
-            local_model_path,
-            num_labels=len(training_data.label_list),
-            id2label=training_data.id2label,
-            label2id=training_data.label2id
-        )
+        model = T5ForConditionalGeneration.from_pretrained(local_model_path)
     model.to(device)
 
-    # Training arguments
-    training_args = TrainingArguments(
+    training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
         eval_strategy="epoch",
         save_strategy="epoch",
         learning_rate=2e-5,
-        per_device_train_batch_size=128,
-        per_device_eval_batch_size=128,
+        per_device_train_batch_size=8,       # safe for 8GB with T5
+        per_device_eval_batch_size=8,
         num_train_epochs=3,
         weight_decay=0.01,
-        logging_dir="./logs",
-        logging_steps=10,
         save_total_limit=2,
+        predict_with_generate=True,
         push_to_hub=False,
         remove_unused_columns=False,
+        gradient_accumulation_steps=16,      # effective batch = 128
+        fp16=True,                           # ~halves VRAM, speeds up training
+        dataloader_num_workers=4,            # parallel data loading off GPU
+        dataloader_pin_memory=True,          # faster CPU→GPU transfer
+        optim="adafactor",                   # T5's native optimizer, uses far less VRAM than AdamW
+        logging_steps=10,
     )
 
-    data_collator = DataCollatorForTokenClassification(tokenizer)
+    data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
 
-    trainer = Trainer(
+    trainer = Seq2SeqTrainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_train,
@@ -125,18 +124,13 @@ def main():
     print("Starting training...")
     trainer.train()
 
-    # save model & tokenizer
     model.save_pretrained(output_dir)
     tokenizer.save_pretrained(output_dir)
-    with open(os.path.join(output_dir, "label_mapping.json"), "w") as f:
-        json.dump({
-            "label_list": training_data.label_list,
-            "label2id": training_data.label2id,
-            "id2label": training_data.id2label
-        }, f)
 
     print(f"Fine-tuned model saved to {output_dir}")
     print("Training completed!")
 
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 if __name__ == "__main__":
     main()

@@ -3,35 +3,18 @@
 """
 
 import torch
-import json
-import os
 import re
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+import os
+from transformers import AutoTokenizer, T5ForConditionalGeneration
 from typing import Dict
 
 
 class TaskPlannerPredictor:
     def __init__(self, model_path="./models/finetuned_parser"):
         print("Loading model...")
-        label_mapping_path = os.path.join(model_path, "label_mapping.json")
-        if os.path.exists(label_mapping_path):
-            with open(label_mapping_path, "r") as f:
-                mapping = json.load(f)
-
-            self.label_list = mapping["label_list"]
-            self.label2id = mapping["label2id"]
-            self.id2label = {int(k): v for k, v in mapping["id2label"].items()}
-        else:
-            raise RuntimeError("label_mapping.json missing")
-
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModelForTokenClassification.from_pretrained(
-            model_path,
-            num_labels=len(self.label_list),
-            id2label=self.id2label,
-            label2id=self.label2id
-        )
+        self.model = T5ForConditionalGeneration.from_pretrained(model_path)
         self.model.to(self.device)
         self.model.eval()
         print("✓ Model ready")
@@ -43,53 +26,24 @@ class TaskPlannerPredictor:
 
     def predict(self, sentence: str) -> Dict:
         original_sentence = self.normalize(sentence)
-        tokens = original_sentence.split()
-        encoding = self.tokenizer(
-            tokens,
-            is_split_into_words=True,
-            truncation=True,
+        input_text = f"extract: {original_sentence}"
+
+        inputs = self.tokenizer(
+            input_text,
             return_tensors="pt",
+            truncation=True,
             padding="max_length",
             max_length=128
-        )
-
-        word_ids = encoding.word_ids()
-        inputs = {k: v.to(self.device) for k, v in encoding.items()}
+        ).to(self.device)
 
         with torch.no_grad():
-            outputs = self.model(**inputs)
+            output_ids = self.model.generate(
+                inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                max_new_tokens=64
+            )
 
-        predictions = torch.argmax(outputs.logits, dim=-1)[0].cpu().numpy()
-        entities = []
-        current_entity = None
-        current_tokens = []
-        seen_words = set()
-
-        for i, word_idx in enumerate(word_ids):
-            if word_idx is None:
-                continue
-            if word_idx in seen_words:
-                continue
-            seen_words.add(word_idx)
-
-            label = self.id2label[predictions[i]]
-            word = tokens[word_idx]
-
-            if label.startswith("B-"):
-                if current_entity:
-                    entities.append((current_entity, " ".join(current_tokens)))
-                current_entity = label[2:]
-                current_tokens = [word]
-            elif label.startswith("I-") and current_entity == label[2:]:
-                current_tokens.append(word)
-            else:
-                if current_entity:
-                    entities.append((current_entity, " ".join(current_tokens)))
-                current_entity = None
-                current_tokens = []
-
-        if current_entity:
-            entities.append((current_entity, " ".join(current_tokens)))
+        output_text = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
 
         raw = {
             "TASK": None,
@@ -103,10 +57,14 @@ class TaskPlannerPredictor:
             "CATEGORY": None,
         }
 
-        for ent_type, text in entities:
-            ent_type = ent_type.upper()
-            if ent_type in raw and raw[ent_type] is None:
-                raw[ent_type] = text
+        for part in output_text.split("|"):
+            part = part.strip()
+            if ":" in part:
+                key, _, value = part.partition(":")
+                key = key.strip().upper()
+                value = value.strip()
+                if key in raw and raw[key] is None:
+                    raw[key] = value
 
         deadline = raw["DEADLINE"]
         if deadline is None and (raw["DATE"] or raw["TIME"]):
@@ -114,10 +72,7 @@ class TaskPlannerPredictor:
 
         fixed_time = None
         if raw["TIME"]:
-            if re.search(r'\bat\s+' + re.escape(raw["TIME"]), original_sentence):
-                fixed_time = True
-            else:
-                fixed_time = False
+            fixed_time = bool(re.search(r'\bat\s+' + re.escape(raw["TIME"]), original_sentence))
 
         return {
             "name":       raw["TASK"],

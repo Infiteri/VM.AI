@@ -28,7 +28,6 @@ class VMAI_YamlTrainingParsedData:
     difficulties: List[str] = field(default_factory=list)
     categories: List[str] = field(default_factory=list)
 
-    # AUTOGEN
     label2id: Dict[str, int] = field(init=False)
     id2label: Dict[int, str] = field(init=False)
 

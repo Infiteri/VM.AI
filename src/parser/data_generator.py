@@ -11,6 +11,8 @@ import random
 import argparse
 from datasets import Dataset
 
+print_sentences = False
+
 class VMAI_DataGenerator:
     def __init__(self, training_data):
         self.training_data = training_data
@@ -19,10 +21,9 @@ class VMAI_DataGenerator:
         templates = self.training_data.templates
         all_placeholders = self.training_data.get_placeholder_map()
 
-        data = {"tokens": [], "labels": []}
-        num_to_gen = max_examples
+        data = {"input_text": [], "target_text": []}
 
-        for _ in range(num_to_gen):
+        for _ in range(max_examples):
             template = random.choice(templates)
             sentence = template
             placeholder_map = {}
@@ -34,38 +35,28 @@ class VMAI_DataGenerator:
                     sentence = sentence.replace(tag, value)
                     placeholder_map[value] = ph
 
-            tokens = sentence.split()
-            labels = ["O"] * len(tokens)
+            input_text = f"extract: {sentence.lower().strip()}"
+            target_parts = [f"{etype}: {val}" for val, etype in placeholder_map.items()]
+            target_text = " | ".join(target_parts)
 
-            for entity_text, entity_type in placeholder_map.items():
-                entity_tokens = entity_text.split()
-                for j in range(len(tokens) - len(entity_tokens) + 1):
-                    if tokens[j:j + len(entity_tokens)] == entity_tokens:
-                        labels[j] = f"B-{entity_type}"
-                        for k in range(1, len(entity_tokens)):
-                            labels[j + k] = f"I-{entity_type}"
-                        break
+            data["input_text"].append(input_text)
+            data["target_text"].append(target_text)
 
-            data["tokens"].append(tokens)
-            data["labels"].append([self.training_data.label2id.get(l, 0) for l in labels])
+            if print_sentences:
+                print("IN: " + input_text)
+                print("TARGET: " + target_text)
 
         return Dataset.from_dict(data)
 
 if __name__ == "__main__":
     from yaml_parser import VMAI_YamlParser
+    print_sentences = True
 
     parser_arg = argparse.ArgumentParser(description="VM.AI Data Generator")
-    
-    parser_arg.add_argument(
-        '--sentences', 
-        type=int, 
-        default=1000, 
-        help='Number of sentences to generate (default: 1000)'
-    )
-    
+    parser_arg.add_argument('--sentences', type=int, default=1000, help='Number of sentences to generate (default: 1000)')
     args = parser_arg.parse_args()
 
-    yaml_parser = VMAI_YamlParser(f'./data/{vars.PARSER_MODEL_NAME}')
+    yaml_parser = VMAI_YamlParser(f'./data/{vars.SYNTHETIC_DATASET_PATH}')
     yaml_parser.load_yaml()
     training_data = yaml_parser.parse()
 
@@ -74,6 +65,6 @@ if __name__ == "__main__":
     print("-" * 30)
 
     dataset = VMAI_DataGenerator(training_data).generate(max_examples=args.sentences)
-    
+
     print("-" * 30)
     print(f"Successfully generated {len(dataset)} examples.")
