@@ -24,7 +24,7 @@ from yaml_parser import VMAI_YamlParser
 import numpy as np
 from data_generator import VMAI_DataGenerator
 
-MAX_LIMIT = 100
+MAX_LIMIT = 100000
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

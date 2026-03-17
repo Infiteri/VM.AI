@@ -21,22 +21,12 @@ class VMAI_YamlTrainingParsedData:
     tasks: List[str]
     durations: List[str]
     deadlines: List[str]
-
-    # Extra fields
-    persons: List[str] = field(default_factory=list)
     locations: List[str] = field(default_factory=list)
     dates: List[str] = field(default_factory=list)
     times: List[str] = field(default_factory=list)
     priorities: List[str] = field(default_factory=list)
-    projects: List[str] = field(default_factory=list)
-    meetings: List[str] = field(default_factory=list)
-    costs: List[str] = field(default_factory=list)
-    quantities: List[str] = field(default_factory=list)
-    contacts: List[str] = field(default_factory=list)
-    emails: List[str] = field(default_factory=list)
-    phones: List[str] = field(default_factory=list)
-    recurrences: List[str] = field(default_factory=list)
-    teams: List[str] = field(default_factory=list)
+    difficulties: List[str] = field(default_factory=list)
+    categories: List[str] = field(default_factory=list)
 
     # AUTOGEN
     label2id: Dict[str, int] = field(init=False)
@@ -47,20 +37,12 @@ class VMAI_YamlTrainingParsedData:
             "TASK": self.tasks,
             "DURATION": self.durations,
             "DEADLINE": self.deadlines,
-            "PERSON": self.persons,
             "LOCATION": self.locations,
             "DATE": self.dates,
             "TIME": self.times,
             "PRIORITY": self.priorities,
-            "PROJECT": self.projects,
-            "MEETING": self.meetings,
-            "COST": self.costs,
-            "QUANTITY": self.quantities,
-            "CONTACT": self.contacts,
-            "EMAIL": self.emails,
-            "PHONE": self.phones,
-            "RECURRENCE": self.recurrences,
-            "TEAM": self.teams
+            "DIFFICULTY": self.difficulties,
+            "CATEGORY": self.categories,
         }
         return {k: v for k, v in mapping.items() if v}
 
@@ -72,12 +54,11 @@ class VMAI_YamlTrainingParsedData:
         print("\n" + "="*60)
         print("VMAI TRAINING CONFIGURATION")
         print("="*60)
-        
+
         fields_to_print = [
-            'templates', 'tasks', 'durations', 'deadlines', 'persons', 
-            'locations', 'dates', 'times', 'priorities', 'projects', 
-            'meetings', 'costs', 'quantities', 'contacts', 'emails', 
-            'phones', 'recurrences', 'teams' 
+            'templates', 'tasks', 'durations', 'deadlines',
+            'locations', 'dates', 'times', 'priorities',
+            'difficulties', 'categories'
         ]
 
         for field_name in fields_to_print:
@@ -109,25 +90,16 @@ class VMAI_YamlParser:
             tasks=self.data.get("tasks", []),
             durations=self.data.get("durations", []),
             deadlines=self.data.get("deadlines", []),
-            persons=self.data.get("persons", []),
             locations=self.data.get("locations", []),
             dates=self.data.get("dates", []),
             times=self.data.get("times", []),
             priorities=self.data.get("priorities", []),
-            projects=self.data.get("projects", []),
-            meetings=self.data.get("meetings", []),
-            costs=self.data.get("costs", []),
-            quantities=self.data.get("quantities", []),
-            contacts=self.data.get("contacts", []),
-            emails=self.data.get("emails", []),
-            phones=self.data.get("phones", []),
-            recurrences=self.data.get("recurrences", []),
-            teams=self.data.get("teams", []) 
+            difficulties=self.data.get("difficulties", []),
+            categories=self.data.get("categories", []),
         )
 
 if __name__ == "__main__":
     parser = VMAI_YamlParser(f'./data/{vars.SYNTHETIC_DATASET_PATH}')
     parser.load_yaml()
     parsed_data = parser.parse()
-
     parsed_data.print_nice()
