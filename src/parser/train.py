@@ -7,6 +7,7 @@
     Written by (1): Vanea @ 07-03-2026
 """
 
+print("preimp")
 import os
 import vars
 import json
@@ -23,8 +24,9 @@ from huggingface_hub import snapshot_download
 from yaml_parser import VMAI_YamlParser
 import numpy as np
 from data_generator import VMAI_DataGenerator
+print("posimp")
 
-MAX_LIMIT = 100000
+MAX_LIMIT = 100
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
