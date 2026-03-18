@@ -60,13 +60,13 @@ def main():
             examples["input_text"],
             truncation=True,
             padding="max_length",
-            max_length=128
+            max_length=256
         )
         targets = tokenizer(
             examples["target_text"],
             truncation=True,
             padding="max_length",
-            max_length=128
+            max_length=256
         )
         labels = targets["input_ids"]
         labels = [
@@ -81,18 +81,21 @@ def main():
     tokenized_train.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
     tokenized_test.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
 
-    if os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir):
+    is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
+    if is_resume:
         print("Resuming training from checkpoint...")
         model = T5ForConditionalGeneration.from_pretrained(cfg.output_dir)
     else:
         model = T5ForConditionalGeneration.from_pretrained(cfg.model_cache)
     model.to(device)
 
+    learning_rate = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
+
     training_args = Seq2SeqTrainingArguments(
         output_dir=                     cfg.output_dir,
         eval_strategy=                  "epoch",
         save_strategy=                  "epoch",
-        learning_rate=                  2e-5,
+        learning_rate=                  learning_rate,
         weight_decay=                   0.01,
         save_total_limit=               2,
         predict_with_generate=          True,

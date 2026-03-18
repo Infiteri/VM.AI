@@ -1,0 +1,80 @@
+examples:
+  # Standard task with deadline
+  - input: "finish chemistry homework before Friday, pretty hard"
+    output:
+      name: "chemistry homework"
+      start: null
+      deadline: "Friday"
+      difficulty: "0.75"
+      duration: null
+      category: null
+      location: null
+      importance: null
+      fixed_time: false
+      fixed_start: null
+      recurrent: false
+      recurrence_days: null
+
+  # Fixed time task
+  - input: "team meeting at 9am Monday, very important"
+    output:
+      name: "team meeting"
+      start: null
+      deadline: null
+      difficulty: null
+      duration: null
+      category: null
+      location: null
+      importance: "0.95"
+      fixed_time: true
+      fixed_start: "Monday 09:00"
+      recurrent: false
+      recurrence_days: null
+
+  # Recurring task with days
+  - input: "gym workout every Monday Thursday and Sunday, heavy session 1.5 hours"
+    output:
+      name: "gym workout"
+      start: null
+      deadline: null
+      difficulty: "0.8"
+      duration: "90"
+      category: null
+      location: null
+      importance: null
+      fixed_time: false
+      fixed_start: null
+      recurrent: true
+      recurrence_days: ["Monday", "Thursday", "Sunday"]
+
+  # Recurring task with time preference
+  - input: "read a book every evening for 30 minutes"
+    output:
+      name: "read a book"
+      start: "evening"
+      deadline: "evening"
+      difficulty: null
+      duration: "30"
+      category: null
+      location: null
+      importance: null
+      fixed_time: false
+      fixed_start: null
+      recurrent: true
+      recurrence_days: null
+
+  # Urgent task
+  - input: "submit math assignment tonight, extremely hard, 2 hours"
+    output:
+      name: "math assignment"
+      start: null
+      deadline: "today 23:59"
+      difficulty: "0.95"
+      duration: "120"
+      category: null
+      location: null
+      importance: "0.98"
+      fixed_time: false
+      fixed_start: null
+      recurrent: false
+      recurrence_days: null
