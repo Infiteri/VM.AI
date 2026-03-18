@@ -116,7 +116,7 @@ class EnvConfig:
         self.learning_rate_fresh         = 2e-5
         self.learning_rate_resume        = 5e-6
 
-        self.base_dir       = "/content/drive/MyDrive"
+        self.base_dir       = "/content/drive/MyDrive/VM.AI"
         self.model_cache    = f"{self.base_dir}/models/google-t5/t5-small"
         self.output_dir     = f"{self.base_dir}/models/{vars.PARSER_MODEL_NAME}"
         self.data_path      = f"{self.base_dir}/data/{vars.SYNTHETIC_DATASET_PATH}"

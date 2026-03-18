@@ -19,7 +19,7 @@ from transformers import (
     DataCollatorForSeq2Seq
 )
 from huggingface_hub import snapshot_download
-from yaml_parser import VMAI_YamlParser
+from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
 from data_generator import VMAI_DataGenerator
 from cfg import EnvConfig
 
@@ -45,7 +45,16 @@ def main():
     parser.load_yaml()
     training_data = parser.parse()
 
-    synthetic_dataset = VMAI_DataGenerator(training_data).generate(cfg.max_limit)
+    real_examples = []
+    if os.path.exists(cfg.real_data_path):
+        real_parser = VMAI_RealDataParser(cfg.real_data_path)
+        real_parser.load_yaml()
+        real_examples = real_parser.parse()
+        print(f"Real examples loaded: {len(real_examples)}")
+    else:
+        print("No real data file found — training on synthetic only")
+
+    synthetic_dataset = VMAI_DataGenerator(training_data, real_examples).generate(cfg.max_limit)
     split_dataset = synthetic_dataset.train_test_split(test_size=0.1, seed=42)
     train_dataset = split_dataset["train"]
     test_dataset = split_dataset["test"]

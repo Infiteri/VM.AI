@@ -5,6 +5,7 @@
     Written for testing purposes but also to be used in the main training code
     Written by: Vanea @ 06-03-2026
     Updated by: Vanea @ 18-03-2026 — add/modify split, JSON schema output
+    Updated by: Vanea @ 18-03-2026 — real examples mixed in from VMAI_REAL_Data.yaml
 """
 
 import vars
@@ -41,8 +42,9 @@ CHANGE_TEMPLATES = [
 
 
 class VMAI_DataGenerator:
-    def __init__(self, training_data):
+    def __init__(self, training_data, real_examples=None):
         self.training_data = training_data
+        self.real_examples = real_examples or []
 
     def generate(self, max_examples=100000):
         half = max_examples // 2
@@ -58,8 +60,18 @@ class VMAI_DataGenerator:
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
+        for example in self.real_examples:
+            inp, tgt = self._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+
         if print_sentences:
-            for i, t in zip(data["input_text"][:4], data["target_text"][:4]):
+            midpoint = len(data["input_text"]) // 2
+            samples = (
+                list(zip(data["input_text"][:2], data["target_text"][:2])) +
+                list(zip(data["input_text"][midpoint:midpoint+2], data["target_text"][midpoint:midpoint+2]))
+            )
+            for i, t in samples:
                 print("IN:     " + i)
                 print("TARGET: " + t)
                 print()
@@ -67,13 +79,12 @@ class VMAI_DataGenerator:
         return Dataset.from_dict(data)
 
     def _fill_template(self):
-        """Pick a random template, fill placeholders, return (sentence, placeholder_map)."""
         templates = self.training_data.templates
         all_placeholders = self.training_data.get_placeholder_map()
 
         template = random.choice(templates)
         sentence = template
-        placeholder_map = {}  # {yaml_key: filled_value}
+        placeholder_map = {}
 
         for ph, options in all_placeholders.items():
             tag = f"[{ph}]"
@@ -85,7 +96,6 @@ class VMAI_DataGenerator:
         return sentence.lower().strip(), placeholder_map
 
     def _build_full_schema(self, placeholder_map):
-        """Build the full output JSON schema from a placeholder_map."""
         schema = {
             "name":            {"value": None,  "predicted": False},
             "start":           {"value": None,  "predicted": True},
@@ -124,6 +134,29 @@ class VMAI_DataGenerator:
 
         return schema
 
+    def _convert_real(self, example: dict):
+        sentence = example["input"]
+        output   = example["output"]
+
+        schema = {
+            "name":            {"value": output.get("name"),                    "predicted": False},
+            "start":           {"value": output.get("start"),                   "predicted": False},
+            "deadline":        {"value": output.get("deadline"),                "predicted": False},
+            "difficulty":      {"value": output.get("difficulty"),              "predicted": True},
+            "duration":        {"value": output.get("duration"),                "predicted": True},
+            "category":        {"value": output.get("category"),                "predicted": True},
+            "location":        {"value": output.get("location"),                "predicted": True},
+            "importance":      {"value": output.get("importance"),              "predicted": True},
+            "fixed_time":      {"value": output.get("fixed_time",   False),     "predicted": False},
+            "fixed_start":     {"value": output.get("fixed_start"),             "predicted": False},
+            "recurrent":       {"value": output.get("recurrent",    False),     "predicted": False},
+            "recurrence_days": {"value": output.get("recurrence_days"),         "predicted": False},
+        }
+
+        input_text  = f"add: {sentence.lower().strip()}"
+        target_text = json.dumps(schema, ensure_ascii=False)
+        return input_text, target_text
+
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
         schema = self._build_full_schema(placeholder_map)
@@ -153,13 +186,14 @@ class VMAI_DataGenerator:
             k: v["value"] for k, v in existing.items() if v["value"] is not None
         }
 
-        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} | {change_prompt}"
+        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} │ {change_prompt}"
         target_text = json.dumps(changed_fields, ensure_ascii=False)
         return input_text, target_text
 
 
 if __name__ == "__main__":
-    from yaml_parser import VMAI_YamlParser
+    from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
+    import os
     print_sentences = True
 
     parser_arg = argparse.ArgumentParser(description="VM.AI Data Generator")
@@ -170,11 +204,21 @@ if __name__ == "__main__":
     yaml_parser.load_yaml()
     training_data = yaml_parser.parse()
 
+    real_examples = []
+    real_path = f"./data/{vars.REAL_DATASET_PATH}"
+    if os.path.exists(real_path):
+        real_parser = VMAI_RealDataParser(real_path)
+        real_parser.load_yaml()
+        real_examples = real_parser.parse()
+        print(f"Real examples loaded: {len(real_examples)}")
+    else:
+        print("No real data file found — using synthetic only")
+
     print("VM.AI Sentence Generation Test:")
     print(f"Generating {args.sentences} sentences...")
     print("-" * 30)
 
-    dataset = VMAI_DataGenerator(training_data).generate(max_examples=args.sentences)
+    dataset = VMAI_DataGenerator(training_data, real_examples).generate(max_examples=args.sentences)
 
     print("-" * 30)
     print(f"Successfully generated {len(dataset)} examples.")

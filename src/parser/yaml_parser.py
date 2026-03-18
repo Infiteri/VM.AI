@@ -7,6 +7,7 @@
     Main dev: Vanea
     Written by: Vanea @ 06-03-2026
     Updated by: Vanea @ 18-03-2026 — added fixed_starts, recurrence_days fields
+    Updated by: Vanea @ 18-03-2026 — added VMAI_RealDataParser for real labeled examples
 """
 
 import yaml
@@ -103,6 +104,21 @@ class VMAI_YamlParser:
             fixed_starts=    self.data.get("fixed_starts", []),
             recurrence_days= self.data.get("recurrence_days", []),
         )
+
+
+class VMAI_RealDataParser:
+    def __init__(self, yaml_file: str):
+        self.yaml_file = yaml_file
+        self.data = None
+
+    def load_yaml(self):
+        with open(self.yaml_file, "r", encoding="utf-8") as file:
+            self.data = yaml.safe_load(file)
+
+    def parse(self) -> list:
+        if not self.data:
+            raise ValueError("YAML data not loaded")
+        return self.data.get("examples", [])
 
 
 if __name__ == "__main__":
