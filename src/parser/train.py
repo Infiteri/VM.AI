@@ -5,12 +5,15 @@
     Module: parser
     Main dev: Vanea
     Written by (1): Vanea @ 07-03-2026
+    Updated by: Vanea @ 19-03-2026 — split into functions, --mode flag, always resume
 """
 
 import os
+import argparse
 import vars
 import torch
 import numpy as np
+from datasets import Dataset
 from transformers import (
     AutoTokenizer,
     T5ForConditionalGeneration,
@@ -25,81 +28,93 @@ from cfg import EnvConfig
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-cfg = EnvConfig("local")
+DEFAULT_MODE = "both"
 
-def main():
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-    print(f"Running in '{cfg.env}' mode")
 
+def download_base_model(cfg):
     os.makedirs(os.path.dirname(cfg.model_cache), exist_ok=True)
-    os.makedirs(cfg.output_dir, exist_ok=True)
-
     if not os.path.exists(cfg.model_cache) or not os.listdir(cfg.model_cache):
         print("Downloading t5-small...")
         snapshot_download(repo_id="google-t5/t5-small", local_dir=cfg.model_cache)
     else:
-        print(f"Model already exists at {cfg.model_cache}")
+        print(f"Model cached at {cfg.model_cache}")
 
+
+def load_model(cfg, device):
+    if os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir):
+        print("Resuming from checkpoint...")
+        return T5ForConditionalGeneration.from_pretrained(cfg.output_dir).to(device)
+    print("No checkpoint found — starting from base model.")
+    return T5ForConditionalGeneration.from_pretrained(cfg.model_cache).to(device)
+
+
+def save_model(model, tokenizer, cfg):
+    model.save_pretrained(cfg.output_dir)
+    tokenizer.save_pretrained(cfg.output_dir)
+    print(f"Model saved to {cfg.output_dir}")
+
+
+def load_synthetic_data(cfg):
     parser = VMAI_YamlParser(cfg.data_path)
     parser.load_yaml()
-    training_data = parser.parse()
+    return parser.parse()
 
-    real_examples = []
-    if os.path.exists(cfg.real_data_path):
-        real_parser = VMAI_RealDataParser(cfg.real_data_path)
-        real_parser.load_yaml()
-        real_examples = real_parser.parse()
-        print(f"Real examples loaded: {len(real_examples)}")
+
+def load_real_examples(cfg):
+    if not os.path.exists(cfg.real_data_path):
+        print("No real data file found — skipping real examples")
+        return []
+    real_parser = VMAI_RealDataParser(cfg.real_data_path)
+    real_parser.load_yaml()
+    examples = real_parser.parse()
+    print(f"Real examples loaded: {len(examples)}")
+    return examples
+
+
+def build_dataset(cfg, mode):
+    training_data = load_synthetic_data(cfg)
+
+    if mode == "synthetic":
+        real_examples = []
     else:
-        print("No real data file found — training on synthetic only")
+        real_examples = load_real_examples(cfg)
 
-    synthetic_dataset = VMAI_DataGenerator(training_data, real_examples).generate(cfg.max_limit)
-    split_dataset = synthetic_dataset.train_test_split(test_size=0.1, seed=42)
-    train_dataset = split_dataset["train"]
-    test_dataset = split_dataset["test"]
+    if mode == "real":
+        gen  = VMAI_DataGenerator(training_data, real_examples)
+        data = {"input_text": [], "target_text": []}
+        for example in real_examples:
+            inp, tgt = gen._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+        dataset = Dataset.from_dict(data)
+    else:
+        dataset = VMAI_DataGenerator(training_data, real_examples).generate(cfg.max_limit)
 
-    print(f"Training examples: {len(train_dataset)}")
-    print(f"Test examples: {len(test_dataset)}")
+    split = dataset.train_test_split(test_size=0.1, seed=42)
+    print(f"Train : {len(split['train'])}  |  Test : {len(split['test'])}")
+    return split["train"], split["test"]
 
-    tokenizer = AutoTokenizer.from_pretrained(cfg.model_cache)
 
+def tokenize_datasets(train_dataset, test_dataset, tokenizer):
     def tokenize_function(examples):
-        inputs = tokenizer(
-            examples["input_text"],
-            truncation=True,
-            padding="max_length",
-            max_length=256
-        )
-        targets = tokenizer(
-            examples["target_text"],
-            truncation=True,
-            padding="max_length",
-            max_length=256
-        )
-        labels = targets["input_ids"]
-        labels = [
-            [(token if token != tokenizer.pad_token_id else -100) for token in label]
-            for label in labels
+        inputs  = tokenizer(examples["input_text"],  truncation=True, padding="max_length", max_length=256)
+        targets = tokenizer(examples["target_text"], truncation=True, padding="max_length", max_length=256)
+        labels  = [
+            [(t if t != tokenizer.pad_token_id else -100) for t in label]
+            for label in targets["input_ids"]
         ]
         inputs["labels"] = np.array(labels, dtype=np.int64)
         return inputs
 
-    tokenized_train = train_dataset.map(tokenize_function, batched=True)
-    tokenized_test = test_dataset.map(tokenize_function, batched=True)
-    tokenized_train.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
-    tokenized_test.set_format(type="torch", columns=["input_ids", "attention_mask", "labels"])
+    cols = ["input_ids", "attention_mask", "labels"]
+    tok_train = train_dataset.map(tokenize_function, batched=True)
+    tok_test  = test_dataset.map(tokenize_function,  batched=True)
+    tok_train.set_format(type="torch", columns=cols)
+    tok_test.set_format( type="torch", columns=cols)
+    return tok_train, tok_test
 
-    is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
-    if is_resume:
-        print("Resuming training from checkpoint...")
-        model = T5ForConditionalGeneration.from_pretrained(cfg.output_dir)
-    else:
-        model = T5ForConditionalGeneration.from_pretrained(cfg.model_cache)
-    model.to(device)
 
-    learning_rate = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
-
+def run_trainer(model, tokenizer, cfg, tok_train, tok_test, learning_rate):
     training_args = Seq2SeqTrainingArguments(
         output_dir=                     cfg.output_dir,
         eval_strategy=                  "epoch",
@@ -120,25 +135,53 @@ def main():
         dataloader_pin_memory=          cfg.dataloader_pin_memory,
         logging_steps=                  cfg.logging_steps,
     )
-
-    data_collator = DataCollatorForSeq2Seq(tokenizer, model=model)
-
     trainer = Seq2SeqTrainer(
-        model=model,
-        args=training_args,
-        train_dataset=tokenized_train,
-        eval_dataset=tokenized_test,
-        data_collator=data_collator
+        model=          model,
+        args=           training_args,
+        train_dataset=  tok_train,
+        eval_dataset=   tok_test,
+        data_collator=  DataCollatorForSeq2Seq(tokenizer, model=model),
     )
-
     print("Starting training...")
     trainer.train()
 
-    model.save_pretrained(cfg.output_dir)
-    tokenizer.save_pretrained(cfg.output_dir)
 
-    print(f"Model saved to {cfg.output_dir}")
-    print("Training completed!")
+def parse_args():
+    parser = argparse.ArgumentParser(description="VM.AI Parser Trainer")
+    parser.add_argument(
+        "--mode",
+        choices=["both", "synthetic", "real"],
+        default=DEFAULT_MODE,
+        help="Data to train on: 'synthetic' | 'real' | 'both' (default)."
+    )
+    return parser.parse_args()
+
+
+def main():
+    args   = parse_args()
+    cfg    = EnvConfig("local")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    print(f"Device     : {device}")
+    print(f"Env        : {cfg.env}")
+    print(f"Train mode : {args.mode}")
+
+    os.makedirs(cfg.output_dir, exist_ok=True)
+    download_base_model(cfg)
+
+    tokenizer = AutoTokenizer.from_pretrained(cfg.model_cache)
+    model     = load_model(cfg, device)
+
+    is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
+    lr        = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
+
+    train_ds, test_ds   = build_dataset(cfg, args.mode)
+    tok_train, tok_test = tokenize_datasets(train_ds, test_ds, tokenizer)
+
+    run_trainer(model, tokenizer, cfg, tok_train, tok_test, lr)
+    save_model(model, tokenizer, cfg)
+
+    print("\nTraining completed!")
 
 
 if __name__ == "__main__":
