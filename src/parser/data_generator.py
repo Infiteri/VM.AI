@@ -6,6 +6,7 @@
     Written by: Vanea @ 06-03-2026
     Updated by: Vanea @ 18-03-2026 — add/modify split, JSON schema output
     Updated by: Vanea @ 18-03-2026 — real examples mixed in from VMAI_REAL_Data.yaml
+    Updated by: Vanea @ 20-03-2026 — fix start.predicted: false when DATE/TIME explicit in template
 """
 
 import vars
@@ -118,6 +119,9 @@ class VMAI_DataGenerator:
             predicted = field in PREDICTED_TRUE_FIELDS
             schema[field]["value"] = value
             schema[field]["predicted"] = predicted
+
+        if "DATE" in placeholder_map or "TIME" in placeholder_map:
+            schema["start"]["predicted"] = False
 
         if random.random() < 0.2:
             days = random.sample(RECURRENCE_DAYS, k=random.randint(1, 3))
