@@ -8,6 +8,9 @@ import torch
 from cfg import Config
 import json
 import re
+import os
+import yaml
+from datetime import datetime
 from transformers import AutoTokenizer, T5ForConditionalGeneration
 from typing import Dict
 
@@ -28,6 +31,26 @@ ALL_FIELDS = {
     "recurrence_days": None,
 }
 
+LOG_FILE = "performance_log.yaml"
+
+
+def log_entry(mode: str, sentence: str, raw_output: str, parsed_result: Dict):
+    """Append one test entry to the performance log."""
+    entry = {
+        "timestamp":  datetime.now().isoformat(),
+        "mode":       mode,
+        "input":      sentence,
+        "raw_output": raw_output,
+        "parsed":     {
+            k: (v["value"] if isinstance(v, dict) else v)
+            for k, v in parsed_result.items()
+        } if "error" not in parsed_result else None,
+        "error":      parsed_result.get("error"),
+    }
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        yaml.dump([entry], f, allow_unicode=True, sort_keys=False)
+        f.write("\n")
+
 
 class TaskPlannerPredictor:
     def __init__(self):
@@ -38,6 +61,7 @@ class TaskPlannerPredictor:
         self.model = T5ForConditionalGeneration.from_pretrained(cfg.output_dir)
         self.model.to(self.device)
         self.model.eval()
+        self._last_raw_output = ""
         print(f"✓ Model ready ({self.device})")
 
     def _normalize(self, text: str) -> str:
@@ -67,10 +91,12 @@ class TaskPlannerPredictor:
                 decoder_input_ids=decoder_input,
                 max_new_tokens=64,
                 no_repeat_ngram_size=4,
+                repetition_penalty=1.5,
             )
 
-        return self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
-
+        raw = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+        self._last_raw_output = raw
+        return raw
 
     def _pipe_to_schema(self, flat: str) -> Dict:
         raw = {}
@@ -85,8 +111,8 @@ class TaskPlannerPredictor:
                 v = False
             elif v.lower().startswith("true"):
                 v = True
-            raw[k] = v
-
+            if k not in raw:
+                raw[k] = v
         schema = {}
         for field, default in ALL_FIELDS.items():
             val = raw.get(field, default)
@@ -104,17 +130,19 @@ class TaskPlannerPredictor:
             if v.lower() == "null":   v = None
             elif v.lower() == "true":  v = True
             elif v.lower() == "false": v = False
-            if k:
+            if k and k not in changed:
                 changed[k] = {"value": v, "predicted": False}
         return changed
 
     def predict_add(self, sentence: str) -> Dict:
         output = self._run_model(f"add: {self._normalize(sentence)}")
         if "=" not in output:
-            return {"error": "parse_failed", "raw": output}
-        result = self._pipe_to_schema(output)
-        if not result.get("name", {}).get("value"):
-            return {"error": "parse_failed", "raw": output}
+            result = {"error": "parse_failed", "raw": output}
+        else:
+            result = self._pipe_to_schema(output)
+            if not result.get("name", {}).get("value"):
+                result = {"error": "parse_failed", "raw": output}
+        log_entry("add", sentence, self._last_raw_output, result)
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:
@@ -127,8 +155,11 @@ class TaskPlannerPredictor:
         output = self._run_model(input_text)
         changed = self._pipe_to_changed(output)
         if not changed:
-            return {"error": "parse_failed", "raw": output}
-        return changed
+            result = {"error": "parse_failed", "raw": output}
+        else:
+            result = changed
+        log_entry("modify", change_prompt, self._last_raw_output, result)
+        return result
 
 
 def format_output(result: Dict) -> str:
@@ -137,15 +168,12 @@ def format_output(result: Dict) -> str:
     if not result:
         return "   ❌ nothing extracted"
 
-    icons = {
-        "name": "📋", "start": "🕐", "deadline": "📅",
-        "difficulty": "💪", "duration": "⏱️", "category": "🏷️",
-        "location": "📍", "importance": "⚡", "fixed_time": "📌",
-        "fixed_start": "🔒", "recurrent": "🔁", "recurrence_days": "📆",
-    }
+    fields = ["name", "start", "deadline", "difficulty", "duration",
+              "category", "location", "importance", "fixed_time",
+              "fixed_start", "recurrent", "recurrence_days"]
 
     rows = []
-    for field, icon in icons.items():
+    for field in fields:
         entry = result.get(field)
         if isinstance(entry, dict):
             value     = entry.get("value")
@@ -155,15 +183,15 @@ def format_output(result: Dict) -> str:
             predicted = False
         value_str     = str(value) if value is not None else "-"
         predicted_str = "predicted" if predicted else "explicit"
-        rows.append((icon, field, value_str, predicted_str))
+        rows.append((field, value_str, predicted_str))
 
-    col_field = max(len(r[1]) for r in rows)
-    col_value = max(len(r[2]) for r in rows)
-    col_pred  = max(len(r[3]) for r in rows)
-    inner = col_field + col_value + col_pred + 9
+    col_field = max(len(r[0]) for r in rows)
+    col_value = max(len(r[1]) for r in rows)
+    col_pred  = max(len(r[2]) for r in rows)
+    inner = col_field + col_value + col_pred + 6
     lines = ["┌" + "─" * inner + "┐"]
-    for icon, field, value_str, predicted_str in rows:
-        lines.append(f"│  {icon}  {field:<{col_field}}  {value_str:<{col_value}}  {predicted_str:<{col_pred}}  │")
+    for field, value_str, predicted_str in rows:
+        lines.append(f"│  {field:<{col_field}}  {value_str:<{col_value}}  {predicted_str:<{col_pred}}  │")
     lines.append("└" + "─" * inner + "┘")
     lines.append("  predicted = inferred by model | explicit = stated by user")
     return "\n" + "\n".join(lines)
@@ -171,12 +199,14 @@ def format_output(result: Dict) -> str:
 
 def main():
     print("\n" + "=" * 60)
-    print("🗓️  VM.AI TASK PLANNER CHAT")
+    print("   VM.AI TASK PLANNER CHAT")
     print("=" * 60)
     print("  add: <prompt>    — extract a new task")
     print("  modify           — modify last add result")
     print("  modify json      — paste your own JSON to modify")
     print("  end              — exit")
+    print("=" * 60)
+    print(f"  Logging to: {os.path.abspath(LOG_FILE)}")
     print("=" * 60)
 
     predictor   = TaskPlannerPredictor()
@@ -189,7 +219,7 @@ def main():
             continue
 
         if user_input.lower() == "end":
-            print(f"\nProcessed {count} inputs")
+            print(f"\nProcessed {count} inputs — log saved to {os.path.abspath(LOG_FILE)}")
             break
 
         try:
@@ -206,7 +236,7 @@ def main():
                 try:
                     pasted = json.loads(raw)
                 except json.JSONDecodeError:
-                    print("   ⚠️  Invalid JSON")
+                    print("   Invalid JSON")
                     continue
                 change  = input("   What to change? > ").strip()
                 if not change:
@@ -222,7 +252,7 @@ def main():
 
             elif user_input.lower() == "modify":
                 if last_result is None or "error" in last_result:
-                    print("   ⚠️  No valid task to modify. Run add: first.")
+                    print("   No valid task to modify. Run add: first.")
                     continue
                 change  = input("   What to change? > ").strip()
                 if not change:
@@ -236,7 +266,7 @@ def main():
                 count += 1
 
             else:
-                print("   ⚠️  Start with 'add:' or type 'modify'. Type 'end' to exit.")
+                print("   Start with 'add:' or type 'modify'. Type 'end' to exit.")
 
         except Exception as e:
             print(f"   Error: {e}")

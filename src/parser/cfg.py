@@ -16,7 +16,7 @@ class Config:
         self.real_data_path = os.path.join(root, "data", vars.REAL_DATASET)
 
         # Training
-        self.max_limit                   = 25000
+        self.max_limit                   = 10000
         self.num_train_epochs            = 5
         self.per_device_train_batch_size = 16
         self.per_device_eval_batch_size  = 16

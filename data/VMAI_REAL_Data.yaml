@@ -24643,4 +24643,1485 @@ examples:
     "0.3", "location": "coffee shop", "importance": "0.4"} │ low priority'
   output:
     importance: '0.99'
-  
+
+# FIXING ISSUES  
+# ─── GROUP 1: "today / this day" one-off deadline — NOT recurrent ───────────
+- input: send homework by 5 pm today
+  output:
+    name: send homework
+    start: null
+    deadline: today 17:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: send homework by 5 pm this day
+  output:
+    name: send homework
+    start: null
+    deadline: today 17:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: take brother home today by 6 pm
+  output:
+    name: take brother home
+    start: null
+    deadline: today 18:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: finish report by 3 pm today
+  output:
+    name: finish report
+    start: null
+    deadline: today 15:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: call client by noon today
+  output:
+    name: call client
+    start: null
+    deadline: today 12:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: submit assignment by 11 pm today
+  output:
+    name: submit assignment
+    start: null
+    deadline: today 23:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: pay the bill by end of today
+  output:
+    name: pay the bill
+    start: null
+    deadline: today
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: reply to emails by 4 pm this day
+  output:
+    name: reply to emails
+    start: null
+    deadline: today 16:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: send invoice by 6 pm today
+  output:
+    name: send invoice
+    start: null
+    deadline: today 18:00
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: clean the kitchen by tonight
+  output:
+    name: clean the kitchen
+    start: null
+    deadline: today evening
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 2: "at X pm today" → fixed_start today, NOT just start ───────────
+- input: take brother home today at 6 pm
+  output:
+    name: take brother home
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: today 18:00
+    recurrent: false
+    recurrence_days: null
+- input: pick up sister at 4 pm today
+  output:
+    name: pick up sister
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: today 16:00
+    recurrent: false
+    recurrence_days: null
+- input: dentist today at 10 am
+  output:
+    name: dentist
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: today 10:00
+    recurrent: false
+    recurrence_days: null
+- input: call mom today at 8 pm
+  output:
+    name: call mom
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.7'
+    fixed_time: true
+    fixed_start: today 20:00
+    recurrent: false
+    recurrence_days: null
+- input: team standup today at 9 am
+  output:
+    name: team standup
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: true
+    fixed_start: today 09:00
+    recurrent: false
+    recurrence_days: null
+- input: lunch with client today at 1 pm
+  output:
+    name: lunch with client
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: today 13:00
+    recurrent: false
+    recurrence_days: null
+- input: job interview today at 2 pm
+  output:
+    name: job interview
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.99'
+    fixed_time: true
+    fixed_start: today 14:00
+    recurrent: false
+    recurrence_days: null
+- input: meeting with boss at 11 am today
+  output:
+    name: meeting with boss
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: true
+    fixed_start: today 11:00
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 3: easy/trivial difficulty words → low score ─────────────────────
+- input: send homework today, really easy
+  output:
+    name: send homework
+    start: null
+    deadline: today
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: water plants, really easy task
+  output:
+    name: water plants
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '10'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: reply to email, really easy
+  output:
+    name: reply to email
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: pack lunch, super easy
+  output:
+    name: pack lunch
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '10'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: take out trash, super easy task
+  output:
+    name: take out trash
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '5'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: send the file, very easy
+  output:
+    name: send the file
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: print document, trivial task
+  output:
+    name: print document
+    start: null
+    deadline: null
+    difficulty: '0.05'
+    duration: '5'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: check notifications, really easy
+  output:
+    name: check notifications
+    start: null
+    deadline: null
+    difficulty: '0.05'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: refill water bottle, super easy
+  output:
+    name: refill water bottle
+    start: null
+    deadline: null
+    difficulty: '0.05'
+    duration: '2'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: forward the email, easy task
+  output:
+    name: forward the email
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 4: location extraction — "go to X" → location=X ─────────────────
+- input: go to school
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the school
+  output:
+    name: go to the school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the library
+  output:
+    name: go to the library
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: library
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the office
+  output:
+    name: go to the office
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: office
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the hospital
+  output:
+    name: go to the hospital
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: hospital
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the supermarket
+  output:
+    name: go to the supermarket
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: supermarket
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the park
+  output:
+    name: go to the park
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: park
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the dentist
+  output:
+    name: go to the dentist
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: dentist
+    importance: '0.85'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go to the bank
+  output:
+    name: go to the bank
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: bank
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: go home
+  output:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: home
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 5: "go to X at Y pm" → location + fixed_start ───────────────────
+- input: go to school at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: 08:00
+    recurrent: false
+    recurrence_days: null
+- input: go to the gym at 7 am
+  output:
+    name: go to the gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: 07:00
+    recurrent: false
+    recurrence_days: null
+- input: go to the office at 9 am Monday
+  output:
+    name: go to the office
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: office
+    importance: null
+    fixed_time: true
+    fixed_start: Monday 09:00
+    recurrent: false
+    recurrence_days: null
+- input: go to the library at 3 pm today
+  output:
+    name: go to the library
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: library
+    importance: null
+    fixed_time: true
+    fixed_start: today 15:00
+    recurrent: false
+    recurrence_days: null
+- input: go to the supermarket today at 5 pm
+  output:
+    name: go to the supermarket
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: supermarket
+    importance: null
+    fixed_time: true
+    fixed_start: today 17:00
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 6: "go to X" recurring ──────────────────────────────────────────
+- input: go to the gym every Monday and Wednesday
+  output:
+    name: go to the gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: gym
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+- input: go to school every weekday
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: go to the library every Saturday
+  output:
+    name: go to the library
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: library
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Saturday
+
+# ─── GROUP 7: ambiguous difficulty words ────────────────────────────────────
+- input: finish report, not too hard
+  output:
+    name: finish report
+    start: null
+    deadline: null
+    difficulty: '0.4'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: clean the house, kind of hard
+  output:
+    name: clean the house
+    start: null
+    deadline: null
+    difficulty: '0.6'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: write essay, moderately difficult
+  output:
+    name: write essay
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: debug the app, insanely hard
+  output:
+    name: debug the app
+    start: null
+    deadline: null
+    difficulty: '0.95'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: fill out form, not hard at all
+  output:
+    name: fill out form
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: learn kubernetes, very challenging
+  output:
+    name: learn kubernetes
+    start: null
+    deadline: null
+    difficulty: '0.9'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: buy groceries, nothing special
+  output:
+    name: buy groceries
+    start: null
+    deadline: null
+    difficulty: '0.2'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 8: importance words ───────────────────────────────────────────────
+- input: call the lawyer, not that important
+  output:
+    name: call the lawyer
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.4'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: tidy desk, low priority
+  output:
+    name: tidy desk
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.3'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: submit tax return, absolutely critical
+  output:
+    name: submit tax return
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.99'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: review pull request, medium priority
+  output:
+    name: review pull request
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: deploy hotfix, urgent
+  output:
+    name: deploy hotfix
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: update readme, can wait
+  output:
+    name: update readme
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.2'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 9: combined today + easy/hard + importance ───────────────────────
+- input: fix critical bug today, extremely hard and urgent
+  output:
+    name: fix critical bug
+    start: null
+    deadline: today
+    difficulty: '0.95'
+    duration: null
+    category: null
+    location: null
+    importance: '0.99'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: send quick email today, really easy, low priority
+  output:
+    name: send quick email
+    start: null
+    deadline: today
+    difficulty: '0.1'
+    duration: null
+    category: null
+    location: null
+    importance: '0.3'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: write documentation today, moderately hard, important
+  output:
+    name: write documentation
+    start: null
+    deadline: today
+    difficulty: '0.6'
+    duration: null
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: do laundry today, easy, not urgent
+  output:
+    name: do laundry
+    start: null
+    deadline: today
+    difficulty: '0.15'
+    duration: '30'
+    category: null
+    location: null
+    importance: '0.3'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+
+# ─── GROUP 10: simple one-word / short tasks with no extra info ──────────────
+- input: shower
+  output:
+    name: shower
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: breakfast
+  output:
+    name: breakfast
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: nap
+  output:
+    name: nap
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: study
+  output:
+    name: study
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: cook dinner
+  output:
+    name: cook dinner
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+# ─── "go to X at Y pm for Z hours" → fixed_time + location + duration ───────
+- input: go to gym at 3 pm for 3 hours
+  output:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '180'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to gym at 7 am for 1 hour
+  output:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '07:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to gym at 6 pm for 90 minutes
+  output:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '90'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to the library at 2 pm for 2 hours
+  output:
+    name: go to the library
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: null
+    location: library
+    importance: null
+    fixed_time: true
+    fixed_start: '14:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to the office at 9 am for 4 hours
+  output:
+    name: go to the office
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '240'
+    category: null
+    location: office
+    importance: null
+    fixed_time: true
+    fixed_start: '09:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 8 am for 6 hours
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '360'
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to the pool at 10 am for 45 minutes
+  output:
+    name: go to the pool
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '45'
+    category: null
+    location: pool
+    importance: null
+    fixed_time: true
+    fixed_start: '10:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to the dentist at 11 am for 30 minutes
+  output:
+    name: go to the dentist
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: dentist
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: '11:00'
+    recurrent: false
+    recurrence_days: null
+- input: work from coffee shop at 1 pm for 3 hours
+  output:
+    name: work from coffee shop
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '180'
+    category: null
+    location: coffee shop
+    importance: null
+    fixed_time: true
+    fixed_start: '13:00'
+    recurrent: false
+    recurrence_days: null
+- input: study at the library at 4 pm for 2 hours
+  output:
+    name: study at the library
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: null
+    location: library
+    importance: null
+    fixed_time: true
+    fixed_start: '16:00'
+    recurrent: false
+    recurrence_days: null
+
+# ─── "go to X at Y pm for Z hours" recurring ────────────────────────────────
+- input: go to gym at 7 am for 1 hour every Monday and Wednesday
+  output:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '07:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+- input: go to gym at 6 pm for 90 minutes every Tuesday and Thursday
+  output:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '90'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Thursday
+- input: go to school at 8 am for 5 hours every weekday
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '300'
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: go to the pool at 6 am for 1 hour every Saturday and Sunday
+  output:
+    name: go to the pool
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: pool
+    importance: null
+    fixed_time: true
+    fixed_start: '06:00'
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Sunday
+
+# ─── task at Y pm for Z hours (no "go to") ──────────────────────────────────
+- input: gym session at 3 pm for 3 hours
+  output:
+    name: gym session
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '180'
+    category: null
+    location: gym
+    importance: null
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+- input: team meeting at 10 am for 1 hour
+  output:
+    name: team meeting
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: '10:00'
+    recurrent: false
+    recurrence_days: null
+- input: yoga class at 8 am for 45 minutes
+  output:
+    name: yoga class
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '45'
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: false
+    recurrence_days: null
+- input: lunch with client at 12 pm for 1 hour
+  output:
+    name: lunch with client
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: true
+    fixed_start: '12:00'
+    recurrent: false
+    recurrence_days: null
+- input: piano practice at 5 pm for 30 minutes
+  output:
+    name: piano practice
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '17:00'
+    recurrent: false
+    recurrence_days: null
+- input: coding session at 9 pm for 2 hours
+  output:
+    name: coding session
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '21:00'
+    recurrent: false
+    recurrence_days: null
+
+# ─── MODIFY: add duration to fixed task ─────────────────────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "15:00",
+    "recurrent": false} │ make it 3 hours'
+  output:
+    duration: '180'
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "07:00",
+    "recurrent": false} │ 90 minutes'
+  output:
+    duration: '90'
+- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "10:00",
+    "recurrent": false} │ make it 2 hours'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "yoga class", "fixed_time": true, "fixed_start": "08:00",
+    "recurrent": false} │ change to 1 hour'
+  output:
+    duration: '60'
+
+# ─── MODIFY: change fixed_start time ────────────────────────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "15:00",
+    "duration": "180", "location": "gym"} │ change to 5 pm'
+  output:
+    fixed_start: '17:00'
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "07:00",
+    "duration": "60", "location": "gym"} │ move to 8 am'
+  output:
+    fixed_start: '08:00'
+- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "10:00",
+    "duration": "60"} │ move to 2 pm'
+  output:
+    fixed_start: '14:00'
+- input: 'modify: {"name": "piano practice", "fixed_time": true, "fixed_start": "17:00",
+    "duration": "30"} │ push to 7 pm'
+  output:
+    fixed_start: '19:00'
+
+# ─── MODIFY: add location to fixed task ─────────────────────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "15:00",
+    "recurrent": false} │ do it at the gym downtown'
+  output:
+    location: gym downtown
+- input: 'modify: {"name": "study session", "fixed_time": true, "fixed_start": "14:00",
+    "duration": "120"} │ do it at the library'
+  output:
+    location: library
+- input: 'modify: {"name": "coding session", "fixed_time": true, "fixed_start": "21:00",
+    "duration": "120"} │ do it at home'
+  output:
+    location: home
+
+# ─── MODIFY: make fixed task recurrent ──────────────────────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "15:00",
+    "duration": "180", "location": "gym", "recurrent": false} │ make it every Monday
+    and Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "07:00",
+    "duration": "60", "location": "gym", "recurrent": false} │ every Tuesday Thursday
+    Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Thursday
+    - Saturday
+- input: 'modify: {"name": "yoga class", "fixed_time": true, "fixed_start": "08:00",
+    "duration": "45", "recurrent": false} │ make it recurring every Monday Wednesday
+    Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+    - Friday
+# ─── MODIFY: short time prompts "at X am/pm" ────────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": false,
+    "recurrent": false} │ at 6 am'
+  output:
+    fixed_time: true
+    fixed_start: '06:00'
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": false,
+    "recurrent": false} │ at 8 am'
+  output:
+    fixed_time: true
+    fixed_start: '08:00'
+- input: 'modify: {"name": "go to gym", "location": "gym", "fixed_time": false,
+    "recurrent": false} │ at 7 am'
+  output:
+    fixed_time: true
+    fixed_start: '07:00'
+- input: 'modify: {"name": "go to gym", "location": "gym", "fixed_time": false,
+    "recurrent": false} │ at 5 pm'
+  output:
+    fixed_time: true
+    fixed_start: '17:00'
+- input: 'modify: {"name": "team meeting", "fixed_time": false, "recurrent": false} │
+    at 10 am'
+  output:
+    fixed_time: true
+    fixed_start: '10:00'
+- input: 'modify: {"name": "team meeting", "fixed_time": false, "recurrent": false} │
+    at 3 pm'
+  output:
+    fixed_time: true
+    fixed_start: '15:00'
+- input: 'modify: {"name": "dentist appointment", "fixed_time": false, "recurrent":
+    false} │ at 2 pm'
+  output:
+    fixed_time: true
+    fixed_start: '14:00'
+- input: 'modify: {"name": "dentist appointment", "fixed_time": false, "recurrent":
+    false} │ at 11 am'
+  output:
+    fixed_time: true
+    fixed_start: '11:00'
+- input: 'modify: {"name": "yoga class", "fixed_time": false, "recurrent": false} │
+    at 9 am'
+  output:
+    fixed_time: true
+    fixed_start: '09:00'
+- input: 'modify: {"name": "lunch with client", "fixed_time": false, "recurrent":
+    false} │ at 1 pm'
+  output:
+    fixed_time: true
+    fixed_start: '13:00'
+- input: 'modify: {"name": "call mom", "fixed_time": false, "recurrent": false} │
+    at 8 pm'
+  output:
+    fixed_time: true
+    fixed_start: '20:00'
+- input: 'modify: {"name": "study session", "fixed_time": false, "recurrent": false} │
+    at 4 pm'
+  output:
+    fixed_time: true
+    fixed_start: '16:00'
+
+# ─── MODIFY: "change to X am/pm" / "move to X am/pm" ───────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "07:00",
+    "location": "gym"} │ change to 6 am'
+  output:
+    fixed_start: '06:00'
+- input: 'modify: {"name": "go to gym", "fixed_time": true, "fixed_start": "15:00",
+    "location": "gym"} │ change to 5 pm'
+  output:
+    fixed_start: '17:00'
+- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "10:00"} │
+    move to 2 pm'
+  output:
+    fixed_start: '14:00'
+- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "14:00"} │
+    move to 9 am'
+  output:
+    fixed_start: '09:00'
+- input: 'modify: {"name": "dentist appointment", "fixed_time": true, "fixed_start":
+    "14:00"} │ change to 10 am'
+  output:
+    fixed_start: '10:00'
+- input: 'modify: {"name": "go to school", "fixed_time": true, "fixed_start": "08:00",
+    "location": "school"} │ move to 7 am'
+  output:
+    fixed_start: '07:00'
+- input: 'modify: {"name": "yoga class", "fixed_time": true, "fixed_start": "09:00"} │
+    move to 7 am'
+  output:
+    fixed_start: '07:00'
+- input: 'modify: {"name": "piano practice", "fixed_time": true, "fixed_start": "17:00"} │
+    change to 6 pm'
+  output:
+    fixed_start: '18:00'
+
+# ─── MODIFY: "at X for Y" — time + duration together ───────────────────────
+- input: 'modify: {"name": "go to gym", "fixed_time": false, "recurrent": false} │
+    at 7 am for 2 hours'
+  output:
+    fixed_time: true
+    fixed_start: '07:00'
+    duration: '120'
+- input: 'modify: {"name": "go to gym", "fixed_time": false, "recurrent": false} │
+    at 5 pm for 90 minutes'
+  output:
+    fixed_time: true
+    fixed_start: '17:00'
+    duration: '90'
+- input: 'modify: {"name": "study session", "fixed_time": false, "recurrent": false} │
+    at 3 pm for 2 hours'
+  output:
+    fixed_time: true
+    fixed_start: '15:00'
+    duration: '120'
+- input: 'modify: {"name": "team meeting", "fixed_time": false, "recurrent": false} │
+    at 9 am for 30 minutes'
+  output:
+    fixed_time: true
+    fixed_start: '09:00'
+    duration: '30'
+- input: 'modify: {"name": "yoga class", "fixed_time": false, "recurrent": false} │
+    at 8 am for 1 hour'
+  output:
+    fixed_time: true
+    fixed_start: '08:00'
+    duration: '60'
