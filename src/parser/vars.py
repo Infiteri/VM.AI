@@ -1,3 +1,3 @@
-PARSER_MODEL_NAME="finetuned_parser"
-SYNTHETIC_DATASET_PATH="VMAI_SYNTHETIC_Data.yaml"
-REAL_DATASET_PATH="VMAI_REAL_Data.yaml"
+PARSER_MODEL_NAME    = "finetuned_parser"
+SYNTHETIC_DATASET    = "VMAI_SYNTHETIC_Data.yaml"
+REAL_DATASET         = "VMAI_REAL_Data.yaml"
