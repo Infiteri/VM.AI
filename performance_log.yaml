@@ -984,3 +984,22 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-03-21T17:56:17.303378'
+  mode: add
+  input: fix the bug by tomorrow
+  raw_output: name=fix the bug | deadline=by tomorrow | fixed_time=false | recurrent=falsels
+  parsed:
+    name: fix the bug
+    start: null
+    deadline: by tomorrow
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+

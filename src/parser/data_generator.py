@@ -4,6 +4,7 @@
 
     Written by: Vanea @ 06-03-2026
     Updated by: Vanea @ 21-03-2026 — full rewrite, pipe format output
+    Updated by: Vanea @ 21-03-2026 — keyword-driven recurrent/fixed_time, no random guessing
 """
 
 import vars
@@ -13,7 +14,6 @@ import argparse
 from datasets import Dataset
 
 PREDICTED_FIELDS = {"difficulty", "duration", "category", "location", "importance", "start"}
-
 FIELD_MAP = {
     "TASK":       "name",
     "DEADLINE":   "deadline",
@@ -27,12 +27,15 @@ FIELD_MAP = {
 }
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+DAYS_LOWER = {d.lower(): d for d in DAYS}
+
+RECURRENT_KEYWORDS = ["every", "daily", "each", "weekday", "weekly"]
 
 CHANGE_TEMPLATES = [
-    ("duration",   lambda v: f"make it {v} minutes",                                      lambda: str(random.randint(15, 180))),
-    ("deadline",   lambda v: f"push deadline to {v}",                                     lambda: random.choice(["Sunday", "next Monday", "Friday", "tomorrow"])),
-    ("location",   lambda v: f"do it at {v}",                                             lambda: random.choice(["home", "office", "gym", "library", "online"])),
-    ("difficulty", lambda v: f"it's a {'hard' if float(v) > 0.5 else 'light'} session",  lambda: str(round(random.uniform(0.1, 0.95), 2))),
+    ("duration",   lambda v: f"make it {v} minutes",                                         lambda: str(random.randint(15, 180))),
+    ("deadline",   lambda v: f"push deadline to {v}",                                        lambda: random.choice(["Sunday", "next Monday", "Friday", "tomorrow"])),
+    ("location",   lambda v: f"do it at {v}",                                                lambda: random.choice(["home", "office", "gym", "library", "online"])),
+    ("difficulty", lambda v: f"it's a {'hard' if float(v) > 0.5 else 'light'} session",     lambda: str(round(random.uniform(0.1, 0.95), 2))),
     ("importance", lambda v: f"it's {'very important' if float(v) > 0.5 else 'not urgent'}", lambda: str(round(random.uniform(0.1, 0.99), 2))),
 ]
 
@@ -61,8 +64,8 @@ def changed_to_pipe(changed: dict) -> str:
 
 class DataGenerator:
     def __init__(self, training_data, real_examples=None, specific_examples=None):
-        self.training_data = training_data
-        self.real_examples = real_examples or []
+        self.training_data     = training_data
+        self.real_examples     = real_examples or []
         self.specific_examples = specific_examples or []
 
     def generate(self, max_examples=10000):
@@ -79,6 +82,7 @@ class DataGenerator:
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
+        # real examples included twice for extra weight
         for example in self.real_examples:
             inp, tgt = self._convert_real(example)
             data["input_text"].append(inp)
@@ -89,7 +93,7 @@ class DataGenerator:
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
-        for example in self.specific_examples:        
+        for example in self.specific_examples:
             inp, tgt = self._convert_real(example)
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
@@ -97,20 +101,20 @@ class DataGenerator:
         return Dataset.from_dict(data)
 
     def _fill_template(self):
-        templates = self.training_data.templates
+        templates        = self.training_data.templates
         all_placeholders = self.training_data.get_placeholder_map()
-        template = random.choice(templates)
-        sentence = template
-        placeholder_map = {}
+        template         = random.choice(templates)
+        sentence         = template
+        placeholder_map  = {}
         for ph, options in all_placeholders.items():
             tag = f"[{ph}]"
-            if tag in sentence:
+            while tag in sentence:
                 value = str(random.choice(options))
                 sentence = sentence.replace(tag, value)
                 placeholder_map[ph] = value
         return sentence.lower().strip(), placeholder_map
 
-    def _build_schema(self, placeholder_map):
+    def _build_schema(self, placeholder_map, sentence=""):
         schema = {
             "name":            {"value": None,  "predicted": False},
             "start":           {"value": None,  "predicted": True},
@@ -130,22 +134,38 @@ class DataGenerator:
             field = FIELD_MAP.get(yaml_key)
             if not field:
                 continue
-            schema[field]["value"] = value
+            schema[field]["value"]     = value
             schema[field]["predicted"] = field in PREDICTED_FIELDS
 
         if "DATE" in placeholder_map or "TIME" in placeholder_map:
             schema["start"]["predicted"] = False
 
-        if random.random() < 0.2:
+        s = sentence.lower()
+        has_recurrent  = any(kw in s for kw in RECURRENT_KEYWORDS)
+        has_fixed_time = (
+            "at" in s
+            and ("am" in s or "pm" in s)
+            and schema["start"]["value"] is not None
+        )
+
+        if has_recurrent:
             schema["recurrent"]["value"] = True
-            schema["recurrence_days"]["value"] = random.sample(DAYS, k=random.randint(1, 3))
-            schema["start"]["value"] = None
-            schema["deadline"]["value"] = None
-        elif random.random() < 0.2 and schema["start"]["value"]:
-            schema["fixed_time"]["value"] = True
+            schema["start"]["value"]     = None
+            schema["deadline"]["value"]  = None
+
+            if "every day" in s or "daily" in s:
+                schema["recurrence_days"]["value"] = DAYS.copy()
+            elif "weekday" in s:
+                schema["recurrence_days"]["value"] = ["Monday","Tuesday","Wednesday","Thursday","Friday"]
+            else:
+                mentioned = [DAYS_LOWER[d] for d in DAYS_LOWER if d in s]
+                schema["recurrence_days"]["value"] = mentioned if mentioned else random.sample(DAYS, k=random.randint(1, 3))
+
+        elif has_fixed_time:
+            schema["fixed_time"]["value"]  = True
             schema["fixed_start"]["value"] = schema["start"]["value"]
-            schema["start"]["value"] = None
-            schema["deadline"]["value"] = None
+            schema["start"]["value"]       = None
+            schema["deadline"]["value"]    = None
 
         return schema
 
@@ -161,32 +181,32 @@ class DataGenerator:
             return sentence, " | ".join(parts)
 
         schema = {
-            "name":            {"value": output.get("name"),                "predicted": False},
-            "start":           {"value": output.get("start"),               "predicted": False},
-            "deadline":        {"value": output.get("deadline"),            "predicted": False},
-            "difficulty":      {"value": output.get("difficulty"),          "predicted": True},
-            "duration":        {"value": output.get("duration"),            "predicted": True},
-            "category":        {"value": output.get("category"),            "predicted": True},
-            "location":        {"value": output.get("location"),            "predicted": True},
-            "importance":      {"value": output.get("importance"),          "predicted": True},
-            "fixed_time":      {"value": output.get("fixed_time",  False),  "predicted": False},
-            "fixed_start":     {"value": output.get("fixed_start"),         "predicted": False},
-            "recurrent":       {"value": output.get("recurrent",   False),  "predicted": False},
-            "recurrence_days": {"value": output.get("recurrence_days"),     "predicted": False},
+            "name":            {"value": output.get("name"),               "predicted": False},
+            "start":           {"value": output.get("start"),              "predicted": False},
+            "deadline":        {"value": output.get("deadline"),           "predicted": False},
+            "difficulty":      {"value": output.get("difficulty"),         "predicted": True},
+            "duration":        {"value": output.get("duration"),           "predicted": True},
+            "category":        {"value": output.get("category"),           "predicted": True},
+            "location":        {"value": output.get("location"),           "predicted": True},
+            "importance":      {"value": output.get("importance"),         "predicted": True},
+            "fixed_time":      {"value": output.get("fixed_time",  False), "predicted": False},
+            "fixed_start":     {"value": output.get("fixed_start"),        "predicted": False},
+            "recurrent":       {"value": output.get("recurrent",   False), "predicted": False},
+            "recurrence_days": {"value": output.get("recurrence_days"),    "predicted": False},
         }
 
         return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
 
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
-        schema = self._build_schema(placeholder_map)
+        schema = self._build_schema(placeholder_map, sentence)
         return f"add: {sentence}", schema_to_pipe(schema)
 
     def _generate_modify(self):
-        _, placeholder_map = self._fill_template()
-        existing = self._build_schema(placeholder_map)
+        sentence, placeholder_map = self._fill_template()
+        existing = self._build_schema(placeholder_map, sentence)
 
-        changes = random.sample(CHANGE_TEMPLATES, k=random.randint(1, 2))
+        changes        = random.sample(CHANGE_TEMPLATES, k=random.randint(1, 2))
         changed_fields = {}
         change_phrases = []
 
@@ -223,7 +243,7 @@ if __name__ == "__main__":
     re = rp.parse()
 
     ds = DataGenerator(td, re).generate(args.sentences)
-    for i in range(min(5, len(ds))):
+    for i in range(min(100, len(ds))):
         print("IN: ", ds["input_text"][i])
         print("OUT:", ds["target_text"][i])
         print()

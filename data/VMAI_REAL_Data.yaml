@@ -3846,7 +3846,7 @@ examples:
     fixed_time: true
     fixed_start: Monday 06:00
     recurrent: true
-    recurrence_calls:
+    recurrence_days:
     - Monday
     - Tuesday
     - Wednesday
