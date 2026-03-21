@@ -146,11 +146,11 @@ class TaskPlannerPredictor:
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:
-        summary = {
-            k: v["value"] if isinstance(v, dict) else v
-            for k, v in existing_task.items()
-            if (v["value"] if isinstance(v, dict) else v) is not None
-        }
+        summary = {}
+        for k, v in existing_task.items():
+            val = v["value"] if isinstance(v, dict) else v
+            if val is not None:
+                summary[k] = val
         input_text = f"modify: {json.dumps(summary, ensure_ascii=False)} \u2502 {self._normalize(change_prompt)}"
         output = self._run_model(input_text)
         changed = self._pipe_to_changed(output)
@@ -164,9 +164,9 @@ class TaskPlannerPredictor:
 
 def format_output(result: Dict) -> str:
     if "error" in result:
-        return f"   ❌ parse failed\n   raw: {result['raw']}"
+        return f"   parse failed\n   raw: {result['raw']}"
     if not result:
-        return "   ❌ nothing extracted"
+        return "   nothing extracted"
 
     fields = ["name", "start", "deadline", "difficulty", "duration",
               "category", "location", "importance", "fixed_time",
@@ -181,7 +181,7 @@ def format_output(result: Dict) -> str:
         else:
             value     = entry
             predicted = False
-        value_str     = str(value) if value is not None else "-"
+        value_str     = str(value).lower() if isinstance(value, bool) else (str(value) if value is not None else "-")
         predicted_str = "predicted" if predicted else "explicit"
         rows.append((field, value_str, predicted_str))
 
@@ -201,10 +201,11 @@ def main():
     print("\n" + "=" * 60)
     print("   VM.AI TASK PLANNER CHAT")
     print("=" * 60)
-    print("  add: <prompt>    — extract a new task")
-    print("  modify           — modify last add result")
-    print("  modify json      — paste your own JSON to modify")
-    print("  end              — exit")
+    print("  add: <prompt>          — extract a new task")
+    print("  modify                 — modify last add result")
+    print("  modify json            — paste JSON then type change")
+    print("  modify: {..} │ <change> — paste full modify string")
+    print("  end                    — exit")
     print("=" * 60)
     print(f"  Logging to: {os.path.abspath(LOG_FILE)}")
     print("=" * 60)
@@ -238,8 +239,33 @@ def main():
                 except json.JSONDecodeError:
                     print("   Invalid JSON")
                     continue
-                change  = input("   What to change? > ").strip()
+                change = input("   What to change? > ").strip()
                 if not change:
+                    continue
+                changes = predictor.predict_modify(pasted, change)
+                print("\n   Changed fields:")
+                print(format_output(changes))
+                last_result = pasted
+                for field, entry in changes.items():
+                    if isinstance(entry, dict):
+                        last_result[field] = entry
+                count += 1
+
+            elif user_input.lower().startswith("modify:"):
+                # inline: modify: {...} │ change prompt
+                rest = user_input[7:].strip()
+                if "│" not in rest:
+                    print("   Missing │ separator.")
+                    continue
+                json_part, _, change_part = rest.partition("│")
+                try:
+                    pasted = json.loads(json_part.strip())
+                except json.JSONDecodeError:
+                    print("   Invalid JSON in modify string.")
+                    continue
+                change = change_part.strip()
+                if not change:
+                    print("   Missing change prompt after │.")
                     continue
                 changes = predictor.predict_modify(pasted, change)
                 print("\n   Changed fields:")
@@ -254,7 +280,7 @@ def main():
                 if last_result is None or "error" in last_result:
                     print("   No valid task to modify. Run add: first.")
                     continue
-                change  = input("   What to change? > ").strip()
+                change = input("   What to change? > ").strip()
                 if not change:
                     continue
                 changes = predictor.predict_modify(last_result, change)
@@ -266,7 +292,7 @@ def main():
                 count += 1
 
             else:
-                print("   Start with 'add:' or type 'modify'. Type 'end' to exit.")
+                print("   Start with 'add:' or 'modify:'. Type 'end' to exit.")
 
         except Exception as e:
             print(f"   Error: {e}")

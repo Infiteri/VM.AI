@@ -766,3 +766,221 @@
     difficulty: '0.66'
   error: null
 
+- timestamp: '2026-03-21T17:12:36.822676'
+  mode: add
+  input: go o gym
+  raw_output: name=go o gym | difficulty=0.2 | importance=0.85 | fixed_time=false
+    | recurrent=falsels
+  parsed:
+    name: go o gym
+    start: null
+    deadline: null
+    difficulty: '0.2'
+    duration: null
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T17:12:39.071270'
+  mode: add
+  input: go to gym
+  raw_output: name=go to gym | difficulty=0.8 | importance=0.75 | fixed_time=false
+    | recurrent=falsels
+  parsed:
+    name: go to gym
+    start: null
+    deadline: null
+    difficulty: '0.8'
+    duration: null
+    category: null
+    location: null
+    importance: '0.75'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T17:23:45.475434'
+  mode: add
+  input: go to school at 5 am
+  raw_output: name=go to school | start=5 am | fixed_time=false | recurrent=true |
+    rattachement=falsen
+  parsed:
+    name: go to school
+    start: 5 am
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T17:23:54.559489'
+  mode: add
+  input: go to school at 6 am
+  raw_output: name=go to school | start=6 am | fixed_time=false | recurrent=true |
+    rattachement=falsen
+  parsed:
+    name: go to school
+    start: 6 am
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T17:46:34.864635'
+  mode: modify
+  input: every Monday at 7 am
+  raw_output: name=selection | difficulty=0.25 | duration=7
+  parsed:
+    name: selection
+    difficulty: '0.25'
+    duration: '7'
+  error: null
+
+- timestamp: '2026-03-21T17:46:44.398643'
+  mode: modify
+  input: every Monday at 7 am
+  raw_output: name=selection | difficulty=0.25 | duration=7
+  parsed:
+    name: selection
+    difficulty: '0.25'
+    duration: '7'
+  error: null
+
+- timestamp: '2026-03-21T17:46:50.740960'
+  mode: modify
+  input: go to school
+  raw_output: name=school | difficulty=0.25
+  parsed:
+    name: school
+    difficulty: '0.25'
+  error: null
+
+- timestamp: '2026-03-21T17:46:58.959688'
+  mode: add
+  input: go to work
+  raw_output: name=go to work | difficulty=0.2 | importance=0.85 | fixed_time=false
+    | recurrent=true
+  parsed:
+    name: go to work
+    start: null
+    deadline: null
+    difficulty: '0.2'
+    duration: null
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T17:47:05.459702'
+  mode: modify
+  input: go to school
+  raw_output: name=go to work | difficulty=0.2
+  parsed:
+    name: go to work
+    difficulty: '0.2'
+  error: null
+
+- timestamp: '2026-03-21T17:53:04.236082'
+  mode: add
+  input: go to school
+  raw_output: name=go to school | difficulty=0.8 | importance=0.7 | fixed_time=false
+    | recurrent=true | rattachement=falsels | recurrence_days=Monday,Wednesday
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.8'
+    duration: null
+    category: null
+    location: null
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday,Wednesday
+  error: null
+
+- timestamp: '2026-03-21T17:53:11.449885'
+  mode: add
+  input: go to school, not important
+  raw_output: name=go to school | difficulty=0.8 | importance=0.6 | fixed_time=false
+    | recurrent=true | rattachement=falsels | recurrence_days=Saturday,Wednesday
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.8'
+    duration: null
+    category: null
+    location: null
+    importance: '0.6'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Saturday,Wednesday
+  error: null
+
+- timestamp: '2026-03-21T17:53:16.335756'
+  mode: add
+  input: go to school, very important
+  raw_output: name=go to school | difficulty=0.2 | importance=0.8 | fixed_time=false
+    | recurrent=true | rattachement=falsels | recurrence_days=Saturday,Wednesday
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.2'
+    duration: null
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Saturday,Wednesday
+  error: null
+
+- timestamp: '2026-03-21T17:53:20.454218'
+  mode: add
+  input: go to school, very important, very hard
+  raw_output: name=go to school | difficulty=0.8 | importance=0.7 | difficulty=0.9
+    | difficulty=0.6 | difficulty=0.2 | importance=0.85 | fixed_time=false | recurrent=falsels
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.8'
+    duration: null
+    category: null
+    location: null
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+

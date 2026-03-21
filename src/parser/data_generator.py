@@ -60,9 +60,10 @@ def changed_to_pipe(changed: dict) -> str:
 
 
 class DataGenerator:
-    def __init__(self, training_data, real_examples=None):
+    def __init__(self, training_data, real_examples=None, specific_examples=None):
         self.training_data = training_data
         self.real_examples = real_examples or []
+        self.specific_examples = specific_examples or []
 
     def generate(self, max_examples=10000):
         half = max_examples // 2
@@ -79,6 +80,16 @@ class DataGenerator:
             data["target_text"].append(tgt)
 
         for example in self.real_examples:
+            inp, tgt = self._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+
+        for example in self.real_examples:
+            inp, tgt = self._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+
+        for example in self.specific_examples:        
             inp, tgt = self._convert_real(example)
             data["input_text"].append(inp)
             data["target_text"].append(tgt)

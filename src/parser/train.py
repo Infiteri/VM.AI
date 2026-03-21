@@ -3,6 +3,7 @@
 
     Written by: Vanea @ 07-03-2026
     Updated by: Vanea @ 21-03-2026 — full rewrite, local only, pipe format
+    Updated by: Vanea @ 21-03-2026 — added specific mode
 """
 
 import os
@@ -64,8 +65,25 @@ def build_dataset(cfg, mode):
         else:
             print("No real data file found — skipping")
 
-    if mode == "real":
-        gen  = DataGenerator(training_data, real_examples)
+    specific_examples = []
+    if os.path.exists(cfg.specific_data_path):
+        sp = VMAI_RealDataParser(cfg.specific_data_path)
+        sp.load_yaml()
+        specific_examples = sp.parse()
+        print(f"Specific examples loaded: {len(specific_examples)}")
+    else:
+        print("No specific data file found — skipping")
+
+    if mode == "specific":
+        gen  = DataGenerator(training_data, real_examples, specific_examples)
+        data = {"input_text": [], "target_text": []}
+        for example in specific_examples:
+            inp, tgt = gen._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+        dataset = Dataset.from_dict(data)
+    elif mode == "real":
+        gen  = DataGenerator(training_data, real_examples, specific_examples)
         data = {"input_text": [], "target_text": []}
         for example in real_examples:
             inp, tgt = gen._convert_real(example)
@@ -73,7 +91,7 @@ def build_dataset(cfg, mode):
             data["target_text"].append(tgt)
         dataset = Dataset.from_dict(data)
     else:
-        dataset = DataGenerator(training_data, real_examples).generate(cfg.max_limit)
+        dataset = DataGenerator(training_data, real_examples, specific_examples).generate(cfg.max_limit)
 
     split = dataset.train_test_split(test_size=0.1, seed=42)
     print(f"Train: {len(split['train'])}  |  Test: {len(split['test'])}")
@@ -131,7 +149,7 @@ def train(model, tokenizer, cfg, tok_train, tok_test, lr):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="VM.AI Parser Trainer")
-    parser.add_argument("--mode", choices=["both", "synthetic", "real"], default="both")
+    parser.add_argument("--mode", choices=["both", "synthetic", "real", "specific"], default="both")
     return parser.parse_args()
 
 
@@ -153,8 +171,8 @@ def main():
     is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
     lr        = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
 
-    train_ds, test_ds     = build_dataset(cfg, args.mode)
-    tok_train, tok_test   = tokenize(train_ds, test_ds, tokenizer)
+    train_ds, test_ds   = build_dataset(cfg, args.mode)
+    tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
 
     train(model, tokenizer, cfg, tok_train, tok_test, lr)
     save_model(model, tokenizer, cfg)

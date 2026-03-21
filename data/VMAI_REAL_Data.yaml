@@ -26125,3 +26125,509 @@ examples:
     fixed_time: true
     fixed_start: '08:00'
     duration: '60'
+# ─── ADD: go to school at X am/pm ───────────────────────────────────────────
+- input: go to school at 5 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '05:00' 
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 6 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '06:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 7 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '07:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 9 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '09:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 10 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '10:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 11 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '11:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 12 pm
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '12:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 1 pm
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '13:00'
+    recurrent: false
+    recurrence_days: null
+- input: go to school at 2 pm
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '14:00'
+    recurrent: false
+    recurrence_days: null
+
+# ─── ADD: go to school every [day] at X am ──────────────────────────────────
+- input: go to school every Monday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+- input: go to school every Tuesday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+- input: go to school every Wednesday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+- input: go to school every Thursday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Thursday
+- input: go to school every Friday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Friday
+- input: go to school every Saturday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Saturday
+- input: go to school every Sunday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Sunday
+- input: go to school every weekday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: go to school every day at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+- input: go to school every Monday and Wednesday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+- input: go to school every Tuesday and Thursday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Thursday
+- input: go to school every Monday Wednesday and Friday at 8 am
+  output:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: school
+    importance: null
+    fixed_time: true
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+    - Friday
+
+# ─── MODIFY: change time ─────────────────────────────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "05:00", "recurrent": false} │ change to 8 am'
+  output:
+    fixed_start: '08:00'
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ change to 7 am'
+  output:
+    fixed_start: '07:00'
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ move to 9 am'
+  output:
+    fixed_start: '09:00'
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ at 6 am'
+  output:
+    fixed_start: '06:00'
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ at 1 pm'
+  output:
+    fixed_start: '13:00'
+
+# ─── MODIFY: make recurrent ──────────────────────────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Monday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Thursday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Friday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Sunday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every weekday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Monday and Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Wednesday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Tuesday and Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Thursday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every day'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+# ─── MODIFY: change recurrence days ─────────────────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": true, "recurrence_days": ["Monday"]} │
+    change to every Tuesday'
+  output:
+    recurrence_days:
+    - Tuesday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": true, "recurrence_days": ["Monday", "Wednesday"]}
+    │ change to every Tuesday and Thursday'
+  output:
+    recurrence_days:
+    - Tuesday
+    - Thursday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": true, "recurrence_days": ["Monday", "Wednesday",
+    "Friday"]} │ change to every weekday'
+  output:
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+
+# ─── MODIFY: change time + recurrence together ───────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Monday at 7 am'
+  output:
+    fixed_start: '07:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every weekday at 9 am'
+  output:
+    fixed_start: '09:00'
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": false} │ every Tuesday and Thursday at 8 am'
+  output:
+    fixed_start: '08:00'
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Thursday
+
+# ─── MODIFY: stop recurring ──────────────────────────────────────────────────
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": true, "recurrence_days": ["Monday", "Wednesday"]}
+    │ not recurring anymore'
+  output:
+    recurrent: false
+    recurrence_days: null
+- input: 'modify: {"name": "go to school", "location": "school", "fixed_time": true,
+    "fixed_start": "08:00", "recurrent": true, "recurrence_days": ["Monday"]} │
+    remove recurrence'
+  output:
+    recurrent: false
+    recurrence_days: null

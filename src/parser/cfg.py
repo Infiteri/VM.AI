@@ -10,10 +10,11 @@ class Config:
         root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
         # Paths
-        self.model_cache    = os.path.join(root, "models", "google-t5", "t5-small")
-        self.output_dir     = os.path.join(root, "models", vars.PARSER_MODEL_NAME)
-        self.data_path      = os.path.join(root, "data", vars.SYNTHETIC_DATASET)
-        self.real_data_path = os.path.join(root, "data", vars.REAL_DATASET)
+        self.model_cache        = os.path.join(root, "models", "google-t5", "t5-small")
+        self.output_dir         = os.path.join(root, "models", vars.PARSER_MODEL_NAME)
+        self.data_path          = os.path.join(root, "data", vars.SYNTHETIC_DATASET)
+        self.real_data_path     = os.path.join(root, "data", vars.REAL_DATASET)
+        self.specific_data_path = os.path.join(root, "data", vars.SPECIFIC_DATASET)
 
         # Training
         self.max_limit                   = 10000
