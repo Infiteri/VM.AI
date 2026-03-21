@@ -54,19 +54,23 @@ class TaskPlannerPredictor:
             max_length=256
         ).to(self.device)
 
-        with torch.no_grad():
-            decoder_input = self.tokenizer("name=", return_tensors="pt", add_special_tokens=False).input_ids.to(self.device)
+        decoder_input = self.tokenizer(
+            "name=",
+            return_tensors="pt",
+            add_special_tokens=False
+        ).input_ids.to(self.device)
 
+        with torch.no_grad():
             output_ids = self.model.generate(
                 inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
                 decoder_input_ids=decoder_input,
                 max_new_tokens=64,
-                num_beams=4,
-                early_stopping=True,
+                no_repeat_ngram_size=4,
             )
 
         return self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+
 
     def _pipe_to_schema(self, flat: str) -> Dict:
         raw = {}
