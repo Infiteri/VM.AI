@@ -22789,3 +22789,1858 @@ examples:
     "recurrence_days": ["Monday", "Thursday"]} │ light session, not that hard'
   output:
     difficulty: '0.2'
+- input: finish the project report before Thursday, very hard, about 3 hours
+  output:
+    name: finish the project report
+    start: null
+    deadline: Thursday
+    difficulty: '0.85'
+    duration: '180'
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: prepare slides for the board meeting by Monday, high stakes, 4 hours
+  output:
+    name: prepare slides for the board meeting
+    start: null
+    deadline: Monday
+    difficulty: '0.8'
+    duration: '240'
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: call the accountant before Friday, important
+  output:
+    name: call the accountant
+    start: null
+    deadline: Friday
+    difficulty: '0.2'
+    duration: '30'
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: fix the payment bug tonight, critical, 2 hours
+  output:
+    name: fix the payment bug
+    start: null
+    deadline: today 23:59
+    difficulty: '0.9'
+    duration: '120'
+    category: null
+    location: null
+    importance: '0.99'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: review pull requests by end of day, moderate effort
+  output:
+    name: review pull requests
+    start: null
+    deadline: today
+    difficulty: '0.5'
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.75'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: doctor appointment at 10am Friday
+  output:
+    name: doctor appointment
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: true
+    fixed_start: Friday 10:00
+    recurrent: false
+    recurrence_days: null
+- input: standup call at 9am every weekday
+  output:
+    name: standup call
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '15'
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: true
+    fixed_start: 09:00
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: therapy session at 3pm Wednesday, 1 hour
+  output:
+    name: therapy session
+    start: null
+    deadline: null
+    difficulty: '0.3'
+    duration: '60'
+    category: null
+    location: null
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: Wednesday 15:00
+    recurrent: false
+    recurrence_days: null
+- input: team lunch at 12pm Thursday, at the italian place
+  output:
+    name: team lunch
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '90'
+    category: null
+    location: the italian place
+    importance: '0.7'
+    fixed_time: true
+    fixed_start: Thursday 12:00
+    recurrent: false
+    recurrence_days: null
+- input: weekly sync at 2pm Monday, 30 minutes
+  output:
+    name: weekly sync
+    start: null
+    deadline: null
+    difficulty: '0.1'
+    duration: '30'
+    category: null
+    location: null
+    importance: '0.75'
+    fixed_time: true
+    fixed_start: Monday 14:00
+    recurrent: true
+    recurrence_days:
+    - Monday
+- input: go to the gym every Tuesday Wednesday and Friday, intense session 1 hour
+  output:
+    name: go to the gym
+    start: null
+    deadline: null
+    difficulty: '0.75'
+    duration: '60'
+    category: null
+    location: gym
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Wednesday
+    - Friday
+- input: practice guitar every evening for 20 minutes
+  output:
+    name: practice guitar
+    start: evening
+    deadline: evening
+    difficulty: '0.3'
+    duration: '20'
+    category: null
+    location: home
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+- input: check emails every morning, quick task
+  output:
+    name: check emails
+    start: morning
+    deadline: morning
+    difficulty: '0.1'
+    duration: '15'
+    category: null
+    location: null
+    importance: '0.6'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+- input: run 5km every Saturday and Sunday morning
+  output:
+    name: run 5km
+    start: morning
+    deadline: null
+    difficulty: '0.6'
+    duration: '30'
+    category: null
+    location: null
+    importance: '0.65'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Sunday
+- input: do laundry every Sunday afternoon
+  output:
+    name: do laundry
+    start: afternoon
+    deadline: afternoon
+    difficulty: '0.1'
+    duration: '60'
+    category: null
+    location: home
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Sunday
+- input: pick up the dry cleaning at the mall before Saturday
+  output:
+    name: pick up the dry cleaning
+    start: null
+    deadline: Saturday
+    difficulty: '0.1'
+    duration: '20'
+    category: null
+    location: the mall
+    importance: '0.6'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: work from the coffee shop on Wednesday
+  output:
+    name: work from the coffee shop
+    start: null
+    deadline: Wednesday
+    difficulty: '0.3'
+    duration: null
+    category: null
+    location: coffee shop
+    importance: '0.4'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: meet the client at their office on Tuesday at 2pm
+  output:
+    name: meet the client
+    start: null
+    deadline: null
+    difficulty: '0.3'
+    duration: '60'
+    category: null
+    location: client office
+    importance: '0.85'
+    fixed_time: true
+    fixed_start: Tuesday 14:00
+    recurrent: false
+    recurrence_days: null
+- input: study at the library every weekday afternoon
+  output:
+    name: study at the library
+    start: afternoon
+    deadline: afternoon
+    difficulty: '0.5'
+    duration: '120'
+    category: null
+    location: library
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+- input: boxing class at the sports centre at 7pm Tuesday
+  output:
+    name: boxing class
+    start: null
+    deadline: null
+    difficulty: '0.7'
+    duration: '60'
+    category: null
+    location: sports centre
+    importance: '0.65'
+    fixed_time: true
+    fixed_start: Tuesday 19:00
+    recurrent: false
+    recurrence_days: null
+- input: reply to the email from Sarah, quick
+  output:
+    name: reply to the email from Sarah
+    start: null
+    deadline: today
+    difficulty: '0.1'
+    duration: '10'
+    category: null
+    location: null
+    importance: '0.6'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: order lunch for the team by noon
+  output:
+    name: order lunch for the team
+    start: null
+    deadline: today
+    difficulty: '0.1'
+    duration: '15'
+    category: null
+    location: null
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: send the meeting notes to everyone, easy
+  output:
+    name: send the meeting notes
+    start: null
+    deadline: today
+    difficulty: '0.1'
+    duration: '15'
+    category: null
+    location: null
+    importance: '0.65'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: book a table for dinner on Friday evening
+  output:
+    name: book a table for dinner
+    start: null
+    deadline: Friday
+    difficulty: '0.1'
+    duration: '10'
+    category: null
+    location: null
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: update the team calendar for next week
+  output:
+    name: update the team calendar
+    start: null
+    deadline: next Monday
+    difficulty: '0.2'
+    duration: '20'
+    category: null
+    location: null
+    importance: '0.6'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: write the technical spec for the new API, very complex, will take a day
+  output:
+    name: write the technical spec for the new API
+    start: null
+    deadline: Friday
+    difficulty: '0.9'
+    duration: '480'
+    category: null
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: debug the production crash, extremely urgent
+  output:
+    name: debug the production crash
+    start: null
+    deadline: today
+    difficulty: '0.95'
+    duration: '240'
+    category: null
+    location: null
+    importance: '0.99'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: prepare for the job interview on Thursday, research the company
+  output:
+    name: prepare for the job interview
+    start: null
+    deadline: Thursday
+    difficulty: '0.7'
+    duration: '120'
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: complete the tax return by end of month, painful
+  output:
+    name: complete the tax return
+    start: null
+    deadline: end of month
+    difficulty: '0.8'
+    duration: '180'
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: learn docker for the new project, steep learning curve
+  output:
+    name: learn docker
+    start: null
+    deadline: next Monday
+    difficulty: '0.75'
+    duration: '300'
+    category: null
+    location: null
+    importance: '0.8'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+- input: 'modify: {"name": "order lunch for the team", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.7"} │ push deadline to Sunday'
+  output:
+    deadline: Sunday
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "water the plants", "difficulty": "0.1", "duration": "10",
+    "importance": "0.4", "recurrent": true, "recurrence_days": ["Sunday"]} │ push
+    deadline to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "learn docker", "deadline": "next Monday", "difficulty":
+    "0.75", "duration": "300", "importance": "0.8"} │ not that important anymore'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "piano practice", "difficulty": "0.5", "duration": "45",
+    "importance": "0.6", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ push deadline to Friday'
+  output:
+    deadline: Friday
+- input: 'modify: {"name": "weekly review", "start": "afternoon", "difficulty": "0.3",
+    "duration": "60", "importance": "0.7", "recurrent": true, "recurrence_days": ["Friday"]}
+    │ lighter than expected'
+  output:
+    difficulty: '0.85'
+- input: 'modify: {"name": "stretching", "start": "morning", "difficulty": "0.2",
+    "duration": "30", "importance": "0.55", "recurrent": true} │ change to every Sunday
+    and Saturday'
+  output:
+    recurrence_days:
+    - Sunday
+    - Saturday
+- input: 'modify: {"name": "grocery shopping", "deadline": "Saturday", "difficulty":
+    "0.2", "importance": "0.6"} │ make it recurring every Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Friday
+- input: 'modify: {"name": "write blog post", "deadline": "Sunday", "difficulty":
+    "0.5", "duration": "120", "importance": "0.6"} │ make it recurring every Saturday
+    and Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Sunday
+- input: 'modify: {"name": "piano practice", "difficulty": "0.5", "duration": "45",
+    "importance": "0.6", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ change to every Monday
+    and Wednesday and Friday'
+  output:
+    recurrence_days:
+    - Monday
+    - Wednesday
+    - Friday
+- input: 'modify: {"name": "doctor appointment", "difficulty": "0.1", "duration":
+    "60", "importance": "0.9", "fixed_time": true, "fixed_start": "Friday 10:00"}
+    │ actually quite hard'
+  output:
+    difficulty: '0.95'
+- input: 'modify: {"name": "gym workout", "difficulty": "0.8", "duration": "90", "recurrent":
+    true, "recurrence_days": ["Monday", "Thursday", "Sunday"]} │ make it 180 minutes
+    and push to Sunday'
+  output:
+    duration: '180'
+    deadline: Sunday
+- input: 'modify: {"name": "send invoice to client", "deadline": "Tuesday", "difficulty":
+    "0.2", "importance": "0.9"} │ push deadline to Sunday'
+  output:
+    deadline: Sunday
+- input: 'modify: {"name": "reply to the email from Sarah", "deadline": "today", "difficulty":
+    "0.1", "duration": "10", "importance": "0.6"} │ make it recurring every Thursday
+    and Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Thursday
+    - Sunday
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ do it at home'
+  output:
+    location: home
+- input: 'modify: {"name": "prepare slides for the board meeting", "deadline": "Monday",
+    "difficulty": "0.8", "duration": "240", "importance": "0.95"} │ push deadline
+    to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "call the accountant", "deadline": "Friday", "difficulty":
+    "0.2", "duration": "30", "importance": "0.8"} │ make it recurring every Saturday
+    and Tuesday and Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Tuesday
+    - Friday
+- input: 'modify: {"name": "study for biology exam", "deadline": "Wednesday", "difficulty":
+    "0.8", "importance": "0.9"} │ make it recurring every Wednesday and Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+    - Tuesday
+- input: 'modify: {"name": "Portuguese class", "difficulty": "0.55", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Tuesday 17:00", "recurrent":
+    true, "recurrence_days": ["Tuesday", "Thursday"]} │ change to every Friday and
+    Sunday and Thursday'
+  output:
+    recurrence_days:
+    - Friday
+    - Sunday
+    - Thursday
+- input: 'modify: {"name": "boxing class", "difficulty": "0.7", "duration": "60",
+    "location": "sports centre", "importance": "0.65", "fixed_time": true, "fixed_start":
+    "Tuesday 19:00"} │ do it at office'
+  output:
+    location: office
+- input: 'modify: {"name": "meditate", "start": "morning", "difficulty": "0.2", "duration":
+    "15", "importance": "0.6", "recurrent": true} │ do it at coffee shop'
+  output:
+    location: coffee shop
+- input: 'modify: {"name": "fix the payment bug", "deadline": "today 23:59", "difficulty":
+    "0.9", "duration": "120", "importance": "0.99"} │ make it recurring every Saturday
+    and Monday and Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Monday
+    - Tuesday
+- input: 'modify: {"name": "do laundry", "start": "afternoon", "deadline": "afternoon",
+    "difficulty": "0.1", "duration": "60", "location": "home", "importance": "0.5",
+    "recurrent": true, "recurrence_days": ["Sunday"]} │ push deadline to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "take out trash", "start": "evening", "difficulty": "0.1",
+    "duration": "5", "importance": "0.5", "recurrent": true, "recurrence_days": ["Monday",
+    "Thursday"]} │ make it 90 minutes and push to tomorrow'
+  output:
+    duration: '90'
+    deadline: tomorrow
+- input: 'modify: {"name": "pick up the dry cleaning", "deadline": "Saturday", "difficulty":
+    "0.1", "duration": "20", "location": "the mall", "importance": "0.6"} │ push deadline
+    to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "conference call", "difficulty": "0.2", "importance": "0.95",
+    "fixed_time": true, "fixed_start": "today 15:00"} │ no longer fixed, finish before
+    Sunday night'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Sunday night
+- input: 'modify: {"name": "fix the login bug", "deadline": "Friday", "difficulty":
+    "0.85", "duration": "240", "importance": "0.95"} │ top priority now'
+  output:
+    importance: '0.7'
+- input: 'modify: {"name": "debug the production crash", "deadline": "today", "difficulty":
+    "0.95", "duration": "240", "importance": "0.99"} │ make it 180 minutes'
+  output:
+    duration: '180'
+- input: 'modify: {"name": "check emails", "start": "morning", "deadline": "morning",
+    "difficulty": "0.1", "duration": "15", "importance": "0.6", "recurrent": true}
+    │ make it 60 minutes and push to next Monday'
+  output:
+    duration: '60'
+    deadline: next Monday
+- input: 'modify: {"name": "do laundry", "deadline": "Sunday", "difficulty": "0.15",
+    "duration": "30", "importance": "0.45"} │ make it recurring every Saturday and
+    Monday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Monday
+- input: 'modify: {"name": "fix CSS layout bug", "deadline": "Thursday", "difficulty":
+    "0.65", "importance": "0.9"} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "send the meeting notes", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.65"} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "evening jog", "start": "evening", "difficulty": "0.5",
+    "duration": "40", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ change to every Thursday'
+  output:
+    recurrence_days:
+    - Thursday
+- input: 'modify: {"name": "piano practice", "difficulty": "0.5", "duration": "45",
+    "importance": "0.6", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ critical'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "read design doc", "deadline": "today 17:00", "difficulty":
+    "0.3", "duration": "45", "importance": "0.5"} │ make it recurring every Wednesday
+    and Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+    - Saturday
+- input: 'modify: {"name": "yoga class", "difficulty": "0.4", "duration": "60", "importance":
+    "0.65", "fixed_time": true, "fixed_start": "Wednesday 19:00", "recurrent": true,
+    "recurrence_days": ["Wednesday"]} │ change to every Saturday and Friday and Sunday'
+  output:
+    recurrence_days:
+    - Saturday
+    - Friday
+    - Sunday
+- input: 'modify: {"name": "doctor checkup", "difficulty": "0.1", "importance": "0.9",
+    "fixed_time": true, "fixed_start": "Friday 11:00"} │ no longer fixed, finish before
+    tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "update resume", "deadline": "next Wednesday", "difficulty":
+    "0.45", "importance": "0.75"} │ make it recurring every Monday and Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Thursday
+- input: 'modify: {"name": "practice guitar", "start": "evening", "deadline": "evening",
+    "difficulty": "0.3", "duration": "20", "location": "home", "importance": "0.5",
+    "recurrent": true} │ low priority'
+  output:
+    importance: '0.95'
+- input: 'modify: {"name": "prepare presentation", "deadline": "Thursday", "difficulty":
+    "0.7", "duration": "180", "importance": "0.9"} │ make it 30 minutes'
+  output:
+    duration: '30'
+- input: 'modify: {"name": "cook dinner", "start": "evening", "difficulty": "0.3",
+    "duration": "45", "importance": "0.7", "recurrent": true, "recurrence_days": ["Monday",
+    "Tuesday", "Wednesday", "Thursday", "Friday"]} │ actually quite hard'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "run 5km", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "importance": "0.65", "recurrent": true, "recurrence_days": ["Saturday",
+    "Sunday"]} │ make it 120 minutes'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "update the team calendar", "deadline": "next Monday",
+    "difficulty": "0.2", "duration": "20", "importance": "0.6"} │ do it at gym'
+  output:
+    location: gym
+- input: 'modify: {"name": "fix the login bug", "deadline": "Friday", "difficulty":
+    "0.85", "duration": "240", "importance": "0.95"} │ make it recurring every Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+- input: 'modify: {"name": "Portuguese class", "difficulty": "0.55", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Tuesday 17:00", "recurrent":
+    true, "recurrence_days": ["Tuesday", "Thursday"]} │ no longer fixed, finish before
+    Monday evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Monday evening
+- input: 'modify: {"name": "do laundry", "start": "afternoon", "deadline": "afternoon",
+    "difficulty": "0.1", "duration": "60", "location": "home", "importance": "0.5",
+    "recurrent": true, "recurrence_days": ["Sunday"]} │ make it 90 minutes and push
+    to Friday'
+  output:
+    duration: '90'
+    deadline: Friday
+- input: 'modify: {"name": "respond to client emails", "deadline": "tomorrow 10:00",
+    "difficulty": "0.3", "importance": "0.85"} │ top priority now'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "book a table for dinner", "deadline": "Friday", "difficulty":
+    "0.1", "duration": "10", "importance": "0.7"} │ can wait'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "send the meeting notes", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.65"} │ make it recurring every Saturday
+    and Thursday and Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Thursday
+    - Sunday
+- input: 'modify: {"name": "reply to the email from Sarah", "deadline": "today", "difficulty":
+    "0.1", "duration": "10", "importance": "0.6"} │ push deadline to next Monday'
+  output:
+    deadline: next Monday
+- input: 'modify: {"name": "review pull requests", "deadline": "today 17:00", "difficulty":
+    "0.5", "importance": "0.9"} │ lighter than expected'
+  output:
+    difficulty: '0.5'
+- input: 'modify: {"name": "weekly review", "start": "afternoon", "difficulty": "0.3",
+    "duration": "60", "importance": "0.7", "recurrent": true, "recurrence_days": ["Friday"]}
+    │ make it 60 minutes'
+  output:
+    duration: '60'
+- input: 'modify: {"name": "walk the dog", "difficulty": "0.15", "duration": "20",
+    "importance": "0.85", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ change to every Monday
+    and Friday and Tuesday'
+  output:
+    recurrence_days:
+    - Monday
+    - Friday
+    - Tuesday
+- input: 'modify: {"name": "deploy hotfix to production", "deadline": "today 23:59",
+    "difficulty": "0.8", "importance": "0.99"} │ top priority now'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "restock office supplies", "deadline": "Monday", "difficulty":
+    "0.15", "importance": "0.55"} │ easier than i thought'
+  output:
+    difficulty: '0.7'
+- input: 'modify: {"name": "send invoice to client", "deadline": "Tuesday", "difficulty":
+    "0.2", "importance": "0.9"} │ very important'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "write blog post", "deadline": "Sunday", "difficulty":
+    "0.5", "duration": "120", "importance": "0.6"} │ actually quite hard'
+  output:
+    difficulty: '0.5'
+- input: 'modify: {"name": "work from the coffee shop", "deadline": "Wednesday", "difficulty":
+    "0.3", "location": "coffee shop", "importance": "0.4"} │ make it recurring every
+    Monday and Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+- input: 'modify: {"name": "team standup", "difficulty": "0.1", "duration": "30",
+    "importance": "0.8", "fixed_time": true, "fixed_start": "Monday 10:00", "recurrent":
+    true, "recurrence_days": ["Monday"]} │ no longer fixed, finish before tomorrow
+    evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "doctor appointment", "difficulty": "0.1", "duration":
+    "60", "importance": "0.9", "fixed_time": true, "fixed_start": "Friday 10:00"}
+    │ no longer fixed, finish before Monday evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Monday evening
+- input: 'modify: {"name": "send the meeting notes", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.65"} │ make it 90 minutes and push to
+    next Monday'
+  output:
+    duration: '90'
+    deadline: next Monday
+- input: 'modify: {"name": "fix CSS layout bug", "deadline": "Thursday", "difficulty":
+    "0.65", "importance": "0.9"} │ push deadline to Friday'
+  output:
+    deadline: Friday
+- input: 'modify: {"name": "take out trash", "start": "evening", "difficulty": "0.1",
+    "duration": "5", "importance": "0.5", "recurrent": true, "recurrence_days": ["Monday",
+    "Thursday"]} │ make it 30 minutes'
+  output:
+    duration: '30'
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ make it recurring
+    every Monday and Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+- input: 'modify: {"name": "revise history notes", "start": "morning", "difficulty":
+    "0.45", "duration": "120", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Sunday"]} │ low priority'
+  output:
+    importance: '0.1'
+- input: 'modify: {"name": "haircut appointment", "difficulty": "0.1", "duration":
+    "45", "importance": "0.5", "fixed_time": true, "fixed_start": "Saturday 16:00"}
+    │ no longer fixed, finish before tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "pay rent", "deadline": "1st", "difficulty": "0.1", "importance":
+    "0.99"} │ can wait'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "finish API integration", "deadline": "next Monday", "difficulty":
+    "0.85", "duration": "360", "importance": "0.9"} │ light session at office'
+  output:
+    difficulty: '0.5'
+    location: office
+- input: 'modify: {"name": "haircut appointment", "difficulty": "0.1", "duration":
+    "45", "importance": "0.5", "fixed_time": true, "fixed_start": "Saturday 16:00"}
+    │ low priority'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "go to the gym", "difficulty": "0.75", "duration": "60",
+    "location": "gym", "importance": "0.7", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ change to every Sunday and Tuesday and Thursday'
+  output:
+    recurrence_days:
+    - Sunday
+    - Tuesday
+    - Thursday
+- input: 'modify: {"name": "clean the apartment", "deadline": "Saturday", "difficulty":
+    "0.3", "duration": "60", "importance": "0.5"} │ make it recurring every Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Thursday
+- input: 'modify: {"name": "stretching", "start": "morning", "difficulty": "0.2",
+    "duration": "30", "importance": "0.55", "recurrent": true} │ make it 180 minutes
+    and push to Sunday'
+  output:
+    duration: '180'
+    deadline: Sunday
+- input: 'modify: {"name": "respond to client emails", "deadline": "tomorrow 10:00",
+    "difficulty": "0.3", "importance": "0.85"} │ push deadline to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "debug the production crash", "deadline": "today", "difficulty":
+    "0.95", "duration": "240", "importance": "0.99"} │ make it 90 minutes and push
+    to Friday'
+  output:
+    duration: '90'
+    deadline: Friday
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "study at the library", "start": "afternoon", "deadline":
+    "afternoon", "difficulty": "0.5", "duration": "120", "location": "library", "importance":
+    "0.7", "recurrent": true, "recurrence_days": ["Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday"]} │ make it 60 minutes'
+  output:
+    duration: '60'
+- input: 'modify: {"name": "finish the project report", "deadline": "Thursday", "difficulty":
+    "0.85", "duration": "180", "importance": "0.9"} │ make it recurring every Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+- input: 'modify: {"name": "deploy hotfix to production", "deadline": "today 23:59",
+    "difficulty": "0.8", "importance": "0.99"} │ make it recurring every Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Sunday
+- input: 'modify: {"name": "Portuguese class", "difficulty": "0.55", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Tuesday 17:00", "recurrent":
+    true, "recurrence_days": ["Tuesday", "Thursday"]} │ not that important anymore'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "standup call", "difficulty": "0.1", "duration": "15",
+    "importance": "0.8", "fixed_time": true, "fixed_start": "09:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]}
+    │ no longer fixed, finish before Sunday night'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Sunday night
+- input: 'modify: {"name": "stretching", "start": "morning", "difficulty": "0.2",
+    "duration": "30", "importance": "0.55", "recurrent": true} │ actually quite hard'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "walk the dog", "difficulty": "0.15", "duration": "20",
+    "importance": "0.85", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ harder than expected'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "meet the client", "difficulty": "0.3", "duration": "60",
+    "location": "client office", "importance": "0.85", "fixed_time": true, "fixed_start":
+    "Tuesday 14:00"} │ no longer fixed, finish before tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "finish the project report", "deadline": "Thursday", "difficulty":
+    "0.85", "duration": "180", "importance": "0.9"} │ do it at online'
+  output:
+    location: online
+- input: 'modify: {"name": "French lesson", "difficulty": "0.5", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Monday 18:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Wednesday"]} │ no longer fixed, finish before
+    tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "debug the production crash", "deadline": "today", "difficulty":
+    "0.95", "duration": "240", "importance": "0.99"} │ can wait'
+  output:
+    importance: '0.2'
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ make it recurring every Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Friday
+- input: 'modify: {"name": "standup call", "difficulty": "0.1", "duration": "15",
+    "importance": "0.8", "fixed_time": true, "fixed_start": "09:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]}
+    │ change to every Sunday and Thursday and Tuesday'
+  output:
+    recurrence_days:
+    - Sunday
+    - Thursday
+    - Tuesday
+- input: 'modify: {"name": "read a book", "start": "evening", "deadline": "evening",
+    "duration": "30", "recurrent": true} │ change to every Tuesday'
+  output:
+    recurrence_days:
+    - Tuesday
+- input: 'modify: {"name": "revise history notes", "start": "morning", "difficulty":
+    "0.45", "duration": "120", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Sunday"]} │ make it 120 minutes'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "lunch with Sarah", "difficulty": "0.1", "duration": "60",
+    "importance": "0.6", "fixed_time": true, "fixed_start": "Tuesday 12:00"} │ no
+    longer fixed, finish before Monday evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Monday evening
+- input: 'modify: {"name": "run 5k", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "recurrent": true, "recurrence_days": ["Tuesday", "Friday"]} │ make it 60
+    minutes'
+  output:
+    duration: '60'
+- input: 'modify: {"name": "cook dinner", "start": "evening", "difficulty": "0.3",
+    "duration": "45", "importance": "0.7", "recurrent": true, "recurrence_days": ["Monday",
+    "Tuesday", "Wednesday", "Thursday", "Friday"]} │ make it 180 minutes and push
+    to tomorrow'
+  output:
+    duration: '180'
+    deadline: tomorrow
+- input: 'modify: {"name": "fix the payment bug", "deadline": "today 23:59", "difficulty":
+    "0.9", "duration": "120", "importance": "0.99"} │ push deadline to Saturday'
+  output:
+    deadline: Saturday
+- input: 'modify: {"name": "order lunch for the team", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.7"} │ make it recurring every Wednesday
+    and Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+    - Thursday
+- input: 'modify: {"name": "study for biology exam", "deadline": "Wednesday", "difficulty":
+    "0.8", "importance": "0.9"} │ do it at home'
+  output:
+    location: home
+- input: 'modify: {"name": "check emails", "start": "morning", "deadline": "morning",
+    "difficulty": "0.1", "duration": "15", "importance": "0.6", "recurrent": true}
+    │ change to every Monday and Sunday'
+  output:
+    recurrence_days:
+    - Monday
+    - Sunday
+- input: 'modify: {"name": "stretching", "start": "morning", "difficulty": "0.2",
+    "duration": "30", "importance": "0.55", "recurrent": true} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ easier than i thought'
+  output:
+    difficulty: '0.85'
+- input: 'modify: {"name": "call the accountant", "deadline": "Friday", "difficulty":
+    "0.2", "duration": "30", "importance": "0.8"} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "revise history notes", "start": "morning", "difficulty":
+    "0.45", "duration": "120", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Sunday"]} │ change to every Saturday and Sunday'
+  output:
+    recurrence_days:
+    - Saturday
+    - Sunday
+- input: 'modify: {"name": "piano practice", "difficulty": "0.5", "duration": "45",
+    "importance": "0.6", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "yoga class", "difficulty": "0.4", "duration": "60", "importance":
+    "0.65", "fixed_time": true, "fixed_start": "Wednesday 19:00", "recurrent": true,
+    "recurrence_days": ["Wednesday"]} │ very important'
+  output:
+    importance: '0.1'
+- input: 'modify: {"name": "boxing class", "difficulty": "0.7", "duration": "60",
+    "location": "sports centre", "importance": "0.65", "fixed_time": true, "fixed_start":
+    "Tuesday 19:00"} │ no longer fixed, finish before tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "dinner with parents", "difficulty": "0.1", "duration":
+    "90", "importance": "0.75", "fixed_time": true, "fixed_start": "Sunday 19:00"}
+    │ no longer fixed, finish before tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "send invoice to client", "deadline": "Tuesday", "difficulty":
+    "0.2", "importance": "0.9"} │ hard session at gym'
+  output:
+    difficulty: '0.8'
+    location: gym
+- input: 'modify: {"name": "water the plants", "difficulty": "0.1", "duration": "10",
+    "importance": "0.4", "recurrent": true, "recurrence_days": ["Sunday"]} │ hard
+    session at home'
+  output:
+    difficulty: '0.9'
+    location: home
+- input: 'modify: {"name": "clean the apartment", "deadline": "Saturday", "difficulty":
+    "0.3", "duration": "60", "importance": "0.5"} │ make it 90 minutes and push to
+    next Monday'
+  output:
+    duration: '90'
+    deadline: next Monday
+- input: 'modify: {"name": "do laundry", "start": "afternoon", "deadline": "afternoon",
+    "difficulty": "0.1", "duration": "60", "location": "home", "importance": "0.5",
+    "recurrent": true, "recurrence_days": ["Sunday"]} │ make it 120 minutes'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "book a table for dinner", "deadline": "Friday", "difficulty":
+    "0.1", "duration": "10", "importance": "0.7"} │ light session at gym'
+  output:
+    difficulty: '0.5'
+    location: gym
+- input: 'modify: {"name": "fix the login bug", "deadline": "Friday", "difficulty":
+    "0.85", "duration": "240", "importance": "0.95"} │ make it 180 minutes'
+  output:
+    duration: '180'
+- input: 'modify: {"name": "chemistry homework", "deadline": "Friday", "difficulty":
+    "0.75"} │ make it 150 minutes'
+  output:
+    duration: '150'
+- input: 'modify: {"name": "finish reading report", "deadline": "tomorrow", "difficulty":
+    "0.4", "importance": "0.7"} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "prepare for the job interview", "deadline": "Thursday",
+    "difficulty": "0.7", "duration": "120", "importance": "0.95"} │ make it 180 minutes
+    and push to tomorrow'
+  output:
+    duration: '180'
+    deadline: tomorrow
+- input: 'modify: {"name": "run 5km", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "importance": "0.65", "recurrent": true, "recurrence_days": ["Saturday",
+    "Sunday"]} │ can wait'
+  output:
+    importance: '0.95'
+- input: 'modify: {"name": "finish the project report", "deadline": "Thursday", "difficulty":
+    "0.85", "duration": "180", "importance": "0.9"} │ actually quite hard'
+  output:
+    difficulty: '0.7'
+- input: 'modify: {"name": "math assignment", "deadline": "today 23:59", "difficulty":
+    "0.95", "duration": "120", "importance": "0.98"} │ light session at office'
+  output:
+    difficulty: '0.2'
+    location: office
+- input: 'modify: {"name": "meditate", "start": "morning", "difficulty": "0.2", "duration":
+    "15", "importance": "0.6", "recurrent": true} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "yoga class", "difficulty": "0.4", "duration": "60", "importance":
+    "0.65", "fixed_time": true, "fixed_start": "Wednesday 19:00", "recurrent": true,
+    "recurrence_days": ["Wednesday"]} │ hard session at gym'
+  output:
+    difficulty: '0.9'
+    location: gym
+- input: 'modify: {"name": "grocery shopping", "deadline": "Saturday", "difficulty":
+    "0.2", "importance": "0.6"} │ do it at online'
+  output:
+    location: online
+- input: 'modify: {"name": "finish reading report", "deadline": "tomorrow", "difficulty":
+    "0.4", "importance": "0.7"} │ harder than expected'
+  output:
+    difficulty: '0.3'
+- input: 'modify: {"name": "write unit tests for payment module", "deadline": "Thursday",
+    "difficulty": "0.7", "importance": "0.85"} │ push deadline to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "Portuguese class", "difficulty": "0.55", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Tuesday 17:00", "recurrent":
+    true, "recurrence_days": ["Tuesday", "Thursday"]} │ difficulty is 0.95'
+  output:
+    difficulty: '0.95'
+- input: 'modify: {"name": "dentist appointment", "difficulty": "0.1", "importance":
+    "0.85", "fixed_time": true, "fixed_start": "Wednesday 14:00"} │ actually quite
+    hard'
+  output:
+    difficulty: '0.7'
+- input: 'modify: {"name": "walk the dog", "difficulty": "0.15", "duration": "20",
+    "importance": "0.85", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ light session at office'
+  output:
+    difficulty: '0.2'
+    location: office
+- input: 'modify: {"name": "walk the dog", "difficulty": "0.15", "duration": "20",
+    "importance": "0.85", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ push deadline to Sunday'
+  output:
+    deadline: Sunday
+- input: 'modify: {"name": "fix the payment bug", "deadline": "today 23:59", "difficulty":
+    "0.9", "duration": "120", "importance": "0.99"} │ light session at home'
+  output:
+    difficulty: '0.5'
+    location: home
+- input: 'modify: {"name": "weekly review", "start": "afternoon", "difficulty": "0.3",
+    "duration": "60", "importance": "0.7", "recurrent": true, "recurrence_days": ["Friday"]}
+    │ do it at home'
+  output:
+    location: home
+- input: 'modify: {"name": "team lunch", "difficulty": "0.1", "duration": "90", "location":
+    "the italian place", "importance": "0.7", "fixed_time": true, "fixed_start": "Thursday
+    12:00"} │ do it at coffee shop'
+  output:
+    location: coffee shop
+- input: 'modify: {"name": "practice guitar", "start": "evening", "deadline": "evening",
+    "difficulty": "0.3", "duration": "20", "location": "home", "importance": "0.5",
+    "recurrent": true} │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "pick up the dry cleaning", "deadline": "Saturday", "difficulty":
+    "0.1", "duration": "20", "location": "the mall", "importance": "0.6"} │ do it
+    at library'
+  output:
+    location: library
+- input: 'modify: {"name": "call mom", "deadline": "Sunday", "difficulty": "0.1",
+    "importance": "0.7"} │ difficulty is 0.9'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "journaling", "start": "night", "difficulty": "0.1", "duration":
+    "10", "importance": "0.5", "recurrent": true} │ hard session at gym'
+  output:
+    difficulty: '0.9'
+    location: gym
+- input: 'modify: {"name": "journaling", "start": "night", "difficulty": "0.1", "duration":
+    "10", "importance": "0.5", "recurrent": true} │ make it 60 minutes and push to
+    Sunday'
+  output:
+    duration: '60'
+    deadline: Sunday
+- input: 'modify: {"name": "chemistry homework", "deadline": "Friday", "difficulty":
+    "0.75"} │ push deadline to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "prepare presentation", "deadline": "Thursday", "difficulty":
+    "0.7", "duration": "180", "importance": "0.9"} │ push deadline to Saturday'
+  output:
+    deadline: Saturday
+- input: 'modify: {"name": "gym workout", "difficulty": "0.8", "duration": "90", "recurrent":
+    true, "recurrence_days": ["Monday", "Thursday", "Sunday"]} │ make it 180 minutes'
+  output:
+    duration: '180'
+- input: 'modify: {"name": "book flight tickets", "deadline": "today", "difficulty":
+    "0.2", "importance": "0.9"} │ push deadline to next Monday'
+  output:
+    deadline: next Monday
+- input: 'modify: {"name": "check emails", "start": "morning", "deadline": "morning",
+    "difficulty": "0.1", "duration": "15", "importance": "0.6", "recurrent": true}
+    │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "gym workout", "difficulty": "0.8", "duration": "90", "recurrent":
+    true, "recurrence_days": ["Monday", "Thursday", "Sunday"]} │ do it at gym'
+  output:
+    location: gym
+- input: 'modify: {"name": "prepare presentation", "deadline": "Thursday", "difficulty":
+    "0.7", "duration": "180", "importance": "0.9"} │ make it recurring every Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+- input: 'modify: {"name": "learn docker", "deadline": "next Monday", "difficulty":
+    "0.75", "duration": "300", "importance": "0.8"} │ difficulty is 0.8'
+  output:
+    difficulty: '0.8'
+- input: 'modify: {"name": "study for biology exam", "deadline": "Wednesday", "difficulty":
+    "0.8", "importance": "0.9"} │ hard session at home'
+  output:
+    difficulty: '0.9'
+    location: home
+- input: 'modify: {"name": "yoga class", "difficulty": "0.4", "duration": "60", "importance":
+    "0.65", "fixed_time": true, "fixed_start": "Wednesday 19:00", "recurrent": true,
+    "recurrence_days": ["Wednesday"]} │ harder than expected'
+  output:
+    difficulty: '0.8'
+- input: 'modify: {"name": "send the meeting notes", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.65"} │ push deadline to next Monday'
+  output:
+    deadline: next Monday
+- input: 'modify: {"name": "write unit tests for payment module", "deadline": "Thursday",
+    "difficulty": "0.7", "importance": "0.85"} │ make it recurring every Thursday
+    and Sunday and Saturday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Thursday
+    - Sunday
+    - Saturday
+- input: 'modify: {"name": "study at the library", "start": "afternoon", "deadline":
+    "afternoon", "difficulty": "0.5", "duration": "120", "location": "library", "importance":
+    "0.7", "recurrent": true, "recurrence_days": ["Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday"]} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "yoga class", "difficulty": "0.4", "duration": "60", "importance":
+    "0.65", "fixed_time": true, "fixed_start": "Wednesday 19:00", "recurrent": true,
+    "recurrence_days": ["Wednesday"]} │ no longer fixed, finish before tomorrow evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: tomorrow evening
+- input: 'modify: {"name": "write the technical spec for the new API", "deadline":
+    "Friday", "difficulty": "0.9", "duration": "480", "importance": "0.9"} │ push
+    deadline to Saturday'
+  output:
+    deadline: Saturday
+- input: 'modify: {"name": "meet the client", "difficulty": "0.3", "duration": "60",
+    "location": "client office", "importance": "0.85", "fixed_time": true, "fixed_start":
+    "Tuesday 14:00"} │ hard session at library'
+  output:
+    difficulty: '0.9'
+    location: library
+- input: 'modify: {"name": "therapy session", "difficulty": "0.3", "duration": "60",
+    "importance": "0.85", "fixed_time": true, "fixed_start": "Wednesday 15:00"} │
+    no longer fixed, finish before Monday evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Monday evening
+- input: 'modify: {"name": "journaling", "start": "night", "difficulty": "0.1", "duration":
+    "10", "importance": "0.5", "recurrent": true} │ change to every Tuesday'
+  output:
+    recurrence_days:
+    - Tuesday
+- input: 'modify: {"name": "send invoice to client", "deadline": "Tuesday", "difficulty":
+    "0.2", "importance": "0.9"} │ make it 60 minutes and push to tomorrow'
+  output:
+    duration: '60'
+    deadline: tomorrow
+- input: 'modify: {"name": "write the technical spec for the new API", "deadline":
+    "Friday", "difficulty": "0.9", "duration": "480", "importance": "0.9"} │ make
+    it 60 minutes and push to tomorrow'
+  output:
+    duration: '60'
+    deadline: tomorrow
+- input: 'modify: {"name": "update the team calendar", "deadline": "next Monday",
+    "difficulty": "0.2", "duration": "20", "importance": "0.6"} │ critical'
+  output:
+    importance: '0.2'
+- input: 'modify: {"name": "study for biology exam", "deadline": "Wednesday", "difficulty":
+    "0.8", "importance": "0.9"} │ make it 90 minutes and push to Friday'
+  output:
+    duration: '90'
+    deadline: Friday
+- input: 'modify: {"name": "stretching", "start": "morning", "difficulty": "0.2",
+    "duration": "30", "importance": "0.55", "recurrent": true} │ do it at online'
+  output:
+    location: online
+- input: 'modify: {"name": "practice guitar", "start": "evening", "deadline": "evening",
+    "difficulty": "0.3", "duration": "20", "location": "home", "importance": "0.5",
+    "recurrent": true} │ change to every Wednesday and Thursday and Saturday'
+  output:
+    recurrence_days:
+    - Wednesday
+    - Thursday
+    - Saturday
+- input: 'modify: {"name": "submit tax return", "deadline": "April 15th", "difficulty":
+    "0.6", "importance": "0.98"} │ make it 180 minutes and push to tomorrow'
+  output:
+    duration: '180'
+    deadline: tomorrow
+- input: 'modify: {"name": "do laundry", "start": "afternoon", "deadline": "afternoon",
+    "difficulty": "0.1", "duration": "60", "location": "home", "importance": "0.5",
+    "recurrent": true, "recurrence_days": ["Sunday"]} │ change to every Sunday and
+    Monday'
+  output:
+    recurrence_days:
+    - Sunday
+    - Monday
+- input: 'modify: {"name": "run 5k", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "recurrent": true, "recurrence_days": ["Tuesday", "Friday"]} │ make it 60
+    minutes and push to Friday'
+  output:
+    duration: '60'
+    deadline: Friday
+- input: 'modify: {"name": "go to the gym", "difficulty": "0.75", "duration": "60",
+    "location": "gym", "importance": "0.7", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ can wait'
+  output:
+    importance: '0.2'
+- input: 'modify: {"name": "meditate", "start": "morning", "difficulty": "0.2", "duration":
+    "15", "importance": "0.6", "recurrent": true} │ change to every Monday and Friday
+    and Thursday'
+  output:
+    recurrence_days:
+    - Monday
+    - Friday
+    - Thursday
+- input: 'modify: {"name": "weekly sync", "difficulty": "0.1", "duration": "30", "importance":
+    "0.75", "fixed_time": true, "fixed_start": "Monday 14:00", "recurrent": true,
+    "recurrence_days": ["Monday"]} │ no longer fixed, finish before Monday evening'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Monday evening
+- input: 'modify: {"name": "pick up the dry cleaning", "deadline": "Saturday", "difficulty":
+    "0.1", "duration": "20", "location": "the mall", "importance": "0.6"} │ harder
+    than expected'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "backup computer files", "difficulty": "0.1", "duration":
+    "15", "importance": "0.6", "recurrent": true, "recurrence_days": ["Sunday"]} │
+    change to every Friday'
+  output:
+    recurrence_days:
+    - Friday
+- input: 'modify: {"name": "reply to the email from Sarah", "deadline": "today", "difficulty":
+    "0.1", "duration": "10", "importance": "0.6"} │ hard session at library'
+  output:
+    difficulty: '0.8'
+    location: library
+- input: 'modify: {"name": "therapy session", "difficulty": "0.3", "duration": "60",
+    "importance": "0.85", "fixed_time": true, "fixed_start": "Wednesday 15:00"} │
+    very important'
+  output:
+    importance: '0.2'
+- input: 'modify: {"name": "evening jog", "start": "evening", "difficulty": "0.5",
+    "duration": "40", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ make it 60 minutes'
+  output:
+    duration: '60'
+- input: 'modify: {"name": "review pull requests", "deadline": "today 17:00", "difficulty":
+    "0.5", "importance": "0.9"} │ make it recurring every Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+- input: 'modify: {"name": "conference call", "difficulty": "0.2", "importance": "0.95",
+    "fixed_time": true, "fixed_start": "today 15:00"} │ hard session at home'
+  output:
+    difficulty: '0.9'
+    location: home
+- input: 'modify: {"name": "write blog post", "deadline": "Sunday", "difficulty":
+    "0.5", "duration": "120", "importance": "0.6"} │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "review pull requests", "deadline": "today 17:00", "difficulty":
+    "0.5", "importance": "0.9"} │ make it 120 minutes and push to tomorrow'
+  output:
+    duration: '120'
+    deadline: tomorrow
+- input: 'modify: {"name": "grocery shopping", "deadline": "Saturday", "difficulty":
+    "0.2", "importance": "0.6"} │ can wait'
+  output:
+    importance: '0.2'
+- input: 'modify: {"name": "cook dinner", "start": "evening", "difficulty": "0.3",
+    "duration": "45", "importance": "0.7", "recurrent": true, "recurrence_days": ["Monday",
+    "Tuesday", "Wednesday", "Thursday", "Friday"]} │ low priority'
+  output:
+    importance: '0.1'
+- input: 'modify: {"name": "order lunch for the team", "deadline": "today", "difficulty":
+    "0.1", "duration": "15", "importance": "0.7"} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "fix CSS layout bug", "deadline": "Thursday", "difficulty":
+    "0.65", "importance": "0.9"} │ make it 120 minutes'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "clean the apartment", "deadline": "Saturday", "difficulty":
+    "0.3", "duration": "60", "importance": "0.5"} │ low priority'
+  output:
+    importance: '0.8'
+- input: 'modify: {"name": "run 5k", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "recurrent": true, "recurrence_days": ["Tuesday", "Friday"]} │ push deadline
+    to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "restock office supplies", "deadline": "Monday", "difficulty":
+    "0.15", "importance": "0.55"} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "fix CSS layout bug", "deadline": "Thursday", "difficulty":
+    "0.65", "importance": "0.9"} │ hard session at office'
+  output:
+    difficulty: '0.8'
+    location: office
+- input: 'modify: {"name": "run 5km", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "importance": "0.65", "recurrent": true, "recurrence_days": ["Saturday",
+    "Sunday"]} │ difficulty is 0.1'
+  output:
+    difficulty: '0.1'
+- input: 'modify: {"name": "math assignment", "deadline": "today 23:59", "difficulty":
+    "0.95", "duration": "120", "importance": "0.98"} │ difficulty is 0.3'
+  output:
+    difficulty: '0.3'
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ push deadline
+    to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "review pull requests", "deadline": "today 17:00", "difficulty":
+    "0.5", "importance": "0.9"} │ make it 60 minutes'
+  output:
+    duration: '60'
+- input: 'modify: {"name": "fix CSS layout bug", "deadline": "Thursday", "difficulty":
+    "0.65", "importance": "0.9"} │ not that important anymore'
+  output:
+    importance: '0.7'
+- input: 'modify: {"name": "prepare for the job interview", "deadline": "Thursday",
+    "difficulty": "0.7", "duration": "120", "importance": "0.95"} │ make it recurring
+    every Saturday and Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Tuesday
+- input: 'modify: {"name": "deploy hotfix to production", "deadline": "today 23:59",
+    "difficulty": "0.8", "importance": "0.99"} │ make it 90 minutes'
+  output:
+    duration: '90'
+- input: 'modify: {"name": "book flight tickets", "deadline": "today", "difficulty":
+    "0.2", "importance": "0.9"} │ make it 180 minutes and push to tomorrow'
+  output:
+    duration: '180'
+    deadline: tomorrow
+- input: 'modify: {"name": "restock office supplies", "deadline": "Monday", "difficulty":
+    "0.15", "importance": "0.55"} │ push deadline to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "read design doc", "deadline": "today 17:00", "difficulty":
+    "0.3", "duration": "45", "importance": "0.5"} │ lighter than expected'
+  output:
+    difficulty: '0.95'
+- input: 'modify: {"name": "update resume", "deadline": "next Wednesday", "difficulty":
+    "0.45", "importance": "0.75"} │ can wait'
+  output:
+    importance: '0.8'
+- input: 'modify: {"name": "update resume", "deadline": "next Wednesday", "difficulty":
+    "0.45", "importance": "0.75"} │ push deadline to Sunday'
+  output:
+    deadline: Sunday
+- input: 'modify: {"name": "run 5k", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "recurrent": true, "recurrence_days": ["Tuesday", "Friday"]} │ actually
+    quite hard'
+  output:
+    difficulty: '0.3'
+- input: 'modify: {"name": "call mom", "deadline": "Sunday", "difficulty": "0.1",
+    "importance": "0.7"} │ make it 30 minutes'
+  output:
+    duration: '30'
+- input: 'modify: {"name": "fix the payment bug", "deadline": "today 23:59", "difficulty":
+    "0.9", "duration": "120", "importance": "0.99"} │ make it 120 minutes'
+  output:
+    duration: '120'
+- input: 'modify: {"name": "do laundry", "deadline": "Sunday", "difficulty": "0.15",
+    "duration": "30", "importance": "0.45"} │ make it 90 minutes and push to Friday'
+  output:
+    duration: '90'
+    deadline: Friday
+- input: 'modify: {"name": "book a table for dinner", "deadline": "Friday", "difficulty":
+    "0.1", "duration": "10", "importance": "0.7"} │ make it recurring every Friday
+    and Monday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Friday
+    - Monday
+- input: 'modify: {"name": "go to the gym", "difficulty": "0.75", "duration": "60",
+    "location": "gym", "importance": "0.7", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ harder than expected'
+  output:
+    difficulty: '0.1'
+- input: 'modify: {"name": "team standup", "difficulty": "0.1", "duration": "30",
+    "importance": "0.8", "fixed_time": true, "fixed_start": "Monday 10:00", "recurrent":
+    true, "recurrence_days": ["Monday"]} │ change to every Friday'
+  output:
+    recurrence_days:
+    - Friday
+- input: 'modify: {"name": "pay rent", "deadline": "1st", "difficulty": "0.1", "importance":
+    "0.99"} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "fix the payment bug", "deadline": "today 23:59", "difficulty":
+    "0.9", "duration": "120", "importance": "0.99"} │ easier than i thought'
+  output:
+    difficulty: '0.5'
+- input: 'modify: {"name": "run 5km", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "importance": "0.65", "recurrent": true, "recurrence_days": ["Saturday",
+    "Sunday"]} │ change to every Saturday and Tuesday and Sunday'
+  output:
+    recurrence_days:
+    - Saturday
+    - Tuesday
+    - Sunday
+- input: 'modify: {"name": "backup computer files", "difficulty": "0.1", "duration":
+    "15", "importance": "0.6", "recurrent": true, "recurrence_days": ["Sunday"]} │
+    make it 120 minutes and push to Friday'
+  output:
+    duration: '120'
+    deadline: Friday
+- input: 'modify: {"name": "cook dinner", "start": "evening", "difficulty": "0.3",
+    "duration": "45", "importance": "0.7", "recurrent": true, "recurrence_days": ["Monday",
+    "Tuesday", "Wednesday", "Thursday", "Friday"]} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "team lunch", "difficulty": "0.1", "duration": "90", "location":
+    "the italian place", "importance": "0.7", "fixed_time": true, "fixed_start": "Thursday
+    12:00"} │ no longer fixed, finish before Friday afternoon'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Friday afternoon
+- input: 'modify: {"name": "prepare slides for the board meeting", "deadline": "Monday",
+    "difficulty": "0.8", "duration": "240", "importance": "0.95"} │ not that important
+    anymore'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "therapy session", "difficulty": "0.3", "duration": "60",
+    "importance": "0.85", "fixed_time": true, "fixed_start": "Wednesday 15:00"} │
+    light session at gym'
+  output:
+    difficulty: '0.5'
+    location: gym
+- input: 'modify: {"name": "submit tax return", "deadline": "April 15th", "difficulty":
+    "0.6", "importance": "0.98"} │ make it recurring every Friday and Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Friday
+    - Wednesday
+- input: 'modify: {"name": "weekly review", "start": "afternoon", "difficulty": "0.3",
+    "duration": "60", "importance": "0.7", "recurrent": true, "recurrence_days": ["Friday"]}
+    │ very important'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "run 5km", "start": "morning", "difficulty": "0.6", "duration":
+    "30", "importance": "0.65", "recurrent": true, "recurrence_days": ["Saturday",
+    "Sunday"]} │ push deadline to next Monday'
+  output:
+    deadline: next Monday
+- input: 'modify: {"name": "journaling", "start": "night", "difficulty": "0.1", "duration":
+    "10", "importance": "0.5", "recurrent": true} │ difficulty is 0.85'
+  output:
+    difficulty: '0.85'
+- input: 'modify: {"name": "update resume", "deadline": "next Wednesday", "difficulty":
+    "0.45", "importance": "0.75"} │ make it 90 minutes'
+  output:
+    duration: '90'
+- input: 'modify: {"name": "work from the coffee shop", "deadline": "Wednesday", "difficulty":
+    "0.3", "location": "coffee shop", "importance": "0.4"} │ light session at library'
+  output:
+    difficulty: '0.2'
+    location: library
+- input: 'modify: {"name": "study for biology exam", "deadline": "Wednesday", "difficulty":
+    "0.8", "importance": "0.9"} │ make it 180 minutes'
+  output:
+    duration: '180'
+- input: 'modify: {"name": "restock office supplies", "deadline": "Monday", "difficulty":
+    "0.15", "importance": "0.55"} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ hard session at library'
+  output:
+    difficulty: '0.9'
+    location: library
+- input: 'modify: {"name": "boxing class", "difficulty": "0.7", "duration": "60",
+    "location": "sports centre", "importance": "0.65", "fixed_time": true, "fixed_start":
+    "Tuesday 19:00"} │ harder than expected'
+  output:
+    difficulty: '0.85'
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ can wait'
+  output:
+    importance: '0.9'
+- input: 'modify: {"name": "backup computer files", "difficulty": "0.1", "duration":
+    "15", "importance": "0.6", "recurrent": true, "recurrence_days": ["Sunday"]} │
+    make it 30 minutes'
+  output:
+    duration: '30'
+- input: 'modify: {"name": "fix the login bug", "deadline": "Friday", "difficulty":
+    "0.85", "duration": "240", "importance": "0.95"} │ do it at online'
+  output:
+    location: online
+- input: 'modify: {"name": "dentist appointment", "difficulty": "0.1", "importance":
+    "0.85", "fixed_time": true, "fixed_start": "Wednesday 14:00"} │ no longer fixed,
+    finish before Friday afternoon'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Friday afternoon
+- input: 'modify: {"name": "French lesson", "difficulty": "0.5", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Monday 18:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Wednesday"]} │ low priority'
+  output:
+    importance: '0.5'
+- input: 'modify: {"name": "write the technical spec for the new API", "deadline":
+    "Friday", "difficulty": "0.9", "duration": "480", "importance": "0.9"} │ make
+    it recurring every Tuesday and Friday and Wednesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+    - Friday
+    - Wednesday
+- input: 'modify: {"name": "write blog post", "deadline": "Sunday", "difficulty":
+    "0.5", "duration": "120", "importance": "0.6"} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "study at the library", "start": "afternoon", "deadline":
+    "afternoon", "difficulty": "0.5", "duration": "120", "location": "library", "importance":
+    "0.7", "recurrent": true, "recurrence_days": ["Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday"]} │ light session at home'
+  output:
+    difficulty: '0.5'
+    location: home
+- input: 'modify: {"name": "call mom", "deadline": "Sunday", "difficulty": "0.1",
+    "importance": "0.7"} │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "team standup", "difficulty": "0.1", "duration": "30",
+    "importance": "0.8", "fixed_time": true, "fixed_start": "Monday 10:00", "recurrent":
+    true, "recurrence_days": ["Monday"]} │ do it at school'
+  output:
+    location: school
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ make it 90 minutes
+    and push to tomorrow'
+  output:
+    duration: '90'
+    deadline: tomorrow
+- input: 'modify: {"name": "French lesson", "difficulty": "0.5", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Monday 18:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Wednesday"]} │ lighter than expected'
+  output:
+    difficulty: '0.5'
+- input: 'modify: {"name": "take out trash", "start": "evening", "difficulty": "0.1",
+    "duration": "5", "importance": "0.5", "recurrent": true, "recurrence_days": ["Monday",
+    "Thursday"]} │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "finish reading report", "deadline": "tomorrow", "difficulty":
+    "0.4", "importance": "0.7"} │ make it recurring every Tuesday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Tuesday
+- input: 'modify: {"name": "prepare slides for the board meeting", "deadline": "Monday",
+    "difficulty": "0.8", "duration": "240", "importance": "0.95"} │ make it 120 minutes
+    and push to next Monday'
+  output:
+    duration: '120'
+    deadline: next Monday
+- input: 'modify: {"name": "math assignment", "deadline": "today 23:59", "difficulty":
+    "0.95", "duration": "120", "importance": "0.98"} │ make it recurring every Saturday
+    and Sunday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Saturday
+    - Sunday
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ hard session at
+    office'
+  output:
+    difficulty: '0.9'
+    location: office
+- input: 'modify: {"name": "finish API integration", "deadline": "next Monday", "difficulty":
+    "0.85", "duration": "360", "importance": "0.9"} │ make it 45 minutes'
+  output:
+    duration: '45'
+- input: 'modify: {"name": "cook dinner", "start": "evening", "difficulty": "0.3",
+    "duration": "45", "importance": "0.7", "recurrent": true, "recurrence_days": ["Monday",
+    "Tuesday", "Wednesday", "Thursday", "Friday"]} │ push deadline to next Friday'
+  output:
+    deadline: next Friday
+- input: 'modify: {"name": "learn docker", "deadline": "next Monday", "difficulty":
+    "0.75", "duration": "300", "importance": "0.8"} │ push deadline to tomorrow'
+  output:
+    deadline: tomorrow
+- input: 'modify: {"name": "learn docker", "deadline": "next Monday", "difficulty":
+    "0.75", "duration": "300", "importance": "0.8"} │ make it recurring every Wednesday
+    and Thursday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Wednesday
+    - Thursday
+- input: 'modify: {"name": "book a table for dinner", "deadline": "Friday", "difficulty":
+    "0.1", "duration": "10", "importance": "0.7"} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "piano practice", "difficulty": "0.5", "duration": "45",
+    "importance": "0.6", "recurrent": true, "recurrence_days": ["Monday", "Tuesday",
+    "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]} │ do it at home'
+  output:
+    location: home
+- input: 'modify: {"name": "update the team calendar", "deadline": "next Monday",
+    "difficulty": "0.2", "duration": "20", "importance": "0.6"} │ push deadline to
+    Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "debug the production crash", "deadline": "today", "difficulty":
+    "0.95", "duration": "240", "importance": "0.99"} │ light session at home'
+  output:
+    difficulty: '0.2'
+    location: home
+- input: 'modify: {"name": "French lesson", "difficulty": "0.5", "duration": "60",
+    "importance": "0.7", "fixed_time": true, "fixed_start": "Monday 18:00", "recurrent":
+    true, "recurrence_days": ["Monday", "Wednesday"]} │ change to every Monday and
+    Tuesday'
+  output:
+    recurrence_days:
+    - Monday
+    - Tuesday
+- input: 'modify: {"name": "send invoice to client", "deadline": "Tuesday", "difficulty":
+    "0.2", "importance": "0.9"} │ make it recurring every Thursday and Friday and
+    Monday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Thursday
+    - Friday
+    - Monday
+- input: 'modify: {"name": "do laundry", "deadline": "Sunday", "difficulty": "0.15",
+    "duration": "30", "importance": "0.45"} │ not that important anymore'
+  output:
+    importance: '0.99'
+- input: 'modify: {"name": "complete the tax return", "deadline": "end of month",
+    "difficulty": "0.8", "duration": "180", "importance": "0.95"} │ actually quite
+    hard'
+  output:
+    difficulty: '0.95'
+- input: 'modify: {"name": "weekly sync", "difficulty": "0.1", "duration": "30", "importance":
+    "0.75", "fixed_time": true, "fixed_start": "Monday 14:00", "recurrent": true,
+    "recurrence_days": ["Monday"]} │ change to every Thursday and Friday and Tuesday'
+  output:
+    recurrence_days:
+    - Thursday
+    - Friday
+    - Tuesday
+- input: 'modify: {"name": "evening jog", "start": "evening", "difficulty": "0.5",
+    "duration": "40", "importance": "0.65", "recurrent": true, "recurrence_days":
+    ["Tuesday", "Wednesday", "Friday"]} │ make it 60 minutes and push to tomorrow'
+  output:
+    duration: '60'
+    deadline: tomorrow
+- input: 'modify: {"name": "dentist appointment", "difficulty": "0.1", "importance":
+    "0.85", "fixed_time": true, "fixed_start": "Wednesday 14:00"} │ top priority now'
+  output:
+    importance: '0.1'
+- input: 'modify: {"name": "review pull requests", "deadline": "today", "difficulty":
+    "0.5", "duration": "60", "importance": "0.75"} │ push deadline to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "backup computer files", "difficulty": "0.1", "duration":
+    "15", "importance": "0.6", "recurrent": true, "recurrence_days": ["Sunday"]} │
+    easier than i thought'
+  output:
+    difficulty: '0.8'
+- input: 'modify: {"name": "work from the coffee shop", "deadline": "Wednesday", "difficulty":
+    "0.3", "location": "coffee shop", "importance": "0.4"} │ make it 60 minutes and
+    push to Friday'
+  output:
+    duration: '60'
+    deadline: Friday
+- input: 'modify: {"name": "restock office supplies", "deadline": "Monday", "difficulty":
+    "0.15", "importance": "0.55"} │ make it 60 minutes and push to Friday'
+  output:
+    duration: '60'
+    deadline: Friday
+- input: 'modify: {"name": "weekly review", "start": "afternoon", "difficulty": "0.3",
+    "duration": "60", "importance": "0.7", "recurrent": true, "recurrence_days": ["Friday"]}
+    │ push deadline to Wednesday'
+  output:
+    deadline: Wednesday
+- input: 'modify: {"name": "prepare for the job interview", "deadline": "Thursday",
+    "difficulty": "0.7", "duration": "120", "importance": "0.95"} │ make it 240 minutes'
+  output:
+    duration: '240'
+- input: 'modify: {"name": "call mom", "deadline": "Sunday", "difficulty": "0.1",
+    "importance": "0.7"} │ make it recurring every Monday and Friday'
+  output:
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Friday
+- input: 'modify: {"name": "prepare presentation", "deadline": "Thursday", "difficulty":
+    "0.7", "duration": "180", "importance": "0.9"} │ make it 90 minutes and push to
+    Friday'
+  output:
+    duration: '90'
+    deadline: Friday
+- input: 'modify: {"name": "team meeting", "importance": "0.95", "fixed_time": true,
+    "fixed_start": "Monday 09:00"} │ no longer fixed, finish before Friday afternoon'
+  output:
+    fixed_time: false
+    fixed_start: null
+    deadline: Friday afternoon
+- input: 'modify: {"name": "write unit tests for payment module", "deadline": "Thursday",
+    "difficulty": "0.7", "importance": "0.85"} │ actually quite hard'
+  output:
+    difficulty: '0.9'
+- input: 'modify: {"name": "team meeting", "importance": "0.95", "fixed_time": true,
+    "fixed_start": "Monday 09:00"} │ difficulty is 0.5'
+  output:
+    difficulty: '0.5'
+- input: 'modify: {"name": "work from the coffee shop", "deadline": "Wednesday", "difficulty":
+    "0.3", "location": "coffee shop", "importance": "0.4"} │ low priority'
+  output:
+    importance: '0.99'
+  

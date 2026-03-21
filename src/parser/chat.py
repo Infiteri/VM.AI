@@ -81,8 +81,10 @@ class TaskPlannerPredictor:
             k, _, v = part.partition("=")
             k, v = k.strip(), v.strip()
             if v.lower() == "null":   v = None
-            elif v.lower() == "true":  v = True
-            elif v.lower() == "false": v = False
+            elif v.lower().startswith("false"):
+                v = False
+            elif v.lower().startswith("true"):
+                v = True
             raw[k] = v
 
         schema = {}
