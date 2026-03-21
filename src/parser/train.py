@@ -6,6 +6,7 @@
     Main dev: Vanea
     Written by (1): Vanea @ 07-03-2026
     Updated by: Vanea @ 19-03-2026 — split into functions, --mode flag, always resume
+    Updated by: Vanea @ 20-03-2026 — --env flag, training timer
 """
 
 import os
@@ -154,12 +155,21 @@ def parse_args():
         default=DEFAULT_MODE,
         help="Data to train on: 'synthetic' | 'real' | 'both' (default)."
     )
+    parser.add_argument(
+        "--env",
+        choices=["local", "colab"],
+        default="local",
+        help="Environment: 'local' (default) | 'colab'."
+    )
     return parser.parse_args()
 
 
 def main():
+    import time
+    start_time = time.time()
+
     args   = parse_args()
-    cfg    = EnvConfig("local")
+    cfg    = EnvConfig(args.env)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print(f"Device     : {device}")
@@ -181,7 +191,10 @@ def main():
     run_trainer(model, tokenizer, cfg, tok_train, tok_test, lr)
     save_model(model, tokenizer, cfg)
 
-    print("\nTraining completed!")
+    elapsed = time.time() - start_time
+    hours, rem = divmod(int(elapsed), 3600)
+    minutes, seconds = divmod(rem, 60)
+    print(f"\nTraining completed in {hours:02d}h {minutes:02d}m {seconds:02d}s")
 
 
 if __name__ == "__main__":

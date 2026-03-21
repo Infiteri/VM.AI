@@ -85,7 +85,7 @@ class EnvConfig:
             self.dataloader_pin_memory = False
 
     def setup_local(self):
-        self.max_limit                   = 10000
+        self.max_limit                   = 6000
         self.num_train_epochs            = 5
         self.per_device_train_batch_size = 16
         self.per_device_eval_batch_size  = 16
@@ -94,7 +94,7 @@ class EnvConfig:
         self.dataloader_num_workers      = 4
         self.dataloader_pin_memory       = True
         self.logging_steps               = 50
-        self.learning_rate_fresh         = 3e-4
+        self.learning_rate_fresh         = 2e-5
         self.learning_rate_resume        = 5e-6
 
         self.base_dir       = "."

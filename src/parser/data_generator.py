@@ -7,6 +7,7 @@
     Updated by: Vanea @ 18-03-2026 — add/modify split, JSON schema output
     Updated by: Vanea @ 18-03-2026 — real examples mixed in from VMAI_REAL_Data.yaml
     Updated by: Vanea @ 20-03-2026 — fix start.predicted: false when DATE/TIME explicit in template
+    Updated by: Vanea @ 21-03-2026 — switch target format from JSON to pipe (name=x | deadline=y)
 """
 
 import vars
@@ -40,6 +41,30 @@ CHANGE_TEMPLATES = [
     ("difficulty", lambda v: f"it's a {'hard' if float(v) > 0.5 else 'light'} session", lambda: str(round(random.uniform(0.1, 0.95), 2))),
     ("importance", lambda v: f"it's {'very important' if float(v) > 0.5 else 'not urgent'}", lambda: str(round(random.uniform(0.1, 0.99), 2))),
 ]
+
+
+def schema_to_pipe(schema: dict) -> str:
+    """Convert full schema dict to flat pipe string for model target."""
+    parts = []
+    for field, entry in schema.items():
+        val = entry["value"]
+        if val is not None and val is not False:
+            if isinstance(val, list):
+                val = ",".join(val)
+            parts.append(f"{field}={val}")
+        elif val is False and field in ("fixed_time", "recurrent"):
+            parts.append(f"{field}=false")
+    return " | ".join(parts)
+
+
+def changed_to_pipe(changed_fields: dict) -> str:
+    """Convert changed fields dict to flat pipe string for modify target."""
+    parts = []
+    for field, entry in changed_fields.items():
+        val = entry["value"]
+        if val is not None:
+            parts.append(f"{field}={val}")
+    return " | ".join(parts)
 
 
 class VMAI_DataGenerator:
@@ -142,6 +167,15 @@ class VMAI_DataGenerator:
         sentence = example["input"]
         output   = example["output"]
 
+        if sentence.startswith("modify:"):
+            input_text  = sentence
+            parts = []
+            for k, v in output.items():
+                if v is not None:
+                    parts.append(f"{k}={v}")
+            target_text = " | ".join(parts)
+            return input_text, target_text
+
         schema = {
             "name":            {"value": output.get("name"),                    "predicted": False},
             "start":           {"value": output.get("start"),                   "predicted": False},
@@ -158,14 +192,14 @@ class VMAI_DataGenerator:
         }
 
         input_text  = f"add: {sentence.lower().strip()}"
-        target_text = json.dumps(schema, ensure_ascii=False)
+        target_text = schema_to_pipe(schema)
         return input_text, target_text
 
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
         schema = self._build_full_schema(placeholder_map)
-        input_text = f"add: {sentence}"
-        target_text = json.dumps(schema, ensure_ascii=False)
+        input_text  = f"add: {sentence}"
+        target_text = schema_to_pipe(schema)
         return input_text, target_text
 
     def _generate_modify(self):
@@ -190,8 +224,8 @@ class VMAI_DataGenerator:
             k: v["value"] for k, v in existing.items() if v["value"] is not None
         }
 
-        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} │ {change_prompt}"
-        target_text = json.dumps(changed_fields, ensure_ascii=False)
+        input_text  = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} │ {change_prompt}"
+        target_text = changed_to_pipe(changed_fields)
         return input_text, target_text
 
 
