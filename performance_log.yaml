@@ -1003,3 +1003,303 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-03-21T19:18:12.748287'
+  mode: add
+  input: Go home by 5 pm
+  raw_output: name=go home | deadline=15 pm | fixed_time=false | recurrent=falsen
+  parsed:
+    name: go home
+    start: null
+    deadline: 15 pm
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T19:18:18.911259'
+  mode: add
+  input: Go home at 5 pm
+  raw_output: name=go home | fixed_time=true | recurrent=false
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-21T19:18:32.924135'
+  mode: add
+  input: Go home at 5 pm
+  raw_output: name=go home | fixed_time=true | recurrent=false
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:17:02.945503'
+  mode: add
+  input: go to school
+  raw_output: name=go to school | fixed_time=false | recurrent=falsen
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:17:06.049113'
+  mode: add
+  input: go to school at 6 pm
+  raw_output: name=go to school | fixed_time=true | fixed_start=18:00 | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:17:14.506047'
+  mode: add
+  input: go to school at 6 am
+  raw_output: name=go to school | fixed_time=true | fixed_start=6:00 | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '6:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:17:18.523737'
+  mode: add
+  input: go to school at 6 am everyday
+  raw_output: name=go to school | fixed_time=true | fixed_start=6:00 | recurrent=true
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '6:00'
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:18:23.139088'
+  mode: modify
+  input: at 9 pm
+  raw_output: name=school | fixed_start=9:00
+  parsed:
+    name: school
+    fixed_start: '9:00'
+  error: null
+
+- timestamp: '2026-03-22T19:18:31.637974'
+  mode: modify
+  input: change to every Monday and Wednesday and Friday
+  raw_output: name=go to the library | location=library | fixed_start=08:00
+  parsed:
+    name: go to the library
+    location: library
+    fixed_start: 08:00
+  error: null
+
+- timestamp: '2026-03-22T19:18:48.649171'
+  mode: modify
+  input: remove recurrence
+  raw_output: name=leave the office | fixed_start=08:00
+  parsed:
+    name: leave the office
+    fixed_start: 08:00
+  error: null
+
+- timestamp: '2026-03-22T19:18:59.217113'
+  mode: add
+  input: leave the office everyday
+  raw_output: name=load the office | fixed_time=true | recurrent=false
+  parsed:
+    name: load the office
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:19:03.514179'
+  mode: add
+  input: leave the office everyday
+  raw_output: name=load the office | fixed_time=true | recurrent=false
+  parsed:
+    name: load the office
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:19:19.045155'
+  mode: add
+  input: go to school at 6 pm
+  raw_output: name=go to school | fixed_time=true | fixed_start=18:00 | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:19:22.209139'
+  mode: modify
+  input: at 5 pm
+  raw_output: name=school | fixed_start=18:00
+  parsed:
+    name: school
+    fixed_start: '18:00'
+  error: null
+
+- timestamp: '2026-03-22T19:19:31.396364'
+  mode: modify
+  input: go to school at 3  pm
+  raw_output: name=school | fixed_start=15:00
+  parsed:
+    name: school
+    fixed_start: '15:00'
+  error: null
+
+- timestamp: '2026-03-22T19:20:13.762598'
+  mode: modify
+  input: change to every Monday and Wednesday and Friday
+  raw_output: name=go to the library | location=library | fixed_start=08:00
+  parsed:
+    name: go to the library
+    location: library
+    fixed_start: 08:00
+  error: null
+
+- timestamp: '2026-03-22T19:20:22.784141'
+  mode: add
+  input: go to school
+  raw_output: name=go to school | fixed_time=false | recurrent=falsen
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-22T19:22:20.822327'
+  mode: modify
+  input: do it a thome
+  raw_output: name=thome
+  parsed:
+    name: thome
+  error: null
+
+- timestamp: '2026-03-22T19:22:27.416200'
+  mode: modify
+  input: do it at home
+  raw_output: name=home | location=home
+  parsed:
+    name: home
+    location: home
+  error: null
+
+- timestamp: '2026-03-22T19:22:33.542264'
+  mode: modify
+  input: make it 10 minutes
+  raw_output: name=home | duration=10
+  parsed:
+    name: home
+    duration: '10'
+  error: null
+
+- timestamp: '2026-03-22T19:22:38.284105'
+  mode: modify
+  input: do it at home
+  raw_output: name=home | location=home
+  parsed:
+    name: home
+    location: home
+  error: null
+
