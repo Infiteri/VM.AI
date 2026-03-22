@@ -30,8 +30,8 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 def download_base_model(cfg):
     os.makedirs(cfg.model_cache, exist_ok=True)
     if not os.listdir(cfg.model_cache):
-        print("Downloading t5-small...")
-        snapshot_download(repo_id="google-t5/t5-small", local_dir=cfg.model_cache)
+        print("Downloading t5-base...")
+        snapshot_download(repo_id="google-t5/t5-base", local_dir=cfg.model_cache)
     else:
         print(f"Base model found at {cfg.model_cache}")
 
