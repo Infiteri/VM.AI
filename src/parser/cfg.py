@@ -26,6 +26,11 @@ class Config:
         self.learning_rate_fresh         = 2e-5
         self.learning_rate_resume        = 5e-6
 
+        # VRAM SAKE
+        self.per_device_train_batch_size = 4   
+        self.per_device_eval_batch_size  = 8   
+        self.gradient_accumulation_steps = 32  
+
         # Hardware
         self.fp16                   = torch.cuda.is_available()
         self.dataloader_num_workers = 4 if torch.cuda.is_available() else 0

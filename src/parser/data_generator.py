@@ -11,6 +11,7 @@ import vars
 import json
 import random
 import argparse
+import re
 from datasets import Dataset
 
 PREDICTED_FIELDS = {"difficulty", "duration", "category", "location", "importance", "start"}
@@ -137,21 +138,28 @@ class DataGenerator:
             schema[field]["value"]     = value
             schema[field]["predicted"] = field in PREDICTED_FIELDS
 
-        if "DATE" in placeholder_map or "TIME" in placeholder_map:
-            schema["start"]["predicted"] = False
-
         s = sentence.lower()
-        has_recurrent  = any(kw in s for kw in RECURRENT_KEYWORDS)
-        has_fixed_time = (
-            "at" in s
-            and ("am" in s or "pm" in s)
-            and schema["start"]["value"] is not None
+        
+        # Check for explicit time (FIXED)
+        has_explicit_time = (
+            "at" in s or 
+            "sharp" in s or
+            re.search(r'\d{1,2}(?::\d{2})?\s*(?:am|pm)', s) is not None or
+            "morning" in s or 
+            "afternoon" in s or 
+            "evening" in s or 
+            "noon" in s
         )
-
+        
+        has_recurrent = any(kw in s for kw in RECURRENT_KEYWORDS)
+        
+        # Handle recurrence first (overrides fixed_time)
         if has_recurrent:
             schema["recurrent"]["value"] = True
             schema["start"]["value"]     = None
             schema["deadline"]["value"]  = None
+            schema["fixed_time"]["value"] = False
+            schema["fixed_start"]["value"] = None
 
             if "every day" in s or "daily" in s:
                 schema["recurrence_days"]["value"] = DAYS.copy()
@@ -160,12 +168,34 @@ class DataGenerator:
             else:
                 mentioned = [DAYS_LOWER[d] for d in DAYS_LOWER if d in s]
                 schema["recurrence_days"]["value"] = mentioned if mentioned else random.sample(DAYS, k=random.randint(1, 3))
-
-        elif has_fixed_time:
-            schema["fixed_time"]["value"]  = True
-            schema["fixed_start"]["value"] = schema["start"]["value"]
-            schema["start"]["value"]       = None
-            schema["deadline"]["value"]    = None
+        
+        # Handle fixed time (only if explicitly mentioned)
+        elif has_explicit_time:
+            schema["fixed_time"]["value"] = True
+            schema["start"]["value"] = None
+            schema["deadline"]["value"] = None
+            
+            # Extract time from sentence
+            time_match = re.search(r'(\d{1,2}(?::\d{2})?\s*(?:am|pm))|(morning|afternoon|evening|noon)', s)
+            if time_match:
+                time_str = time_match.group(0)
+                # Normalize time
+                if "morning" in time_str:
+                    schema["fixed_start"]["value"] = "08:00"
+                elif "afternoon" in time_str:
+                    schema["fixed_start"]["value"] = "13:00"
+                elif "evening" in time_str:
+                    schema["fixed_start"]["value"] = "18:00"
+                elif "noon" in time_str:
+                    schema["fixed_start"]["value"] = "12:00"
+                else:
+                    schema["fixed_start"]["value"] = time_str
+        
+        # Handle "today" as start (not fixed_time)
+        if "today" in s and not has_recurrent and not has_explicit_time:
+            if schema["start"]["value"] is None:
+                schema["start"]["value"] = "today"
+                schema["start"]["predicted"] = False
 
         return schema
 
@@ -200,6 +230,25 @@ class DataGenerator:
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
         schema = self._build_schema(placeholder_map, sentence)
+        
+        # Additional validation to ensure consistent outputs
+        s = sentence.lower()
+        
+        # Double-check: if no explicit time, fixed_time should be false
+        has_explicit_time = (
+            "at" in s or 
+            "sharp" in s or
+            re.search(r'\d{1,2}(?::\d{2})?\s*(?:am|pm)', s) is not None or
+            "morning" in s or 
+            "afternoon" in s or 
+            "evening" in s or 
+            "noon" in s
+        )
+        
+        if not has_explicit_time and schema["fixed_time"]["value"] == True:
+            schema["fixed_time"]["value"] = False
+            schema["fixed_start"]["value"] = None
+        
         return f"add: {sentence}", schema_to_pipe(schema)
 
     def _generate_modify(self):
@@ -236,13 +285,14 @@ if __name__ == "__main__":
 
     yp = VMAI_YamlParser(os.path.join(cfg_path, vars.SYNTHETIC_DATASET))
     yp.load_yaml()
-    td = yp.parse()
+    training_data = yp.parse()
 
     rp = VMAI_RealDataParser(os.path.join(cfg_path, vars.REAL_DATASET))
     rp.load_yaml()
-    re = rp.parse()
+    real_data = rp.parse()  
 
-    ds = DataGenerator(td, re).generate(args.sentences)
+    ds = DataGenerator(training_data, real_data).generate(args.sentences)  
+    
     for i in range(min(100, len(ds))):
         print("IN: ", ds["input_text"][i])
         print("OUT:", ds["target_text"][i])
