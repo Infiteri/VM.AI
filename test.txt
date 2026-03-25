@@ -298,3 +298,88 @@ OUT: name=water the plants | location=home | fixed_time=true | fixed_start=3:30p
 IN:  add: should write the email on april 5th
 OUT: name=write the email | start=April 5th | fixed_time=false | recurrent=false
 
+
+============================================================
+BALANCED DATA GENERATION REPORT
+============================================================
+
+ADD EXAMPLES:
+  flexible        : 1250
+  fixed_time      : 1250
+  recurrent       : 1250
+  location        : 1250
+  deadline        : 1250
+  duration        : 1250
+  difficulty      : 1250
+  importance      : 1250
+
+MODIFY EXAMPLES: 2500
+TOTAL: 12500
+============================================================
+IN:  add: meet at the gym to learn piano at 10am every day
+OUT: name=learn piano | location=the gym | fixed_time=false | recurrent=true | recurrence_days=Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+
+IN:  add: return the item - est. 3 hours
+OUT: name=return the item | duration=3 hours | fixed_time=false | recurrent=false
+
+IN:  add: meditate might take 2 hours by next week
+OUT: name=meditate | deadline=next week | duration=2 hours | fixed_time=false | recurrent=false
+
+IN:  add: pick up the kids has to be done at the dentist, critical
+OUT: name=pick up the kids | location=the dentist | importance=0.88 | fixed_time=false | recurrent=false
+
+IN:  add: walk the dog every morning by next week
+OUT: name=walk the dog | deadline=next week | fixed_time=false | recurrent=false
+
+IN:  add: learning - back up the files at school. every evening
+OUT: name=back up the files | category=learning | location=school | fixed_time=false | recurrent=true
+
+IN:  add: cannot forget to transfer the money, urgent
+OUT: name=transfer the money | importance=0.84 | fixed_time=false | recurrent=false
+
+IN:  add: at 8am sharp flag this: clean the house due end of week
+OUT: name=clean the house | deadline=end of week | fixed_time=true | fixed_start=8am | recurrent=false
+
+IN:  add: buy a gift every monday at 5:30pm, easy
+OUT: name=buy a gift | start=5:30pm | difficulty=0.17 | fixed_time=false | recurrent=false
+
+IN:  add: study - do the reading at the coffee shop by today. 15 minutes
+OUT: name=do the reading | deadline=today | duration=15 | category=study | location=the coffee shop | fixed_time=false | recurrent=false
+
+IN:  add: at 11:30am prepare for the interview with 180 minutes at school on january 15th
+OUT: name=prepare for the interview | duration=180 minutes | location=school | fixed_time=true | fixed_start=11:30am | recurrent=false
+
+IN:  add: at 8am sharp schedule the checkup next january 15th
+OUT: name=schedule the checkup | fixed_time=true | fixed_start=8am | recurrent=false
+
+IN:  add: heads up: call the client by the end of the day by end of day
+OUT: name=call the client | deadline=the end | fixed_time=false | recurrent=false
+
+IN:  add: i need to call the client by q1 end
+OUT: name=call the client | start=today | deadline=Q1 end | fixed_time=false | recurrent=false
+
+IN:  add: send the application by december 25th, hard one, low priority
+OUT: name=send the application | deadline=December 25th | importance=0.21 | fixed_time=false | recurrent=false
+
+IN:  
+============================================================
+BALANCED DATA GENERATION REPORT
+============================================================
+
+ADD EXAMPLES:
+  flexible        : 125
+  fixed_time      : 125
+  recurrent       : 125
+  location        : 125
+  deadline        : 125
+  duration        : 125
+  difficulty      : 125
+  importance      : 125
+
+MODIFY EXAMPLES: 250
+TOTAL: 1250
+============================================================
+IN:  add: practice guitar every evening
+OUT: name=practice guitar | difficulty=0.4 | duration=30 minutes | category=creative | importance=0.35 | fixed_time=false | recurrent=true | recurrence_days=Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+
+IN:  

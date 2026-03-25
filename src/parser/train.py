@@ -4,6 +4,7 @@
     Written by: Vanea @ 07-03-2026
     Updated by: Vanea @ 21-03-2026 — full rewrite, local only, pipe format
     Updated by: Vanea @ 21-03-2026 — added specific mode
+    Updated by: Vanea @ 25-03-2026 — compute_metrics, target length fix, Windows fix
 """
 
 import os
@@ -18,14 +19,73 @@ from transformers import (
     Seq2SeqTrainingArguments,
     Seq2SeqTrainer,
     DataCollatorForSeq2Seq,
+    EvalPrediction,
 )
 from huggingface_hub import snapshot_download
 from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
 from data_generator import DataGenerator
 from cfg import Config
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+if os.name != "nt":  # expandable_segments not supported on Windows
+    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
+TRACKED_FIELDS = [
+    "name", "deadline", "difficulty", "importance",
+    "duration", "category", "location",
+    "fixed_time", "fixed_start", "recurrent", "recurrence_days",
+]
+
+
+def _parse_pipe(text: str) -> dict:
+    result = {}
+    for part in text.split("|"):
+        part = part.strip()
+        if "=" not in part:
+            continue
+        k, _, v = part.partition("=")
+        k, v = k.strip().lower(), v.strip().lower()
+        if v in ("null", ""):
+            v = None
+        result[k] = v
+    return result
+
+
+def compute_metrics(eval_preds: EvalPrediction, tokenizer):
+    predictions, label_ids = eval_preds
+
+    # clip negatives — predictions can have -100 padding the tokenizer can't handle
+    predictions = np.where(predictions < 0, tokenizer.pad_token_id, predictions)
+    label_ids   = np.where(label_ids   < 0, tokenizer.pad_token_id, label_ids)
+
+    decoded_preds  = tokenizer.batch_decode(predictions, skip_special_tokens=True)
+    decoded_labels = tokenizer.batch_decode(label_ids,   skip_special_tokens=True)
+
+    correct = {f: 0 for f in TRACKED_FIELDS}
+    present = {f: 0 for f in TRACKED_FIELDS}
+
+    for pred_str, label_str in zip(decoded_preds, decoded_labels):
+        pred_dict  = _parse_pipe(pred_str)
+        label_dict = _parse_pipe(label_str)
+        for field in TRACKED_FIELDS:
+            if field not in label_dict:
+                continue
+            present[field] += 1
+            if pred_dict.get(field) == label_dict[field]:
+                correct[field] += 1
+
+    metrics = {}
+    total_correct = 0
+    total_present = 0
+    for field in TRACKED_FIELDS:
+        n = present[field]
+        c = correct[field]
+        acc = round(c / n, 4) if n > 0 else 0.0
+        metrics[f"acc_{field}"] = acc
+        total_correct += c
+        total_present += n
+
+    metrics["acc_overall"] = round(total_correct / total_present, 4) if total_present > 0 else 0.0
+    return metrics
 
 def download_base_model(cfg):
     os.makedirs(cfg.model_cache, exist_ok=True)
@@ -58,19 +118,25 @@ def build_dataset(cfg, mode):
     real_examples = []
     if mode != "synthetic":
         if os.path.exists(cfg.real_data_path):
-            rp = VMAI_RealDataParser(cfg.real_data_path)
-            rp.load_yaml()
-            real_examples = rp.parse()
-            print(f"Real examples loaded: {len(real_examples)}")
+            try:
+                rp = VMAI_RealDataParser(cfg.real_data_path)
+                rp.load_yaml()
+                real_examples = rp.parse()
+                print(f"Real examples loaded: {len(real_examples)}")
+            except Exception as e:
+                print(f"Real data skipped — failed to load: {e}")
         else:
             print("No real data file found — skipping")
 
     specific_examples = []
     if os.path.exists(cfg.specific_data_path):
-        sp = VMAI_RealDataParser(cfg.specific_data_path)
-        sp.load_yaml()
-        specific_examples = sp.parse()
-        print(f"Specific examples loaded: {len(specific_examples)}")
+        try:
+            sp = VMAI_RealDataParser(cfg.specific_data_path)
+            sp.load_yaml()
+            specific_examples = sp.parse()
+            print(f"Specific examples loaded: {len(specific_examples)}")
+        except Exception as e:
+            print(f"Specific data skipped — failed to load: {e}")
     else:
         print("No specific data file found — skipping")
 
@@ -100,20 +166,25 @@ def build_dataset(cfg, mode):
 
 def tokenize(train_ds, test_ds, tokenizer):
     def tokenize_fn(examples):
-        inputs  = tokenizer(examples["input_text"],  truncation=True, padding="max_length", max_length=256)
-        targets = tokenizer(examples["target_text"], truncation=True, padding="max_length", max_length=64)
-        labels  = [
+        inputs  = tokenizer(
+            examples["input_text"],
+            truncation=True, padding="max_length", max_length=256,
+        )
+        targets = tokenizer(
+            examples["target_text"],
+            truncation=True, padding="max_length", max_length=128,
+        )
+        labels = np.array([
             [(t if t != tokenizer.pad_token_id else -100) for t in label]
             for label in targets["input_ids"]
-        ]
-        inputs["labels"] = np.array(labels, dtype=np.int64)
+        ], dtype=np.int64)   # single stacked array — kills the slow warning
+        inputs["labels"] = labels
         return inputs
 
     cols = ["input_ids", "attention_mask", "labels"]
     tok_train = train_ds.map(tokenize_fn, batched=True).with_format("torch", columns=cols)
     tok_test  = test_ds.map(tokenize_fn,  batched=True).with_format("torch", columns=cols)
     return tok_train, tok_test
-
 
 def train(model, tokenizer, cfg, tok_train, tok_test, lr):
     args = Seq2SeqTrainingArguments(
@@ -124,6 +195,7 @@ def train(model, tokenizer, cfg, tok_train, tok_test, lr):
         weight_decay=                0.01,
         save_total_limit=            2,
         predict_with_generate=       True,
+        generation_max_length=       128,
         push_to_hub=                 False,
         remove_unused_columns=       False,
         optim=                       "adafactor",
@@ -136,13 +208,16 @@ def train(model, tokenizer, cfg, tok_train, tok_test, lr):
         dataloader_pin_memory=       cfg.dataloader_pin_memory,
         logging_steps=               cfg.logging_steps,
     )
+
     trainer = Seq2SeqTrainer(
-        model=         model,
-        args=          args,
-        train_dataset= tok_train,
-        eval_dataset=  tok_test,
-        data_collator= DataCollatorForSeq2Seq(tokenizer, model=model),
+        model=           model,
+        args=            args,
+        train_dataset=   tok_train,
+        eval_dataset=    tok_test,
+        data_collator=   DataCollatorForSeq2Seq(tokenizer, model=model),
+        compute_metrics= lambda p: compute_metrics(p, tokenizer),
     )
+
     print("Starting training...")
     trainer.train()
 
@@ -154,9 +229,9 @@ def parse_args():
 
 
 def main():
-    start = time.time()
-    args  = parse_args()
-    cfg   = Config()
+    start  = time.time()
+    args   = parse_args()
+    cfg    = Config()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print(f"Device : {device}")

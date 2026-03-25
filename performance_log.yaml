@@ -1618,3 +1618,41 @@
     name: financial report
   error: null
 
+- timestamp: '2026-03-25T22:04:30.600009'
+  mode: add
+  input: go to school
+  raw_output: name=go to school | fixed_time=false | recurrent=falsity
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: falsity
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-25T22:04:51.221399'
+  mode: add
+  input: go home
+  raw_output: name=go home | fixed_time=false | recurrent=falsity
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: falsity
+    recurrence_days: null
+  error: null
+

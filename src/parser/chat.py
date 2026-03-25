@@ -64,10 +64,43 @@ class TaskPlannerPredictor:
         self._last_raw_output = ""
         print(f"✓ Model ready ({self.device})")
 
+    # Regex that matches an explicit clock time in the raw sentence
+    _TIME_RE = re.compile(
+        r'\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b', re.IGNORECASE
+    )
+
     def _normalize(self, text: str) -> str:
         text = text.strip()
         text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
         return text
+
+    def _sanity_check(self, schema: Dict, original_sentence: str) -> Dict:
+        """
+        Post-generation guard:
+        - fixed_time should only be True if the input sentence contains an
+          explicit clock time (HH:MM, Xam/pm, @Xpm).  If the model hallucinated
+          it, reset to False and clear fixed_start.
+        - fixed_start values that are clearly not times (day names, dates,
+          percentages, raw numbers like '45') are cleared.
+        """
+        # ── fix fixed_time hallucination ────────────────────────────────────
+        ft = schema.get("fixed_time", {})
+        ft_val = ft.get("value") if isinstance(ft, dict) else ft
+        if ft_val is True:
+            if not self._TIME_RE.search(original_sentence):
+                schema["fixed_time"]["value"] = False
+                schema["fixed_start"]["value"] = None
+
+        # ── fix bad fixed_start values ───────────────────────────────────────
+        fs = schema.get("fixed_start", {})
+        fs_val = fs.get("value") if isinstance(fs, dict) else fs
+        if fs_val is not None:
+            fs_str = str(fs_val).strip()
+            # Valid: HH:MM format only (after normalisation by model)
+            if not re.match(r'^\d{1,2}:\d{2}$', fs_str):
+                schema["fixed_start"]["value"] = None
+
+        return schema
 
     def _run_model(self, input_text: str) -> str:
         inputs = self.tokenizer(
@@ -89,7 +122,7 @@ class TaskPlannerPredictor:
                 inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
                 decoder_input_ids=decoder_input,
-                max_new_tokens=64,
+                max_new_tokens=128,
                 no_repeat_ngram_size=4,
                 repetition_penalty=1.5,
             )
@@ -106,11 +139,9 @@ class TaskPlannerPredictor:
                 continue
             k, _, v = part.partition("=")
             k, v = k.strip(), v.strip()
-            if v.lower() == "null":   v = None
-            elif v.lower().startswith("false"):
-                v = False
-            elif v.lower().startswith("true"):
-                v = True
+            if v.lower() == "null":    v = None
+            elif v.lower() == "false": v = False
+            elif v.lower() == "true":  v = True
             if k not in raw:
                 raw[k] = v
         schema = {}
@@ -142,6 +173,8 @@ class TaskPlannerPredictor:
             result = self._pipe_to_schema(output)
             if not result.get("name", {}).get("value"):
                 result = {"error": "parse_failed", "raw": output}
+            else:
+                result = self._sanity_check(result, sentence)
         log_entry("add", sentence, self._last_raw_output, result)
         return result
 
