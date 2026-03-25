@@ -1,0 +1,300 @@
+IN:  add: practice guitar - 0.1
+OUT: name=practice guitar | difficulty=0.1 | fixed_time=false | recurrent=false
+
+IN:  add: travel session: respond to the ticket at 3:30pm.
+OUT: name=respond to the ticket | category=travel | fixed_time=true | fixed_start=3:30pm | recurrent=false
+
+IN:  add: family: design the mockup at the restaurant
+OUT: name=design the mockup | category=family | location=the restaurant | fixed_time=false | recurrent=false
+
+IN:  add: schedule the checkup by before the weekend, 0.25.
+OUT: name=schedule the checkup | deadline=before the weekend | difficulty=0.25 | fixed_time=false | recurrent=false
+
+IN:  add: i need to attend the lecture at 10am.
+OUT: name=attend the lecture | fixed_time=true | fixed_start=10am | recurrent=false
+
+IN:  add: draft the proposal is scheduled at the cinema on january 15th at 10am
+OUT: name=draft the proposal | location=the cinema | fixed_time=true | fixed_start=10am | recurrent=false
+
+IN:  add: clean the house is going to be 0.5
+OUT: name=clean the house | difficulty=0.5 | fixed_time=false | recurrent=false
+
+IN:  add: log the calories - due march 31st
+OUT: name=log the calories | deadline=March 31st | fixed_time=false | recurrent=false
+
+IN:  add: make the reservation every evening
+OUT: name=make the reservation | fixed_time=false | recurrent=true | recurrence_days=Friday
+
+IN:  add: send the invoice - 0.25
+OUT: name=send the invoice | difficulty=0.25 | fixed_time=false | recurrent=false
+
+IN:  add: task: plan the party
+OUT: name=plan the party | fixed_time=false | recurrent=false
+
+IN:  add: check the schedule this saturday at 2:30pm
+OUT: name=check the schedule | fixed_time=true | fixed_start=2:30pm | recurrent=false
+
+IN:  add: block out 120 minutes to charge the laptop
+OUT: name=charge the laptop | duration=120 minutes | fixed_time=false | recurrent=false
+
+IN:  add: do book the hotel at the dentist for 45 minutes.
+OUT: name=book the hotel | duration=45 minutes | location=the dentist | fixed_time=false | recurrent=false
+
+IN:  add: thinking about schedule the call this saturday
+OUT: name=schedule the call | start=Saturday | fixed_time=false | recurrent=false
+
+IN:  add: work - write the email at the clinic by october 15th.
+OUT: name=write the email | deadline=October 15th | category=work | location=the clinic | fixed_time=false | recurrent=false
+
+IN:  add: review the design has to be done at the coffee shop
+OUT: name=review the design | location=the coffee shop | fixed_time=false | recurrent=false
+
+IN:  add: schedule learning: attend the meeting by the end of the day.
+OUT: name=attend the meeting | deadline=the end of the day | category=learning | fixed_time=false | recurrent=false
+
+IN:  add: must reply to messages at 10pm
+OUT: name=reply to messages | fixed_time=true | fixed_start=10pm | recurrent=false
+
+IN:  add: 3pm - charge the laptop
+OUT: name=charge the laptop | fixed_time=true | fixed_start=3pm | recurrent=false
+
+IN:  add: buy groceries every saturday and saturday
+OUT: name=buy groceries | fixed_time=false | recurrent=true | recurrence_days=Saturday
+
+IN:  add: admin session: back up the phone at 11am.
+OUT: name=back up the phone | category=admin | fixed_time=true | fixed_start=11am | recurrent=false
+
+IN:  add: write the essay by in 2 days.
+OUT: name=write the essay | deadline=in 2 days | fixed_time=false | recurrent=false
+
+IN:  add: absolutely have to fix the crash by tuesday
+OUT: name=fix the crash | deadline=Tuesday | fixed_time=false | recurrent=false
+
+IN:  add: finish measure blood pressure before next month.
+OUT: name=measure blood pressure | deadline=next month | fixed_time=false | recurrent=false
+
+IN:  add: reminder to review the contract at 7am
+OUT: name=review the contract | fixed_time=true | fixed_start=7am | recurrent=false
+
+IN:  add: draw - 0.7 - 240 minutes
+OUT: name=draw | difficulty=0.7 | duration=240 minutes | fixed_time=false | recurrent=false
+
+IN:  add: review flashcards every sunday for 20 minutes
+OUT: name=review flashcards | duration=20 minutes | fixed_time=false | recurrent=true | recurrence_days=Sunday
+
+IN:  add: apply for the job (5 hours)
+OUT: name=apply for the job | duration=5 hours | fixed_time=false | recurrent=false
+
+IN:  add: i have plan the sprint at 11am on wednesday
+OUT: name=plan the sprint | fixed_time=true | fixed_start=11am | recurrent=false
+
+IN:  add: meditate every evening
+OUT: name=meditate | fixed_time=false | recurrent=true | recurrence_days=Friday
+
+IN:  add: reminder to call the doctor at 11am
+OUT: name=call the doctor | fixed_time=true | fixed_start=11am | recurrent=false
+
+IN:  add: flag this: cancel the subscription due before the weekend
+OUT: name=cancel the subscription | deadline=before the weekend | fixed_time=false | recurrent=false
+
+IN:  add: plan the sprint at remotely, 0.6 difficulty.
+OUT: name=plan the sprint | difficulty=0.6 | location=remotely | fixed_time=false | recurrent=false
+
+IN:  add: do the reading every thursday and thursday
+OUT: name=do the reading | fixed_time=false | recurrent=true | recurrence_days=Thursday
+
+IN:  add: low key need to study for the exam by this friday
+OUT: name=study for the exam | deadline=this Friday | fixed_time=false | recurrent=false
+
+IN:  add: don't let me forget: review the document
+OUT: name=review the document | fixed_time=false | recurrent=false
+
+IN:  add: reminder: pay the invoice at 10am
+OUT: name=pay the invoice | fixed_time=true | fixed_start=10am | recurrent=false
+
+IN:  add: review the design by november 30th, 0.8.
+OUT: name=review the design | deadline=November 30th | difficulty=0.8 | fixed_time=false | recurrent=false
+
+IN:  add: sign the documents at the classroom, important.
+OUT: name=sign the documents | location=the classroom | fixed_time=false | recurrent=false
+
+IN:  add: schedule the checkup at the office, 0.95 difficulty.
+OUT: name=schedule the checkup | difficulty=0.95 | location=the office | fixed_time=false | recurrent=false
+
+IN:  add: meet at the studio to review the budget at 8am
+OUT: name=review the budget | location=the studio | fixed_time=true | fixed_start=8am | recurrent=false
+
+IN:  add: pick up the order for creative on march 20th.
+OUT: name=pick up the order | start=March 20th | category=creative | fixed_time=false | recurrent=false
+
+IN:  add: don't let me forget: read
+OUT: name=read | fixed_time=false | recurrent=false
+
+IN:  add: renew the passport every thursday
+OUT: name=renew the passport | fixed_time=false | recurrent=true | recurrence_days=Thursday
+
+IN:  add: make the reservation - june 1st at 6am
+OUT: name=make the reservation | fixed_time=true | fixed_start=6am | recurrent=false
+
+IN:  add: book the flight is due february 28th.
+OUT: name=book the flight | deadline=February 28th | fixed_time=false | recurrent=false
+
+IN:  add: admin - take the medication at the pharmacy.
+OUT: name=take the medication | category=admin | location=the pharmacy | fixed_time=false | recurrent=false
+
+IN:  add: head to the lab for write the email on july 4th
+OUT: name=write the email | start=July 4th | location=the lab | fixed_time=false | recurrent=false
+
+IN:  add: oh also meditate on april 5th
+OUT: name=meditate | start=April 5th | fixed_time=false | recurrent=false
+
+IN:  add: attend the meeting - 0.85
+OUT: name=attend the meeting | difficulty=0.85 | fixed_time=false | recurrent=false
+
+IN:  add: clean the house could take up to half a day
+OUT: name=clean the house | duration=half a day | fixed_time=false | recurrent=false
+
+IN:  add: file the taxes - 0.4
+OUT: name=file the taxes | difficulty=0.4 | fixed_time=false | recurrent=false
+
+IN:  add: need 60 minutes blocked for practice guitar
+OUT: name=practice guitar | duration=60 minutes | fixed_time=false | recurrent=false
+
+IN:  add: review the budget is a 0.8 task.
+OUT: name=review the budget | difficulty=0.8 | fixed_time=false | recurrent=false
+
+IN:  add: submit the assignment at 6am
+OUT: name=submit the assignment | fixed_time=true | fixed_start=6am | recurrent=false
+
+IN:  add: errands - write the summary - next month
+OUT: name=write the summary | deadline=next month | category=errands | fixed_time=false | recurrent=false
+
+IN:  add: reserve all day for charge the laptop
+OUT: name=charge the laptop | duration=all day | fixed_time=false | recurrent=false
+
+IN:  add: write the summary by the end of the day, hard one
+OUT: name=write the summary | deadline=the end of the day | fixed_time=false | recurrent=false
+
+IN:  add: don't let me forget: send the birthday card
+OUT: name=send the birthday card | fixed_time=false | recurrent=false
+
+IN:  add: send the invoice will probably need 30 minutes
+OUT: name=send the invoice | duration=30 minutes | fixed_time=false | recurrent=false
+
+IN:  add: finish the report won't take long, maybe 3 hours
+OUT: name=finish the report | duration=3 hours | fixed_time=false | recurrent=false
+
+IN:  add: travel session: book the dentist at 6am.
+OUT: name=book the dentist | category=travel | fixed_time=true | fixed_start=6am | recurrent=false
+
+IN:  add: i have walk the dog at 7:30am on this weekend
+OUT: name=walk the dog | fixed_time=true | fixed_start=7:30am | recurrent=false
+
+IN:  add: pack for the trip at 9pm on july 4th.
+OUT: name=pack for the trip | fixed_time=true | fixed_start=9pm | recurrent=false
+
+IN:  add: i need to review the document at 6am.
+OUT: name=review the document | fixed_time=true | fixed_start=6am | recurrent=false
+
+IN:  add: must write the email at 9:30am
+OUT: name=write the email | fixed_time=true | fixed_start=9:30am | recurrent=false
+
+IN:  add: flag this: submit the assignment due tomorrow
+OUT: name=submit the assignment | deadline=tomorrow | fixed_time=false | recurrent=false
+
+IN:  add: buy medicine - 0.8
+OUT: name=buy medicine | difficulty=0.8 | fixed_time=false | recurrent=false
+
+IN:  add: study for the exam - est. 180 minutes
+OUT: name=study for the exam | duration=180 minutes | fixed_time=false | recurrent=false
+
+IN:  add: book the hotel every evening
+OUT: name=book the hotel | fixed_time=false | recurrent=true | recurrence_days=Thursday,Wednesday
+
+IN:  add: study spanish at the warehouse on thursday.
+OUT: name=study Spanish | start=Thursday | location=the warehouse | fixed_time=false | recurrent=false
+
+IN:  add: send the invoice with 120 minutes at the post office on saturday
+OUT: name=send the invoice | start=Saturday | duration=120 minutes | location=the post office | fixed_time=false | recurrent=false
+
+IN:  add: write the email at the meeting room, important.
+OUT: name=write the email | location=the meeting room | fixed_time=false | recurrent=false
+
+IN:  add: errands - write in the diary - end of month
+OUT: name=write in the diary | deadline=end of month | category=errands | fixed_time=false | recurrent=false
+
+IN:  add: journal this november 11th at 7am
+OUT: name=journal | fixed_time=true | fixed_start=7am | recurrent=false
+
+IN:  add: do send the report at the hospital for half a day.
+OUT: name=send the report | duration=half a day | location=the hospital | fixed_time=false | recurrent=false
+
+IN:  add: heads up: book the dentist by may 1st
+OUT: name=book the dentist | deadline=May 1st | fixed_time=false | recurrent=false
+
+IN:  add: reminder: pick up the order at 7:30am
+OUT: name=pick up the order | fixed_time=true | fixed_start=7:30am | recurrent=false
+
+IN:  add: review flashcards at the supermarket on august 20th at 6:30pm.
+OUT: name=review flashcards | location=the supermarket | fixed_time=true | fixed_start=6:30pm | recurrent=false
+
+IN:  add: charge the laptop at 8am
+OUT: name=charge the laptop | fixed_time=true | fixed_start=8am | recurrent=false
+
+IN:  add: meet at the meeting room to write the blog post at 5:30pm
+OUT: name=write the blog post | location=the meeting room | fixed_time=true | fixed_start=5:30pm | recurrent=false
+
+IN:  add: send the invoice for errands on wednesday.
+OUT: name=send the invoice | start=Wednesday | category=errands | fixed_time=false | recurrent=false
+
+IN:  add: should fix the login bug on june 1st
+OUT: name=fix the login bug | start=June 1st | fixed_time=false | recurrent=false
+
+IN:  add: renew the subscription might take 10 minutes
+OUT: name=renew the subscription | duration=10 minutes | fixed_time=false | recurrent=false
+
+IN:  add: record the podcast is going to be 0.25
+OUT: name=record the podcast | difficulty=0.25 | fixed_time=false | recurrent=false
+
+IN:  add: attend the lecture every sunday for 1 hour
+OUT: name=attend the lecture | duration=1 hour | fixed_time=false | recurrent=true | recurrence_days=Sunday
+
+IN:  add: attend the meeting should only take 1.5 hours
+OUT: name=attend the meeting | duration=1.5 hours | fixed_time=false | recurrent=false
+
+IN:  add: i need to attend the meeting by monday
+OUT: name=attend the meeting | deadline=Monday | fixed_time=false | recurrent=false
+
+IN:  add: thinking about pick up the kids this wednesday
+OUT: name=pick up the kids | start=Wednesday | fixed_time=false | recurrent=false
+
+IN:  add: buy medicine every morning
+OUT: name=buy medicine | fixed_time=false | recurrent=true | recurrence_days=Tuesday,Saturday,Sunday
+
+IN:  add: send the email might take 30 minutes
+OUT: name=send the email | duration=30 minutes | fixed_time=false | recurrent=false
+
+IN:  add: attend the meeting - 0.2 - 3 hours
+OUT: name=attend the meeting | difficulty=0.2 | duration=3 hours | fixed_time=false | recurrent=false
+
+IN:  add: i need to write the documentation at 7am.
+OUT: name=write the documentation | fixed_time=true | fixed_start=7am | recurrent=false
+
+IN:  add: deploy the update needs to happen at the hospital on april 5th
+OUT: name=deploy the update | start=April 5th | location=the hospital | fixed_time=false | recurrent=false
+
+IN:  add: fit prepare the presentation into the schedule by thursday
+OUT: name=prepare the presentation | deadline=Thursday | fixed_time=false | recurrent=false
+
+IN:  add: book 25 minutes for read on december 25th
+OUT: name=read | start=December 25th | duration=25 minutes | fixed_time=false | recurrent=false
+
+IN:  add: meet with the tutor every monday at 10am
+OUT: name=meet with the tutor | fixed_time=false | recurrent=true | recurrence_days=Monday
+
+IN:  add: water the plants - 3:30pm this weekend home
+OUT: name=water the plants | location=home | fixed_time=true | fixed_start=3:30pm | recurrent=false
+
+IN:  add: should write the email on april 5th
+OUT: name=write the email | start=April 5th | fixed_time=false | recurrent=false
+

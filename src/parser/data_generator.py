@@ -114,6 +114,33 @@ class DataGenerator:
                 sentence = sentence.replace(tag, value)
                 placeholder_map[ph] = value
         return sentence.lower().strip(), placeholder_map
+    
+    def _has_explicit_time(self, sentence: str) -> bool:
+        """Check if sentence contains explicit time indicators (not location)"""
+        s = sentence.lower()
+        
+        at_time_patterns = [
+            r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',  # at 2pm, at 2:30pm
+            r'at\s+\d{1,2}\s*(?:am|pm)',              # at 2 pm
+            r'at\s+(morning|afternoon|evening|noon|midnight)',  # at morning
+        ]
+        
+        for pattern in at_time_patterns:
+            if re.search(pattern, s):
+                return True
+        
+        other_time_patterns = [
+            r'\d{1,2}:\d{2}\s*(?:am|pm)',  # 09:30am
+            r'\d{1,2}\s*(?:am|pm)',         # 9am
+            r'(morning|afternoon|evening|noon|midnight)(?!\s+(?:at|in|on))',  # morning not followed by location
+            r'sharp',                        # 3pm sharp
+        ]
+        
+        for pattern in other_time_patterns:
+            if re.search(pattern, s):
+                return True
+        
+        return False
 
     def _build_schema(self, placeholder_map, sentence=""):
         schema = {
@@ -140,16 +167,36 @@ class DataGenerator:
 
         s = sentence.lower()
         
-        # Check for explicit time (FIXED)
-        has_explicit_time = (
-            "at" in s or 
-            "sharp" in s or
-            re.search(r'\d{1,2}(?::\d{2})?\s*(?:am|pm)', s) is not None or
-            "morning" in s or 
-            "afternoon" in s or 
-            "evening" in s or 
-            "noon" in s
-        )
+        # IMPROVED: Check for explicit time (distinguish from location)
+        # Pattern 1: "at" followed by time (NOT location)
+        at_time_patterns = [
+            r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',  # at 2pm, at 2:30pm
+            r'at\s+\d{1,2}\s*(?:am|pm)',              # at 2 pm
+            r'at\s+(morning|afternoon|evening|noon|midnight)',  # at morning
+        ]
+        
+        has_at_time = False
+        for pattern in at_time_patterns:
+            if re.search(pattern, s):
+                has_at_time = True
+                break
+        
+        # Pattern 2: Time without "at"
+        other_time_patterns = [
+            r'\d{1,2}:\d{2}\s*(?:am|pm)',  # 09:30am
+            r'\d{1,2}\s*(?:am|pm)',         # 9am
+            r'(morning|afternoon|evening|noon|midnight)(?!\s+(?:at|in|on))',  # morning not followed by location
+            r'sharp',                        # 3pm sharp
+        ]
+        
+        has_other_time = False
+        for pattern in other_time_patterns:
+            if re.search(pattern, s):
+                has_other_time = True
+                break
+        
+        # Combined time detection
+        has_explicit_time = has_at_time or has_other_time
         
         has_recurrent = any(kw in s for kw in RECURRENT_KEYWORDS)
         
@@ -189,7 +236,13 @@ class DataGenerator:
                 elif "noon" in time_str:
                     schema["fixed_start"]["value"] = "12:00"
                 else:
-                    schema["fixed_start"]["value"] = time_str
+                    # Convert to 24-hour format
+                    time_clean = time_str.strip()
+                    if "am" in time_clean or "pm" in time_clean:
+                        # Keep as is for now, will be normalized later if needed
+                        schema["fixed_start"]["value"] = time_clean
+                    else:
+                        schema["fixed_start"]["value"] = time_clean
         
         # Handle "today" as start (not fixed_time)
         if "today" in s and not has_recurrent and not has_explicit_time:
