@@ -1,1 +1,67 @@
+/* 1. Imports FIRST */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+/* 2. Then Tailwind */
 @import "tailwindcss";
+
+/* 3. Then any custom layers or utilities */
+@tailwind utilities;
+
+@layer base {
+
+  html,
+  body,
+  * {
+    font-family: Quicksand, sans-serif;
+  }
+}
+
+.bg-main {
+  background-color: #0C1821;
+}
+
+.border-col {
+  border-right-color: #152032;
+}
+
+.text-main {
+  color: #FFECD1;
+}
+
+.text-second {
+  color: #324A5F;
+}
+
+@keyframes slideTap {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(20px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-tap {
+  animation: slideTap 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease forwards;
+}

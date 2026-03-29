@@ -231,11 +231,13 @@ def parse_args():
 def main():
     start  = time.time()
     args   = parse_args()
-    cfg    = Config()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    cfg    = Config(args.mode)  
 
     print(f"Device : {device}")
     print(f"Mode   : {args.mode}")
+    print(f"Epochs : {cfg.num_train_epochs}")  
+    print(f"LR     : {cfg.learning_rate_fresh if not os.path.exists(cfg.output_dir) or not os.listdir(cfg.output_dir) else cfg.learning_rate_resume}")
 
     os.makedirs(cfg.output_dir, exist_ok=True)
     download_base_model(cfg)
@@ -244,9 +246,10 @@ def main():
     model     = load_model(cfg, device)
 
     is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
-    lr        = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
+    lr = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
+    print(f"Resume: {is_resume}, LR: {lr}")  
 
-    train_ds, test_ds   = build_dataset(cfg, args.mode)
+    train_ds, test_ds   = build_dataset(cfg, args.mode) 
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
 
     train(model, tokenizer, cfg, tok_train, tok_test, lr)

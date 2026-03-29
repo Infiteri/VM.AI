@@ -1,10 +1,13 @@
+import { BrowserRouter, Route, Router, Routes } from "react-router-dom"
+import HomePage from "./pages/HomePage"
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-600">
-        Tailwind CSS v4 with Vite
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

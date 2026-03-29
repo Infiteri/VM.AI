@@ -1,0 +1,175 @@
+examples:
+- input: study at the library
+  output:
+    name: study
+    location: library
+    fixed_time: false
+    recurrent: false
+- input: meet at the coffee shop
+  output:
+    name: meet
+    location: coffee shop
+    fixed_time: false
+    recurrent: false
+- input: work from home
+  output:
+    name: work
+    location: home
+    fixed_time: false
+    recurrent: false
+- input: workout at the gym
+  output:
+    name: workout
+    location: gym
+    fixed_time: false
+    recurrent: false
+- input: meet client at the office
+  output:
+    name: meet client
+    location: office
+    fixed_time: false
+    recurrent: false
+- input: pick up prescription from pharmacy
+  output:
+    name: pick up prescription
+    location: pharmacy
+    fixed_time: false
+    recurrent: false
+- input: have lunch at the restaurant
+  output:
+    name: have lunch
+    location: restaurant
+    fixed_time: false
+    recurrent: false
+- input: attend meeting in the conference room
+  output:
+    name: attend meeting
+    location: conference room
+    fixed_time: false
+    recurrent: false
+- input: pick up groceries from the supermarket
+  output:
+    name: pick up groceries
+    location: supermarket
+    fixed_time: false
+    recurrent: false
+- input: study at the park
+  output:
+    name: study
+    location: park
+    fixed_time: false
+    recurrent: false
+- input: meet friends at the cinema
+  output:
+    name: meet friends
+    location: cinema
+    fixed_time: false
+    recurrent: false
+- input: work from the coffee shop
+  output:
+    name: work
+    location: coffee shop
+    fixed_time: false
+    recurrent: false
+- input: exercise at the gym
+  output:
+    name: exercise
+    location: gym
+    fixed_time: false
+    recurrent: false
+- input: buy vegetables at the farmers market
+  output:
+    name: buy vegetables
+    location: farmers market
+    fixed_time: false
+    recurrent: false
+- input: read at the park
+  output:
+    name: read
+    location: park
+    fixed_time: false
+    recurrent: false
+- input: swim at the pool
+  output:
+    name: swim
+    location: pool
+    fixed_time: false
+    recurrent: false
+- input: eat dinner at the new bistro
+  output:
+    name: eat dinner
+    location: bistro
+    fixed_time: false
+    recurrent: false
+- input: attend lecture in the hall
+  output:
+    name: attend lecture
+    location: hall
+    fixed_time: false
+    recurrent: false
+- input: pick up dry cleaning from the cleaners
+  output:
+    name: pick up dry cleaning
+    location: cleaners
+    fixed_time: false
+    recurrent: false
+- input: have coffee at Starbucks
+  output:
+    name: have coffee
+    location: Starbucks
+    fixed_time: false
+    recurrent: false
+- input: meet supplier at the warehouse
+  output:
+    name: meet supplier
+    location: warehouse
+    fixed_time: false
+    recurrent: false
+- input: study at the university library
+  output:
+    name: study
+    location: university library
+    fixed_time: false
+    recurrent: false
+- input: relax at the beach
+  output:
+    name: relax
+    location: beach
+    fixed_time: false
+    recurrent: false
+- input: shop at the mall
+  output:
+    name: shop
+    location: mall
+    fixed_time: false
+    recurrent: false
+- input: get gas at the petrol station
+  output:
+    name: get gas
+    location: petrol station
+    fixed_time: false
+    recurrent: false
+- input: vote at the town hall
+  output:
+    name: vote
+    location: town hall
+    fixed_time: false
+    recurrent: false
+- input: pick up children from school
+  output:
+    name: pick up children
+    location: school
+    fixed_time: false
+    recurrent: false
+- input: have a picnic at the botanical garden
+  output:
+    name: have a picnic
+    location: botanical garden
+    fixed_time: false
+    recurrent: false
+- input: get a haircut at the salon
+  output:
+    name: get a haircut
+    location: salon
+    fixed_time: false
+    recurrent: false

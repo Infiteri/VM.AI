@@ -164,7 +164,7 @@ def get_importance_value(keyword: str) -> str:
     return str(round(random.uniform(0.4, 0.6), 2))
 
 
-class BalancedDataGenerator:
+class DataGenerator:
     def __init__(self, training_data, real_examples=None, specific_examples=None):
         self.training_data = training_data
         self.real_examples = real_examples or []
@@ -628,7 +628,7 @@ if __name__ == "__main__":
         except:
             print("Could not load real data, continuing without")
 
-    generator = BalancedDataGenerator(training_data, real_data)
+    generator = DataGenerator(training_data, real_data)
     dataset = generator.generate(args.sentences)
     
     if args.output:

@@ -161,7 +161,7 @@ def validate_schema(data: Dict, file_name: str = "") -> List[str]:
     valid_fields = {
         "fixed_start", "fixed_time", "recurrent", "recurrence_days",
         "deadline", "duration", "location", "difficulty", "importance",
-        "start", "name"
+        "start", "name", "category"
     }
     
     prefix = f"[{file_name}] " if file_name else ""
@@ -197,6 +197,7 @@ def generate_stats(data: Dict, file_name: str = "") -> Dict:
         "deadline_examples": 0,
         "difficulty_examples": 0,
         "importance_examples": 0,
+        "category_examples": 0,
         "unique_modify": 0,
         "unique_add": 0,
     }
@@ -231,6 +232,8 @@ def generate_stats(data: Dict, file_name: str = "") -> Dict:
             stats["difficulty_examples"] += 1
         if output.get("importance"):
             stats["importance_examples"] += 1
+        if output.get("category"):
+            stats["category_examples"] += 1
     
     stats["unique_modify"] = len(seen_modify)
     stats["unique_add"] = len(seen_add)
@@ -316,6 +319,7 @@ def print_report(results: List[Dict]):
     total_deadline = 0
     total_difficulty = 0
     total_importance = 0
+    total_category = 0
     total_errors = 0
     total_duplicates = 0
     files_fixed = 0
@@ -339,6 +343,7 @@ def print_report(results: List[Dict]):
         print(f"  Deadline examples: {stats['deadline_examples']}")
         print(f"  Difficulty examples: {stats['difficulty_examples']}")
         print(f"  Importance examples: {stats['importance_examples']}")
+        print(f"  Category examples: {stats['category_examples']}")
         
         if result["duplicates"]:
             print(f"  DUPLICATES: {len(result['duplicates'])} found")
@@ -373,6 +378,7 @@ def print_report(results: List[Dict]):
         total_deadline += stats['deadline_examples']
         total_difficulty += stats['difficulty_examples']
         total_importance += stats['importance_examples']
+        total_category += stats['category_examples']
         total_errors += len(result["errors"])
         total_duplicates += len(result["duplicates"])
     
@@ -391,6 +397,7 @@ def print_report(results: List[Dict]):
     print(f"Total deadline examples: {total_deadline}")
     print(f"Total difficulty examples: {total_difficulty}")
     print(f"Total importance examples: {total_importance}")
+    print(f"Total category examples: {total_category}")
     print(f"Total schema errors found: {total_errors}")
     print(f"Total duplicates found: {total_duplicates}")
     
