@@ -26,7 +26,7 @@ function Field({ data, isSelected, onTap }) {
     );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ firstIcon = false }) {
     const [selectedId, setSelectedId] = useState(null);
     const navigate = useNavigate();
 
@@ -49,11 +49,11 @@ export default function Sidebar() {
             </div>
 
             <div className="py-3 flex flex-col gap-5">
-                {fields.map((field) => (
+                {fields.map((field, i) => (
                     <Field
                         key={field.id}
                         data={field}
-                        isSelected={selectedId === field.id}
+                        isSelected={selectedId === field.id || (firstIcon && i === 0 && selectedId === null)}
                         onTap={() => handleFieldTap(field)}
                     />
                 ))}
