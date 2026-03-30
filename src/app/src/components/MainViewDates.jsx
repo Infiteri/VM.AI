@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { ChevronsLeftRight } from "lucide-react"; // Ensure your library matches this import
+import { ChevronsLeftRight } from "lucide-react";
 
 function generateDates(startDate, backCount) {
     const dates = [];
-    // Standardize to midnight to avoid time-offset bugs
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
 
@@ -34,25 +33,37 @@ export default function MainViewDates() {
     const dates = generateDates(today, visibleBack);
 
     const toggleBack = () => {
-        // Toggles between 0 and 3 days backward all at once
         setVisibleBack((prev) => (prev === 0 ? 3 : 0));
     };
 
-    // CRITICAL FIX: Compare the formatted strings, not the Date objects
     const isSameDay = (d1, d2) => formatDate(d1) === formatDate(d2);
 
     return (
-        <div className="flex items-center gap-1 p-1.5 bg-[#0a0f1a]/90 backdrop-blur-md border border-white/10 rounded-full w-fit shadow-xl">
-            {/* Expand/Collapse Toggle */}
+        <div className="relative flex items-center gap-1 p-1.5 rounded-full w-fit backdrop-blur-md">
+            {/* Directional Glass Border using main-font variable */}
+            <div 
+                className="absolute inset-0 rounded-full pointer-events-none"
+                style={{
+                    padding: "1.5px",
+                    background: "linear-gradient(135deg, var(--main-font), transparent)",
+                    opacity: 0.4,
+                    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    maskComposite: "exclude",
+                }}
+            />
+
             <button
                 onClick={toggleBack}
-                className={`p-2 transition-all duration-300 ${visibleBack > 0 ? "text-white rotate-180" : "text-white/40 hover:text-white"
-                    }`}
+                style={{ color: visibleBack > 0 ? "var(--main-font)" : "var(--second-font)" }}
+                className={`relative z-10 p-2 transition-all duration-300 ${
+                    visibleBack > 0 ? "rotate-180" : "hover:opacity-80"
+                }`}
             >
                 <ChevronsLeftRight size={20} strokeWidth={2.5} />
             </button>
 
-            <div className="flex items-center gap-2 pr-2">
+            <div className="relative z-10 flex items-center gap-2 pr-2">
                 {dates.map((date) => {
                     const isSel = isSameDay(date, selectedDate);
                     const isTdy = isSameDay(date, today);
@@ -62,15 +73,15 @@ export default function MainViewDates() {
                         <button
                             key={dateStr}
                             onClick={() => setSelectedDate(date)}
+                            style={{
+                                backgroundColor: isSel ? "var(--main-font)" : "var(--bg3)",
+                                color: isSel ? "var(--background)" : (isTdy ? "var(--main-font)" : "var(--second-font)"),
+                                borderColor: isTdy ? "var(--main-font)" : "transparent",
+                            }}
                             className={`
-                px-4 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200
-                ${isSel
-                                    ? "bg-[#fef3c7] text-[#0a0f1a]" // Selected: Solid Cream
-                                    : isTdy
-                                        ? "border border-[#fef3c7] text-[#fef3c7] bg-[#161d2f]" // Today: Cream Outline
-                                        : "bg-[#161d2f] text-white/80 hover:bg-[#1e293b]" // Others: Dark Capsule
-                                }
-              `}
+                                px-4 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200
+                                border-1.5 hover:brightness-125
+                            `}
                         >
                             {dateStr}
                         </button>

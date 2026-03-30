@@ -16,22 +16,25 @@
   }
 }
 
-.bg-main {
-  background-color: #0C1821;
+:root {
+  /* From your image list */
+  --background: #0C1821;      /* The darkest navy */
+  --main-font: #FFECD1;       /* The cream/off-white */
+  --second-font: #324A5F;     /* The muted slate blue */
+  --bg-secondary: #152032;    /* The middle navy */
+  --bg3: #1B263B;             /* The lighter navy/blue */
+  --modify-yellow: #E9C46A;   /* The golden yellow */
+  --delete-red: #E76F51;      /* The coral/red */
 }
 
-.border-col {
-  border-right-color: #152032;
-}
-
-.text-main {
-  color: #FFECD1;
-}
-
-.text-second {
-  color: #324A5F;
-}
-
+/* Utility classes for your components */
+.text-main { color: var(--main-font); }
+.text-second { color: var(--second-font); }
+.bg-main { background-color: var(--background); }
+.bg-sec { background-color: var(--bg-secondary); }
+.bg-3 { background-color: var(--bg3); }
+.text-mod { color: var(--modify-yellow); }
+.text-del { color: var(--delete-red); }
 @keyframes slideTap {
   0% {
     transform: translateX(0);
