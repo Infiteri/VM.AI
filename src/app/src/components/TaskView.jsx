@@ -35,7 +35,7 @@ export default function TaskView({ task }) {
                     <div className="bg-sec border border-main/20 px-2 py-1 rounded flex gap-1.5 items-center text-xs">
                         <span className="text-main/60">Location</span>
                         <span className="text-main/30">|</span>
-                        <span className="text-main/80 truncate max-w-[60px]">{locationValue}</span>
+                        <span className="text-main/80 truncate max-w-15">{locationValue}</span>
                     </div>
 
                     <button
@@ -66,7 +66,7 @@ export default function TaskView({ task }) {
                         transition={{ type: "spring", bounce: 0, duration: 0.4 }}
                         className="bg-main border border-white/5 border-l-0 rounded-r-xl overflow-hidden shadow-xl z-10"
                     >
-                        <div className="p-5 h-full min-w-[220px] flex flex-col gap-4 border-l border-white/10 justify-center">
+                        <div className="p-5 h-full min-w-55 flex flex-col gap-4 border-l border-white/10 justify-center">
 
                             {/* Realization Row - Improved UX */}
                             <div className="flex items-center justify-between gap-4">

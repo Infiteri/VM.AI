@@ -1,6 +1,6 @@
 import { Calendar, Calendar1, BarChart } from "lucide-react";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 function Field({ data, isSelected, onTap }) {
     const iconMap = {
@@ -13,48 +13,61 @@ function Field({ data, isSelected, onTap }) {
 
     return (
         <div
-            className={`
-        flex flex-row items-center gap-2 text-main cursor-pointer
-        transition-all duration-300 ease-out
-        ${isSelected ? 'ml-10' : ''}
-      `}
+            className="relative flex flex-row items-center justify-end gap-3 text-main cursor-pointer py-1"
             onClick={onTap}
         >
-            <h1 className="text-[16px] font-light">{data.name}</h1>
-            <IconComp size={22} strokeWidth={2} />
+            {/* The Sliding Indicator */}
+            <AnimatePresence>
+                {isSelected && (
+                    <motion.div
+                        layoutId="sidebar-accent"
+                        className="absolute -right-4 w-1 h-full bg-mod shadow-[0_0_15px_rgba(255,214,102,0.5)]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                )}
+            </AnimatePresence>
+
+            <motion.div
+                animate={{ x: isSelected ? -20 : 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className={`flex items-center gap-3 ${isSelected ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
+            >
+                <h1 className="text-[16px] font-light uppercase tracking-widest">{data.name}</h1>
+                <IconComp size={22} strokeWidth={1.5} />
+            </motion.div>
         </div>
     );
 }
 
-export default function Sidebar({ firstIcon = false }) {
-    const [selectedId, setSelectedId] = useState(null);
+export default function Sidebar() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const fields = [
         { id: 1, name: "Schedule", icon: "schedule", path: "/" },
-        { id: 2, name: "Add a task", icon: "task", path: "/" },
-        { id: 3, name: "Statistics", icon: "stats", path: "/" },
+        { id: 2, name: "Add a task", icon: "task", path: "/task" },
+        { id: 3, name: "Statistics", icon: "stats", path: "/stats" },
     ];
 
-    const handleFieldTap = (field) => {
-        setSelectedId(field.id);
-        navigate(field.path);
-    };
-
     return (
-        <div className="w-67 bg-main h-full flex flex-col p-4 gap-4 border-4 border-r-[#152032]">
+        <div className="w-64 bg-main h-full flex flex-col p-6 gap-8 border-r border-white/5">
             <div className="py-4">
-                <h1 className="text-main text-[68px] mb-0">VM.AI</h1>
-                <h2 className="text-second font-bold text-[24px] -mt-5">set your day</h2>
+                <h1 className="text-main text-[62px] font-bold leading-none tracking-tighter">VM.AI</h1>
+                <h2 className="text-second font-medium text-[18px] uppercase tracking-[0.2em] mt-1">
+                    set your day
+                </h2>
             </div>
 
-            <div className="py-3 flex flex-col gap-5">
-                {fields.map((field, i) => (
+            <div className="flex flex-col gap-8 mt-10">
+                {fields.map((field) => (
                     <Field
                         key={field.id}
                         data={field}
-                        isSelected={selectedId === field.id || (firstIcon && i === 0 && selectedId === null)}
-                        onTap={() => handleFieldTap(field)}
+                        isSelected={location.pathname === field.path}
+                        onTap={() => navigate(field.path)}
                     />
                 ))}
             </div>
