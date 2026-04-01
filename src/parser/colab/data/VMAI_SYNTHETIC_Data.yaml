@@ -1,0 +1,475 @@
+labels:
+- O
+- B-TASK
+- I-TASK
+- B-DEADLINE
+- I-DEADLINE
+- B-DURATION
+- I-DURATION
+- B-LOCATION
+- I-LOCATION
+- B-DATE
+- I-DATE
+- B-TIME
+- I-TIME
+- B-PRIORITY
+- B-DIFFICULTY
+- B-CATEGORY
+- I-CATEGORY
+- B-RECURRENCE
+- I-RECURRENCE
+templates:
+- '[TASK] by [DEADLINE].'
+- I need to [TASK] at [TIME].
+- '[TASK] at [LOCATION] on [DATE].'
+- Finish [TASK] before [DEADLINE].
+- '[TASK] for [DURATION] at [TIME].'
+- Set aside [DURATION] for [TASK].
+- '[TASK] at [TIME] on [DATE].'
+- Do [TASK] at [LOCATION].
+- '[TASK] is due [DEADLINE].'
+- Complete [TASK] by [DATE] at [TIME].
+- '[TASK] is a [DIFFICULTY] task.'
+- '[TASK] by [DEADLINE], [DIFFICULTY] difficulty.'
+- '[TASK] is [DIFFICULTY], give it [DURATION].'
+- '[TASK] at [LOCATION], [DIFFICULTY] difficulty.'
+- '[TASK] scheduled for [DATE], [DIFFICULTY] level.'
+- '[CATEGORY] session: [TASK] at [TIME].'
+- '[CATEGORY] - [TASK] at [LOCATION].'
+- '[TASK] for [CATEGORY] on [DATE].'
+- 'Schedule [CATEGORY]: [TASK] by [DEADLINE].'
+- '[CATEGORY] - [TASK] for [DURATION].'
+- Urgent [TASK] by [DEADLINE].
+- '[TASK] at [TIME], very important.'
+- '[TASK] is high priority, due [DATE].'
+- '[TASK] at [LOCATION], important.'
+- '[TASK] for [DURATION], low priority.'
+- '[TASK] at [LOCATION] by [DEADLINE].'
+- Go to [LOCATION] to [TASK] at [TIME].
+- '[TASK] at [LOCATION] on [DATE].'
+- Do [TASK] at [LOCATION] for [DURATION].
+- '[CATEGORY] - [TASK] at [LOCATION] by [DEADLINE].'
+- '[TASK] at [TIME], takes [DURATION].'
+- '[TASK] by [DEADLINE], [DIFFICULTY].'
+- '[TASK] at [LOCATION] on [DATE] at [TIME].'
+- '[TASK] for [DURATION], [DIFFICULTY].'
+- '[TASK] at [LOCATION] by [DEADLINE], important.'
+- can you remind me to [TASK]
+- i need to [TASK] by [DEADLINE]
+- don't forget to [TASK] at [LOCATION]
+- need [DURATION] blocked for [TASK]
+- gotta [TASK] before [DEADLINE]
+- have to [TASK] by [DEADLINE]
+- must [TASK] at [TIME]
+- should [TASK] on [DATE]
+- want to [TASK] at [LOCATION]
+- planning to [TASK] on [DATE]
+- thinking about [TASK] this [DATE]
+- need to [TASK] pretty soon
+- really need to [TASK]
+- absolutely have to [TASK] by [DEADLINE]
+- cannot forget to [TASK]
+- reminder to [TASK] at [TIME]
+- block [DURATION] for [TASK]
+- block out [DURATION] to [TASK]
+- set [DURATION] aside for [TASK]
+- I have [TASK] at [TIME]
+- I have [TASK] at [TIME] on [DATE]
+- '[TASK] - [DATE] at [TIME]'
+- '[TASK] - [LOCATION] - [DATE]'
+- '[TASK] ([DURATION])'
+- '[TASK] at [LOCATION] at [TIME]'
+- '[TASK] at [TIME]'
+- '[DATE]: [TASK]'
+- '[TIME] - [TASK]'
+- '[TASK] tonight at [TIME]'
+- '[TASK] this [DATE] at [TIME]'
+- '[TASK] next [DATE]'
+- meet at [LOCATION] to [TASK] at [TIME]
+- head to [LOCATION] for [TASK] on [DATE]
+- going to [LOCATION] to [TASK]
+- at [LOCATION] for [TASK]
+- squeeze in [TASK] before [DEADLINE]
+- fit [TASK] into the schedule by [DEADLINE]
+- add [TASK] to the calendar for [DATE]
+- put [TASK] in the calendar at [TIME]
+- schedule [TASK] for [DATE] at [TIME]
+- book [DURATION] for [TASK] on [DATE]
+- reserve [DURATION] for [TASK]
+- '[TASK] is important'
+- '[TASK] is urgent'
+- '[TASK] can wait'
+- '[TASK] - low priority'
+- '[TASK] - [DIFFICULTY] - [DURATION]'
+- '[TASK] won''t take long, maybe [DURATION]'
+- '[TASK] might take [DURATION]'
+- '[TASK] is going to be [DIFFICULTY]'
+- '[CATEGORY]: [TASK] - [DATE]'
+- '[CATEGORY]: [TASK] at [LOCATION]'
+- '[CATEGORY] - [TASK] - [DEADLINE]'
+- 'for [CATEGORY]: [TASK] by [DEADLINE]'
+- '[TASK] for [CATEGORY], takes [DURATION]'
+- '[TASK] for [CATEGORY] at [TIME]'
+- '[TASK] with [DURATION] at [LOCATION] on [DATE]'
+- '[TASK] by [DEADLINE], hard one'
+- 'heads up: [TASK] by [DEADLINE]'
+- 'note: [TASK] at [TIME] on [DATE]'
+- 'todo: [TASK]'
+- 'todo: [TASK] by [DEADLINE]'
+- 'task: [TASK]'
+- 'action item: [TASK] by [DEADLINE]'
+- 'reminder: [TASK] at [TIME]'
+- 'don''t let me forget: [TASK]'
+- 'flag this: [TASK] due [DEADLINE]'
+- '[TASK] - flagged as important'
+- '[TASK] - [DIFFICULTY]'
+- '[TASK] - est. [DURATION]'
+- '[TASK] - due [DEADLINE]'
+- '[TASK] - [TIME] [DATE] [LOCATION]'
+- low key need to [TASK] by [DEADLINE]
+- 'super important: [TASK] before [DEADLINE]'
+- oh also [TASK] on [DATE]
+- 'almost forgot: [TASK] at [TIME]'
+- 'quick thing: [TASK] at [LOCATION]'
+- '[TASK] should only take [DURATION]'
+- '[TASK] could take up to [DURATION]'
+- '[TASK] will probably need [DURATION]'
+- '[TASK] needs to happen at [LOCATION] on [DATE]'
+- '[TASK] has to be done at [LOCATION]'
+- '[TASK] is scheduled at [LOCATION] on [DATE] at [TIME]'
+- '[TASK] every [RECURRENCE_DAY]'
+- '[TASK] every [RECURRENCE_DAY] at [TIME]'
+- '[TASK] every [RECURRENCE_DAY] for [DURATION]'
+- daily [TASK] at [TIME]
+- '[TASK] every morning'
+- '[TASK] every evening'
+- weekly [TASK] on [RECURRENCE_DAY]
+- '[TASK] every [RECURRENCE_DAY] and [RECURRENCE_DAY]'
+tasks:
+- finish the report
+- submit the assignment
+- send the email
+- prepare the presentation
+- review the document
+- complete the form
+- write the summary
+- update the spreadsheet
+- call the client
+- fix the bug
+- run the tests
+- organize the files
+- check the schedule
+- print the notes
+- reply to messages
+- book the appointment
+- attend the meeting
+- read the article
+- clean the desk
+- buy groceries
+- draft the proposal
+- review the contract
+- sign the documents
+- send the invoice
+- prepare the report
+- schedule the call
+- write the email
+- respond to the ticket
+- update the website
+- test the feature
+- deploy the update
+- write the tests
+- review the pull request
+- fix the login bug
+- update the database
+- back up the files
+- write the documentation
+- plan the sprint
+- prepare the agenda
+- send the report
+- review the budget
+- update the timeline
+- write the blog post
+- edit the video
+- record the podcast
+- design the mockup
+- review the design
+- update the config
+- fix the crash
+- write the spec
+- pay the rent
+- pay the bill
+- pay the invoice
+- call the doctor
+- book the dentist
+- pick up the kids
+- drop off the package
+- go to the gym
+- go for a run
+- cook dinner
+- do the laundry
+- clean the house
+- water the plants
+- walk the dog
+- buy medicine
+- renew the subscription
+- cancel the subscription
+- file the taxes
+- apply for the job
+- send the application
+- prepare for the interview
+- study for the exam
+- finish the homework
+- submit the project
+- attend the lecture
+- do the reading
+- write the essay
+- revise the notes
+- meet with the tutor
+- book the flight
+- book the hotel
+- pack for the trip
+- renew the passport
+- apply for the visa
+- buy a gift
+- send the birthday card
+- plan the party
+- make the reservation
+- pick up the order
+- return the item
+- call the bank
+- transfer the money
+- check the account
+- update the password
+- back up the phone
+- charge the laptop
+- take the medication
+- go to the pharmacy
+- schedule the checkup
+- measure blood pressure
+- log the calories
+- meditate
+- stretch
+- journal
+- read
+- practice guitar
+- study Spanish
+- learn piano
+- draw
+- write in the diary
+- review flashcards
+deadlines:
+- tomorrow
+- today
+- tonight
+- this evening
+- end of day
+- end of week
+- end of month
+- Friday
+- Monday
+- Tuesday
+- Wednesday
+- Thursday
+- Saturday
+- Sunday
+- next Monday
+- next Friday
+- next week
+- next month
+- this Friday
+- this weekend
+- noon
+- 5pm
+- 6pm
+- midnight
+- 9am
+- in 2 days
+- in 3 days
+- in a week
+- before the weekend
+- before next week
+- before Friday afternoon
+- the end of the day
+- the end of the week
+- before I leave
+- as soon as possible
+- January 15th
+- February 28th
+- March 31st
+- April 10th
+- May 1st
+- June 30th
+- September 1st
+- October 15th
+- November 30th
+- December 25th
+- Q1 end
+- Q2 end
+- before the deadline
+- before the meeting
+- before the presentation
+durations:
+- 5 minutes
+- 10 minutes
+- 15 minutes
+- 20 minutes
+- 25 minutes
+- 30 minutes
+- 45 minutes
+- 1 hour
+- 1.5 hours
+- 2 hours
+- 2.5 hours
+- 3 hours
+- 4 hours
+- 5 hours
+- half a day
+- all day
+- 90 minutes
+- 60 minutes
+- 120 minutes
+- 180 minutes
+- 240 minutes
+dates:
+- Monday
+- Tuesday
+- Wednesday
+- Thursday
+- Friday
+- Saturday
+- Sunday
+- tomorrow
+- today
+- this weekend
+- next Monday
+- next Friday
+- January 15th
+- February 10th
+- March 20th
+- April 5th
+- May 12th
+- June 1st
+- July 4th
+- August 20th
+- September 15th
+- October 31st
+- November 11th
+- December 25th
+times:
+- 6am
+- 7am
+- 7:30am
+- 8am
+- 8:30am
+- 9am
+- 9:30am
+- 10am
+- 10:30am
+- 11am
+- 11:30am
+- 12pm
+- 12:30pm
+- 1pm
+- 1:30pm
+- 2pm
+- 2:30pm
+- 3pm
+- 3:30pm
+- 4pm
+- 4:30pm
+- 5pm
+- 5:30pm
+- 6pm
+- 6:30pm
+- 7pm
+- 7:30pm
+- 8pm
+- 9pm
+- 10pm
+locations:
+- home
+- the office
+- work
+- school
+- university
+- the gym
+- the library
+- the coffee shop
+- the park
+- the hospital
+- the clinic
+- the dentist
+- the bank
+- the supermarket
+- the pharmacy
+- the post office
+- the airport
+- the train station
+- the restaurant
+- the cinema
+- online
+- remotely
+- the meeting room
+- the conference room
+- the lab
+- the studio
+- the warehouse
+- the classroom
+- the kitchen
+- the garage
+categories:
+- work
+- study
+- fitness
+- health
+- personal
+- finance
+- home
+- family
+- social
+- errands
+- travel
+- creative
+- learning
+- admin
+- shopping
+priorities:
+- 0.1
+- 0.2
+- 0.3
+- 0.4
+- 0.5
+- 0.6
+- 0.7
+- 0.75
+- 0.8
+- 0.85
+- 0.9
+- 0.95
+- 0.99
+difficulties:
+- 0.05
+- 0.1
+- 0.15
+- 0.2
+- 0.25
+- 0.3
+- 0.4
+- 0.5
+- 0.6
+- 0.65
+- 0.7
+- 0.75
+- 0.8
+- 0.85
+- 0.9
+- 0.95
+- 1.0
+recurrence_days:
+- Monday
+- Tuesday
+- Wednesday
+- Thursday
+- Friday
+- Saturday
+- Sunday
