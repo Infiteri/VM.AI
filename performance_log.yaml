@@ -1,433 +1,4 @@
-- timestamp: '2026-03-29T13:28:37.465917'
-  mode: add
-  input: study at the library
-  raw_output: name=study at the library | fixed_time=false | recurrent=falsity
-  parsed:
-    name: study at the library
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:37.878851'
-  mode: add
-  input: meet at the coffee shop
-  raw_output: name=meet at the coffee shop | fixed_time=false | recurrent=falsity
-  parsed:
-    name: meet at the coffee shop
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:38.308998'
-  mode: add
-  input: workout at the gym
-  raw_output: name=workout | location=the gym | fixed_time=false | recurrent=falsity
-  parsed:
-    name: workout
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: the gym
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:38.731336'
-  mode: add
-  input: this is a very hard task
-  raw_output: name=complete task | difficulty=0.85 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: complete task
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:39.166497'
-  mode: add
-  input: easy quick job
-  raw_output: name=easy quick job | difficulty=0.85 | fixed_time=false | recurrent=falser
-  parsed:
-    name: easy quick job
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falser
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:39.582802'
-  mode: add
-  input: not important at all
-  raw_output: name=not important | importance=0.25 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: not important
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: '0.25'
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:40.009716'
-  mode: add
-  input: urgent, needs immediate attention
-  raw_output: name=urgent | importance=0.85 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: urgent
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: '0.85'
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:40.425802'
-  mode: add
-  input: meeting for 30 minutes
-  raw_output: name=meeting | duration=30 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: meeting
-    start: null
-    deadline: null
-    difficulty: null
-    duration: '30'
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:40.806461'
-  mode: add
-  input: task takes 2 hours
-  raw_output: name=task | duration=120 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: task
-    start: null
-    deadline: null
-    difficulty: null
-    duration: '120'
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:41.714099'
-  mode: add
-  input: meditate every morning
-  raw_output: name=meditation | fixed_time=false | recurrent=true | cd=18:00 | recurrence_days=Monday,Tuesday,Wednesday,Thursday,Friday
-  parsed:
-    name: meditation
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday
-  error: null
-
-- timestamp: '2026-03-29T13:28:42.204455'
-  mode: add
-  input: team sync every Monday
-  raw_output: name=sync | fixed_time=true | fixed_start=17:00 | recurrent=false
-  parsed:
-    name: sync
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:43.145778'
-  mode: add
-  input: daily standup every weekday
-  raw_output: name=standup | fixed_time=false | recurrent=true | avg.=weekdays | recurrence_days=Monday,Tuesday,Wednesday,Thursday
-  parsed:
-    name: standup
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: Monday,Tuesday,Wednesday,Thursday
-  error: null
-
-- timestamp: '2026-03-29T13:28:43.600079'
-  mode: add
-  input: urgent meeting at 2pm in the conference room
-  raw_output: name=urgent meeting | fixed_time=true | fixed_start=14:00 | recurrent=false
-  parsed:
-    name: urgent meeting
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: true
-    fixed_start: '14:00'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:44.066468'
-  mode: add
-  input: call client before Friday, very important
-  raw_output: name=call client | deadline=Friday | importance=0.9 | fixed_time=false
-    | recurrent=falsity
-  parsed:
-    name: call client
-    start: null
-    deadline: Friday
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:44.546970'
-  mode: add
-  input: go to the gym at 6am
-  raw_output: name=go to the gym | fixed_time=true | fixed_start=06:00 | recurrent=false
-  parsed:
-    name: go to the gym
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: true
-    fixed_start: 06:00
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:44.611019'
-  mode: modify
-  input: move to 7am
-  raw_output: name=7
-  parsed:
-    name: '7'
-  error: null
-
-- timestamp: '2026-03-29T13:28:45.019336'
-  mode: add
-  input: finish report by Friday
-  raw_output: name=finish report | deadline=Friday | fixed_time=false | recurrent=falsity
-  parsed:
-    name: finish report
-    start: null
-    deadline: Friday
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:45.099357'
-  mode: modify
-  input: it is urgent, due tomorrow
-  raw_output: name=urgent
-  parsed:
-    name: urgent
-  error: null
-
-- timestamp: '2026-03-29T13:28:45.469559'
-  mode: add
-  input: study at home
-  raw_output: name=study at home | fixed_time=false | recurrent=falser
-  parsed:
-    name: study at home
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falser
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:45.533641'
-  mode: modify
-  input: do it at the library instead
-  raw_output: name=library
-  parsed:
-    name: library
-  error: null
-
-- timestamp: '2026-03-29T13:28:45.941928'
-  mode: add
-  input: workout for 60 minutes
-  raw_output: name=workout | duration=60 | fixed_time=false | recurrent=falsity
-  parsed:
-    name: workout
-    start: null
-    deadline: null
-    difficulty: null
-    duration: '60'
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:46.021947'
-  mode: modify
-  input: make it 30 minutes
-  raw_output: name=workout
-  parsed:
-    name: workout
-  error: null
-
-- timestamp: '2026-03-29T13:28:46.336766'
-  mode: add
-  input: gym every Monday and Wednesday
-  raw_output: name=gym | fixed_time=true | fixed_start=Monday
-  parsed:
-    name: gym
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:46.465869'
-  mode: modify
-  input: change to Tuesday and Thursday
-  raw_output: name=tuesday
-  parsed:
-    name: tuesday
-  error: null
-
-- timestamp: '2026-03-29T13:28:46.918194'
-  mode: add
-  input: team meeting at 3pm
-  raw_output: name=team meeting | fixed_time=true | fixed_start=15:00 | recurrent=false
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: true
-    fixed_start: '15:00'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:28:49.671179'
-  mode: modify
-  input: cancel fixed time
-  raw_output: name=cancell fixed time
-  parsed:
-    name: cancell fixed time
-  error: null
-
-- timestamp: '2026-03-29T13:31:09.298967'
+- timestamp: '2026-03-31T20:38:35.252200'
   mode: add
   input: go to school
   raw_output: name=go to school | fixed_time=false | recurrent=falsity
@@ -446,10 +17,10 @@
     recurrence_days: null
   error: null
 
-- timestamp: '2026-03-29T13:31:13.834663'
+- timestamp: '2026-03-31T20:38:41.123713'
   mode: add
-  input: go to school everyday
-  raw_output: name=go to school | fixed_time=false | recurrent=true | apr=falser
+  input: go to school at 5 pm
+  raw_output: name=go to school | fixed_time=true | fixed_start=5 pm | recurrent=false
   parsed:
     name: go to school
     start: null
@@ -459,35 +30,16 @@
     category: null
     location: null
     importance: null
-    fixed_time: false
+    fixed_time: true
     fixed_start: null
-    recurrent: true
+    recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-03-29T13:31:19.167155'
-  mode: add
-  input: go to school on monday
-  raw_output: name=go to school | fixed_time=false | recurrent=falsity
-  parsed:
-    name: go to school
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:31:23.557072'
+- timestamp: '2026-03-31T20:38:45.158457'
   mode: add
   input: go to school at 6 pm
-  raw_output: name=go to school | fixed_time=true | fixed_start=18:00 | recurrent=false
+  raw_output: name=go to school | fixed_time=true | fixed_start=6 pm | recurrent=false
   parsed:
     name: go to school
     start: null
@@ -498,15 +50,34 @@
     location: null
     importance: null
     fixed_time: true
-    fixed_start: '18:00'
+    fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-03-29T13:31:27.913921'
+- timestamp: '2026-03-31T20:38:50.129428'
   mode: add
-  input: go to school until 6 pm
-  raw_output: name=go to school | fixed_time=true | fixed_start=18:00 | recurrent=false
+  input: go to school everyday
+  raw_output: name=go to school | fixed_time=false | recurrent=true | recurring=falsity
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-03-31T20:38:52.940085'
+  mode: add
+  input: go to school everyday at 6 pm
+  raw_output: name=go to school | fixed_time=true | fixed_start=6 pm | recurrent=false
   parsed:
     name: go to school
     start: null
@@ -517,15 +88,34 @@
     location: null
     importance: null
     fixed_time: true
-    fixed_start: '18:00'
+    fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-03-29T13:40:55.347261'
+- timestamp: '2026-03-31T20:38:58.205189'
+  mode: add
+  input: go to school at 6 pm everyday
+  raw_output: name=go to school | fixed_time=true | fixed_start=6 pm | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-01T19:34:25.937678'
   mode: add
   input: go to school
-  raw_output: name=go to school | fixed_time=false | recurrent=falsity
+  raw_output: name=go to school | fixed_time=false | recurrent=true | upcoming=true
   parsed:
     name: go to school
     start: null
@@ -537,256 +127,40 @@
     importance: null
     fixed_time: false
     fixed_start: null
-    recurrent: falsity
+    recurrent: true
     recurrence_days: null
   error: null
 
-- timestamp: '2026-03-29T13:44:52.975565'
-  mode: add
+- timestamp: '2026-04-01T19:34:27.928904'
+  mode: modify
+  input: home
+  raw_output: name=home
+  parsed:
+    name: home
+  error: null
+
+- timestamp: '2026-04-01T19:34:32.384816'
+  mode: modify
   input: go to school
-  raw_output: name=go to school | fixed_time=false | recurrent=falsity
+  raw_output: name=school
   parsed:
-    name: go to school
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
+    name: school
   error: null
 
-- timestamp: '2026-03-29T13:45:05.958722'
-  mode: add
-  input: meet at the coffee shop
-  raw_output: name=meet at the coffee shop | fixed_time=false | recurrent=falsity
+- timestamp: '2026-04-01T19:35:17.593650'
+  mode: modify
+  input: make it 90 minutes instead
+  raw_output: name=90
   parsed:
-    name: meet at the coffee shop
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
+    name: '90'
   error: null
 
-- timestamp: '2026-03-29T13:45:11.618529'
-  mode: add
-  input: work from home
-  raw_output: name=work | location=home | fixed_time=false | recurrent=falsity
+- timestamp: '2026-04-01T19:35:27.516715'
+  mode: modify
+  input: change duration to 2 hours
+  raw_output: name=study session | duration=2 hours
   parsed:
-    name: work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: home
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:45:16.506502'
-  mode: add
-  input: meet client at the office
-  raw_output: name=meet client | location=office | fixed_time=false | recurrent=falsity
-  parsed:
-    name: meet client
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: office
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:45:21.497973'
-  mode: add
-  input: meet at the coffee shop
-  raw_output: name=meet at the coffee shop | fixed_time=false | recurrent=falsity
-  parsed:
-    name: meet at the coffee shop
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T13:45:25.567841'
-  mode: add
-  input: work from the coffee shop
-  raw_output: name=work from the coffee shop | fixed_time=false | recurrent=falsity
-  parsed:
-    name: work from the coffee shop
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:20.587143'
-  mode: add
-  input: GO TO SCHOOL
-  raw_output: name=GO TO SCHOOL | fixed_time=false | recurrent=falsE
-  parsed:
-    name: GO TO SCHOOL
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:26.966864'
-  mode: add
-  input: go to work
-  raw_output: name=go to work | fixed_time=false | recurrent=falsity
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: falsity
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:30.918025'
-  mode: add
-  input: go to work everyday
-  raw_output: name=go to work | fixed_time=false | recurrent=true | recurring=nope
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:37.340978'
-  mode: add
-  input: go to work every monday
-  raw_output: name=go to work | fixed_time=false | recurrent=true | recurring=Monday
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:40.205849'
-  mode: add
-  input: go to work every
-  raw_output: name=go to work | fixed_time=false | recurrent=true | recurring=falsified
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:43.969744'
-  mode: add
-  input: go to work every wensday
-  raw_output: name=go to work | fixed_time=false | recurrent=true | recurring=next
-    week
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-03-29T21:05:45.304931'
-  mode: add
-  input: go to work every wensday
-  raw_output: name=go to work | fixed_time=false | recurrent=true | recurring=next
-    week
-  parsed:
-    name: go to work
-    start: null
-    deadline: null
-    difficulty: null
-    duration: null
-    category: null
-    location: null
-    importance: null
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
+    name: study session
+    duration: 2 hours
   error: null
 

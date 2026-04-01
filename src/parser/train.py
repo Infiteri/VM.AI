@@ -5,6 +5,7 @@
     Updated by: Vanea @ 21-03-2026 — full rewrite, local only, pipe format
     Updated by: Vanea @ 21-03-2026 — added specific mode
     Updated by: Vanea @ 25-03-2026 — compute_metrics, target length fix, Windows fix
+    Updated by: Vanea @ 01-04-2026 — added modify_only mode
 """
 
 import os
@@ -26,7 +27,7 @@ from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
 from data_generator import DataGenerator
 from cfg import Config
 
-if os.name != "nt":  # expandable_segments not supported on Windows
+if os.name != "nt":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 TRACKED_FIELDS = [
@@ -53,7 +54,6 @@ def _parse_pipe(text: str) -> dict:
 def compute_metrics(eval_preds: EvalPrediction, tokenizer):
     predictions, label_ids = eval_preds
 
-    # clip negatives — predictions can have -100 padding the tokenizer can't handle
     predictions = np.where(predictions < 0, tokenizer.pad_token_id, predictions)
     label_ids   = np.where(label_ids   < 0, tokenizer.pad_token_id, label_ids)
 
@@ -86,6 +86,7 @@ def compute_metrics(eval_preds: EvalPrediction, tokenizer):
 
     metrics["acc_overall"] = round(total_correct / total_present, 4) if total_present > 0 else 0.0
     return metrics
+
 
 def download_base_model(cfg):
     os.makedirs(cfg.model_cache, exist_ok=True)
@@ -140,24 +141,30 @@ def build_dataset(cfg, mode):
     else:
         print("No specific data file found — skipping")
 
-    if mode == "specific":
-        gen  = DataGenerator(training_data, real_examples, specific_examples)
+    gen = DataGenerator(training_data, real_examples, specific_examples)
+
+    # ── mode routing ──────────────────────────────────────────────────────────
+    if mode == "modify_only":
+        dataset = gen.generate_modify_only(cfg.max_limit)
+
+    elif mode == "specific":
         data = {"input_text": [], "target_text": []}
         for example in specific_examples:
             inp, tgt = gen._convert_real(example)
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
         dataset = Dataset.from_dict(data)
+
     elif mode == "real":
-        gen  = DataGenerator(training_data, real_examples, specific_examples)
         data = {"input_text": [], "target_text": []}
         for example in real_examples:
             inp, tgt = gen._convert_real(example)
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
         dataset = Dataset.from_dict(data)
+
     else:
-        dataset = DataGenerator(training_data, real_examples, specific_examples).generate(cfg.max_limit)
+        dataset = gen.generate(cfg.max_limit)
 
     split = dataset.train_test_split(test_size=0.1, seed=42)
     print(f"Train: {len(split['train'])}  |  Test: {len(split['test'])}")
@@ -177,7 +184,7 @@ def tokenize(train_ds, test_ds, tokenizer):
         labels = np.array([
             [(t if t != tokenizer.pad_token_id else -100) for t in label]
             for label in targets["input_ids"]
-        ], dtype=np.int64)   # single stacked array — kills the slow warning
+        ], dtype=np.int64)
         inputs["labels"] = labels
         return inputs
 
@@ -185,6 +192,7 @@ def tokenize(train_ds, test_ds, tokenizer):
     tok_train = train_ds.map(tokenize_fn, batched=True).with_format("torch", columns=cols)
     tok_test  = test_ds.map(tokenize_fn,  batched=True).with_format("torch", columns=cols)
     return tok_train, tok_test
+
 
 def train(model, tokenizer, cfg, tok_train, tok_test, lr):
     args = Seq2SeqTrainingArguments(
@@ -224,7 +232,16 @@ def train(model, tokenizer, cfg, tok_train, tok_test, lr):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="VM.AI Parser Trainer")
-    parser.add_argument("--mode", choices=["both", "synthetic", "real", "specific"], default="both")
+    parser.add_argument(
+        "--mode",
+        choices=["both", "synthetic", "real", "specific", "modify_only"],
+        default="both",
+        help=(
+            "both/synthetic/real/specific = standard modes. "
+            "modify_only = targeted fine-tune on modify examples only "
+            "(requires an existing checkpoint)."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -232,12 +249,22 @@ def main():
     start  = time.time()
     args   = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    cfg    = Config(args.mode)  
+    cfg    = Config(args.mode)
+
+    if args.mode == "modify_only":
+        if not os.path.exists(cfg.output_dir) or not os.listdir(cfg.output_dir):
+            print("ERROR: modify_only requires an existing trained checkpoint.")
+            print(f"       Nothing found at: {cfg.output_dir}")
+            print("       Train with --mode both (or synthetic) first.")
+            return
 
     print(f"Device : {device}")
     print(f"Mode   : {args.mode}")
-    print(f"Epochs : {cfg.num_train_epochs}")  
-    print(f"LR     : {cfg.learning_rate_fresh if not os.path.exists(cfg.output_dir) or not os.listdir(cfg.output_dir) else cfg.learning_rate_resume}")
+    print(f"Epochs : {cfg.num_train_epochs}")
+
+    is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
+    lr = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
+    print(f"Resume : {is_resume}  LR: {lr}")
 
     os.makedirs(cfg.output_dir, exist_ok=True)
     download_base_model(cfg)
@@ -245,11 +272,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_cache)
     model     = load_model(cfg, device)
 
-    is_resume = os.path.exists(cfg.output_dir) and os.listdir(cfg.output_dir)
-    lr = cfg.learning_rate_resume if is_resume else cfg.learning_rate_fresh
-    print(f"Resume: {is_resume}, LR: {lr}")  
-
-    train_ds, test_ds   = build_dataset(cfg, args.mode) 
+    train_ds, test_ds   = build_dataset(cfg, args.mode)
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
 
     train(model, tokenizer, cfg, tok_train, tok_test, lr)

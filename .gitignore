@@ -9,6 +9,8 @@ build/
 .env
 .DS_Store
 Thumbs.db
+.qwen/
+**/.qwen/
 
 # Logs
 logs

@@ -939,6 +939,103 @@ examples:
     category: health
     duration: 15 minutes
     recurrent: true
+    start: morning
+    deadline: morning
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+- input: read a book every evening
+  output:
+    name: read a book
+    difficulty: 0.2
+    importance: 0.4
+    category: personal
+    duration: 30 minutes
+    recurrent: true
+    start: evening
+    deadline: evening
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+- input: journal every night
+  output:
+    name: journal
+    difficulty: 0.1
+    importance: 0.4
+    category: personal
+    duration: 15 minutes
+    recurrent: true
+    start: night
+    deadline: night
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+- input: walk the dog every afternoon
+  output:
+    name: walk the dog
+    difficulty: 0.2
+    importance: 0.5
+    category: fitness
+    duration: 30 minutes
+    recurrent: true
+    start: afternoon
+    deadline: afternoon
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+- input: practice guitar every evening
+  output:
+    name: practice guitar
+    difficulty: 0.4
+    importance: 0.35
+    category: creative
+    duration: 30 minutes
+    recurrent: true
+    start: evening
+    deadline: evening
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+- input: do yoga every morning
+  output:
+    name: do yoga
+    difficulty: 0.3
+    importance: 0.5
+    category: fitness
+    duration: 30 minutes
+    recurrent: true
+    start: morning
+    deadline: morning
     recurrence_days:
     - Monday
     - Tuesday
@@ -1000,6 +1097,8 @@ examples:
     category: personal
     duration: 15 minutes
     recurrent: true
+    start: evening
+    deadline: evening
     recurrence_days:
     - Monday
     - Tuesday
