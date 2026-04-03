@@ -6,7 +6,6 @@ examples:
     importance: 0.99
     category: work
     duration: 120 minutes
-
 - input: the app is down, need to hotfix asap
   output:
     name: hotfix the app
@@ -14,7 +13,6 @@ examples:
     importance: 0.99
     category: work
     duration: 90 minutes
-
 - input: deploy the hotfix to production
   output:
     name: deploy hotfix
@@ -22,7 +20,6 @@ examples:
     importance: 0.95
     category: work
     duration: 60 minutes
-
 - input: back up the database before the migration
   output:
     name: back up the database
@@ -30,7 +27,6 @@ examples:
     importance: 0.95
     category: work
     duration: 20 minutes
-
 - input: respond to the urgent support ticket
   output:
     name: respond to urgent support ticket
@@ -38,7 +34,6 @@ examples:
     importance: 0.9
     category: work
     duration: 30 minutes
-
 - input: send the invoice to the client
   output:
     name: send invoice to client
@@ -46,7 +41,6 @@ examples:
     importance: 0.88
     category: work
     duration: 10 minutes
-
 - input: prepare the quarterly presentation
   output:
     name: prepare quarterly presentation
@@ -54,7 +48,6 @@ examples:
     importance: 0.9
     category: work
     duration: 180 minutes
-
 - input: fix the login bug
   output:
     name: fix login bug
@@ -62,7 +55,6 @@ examples:
     importance: 0.85
     category: work
     duration: 90 minutes
-
 - input: debug the crashing app
   output:
     name: debug crashing app
@@ -70,7 +62,6 @@ examples:
     importance: 0.88
     category: work
     duration: 120 minutes
-
 - input: call the client about the contract
   output:
     name: call client about contract
@@ -78,7 +69,6 @@ examples:
     importance: 0.82
     category: work
     duration: 30 minutes
-
 - input: plan the sprint for next week
   output:
     name: plan sprint
@@ -86,7 +76,6 @@ examples:
     importance: 0.8
     category: work
     duration: 60 minutes
-
 - input: write the technical specification
   output:
     name: write technical specification
@@ -94,7 +83,6 @@ examples:
     importance: 0.78
     category: work
     duration: 120 minutes
-
 - input: review the pull request
   output:
     name: review pull request
@@ -102,7 +90,6 @@ examples:
     importance: 0.75
     category: work
     duration: 45 minutes
-
 - input: attend the team meeting
   output:
     name: attend team meeting
@@ -110,7 +97,6 @@ examples:
     importance: 0.75
     category: work
     duration: 60 minutes
-
 - input: write the weekly status report
   output:
     name: write weekly status report
@@ -118,7 +104,6 @@ examples:
     importance: 0.72
     category: work
     duration: 45 minutes
-
 - input: prepare the agenda for tomorrow's meeting
   output:
     name: prepare meeting agenda
@@ -126,7 +111,6 @@ examples:
     importance: 0.7
     category: work
     duration: 20 minutes
-
 - input: run the automated tests
   output:
     name: run automated tests
@@ -134,7 +118,6 @@ examples:
     importance: 0.78
     category: work
     duration: 30 minutes
-
 - input: update the project documentation
   output:
     name: update project documentation
@@ -142,7 +125,6 @@ examples:
     importance: 0.65
     category: work
     duration: 45 minutes
-
 - input: update the website content
   output:
     name: update website content
@@ -150,7 +132,6 @@ examples:
     importance: 0.62
     category: work
     duration: 60 minutes
-
 - input: reply to the client's email
   output:
     name: reply to client email
@@ -158,7 +139,6 @@ examples:
     importance: 0.75
     category: work
     duration: 15 minutes
-
 - input: send the daily standup update
   output:
     name: send standup update
@@ -166,7 +146,6 @@ examples:
     importance: 0.6
     category: work
     duration: 5 minutes
-
 - input: schedule the team sync
   output:
     name: schedule team sync
@@ -174,7 +153,6 @@ examples:
     importance: 0.65
     category: work
     duration: 10 minutes
-
 - input: write the post-mortem report
   output:
     name: write post-mortem report
@@ -182,7 +160,6 @@ examples:
     importance: 0.8
     category: work
     duration: 60 minutes
-
 - input: onboard the new developer
   output:
     name: onboard new developer
@@ -190,7 +167,6 @@ examples:
     importance: 0.75
     category: work
     duration: 120 minutes
-
 - input: refactor the authentication module
   output:
     name: refactor authentication module
@@ -198,7 +174,6 @@ examples:
     importance: 0.7
     category: work
     duration: 180 minutes
-
 - input: update the database schema
   output:
     name: update database schema
@@ -206,7 +181,6 @@ examples:
     importance: 0.8
     category: work
     duration: 90 minutes
-
 - input: send the project proposal to the client
   output:
     name: send project proposal
@@ -214,7 +188,6 @@ examples:
     importance: 0.82
     category: work
     duration: 30 minutes
-
 - input: review the contract before signing
   output:
     name: review contract
@@ -222,7 +195,6 @@ examples:
     importance: 0.88
     category: work
     duration: 60 minutes
-
 - input: write the job description for the open position
   output:
     name: write job description
@@ -230,7 +202,6 @@ examples:
     importance: 0.6
     category: work
     duration: 30 minutes
-
 - input: prepare the performance review
   output:
     name: prepare performance review
@@ -238,9 +209,6 @@ examples:
     importance: 0.75
     category: work
     duration: 60 minutes
-
-# ─── STUDY: add examples ──────────────────────────────────────────────────────
-
 - input: study for the final exam
   output:
     name: study for final exam
@@ -248,7 +216,6 @@ examples:
     importance: 0.95
     category: study
     duration: 180 minutes
-
 - input: write the thesis chapter
   output:
     name: write thesis chapter
@@ -256,7 +223,6 @@ examples:
     importance: 0.9
     category: study
     duration: 240 minutes
-
 - input: finish the assignment
   output:
     name: finish assignment
@@ -264,7 +230,6 @@ examples:
     importance: 0.85
     category: study
     duration: 90 minutes
-
 - input: write the essay
   output:
     name: write essay
@@ -272,7 +237,6 @@ examples:
     importance: 0.85
     category: study
     duration: 120 minutes
-
 - input: do the homework
   output:
     name: do homework
@@ -280,7 +244,6 @@ examples:
     importance: 0.8
     category: study
     duration: 60 minutes
-
 - input: prepare the class presentation
   output:
     name: prepare class presentation
@@ -288,7 +251,6 @@ examples:
     importance: 0.82
     category: study
     duration: 90 minutes
-
 - input: submit the project
   output:
     name: submit project
@@ -296,7 +258,6 @@ examples:
     importance: 0.85
     category: study
     duration: 30 minutes
-
 - input: attend the lecture
   output:
     name: attend lecture
@@ -304,7 +265,6 @@ examples:
     importance: 0.75
     category: study
     duration: 60 minutes
-
 - input: read the assigned chapter
   output:
     name: read assigned chapter
@@ -312,7 +272,6 @@ examples:
     importance: 0.7
     category: study
     duration: 45 minutes
-
 - input: meet with the tutor
   output:
     name: meet with tutor
@@ -320,7 +279,6 @@ examples:
     importance: 0.75
     category: study
     duration: 60 minutes
-
 - input: review notes before the exam
   output:
     name: review notes
@@ -328,7 +286,6 @@ examples:
     importance: 0.75
     category: study
     duration: 30 minutes
-
 - input: review flashcards
   output:
     name: review flashcards
@@ -336,7 +293,6 @@ examples:
     importance: 0.6
     category: study
     duration: 20 minutes
-
 - input: study Spanish for 30 minutes
   output:
     name: study Spanish
@@ -344,7 +300,6 @@ examples:
     importance: 0.5
     category: learning
     duration: 30 minutes
-
 - input: apply for the internship
   output:
     name: apply for internship
@@ -352,7 +307,6 @@ examples:
     importance: 0.85
     category: study
     duration: 60 minutes
-
 - input: prepare for the job interview
   output:
     name: prepare for interview
@@ -360,9 +314,6 @@ examples:
     importance: 0.92
     category: study
     duration: 120 minutes
-
-# ─── FITNESS: add examples ────────────────────────────────────────────────────
-
 - input: go to the gym
   output:
     name: go to the gym
@@ -370,7 +321,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 60 minutes
-
 - input: go for a run
   output:
     name: go for a run
@@ -378,7 +328,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 30 minutes
-
 - input: do yoga
   output:
     name: do yoga
@@ -386,7 +335,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 45 minutes
-
 - input: swim laps at the pool
   output:
     name: swim laps
@@ -394,7 +342,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 45 minutes
-
 - input: go cycling
   output:
     name: go cycling
@@ -402,7 +349,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 60 minutes
-
 - input: do a home workout
   output:
     name: home workout
@@ -410,7 +356,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 45 minutes
-
 - input: heavy leg day at the gym
   output:
     name: leg day
@@ -418,7 +363,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 75 minutes
-
 - input: go for a walk
   output:
     name: go for a walk
@@ -426,7 +370,6 @@ examples:
     importance: 0.45
     category: fitness
     duration: 30 minutes
-
 - input: stretch
   output:
     name: stretch
@@ -434,7 +377,6 @@ examples:
     importance: 0.4
     category: fitness
     duration: 10 minutes
-
 - input: morning jog
   output:
     name: morning jog
@@ -442,9 +384,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 30 minutes
-
-# ─── HEALTH: add examples ─────────────────────────────────────────────────────
-
 - input: take the medication
   output:
     name: take medication
@@ -452,7 +391,6 @@ examples:
     importance: 0.95
     category: health
     duration: 5 minutes
-
 - input: go to the doctor
   output:
     name: go to the doctor
@@ -460,7 +398,6 @@ examples:
     importance: 0.85
     category: health
     duration: 60 minutes
-
 - input: pick up the prescription from the pharmacy
   output:
     name: pick up prescription
@@ -468,7 +405,6 @@ examples:
     importance: 0.85
     category: health
     duration: 20 minutes
-
 - input: book the dentist appointment
   output:
     name: book dentist appointment
@@ -476,7 +412,6 @@ examples:
     importance: 0.75
     category: health
     duration: 10 minutes
-
 - input: meditate
   output:
     name: meditate
@@ -484,7 +419,6 @@ examples:
     importance: 0.55
     category: health
     duration: 15 minutes
-
 - input: measure blood pressure
   output:
     name: measure blood pressure
@@ -492,7 +426,6 @@ examples:
     importance: 0.8
     category: health
     duration: 5 minutes
-
 - input: schedule the annual checkup
   output:
     name: schedule annual checkup
@@ -500,7 +433,6 @@ examples:
     importance: 0.75
     category: health
     duration: 10 minutes
-
 - input: log my calories for today
   output:
     name: log calories
@@ -508,7 +440,6 @@ examples:
     importance: 0.45
     category: health
     duration: 5 minutes
-
 - input: go to the physio appointment
   output:
     name: physio appointment
@@ -516,7 +447,6 @@ examples:
     importance: 0.82
     category: health
     duration: 60 minutes
-
 - input: buy vitamins from the pharmacy
   output:
     name: buy vitamins
@@ -524,9 +454,6 @@ examples:
     importance: 0.6
     category: health
     duration: 20 minutes
-
-# ─── PERSONAL / FINANCE / HOME / SOCIAL: add examples ────────────────────────
-
 - input: journal
   output:
     name: journal
@@ -534,7 +461,6 @@ examples:
     importance: 0.4
     category: personal
     duration: 15 minutes
-
 - input: read for pleasure
   output:
     name: read
@@ -542,7 +468,6 @@ examples:
     importance: 0.3
     category: personal
     duration: 30 minutes
-
 - input: call mom
   output:
     name: call mom
@@ -550,7 +475,6 @@ examples:
     importance: 0.7
     category: personal
     duration: 20 minutes
-
 - input: plan the weekend
   output:
     name: plan the weekend
@@ -558,7 +482,6 @@ examples:
     importance: 0.4
     category: personal
     duration: 15 minutes
-
 - input: pay the rent
   output:
     name: pay rent
@@ -566,7 +489,6 @@ examples:
     importance: 0.99
     category: finance
     duration: 10 minutes
-
 - input: pay the utility bill
   output:
     name: pay utility bill
@@ -574,7 +496,6 @@ examples:
     importance: 0.9
     category: finance
     duration: 10 minutes
-
 - input: file the taxes
   output:
     name: file taxes
@@ -582,7 +503,6 @@ examples:
     importance: 0.95
     category: finance
     duration: 180 minutes
-
 - input: transfer money to savings
   output:
     name: transfer money to savings
@@ -590,7 +510,6 @@ examples:
     importance: 0.75
     category: finance
     duration: 10 minutes
-
 - input: check the bank account
   output:
     name: check bank account
@@ -598,7 +517,6 @@ examples:
     importance: 0.65
     category: finance
     duration: 5 minutes
-
 - input: review the monthly budget
   output:
     name: review monthly budget
@@ -606,7 +524,6 @@ examples:
     importance: 0.7
     category: finance
     duration: 30 minutes
-
 - input: renew the car insurance
   output:
     name: renew car insurance
@@ -614,7 +531,6 @@ examples:
     importance: 0.88
     category: finance
     duration: 30 minutes
-
 - input: clean the house
   output:
     name: clean the house
@@ -622,7 +538,6 @@ examples:
     importance: 0.55
     category: home
     duration: 120 minutes
-
 - input: do the laundry
   output:
     name: do laundry
@@ -630,7 +545,6 @@ examples:
     importance: 0.6
     category: home
     duration: 60 minutes
-
 - input: cook dinner
   output:
     name: cook dinner
@@ -638,7 +552,6 @@ examples:
     importance: 0.7
     category: home
     duration: 45 minutes
-
 - input: water the plants
   output:
     name: water the plants
@@ -646,7 +559,6 @@ examples:
     importance: 0.5
     category: home
     duration: 5 minutes
-
 - input: fix the leaking tap
   output:
     name: fix leaking tap
@@ -654,7 +566,6 @@ examples:
     importance: 0.75
     category: home
     duration: 60 minutes
-
 - input: take out the trash
   output:
     name: take out trash
@@ -662,7 +573,6 @@ examples:
     importance: 0.6
     category: home
     duration: 5 minutes
-
 - input: organize the desk
   output:
     name: organize desk
@@ -670,7 +580,6 @@ examples:
     importance: 0.4
     category: home
     duration: 20 minutes
-
 - input: pick up the kids from school
   output:
     name: pick up kids from school
@@ -678,7 +587,6 @@ examples:
     importance: 0.95
     category: family
     duration: 30 minutes
-
 - input: buy a birthday gift for Sarah
   output:
     name: buy birthday gift
@@ -686,7 +594,6 @@ examples:
     importance: 0.7
     category: errands
     duration: 45 minutes
-
 - input: buy groceries
   output:
     name: buy groceries
@@ -694,7 +601,6 @@ examples:
     importance: 0.75
     category: errands
     duration: 45 minutes
-
 - input: go to the bank
   output:
     name: go to the bank
@@ -702,7 +608,6 @@ examples:
     importance: 0.75
     category: errands
     duration: 30 minutes
-
 - input: send the package
   output:
     name: send package
@@ -710,7 +615,6 @@ examples:
     importance: 0.7
     category: errands
     duration: 20 minutes
-
 - input: return the item to the store
   output:
     name: return item
@@ -718,7 +622,6 @@ examples:
     importance: 0.55
     category: errands
     duration: 30 minutes
-
 - input: practice guitar
   output:
     name: practice guitar
@@ -726,7 +629,6 @@ examples:
     importance: 0.35
     category: creative
     duration: 30 minutes
-
 - input: write the blog post
   output:
     name: write blog post
@@ -734,7 +636,6 @@ examples:
     importance: 0.55
     category: creative
     duration: 60 minutes
-
 - input: draw for a bit
   output:
     name: draw
@@ -742,7 +643,6 @@ examples:
     importance: 0.3
     category: creative
     duration: 30 minutes
-
 - input: record the podcast episode
   output:
     name: record podcast episode
@@ -750,9 +650,6 @@ examples:
     importance: 0.5
     category: creative
     duration: 60 minutes
-
-# ─── FIXED TIME: add examples ─────────────────────────────────────────────────
-
 - input: gym at 6am
   output:
     name: gym
@@ -761,9 +658,8 @@ examples:
     category: fitness
     duration: 60 minutes
     fixed_time: true
-    fixed_start: '06:00'
+    fixed_start: 06:00
     recurrent: false
-
 - input: standup at 9am
   output:
     name: standup
@@ -772,9 +668,8 @@ examples:
     category: work
     duration: 15 minutes
     fixed_time: true
-    fixed_start: '09:00'
+    fixed_start: 09:00
     recurrent: false
-
 - input: dentist appointment at 2pm
   output:
     name: dentist appointment
@@ -785,7 +680,6 @@ examples:
     fixed_time: true
     fixed_start: '14:00'
     recurrent: false
-
 - input: team meeting at 3pm
   output:
     name: team meeting
@@ -796,7 +690,6 @@ examples:
     fixed_time: true
     fixed_start: '15:00'
     recurrent: false
-
 - input: meditate at 7am
   output:
     name: meditate
@@ -805,9 +698,8 @@ examples:
     category: health
     duration: 15 minutes
     fixed_time: true
-    fixed_start: '07:00'
+    fixed_start: 07:00
     recurrent: false
-
 - input: go to the gym at 7am
   output:
     name: go to the gym
@@ -816,9 +708,8 @@ examples:
     category: fitness
     duration: 60 minutes
     fixed_time: true
-    fixed_start: '07:00'
+    fixed_start: 07:00
     recurrent: false
-
 - input: client call at 11am
   output:
     name: client call
@@ -829,7 +720,6 @@ examples:
     fixed_time: true
     fixed_start: '11:00'
     recurrent: false
-
 - input: doctor appointment at 10am
   output:
     name: doctor appointment
@@ -840,7 +730,6 @@ examples:
     fixed_time: true
     fixed_start: '10:00'
     recurrent: false
-
 - input: lunch with the team at noon
   output:
     name: lunch with team
@@ -851,7 +740,6 @@ examples:
     fixed_time: true
     fixed_start: '12:00'
     recurrent: false
-
 - input: morning run at 6:30am
   output:
     name: morning run
@@ -860,9 +748,8 @@ examples:
     category: fitness
     duration: 30 minutes
     fixed_time: true
-    fixed_start: '06:30'
+    fixed_start: 06:30
     recurrent: false
-
 - input: yoga class at 8am
   output:
     name: yoga class
@@ -871,9 +758,8 @@ examples:
     category: fitness
     duration: 60 minutes
     fixed_time: true
-    fixed_start: '08:00'
+    fixed_start: 08:00
     recurrent: false
-
 - input: take medication at 8am
   output:
     name: take medication
@@ -882,9 +768,8 @@ examples:
     category: health
     duration: 5 minutes
     fixed_time: true
-    fixed_start: '08:00'
+    fixed_start: 08:00
     recurrent: false
-
 - input: interview at 2pm
   output:
     name: interview
@@ -895,7 +780,6 @@ examples:
     fixed_time: true
     fixed_start: '14:00'
     recurrent: false
-
 - input: exam starts at 9am
   output:
     name: exam
@@ -904,9 +788,8 @@ examples:
     category: study
     duration: 120 minutes
     fixed_time: true
-    fixed_start: '09:00'
+    fixed_start: 09:00
     recurrent: false
-
 - input: evening walk at 6pm
   output:
     name: evening walk
@@ -917,7 +800,6 @@ examples:
     fixed_time: true
     fixed_start: '18:00'
     recurrent: false
-
 - input: daily standup at 9:30am
   output:
     name: daily standup
@@ -926,11 +808,8 @@ examples:
     category: work
     duration: 15 minutes
     fixed_time: true
-    fixed_start: '09:30'
+    fixed_start: 09:30
     recurrent: false
-
-# ─── RECURRENT: add examples ──────────────────────────────────────────────────
-
 - input: meditate every morning
   output:
     name: meditate
@@ -949,7 +828,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: read a book every evening
   output:
     name: read a book
@@ -968,7 +846,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: journal every night
   output:
     name: journal
@@ -987,7 +864,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: walk the dog every afternoon
   output:
     name: walk the dog
@@ -1006,7 +882,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: practice guitar every evening
   output:
     name: practice guitar
@@ -1025,7 +900,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: do yoga every morning
   output:
     name: do yoga
@@ -1044,7 +918,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: go to the gym every Monday and Thursday
   output:
     name: go to the gym
@@ -1056,7 +929,6 @@ examples:
     recurrence_days:
     - Monday
     - Thursday
-
 - input: daily standup every weekday
   output:
     name: daily standup
@@ -1071,7 +943,6 @@ examples:
     - Wednesday
     - Thursday
     - Friday
-
 - input: review flashcards every day
   output:
     name: review flashcards
@@ -1088,7 +959,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: journal every evening
   output:
     name: journal
@@ -1107,7 +977,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: yoga every Tuesday and Friday
   output:
     name: yoga
@@ -1119,7 +988,6 @@ examples:
     recurrence_days:
     - Tuesday
     - Friday
-
 - input: weekly team meeting every Monday
   output:
     name: team meeting
@@ -1130,7 +998,6 @@ examples:
     recurrent: true
     recurrence_days:
     - Monday
-
 - input: take medication daily
   output:
     name: take medication
@@ -1147,7 +1014,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: run every Monday Wednesday Friday
   output:
     name: run
@@ -1160,7 +1026,6 @@ examples:
     - Monday
     - Wednesday
     - Friday
-
 - input: study Spanish every weekday
   output:
     name: study Spanish
@@ -1175,7 +1040,6 @@ examples:
     - Wednesday
     - Thursday
     - Friday
-
 - input: practice guitar every evening
   output:
     name: practice guitar
@@ -1192,7 +1056,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: weekly budget review every Sunday
   output:
     name: budget review
@@ -1203,9 +1066,6 @@ examples:
     recurrent: true
     recurrence_days:
     - Sunday
-
-# ─── WITH DEADLINES: add examples ────────────────────────────────────────────
-
 - input: submit the report by Friday
   output:
     name: submit report
@@ -1214,7 +1074,6 @@ examples:
     category: work
     duration: 90 minutes
     deadline: Friday
-
 - input: finish the assignment before Monday
   output:
     name: finish assignment
@@ -1223,7 +1082,6 @@ examples:
     category: study
     duration: 120 minutes
     deadline: Monday
-
 - input: send the invoice by end of day
   output:
     name: send invoice
@@ -1232,7 +1090,6 @@ examples:
     category: work
     duration: 10 minutes
     deadline: end of day
-
 - input: pay the rent by tomorrow
   output:
     name: pay rent
@@ -1241,7 +1098,6 @@ examples:
     category: finance
     duration: 10 minutes
     deadline: tomorrow
-
 - input: file the taxes before April deadline
   output:
     name: file taxes
@@ -1250,7 +1106,6 @@ examples:
     category: finance
     duration: 180 minutes
     deadline: April 10th
-
 - input: review the contract by end of week
   output:
     name: review contract
@@ -1259,7 +1114,6 @@ examples:
     category: work
     duration: 60 minutes
     deadline: end of week
-
 - input: write the essay due Wednesday
   output:
     name: write essay
@@ -1268,7 +1122,6 @@ examples:
     category: study
     duration: 120 minutes
     deadline: Wednesday
-
 - input: deploy the update by tonight
   output:
     name: deploy update
@@ -1277,7 +1130,6 @@ examples:
     category: work
     duration: 60 minutes
     deadline: tonight
-
 - input: prepare the presentation for Thursday
   output:
     name: prepare presentation
@@ -1286,7 +1138,6 @@ examples:
     category: work
     duration: 180 minutes
     deadline: Thursday
-
 - input: submit the application by next Monday
   output:
     name: submit application
@@ -1295,7 +1146,6 @@ examples:
     category: study
     duration: 60 minutes
     deadline: next Monday
-
 - input: fix the bug before the client demo on Friday
   output:
     name: fix bug before demo
@@ -1304,7 +1154,6 @@ examples:
     category: work
     duration: 120 minutes
     deadline: Friday
-
 - input: return the library book by tomorrow
   output:
     name: return library book
@@ -1313,7 +1162,6 @@ examples:
     category: errands
     duration: 15 minutes
     deadline: tomorrow
-
 - input: send the birthday card before Saturday
   output:
     name: send birthday card
@@ -1322,7 +1170,6 @@ examples:
     category: personal
     duration: 10 minutes
     deadline: Saturday
-
 - input: renew passport before it expires next month
   output:
     name: renew passport
@@ -1331,9 +1178,6 @@ examples:
     category: admin
     duration: 60 minutes
     deadline: next month
-
-# ─── WITH LOCATIONS: add examples ────────────────────────────────────────────
-
 - input: meet the client at the coffee shop
   output:
     name: meet client
@@ -1342,7 +1186,6 @@ examples:
     category: work
     duration: 60 minutes
     location: coffee shop
-
 - input: study at the library
   output:
     name: study
@@ -1351,7 +1194,6 @@ examples:
     category: study
     duration: 120 minutes
     location: library
-
 - input: work out at the gym
   output:
     name: work out
@@ -1360,7 +1202,6 @@ examples:
     category: fitness
     duration: 60 minutes
     location: gym
-
 - input: pick up groceries at the supermarket
   output:
     name: pick up groceries
@@ -1369,7 +1210,6 @@ examples:
     category: errands
     duration: 45 minutes
     location: supermarket
-
 - input: buy medicine at the pharmacy
   output:
     name: buy medicine
@@ -1378,7 +1218,6 @@ examples:
     category: health
     duration: 20 minutes
     location: pharmacy
-
 - input: conference call from home
   output:
     name: conference call
@@ -1387,7 +1226,6 @@ examples:
     category: work
     duration: 60 minutes
     location: home
-
 - input: work from the office today
   output:
     name: work
@@ -1396,7 +1234,6 @@ examples:
     category: work
     duration: 480 minutes
     location: office
-
 - input: train at the gym this morning
   output:
     name: train
@@ -1405,9 +1242,6 @@ examples:
     category: fitness
     duration: 75 minutes
     location: gym
-
-# ─── CASUAL / CONVERSATIONAL PHRASING: add examples ──────────────────────────
-
 - input: gotta fix that nasty bug before the release
   output:
     name: fix bug before release
@@ -1415,7 +1249,6 @@ examples:
     importance: 0.9
     category: work
     duration: 90 minutes
-
 - input: need to hit the gym today
   output:
     name: go to the gym
@@ -1423,7 +1256,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 60 minutes
-
 - input: can't forget to pay the electricity bill
   output:
     name: pay electricity bill
@@ -1431,7 +1263,6 @@ examples:
     importance: 0.9
     category: finance
     duration: 10 minutes
-
 - input: really need to clean up the apartment
   output:
     name: clean apartment
@@ -1439,7 +1270,6 @@ examples:
     importance: 0.55
     category: home
     duration: 90 minutes
-
 - input: should probably call the bank about my account
   output:
     name: call bank
@@ -1447,7 +1277,6 @@ examples:
     importance: 0.75
     category: finance
     duration: 20 minutes
-
 - input: thinking about starting to meditate in the mornings
   output:
     name: meditate
@@ -1455,7 +1284,6 @@ examples:
     importance: 0.5
     category: health
     duration: 15 minutes
-
 - input: low key need to sort out my taxes before the deadline
   output:
     name: sort out taxes
@@ -1463,7 +1291,6 @@ examples:
     importance: 0.95
     category: finance
     duration: 180 minutes
-
 - input: super important — fix the security vulnerability
   output:
     name: fix security vulnerability
@@ -1471,7 +1298,6 @@ examples:
     importance: 0.99
     category: work
     duration: 120 minutes
-
 - input: almost forgot, need to submit the timesheet
   output:
     name: submit timesheet
@@ -1479,7 +1305,6 @@ examples:
     importance: 0.8
     category: work
     duration: 10 minutes
-
 - input: quick thing, email the recruiter back
   output:
     name: email recruiter
@@ -1487,7 +1312,6 @@ examples:
     importance: 0.75
     category: work
     duration: 10 minutes
-
 - input: don't let me forget to water the plants
   output:
     name: water plants
@@ -1495,7 +1319,6 @@ examples:
     importance: 0.5
     category: home
     duration: 5 minutes
-
 - input: heads up to myself — prepare for the sprint review
   output:
     name: prepare for sprint review
@@ -1503,7 +1326,6 @@ examples:
     importance: 0.8
     category: work
     duration: 60 minutes
-
 - input: todo — update the resume
   output:
     name: update resume
@@ -1511,7 +1333,6 @@ examples:
     importance: 0.7
     category: personal
     duration: 60 minutes
-
 - input: flag this — renew the domain before it expires
   output:
     name: renew domain
@@ -1519,7 +1340,6 @@ examples:
     importance: 0.88
     category: work
     duration: 10 minutes
-
 - input: reminder to take blood pressure medication tonight
   output:
     name: take blood pressure medication
@@ -1527,462 +1347,368 @@ examples:
     importance: 0.95
     category: health
     duration: 5 minutes
-
-# ─── MODIFY: change difficulty ────────────────────────────────────────────────
-
 - input: 'modify: {"name": "go to the gym", "category": "fitness", "difficulty": 0.6,
     "importance": 0.5, "duration": "60 minutes"} │ make it a light session'
   output:
     difficulty: 0.2
-
-- input: 'modify: {"name": "fix the bug", "category": "work", "difficulty": 0.5,
-    "importance": 0.7} │ it''s actually a critical security issue'
+- input: 'modify: {"name": "fix the bug", "category": "work", "difficulty": 0.5, "importance":
+    0.7} │ it''s actually a critical security issue'
   output:
     difficulty: 0.95
     importance: 0.99
-
 - input: 'modify: {"name": "write the report", "category": "work", "difficulty": 0.5,
     "importance": 0.7} │ this is harder than I thought'
   output:
     difficulty: 0.8
-
 - input: 'modify: {"name": "go for a run", "category": "fitness", "difficulty": 0.55,
     "importance": 0.5} │ just a short easy jog today'
   output:
     difficulty: 0.2
-
-- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.5,
-    "importance": 0.7} │ it''s a very tough subject'
+- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.5, "importance":
+    0.7} │ it''s a very tough subject'
   output:
     difficulty: 0.9
-
-- input: 'modify: {"name": "cook dinner", "category": "home", "difficulty": 0.4,
-    "importance": 0.7} │ just heating up leftovers'
+- input: 'modify: {"name": "cook dinner", "category": "home", "difficulty": 0.4, "importance":
+    0.7} │ just heating up leftovers'
   output:
     difficulty: 0.05
     duration: 10 minutes
-
-- input: 'modify: {"name": "prepare presentation", "category": "work", "difficulty": 0.6,
-    "importance": 0.8} │ it''s a board-level presentation, make it hard'
+- input: 'modify: {"name": "prepare presentation", "category": "work", "difficulty":
+    0.6, "importance": 0.8} │ it''s a board-level presentation, make it hard'
   output:
     difficulty: 0.9
     importance: 0.95
-
-- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1,
-    "importance": 0.55} │ trying a much harder breathing technique today'
+- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1, "importance":
+    0.55} │ trying a much harder breathing technique today'
   output:
     difficulty: 0.45
-
 - input: 'modify: {"name": "do homework", "category": "study", "difficulty": 0.5,
     "importance": 0.8} │ it''s just review problems, should be easy'
   output:
     difficulty: 0.25
-
-- input: 'modify: {"name": "write blog post", "category": "creative", "difficulty": 0.55,
-    "importance": 0.55} │ actually it''s a super complex technical deep dive'
+- input: 'modify: {"name": "write blog post", "category": "creative", "difficulty":
+    0.55, "importance": 0.55} │ actually it''s a super complex technical deep dive'
   output:
     difficulty: 0.85
-
-# ─── MODIFY: change importance ────────────────────────────────────────────────
-
-- input: 'modify: {"name": "read the article", "category": "personal", "difficulty": 0.2,
-    "importance": 0.3} │ actually it''s very important for my project'
+- input: 'modify: {"name": "read the article", "category": "personal", "difficulty":
+    0.2, "importance": 0.3} │ actually it''s very important for my project'
   output:
     importance: 0.88
-
-- input: 'modify: {"name": "update documentation", "category": "work", "difficulty": 0.35,
-    "importance": 0.65} │ it''s urgent, client is waiting'
+- input: 'modify: {"name": "update documentation", "category": "work", "difficulty":
+    0.35, "importance": 0.65} │ it''s urgent, client is waiting'
   output:
     importance: 0.92
-
-- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.6,
-    "importance": 0.75} │ mark it as critical'
+- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.6, "importance":
+    0.75} │ mark it as critical'
   output:
     importance: 0.99
-
-- input: 'modify: {"name": "write blog post", "category": "creative", "difficulty": 0.55,
-    "importance": 0.55} │ not urgent, can skip for now'
+- input: 'modify: {"name": "write blog post", "category": "creative", "difficulty":
+    0.55, "importance": 0.55} │ not urgent, can skip for now'
   output:
     importance: 0.2
-
 - input: 'modify: {"name": "clean the house", "category": "home", "difficulty": 0.4,
     "importance": 0.55} │ guests coming tonight, very important'
   output:
     importance: 0.9
-
 - input: 'modify: {"name": "reply to email", "category": "work", "difficulty": 0.2,
     "importance": 0.5} │ it''s very important, the CEO is waiting'
   output:
     importance: 0.97
-
-- input: 'modify: {"name": "review flashcards", "category": "study", "difficulty": 0.2,
-    "importance": 0.6} │ exam is tomorrow, make it high priority'
+- input: 'modify: {"name": "review flashcards", "category": "study", "difficulty":
+    0.2, "importance": 0.6} │ exam is tomorrow, make it high priority'
   output:
     importance: 0.95
-
-- input: 'modify: {"name": "plan the weekend", "category": "personal", "difficulty": 0.15,
-    "importance": 0.4} │ doesn''t really matter, very low priority'
+- input: 'modify: {"name": "plan the weekend", "category": "personal", "difficulty":
+    0.15, "importance": 0.4} │ doesn''t really matter, very low priority'
   output:
     importance: 0.1
-
-- input: 'modify: {"name": "pay rent", "category": "finance", "difficulty": 0.1,
-    "importance": 0.99} │ already paid it'
+- input: 'modify: {"name": "pay rent", "category": "finance", "difficulty": 0.1, "importance":
+    0.99} │ already paid it'
   output:
     importance: 0.1
-
 - input: 'modify: {"name": "buy groceries", "category": "errands", "difficulty": 0.15,
     "importance": 0.75} │ nothing at home, it''s urgent'
   output:
     importance: 0.92
-
-- input: 'modify: {"name": "study Spanish", "category": "learning", "difficulty": 0.5,
-    "importance": 0.5} │ I have a Spanish interview next week, make it very important'
+- input: 'modify: {"name": "study Spanish", "category": "learning", "difficulty":
+    0.5, "importance": 0.5} │ I have a Spanish interview next week, make it very important'
   output:
     importance: 0.9
-
-- input: 'modify: {"name": "write the thesis chapter", "category": "study", "difficulty": 0.9,
-    "importance": 0.9} │ my supervisor says it''s the most critical part'
+- input: 'modify: {"name": "write the thesis chapter", "category": "study", "difficulty":
+    0.9, "importance": 0.9} │ my supervisor says it''s the most critical part'
   output:
     importance: 0.99
-
-# ─── MODIFY: change duration ──────────────────────────────────────────────────
-
 - input: 'modify: {"name": "gym session", "category": "fitness", "difficulty": 0.6,
     "importance": 0.5, "duration": "60 minutes"} │ make it 90 minutes'
   output:
     duration: 90 minutes
-
 - input: 'modify: {"name": "team meeting", "category": "work", "difficulty": 0.1,
     "importance": 0.75, "duration": "60 minutes"} │ cut it to 30 minutes'
   output:
     duration: 30 minutes
-
-- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.6,
-    "importance": 0.8, "duration": "60 minutes"} │ need to study for 3 hours'
+- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.6, "importance":
+    0.8, "duration": "60 minutes"} │ need to study for 3 hours'
   output:
     duration: 180 minutes
-
 - input: 'modify: {"name": "write report", "category": "work", "difficulty": 0.5,
     "importance": 0.75, "duration": "45 minutes"} │ it will take 2 hours'
   output:
     duration: 120 minutes
-
-- input: 'modify: {"name": "review PR", "category": "work", "difficulty": 0.5,
-    "importance": 0.75, "duration": "45 minutes"} │ block 20 minutes for it'
+- input: 'modify: {"name": "review PR", "category": "work", "difficulty": 0.5, "importance":
+    0.75, "duration": "45 minutes"} │ block 20 minutes for it'
   output:
     duration: 20 minutes
-
-- input: 'modify: {"name": "client call", "category": "work", "difficulty": 0.3,
-    "importance": 0.8, "duration": "30 minutes"} │ it''s going to be a long one, 2 hours'
+- input: 'modify: {"name": "client call", "category": "work", "difficulty": 0.3, "importance":
+    0.8, "duration": "30 minutes"} │ it''s going to be a long one, 2 hours'
   output:
     duration: 120 minutes
-
-- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1,
-    "importance": 0.55, "duration": "15 minutes"} │ just 5 minutes today'
+- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1, "importance":
+    0.55, "duration": "15 minutes"} │ just 5 minutes today'
   output:
     duration: 5 minutes
-
 - input: 'modify: {"name": "write essay", "category": "study", "difficulty": 0.7,
     "importance": 0.85, "duration": "120 minutes"} │ should only take about 45 minutes'
   output:
     duration: 45 minutes
-
-- input: 'modify: {"name": "grocery shopping", "category": "errands", "difficulty": 0.15,
-    "importance": 0.75, "duration": "45 minutes"} │ long list, block 90 minutes'
+- input: 'modify: {"name": "grocery shopping", "category": "errands", "difficulty":
+    0.15, "importance": 0.75, "duration": "45 minutes"} │ long list, block 90 minutes'
   output:
     duration: 90 minutes
-
-- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.7,
-    "importance": 0.85, "duration": "60 minutes"} │ quick fix, only 15 minutes'
+- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.7, "importance":
+    0.85, "duration": "60 minutes"} │ quick fix, only 15 minutes'
   output:
     duration: 15 minutes
-
-# ─── MODIFY: change location ──────────────────────────────────────────────────
-
-- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.5,
-    "importance": 0.7, "location": "home"} │ do it at the library instead'
+- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.5, "importance":
+    0.7, "location": "home"} │ do it at the library instead'
   output:
     location: library
-
-- input: 'modify: {"name": "work", "category": "work", "difficulty": 0.5,
-    "importance": 0.75, "location": "office"} │ working from home today'
+- input: 'modify: {"name": "work", "category": "work", "difficulty": 0.5, "importance":
+    0.75, "location": "office"} │ working from home today'
   output:
     location: home
-
-- input: 'modify: {"name": "meet client", "category": "work", "difficulty": 0.3,
-    "importance": 0.8, "location": "office"} │ meeting at the coffee shop instead'
+- input: 'modify: {"name": "meet client", "category": "work", "difficulty": 0.3, "importance":
+    0.8, "location": "office"} │ meeting at the coffee shop instead'
   output:
     location: coffee shop
-
 - input: 'modify: {"name": "gym session", "category": "fitness", "difficulty": 0.6,
     "importance": 0.5, "location": "gym"} │ do it at home'
   output:
     location: home
-
 - input: 'modify: {"name": "team lunch", "category": "social", "difficulty": 0.1,
     "importance": 0.55} │ do it at the restaurant on main street'
   output:
     location: restaurant
-
-- input: 'modify: {"name": "call", "category": "work", "difficulty": 0.25,
-    "importance": 0.75} │ take it remotely'
+- input: 'modify: {"name": "call", "category": "work", "difficulty": 0.25, "importance":
+    0.75} │ take it remotely'
   output:
     location: online
-
-- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6,
-    "importance": 0.5} │ change it to the park'
+- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance":
+    0.5} │ change it to the park'
   output:
     location: park
-
-# ─── MODIFY: change deadline ──────────────────────────────────────────────────
-
 - input: 'modify: {"name": "submit report", "category": "work", "difficulty": 0.55,
     "importance": 0.85, "deadline": "Friday"} │ push deadline to next Monday'
   output:
     deadline: next Monday
-
 - input: 'modify: {"name": "write essay", "category": "study", "difficulty": 0.7,
     "importance": 0.85, "deadline": "Sunday"} │ actually due Wednesday'
   output:
     deadline: Wednesday
-
-- input: 'modify: {"name": "pay bill", "category": "finance", "difficulty": 0.1,
-    "importance": 0.9, "deadline": "end of month"} │ due tomorrow actually'
+- input: 'modify: {"name": "pay bill", "category": "finance", "difficulty": 0.1, "importance":
+    0.9, "deadline": "end of month"} │ due tomorrow actually'
   output:
     deadline: tomorrow
-
 - input: 'modify: {"name": "deploy update", "category": "work", "difficulty": 0.7,
     "importance": 0.88, "deadline": "Thursday"} │ move it to end of week'
   output:
     deadline: end of week
-
-- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.65,
-    "importance": 0.8, "deadline": "next week"} │ needs to be done today'
+- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.65, "importance":
+    0.8, "deadline": "next week"} │ needs to be done today'
   output:
     deadline: today
     importance: 0.95
-
-- input: 'modify: {"name": "submit application", "category": "study", "difficulty": 0.5,
-    "importance": 0.85, "deadline": "next Monday"} │ deadline is actually this Friday'
+- input: 'modify: {"name": "submit application", "category": "study", "difficulty":
+    0.5, "importance": 0.85, "deadline": "next Monday"} │ deadline is actually this
+    Friday'
   output:
     deadline: this Friday
-
 - input: 'modify: {"name": "review contract", "category": "work", "difficulty": 0.5,
     "importance": 0.85, "deadline": "end of week"} │ client pushed it to next month'
   output:
     deadline: next month
     importance: 0.7
-
 - input: 'modify: {"name": "file taxes", "category": "finance", "difficulty": 0.8,
     "importance": 0.95, "deadline": "April 10th"} │ got an extension until April 30th'
   output:
     deadline: April 30th
-
-# ─── MODIFY: change fixed_start (time) ───────────────────────────────────────
-
-- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "07:00",
-    "category": "fitness"} │ at 6am'
+- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "07:00", "category":
+    "fitness"} │ at 6am'
   output:
-    fixed_start: '06:00'
-
+    fixed_start: 06:00
 - input: 'modify: {"name": "standup", "fixed_time": true, "fixed_start": "09:00",
     "category": "work"} │ move to 10am'
   output:
     fixed_start: '10:00'
-
 - input: 'modify: {"name": "dentist", "fixed_time": true, "fixed_start": "14:00",
     "category": "health"} │ rescheduled to 3pm'
   output:
     fixed_start: '15:00'
-
 - input: 'modify: {"name": "yoga class", "fixed_time": true, "fixed_start": "08:00",
     "category": "fitness"} │ moving to 7am'
   output:
-    fixed_start: '07:00'
-
+    fixed_start: 07:00
 - input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "15:00",
     "category": "work"} │ push it to 4pm'
   output:
     fixed_start: '16:00'
-
 - input: 'modify: {"name": "morning run", "fixed_time": true, "fixed_start": "06:30",
     "category": "fitness"} │ make it 5:30am'
   output:
-    fixed_start: '05:30'
-
+    fixed_start: 05:30
 - input: 'modify: {"name": "client call", "fixed_time": true, "fixed_start": "11:00",
     "category": "work"} │ moved to 2pm'
   output:
     fixed_start: '14:00'
-
 - input: 'modify: {"name": "take medication", "fixed_time": true, "fixed_start": "08:00",
     "category": "health"} │ change to 9am'
   output:
-    fixed_start: '09:00'
-
+    fixed_start: 09:00
 - input: 'modify: {"name": "interview", "fixed_time": true, "fixed_start": "14:00",
     "category": "work"} │ moved to 11am'
   output:
     fixed_start: '11:00'
-
-- input: 'modify: {"name": "doctor appointment", "fixed_time": true, "fixed_start": "10:00",
-    "category": "health"} │ reschedule to 9am'
+- input: 'modify: {"name": "doctor appointment", "fixed_time": true, "fixed_start":
+    "10:00", "category": "health"} │ reschedule to 9am'
   output:
-    fixed_start: '09:00'
-
-- input: 'modify: {"name": "lunch", "fixed_time": true, "fixed_start": "12:00",
-    "category": "social"} │ at 1pm instead'
+    fixed_start: 09:00
+- input: 'modify: {"name": "lunch", "fixed_time": true, "fixed_start": "12:00", "category":
+    "social"} │ at 1pm instead'
   output:
     fixed_start: '13:00'
-
-- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "06:00",
-    "category": "fitness"} │ move to 8am'
+- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "06:00", "category":
+    "fitness"} │ move to 8am'
   output:
-    fixed_start: '08:00'
-
+    fixed_start: 08:00
 - input: 'modify: {"name": "evening walk", "fixed_time": true, "fixed_start": "18:00",
     "category": "fitness"} │ at 7pm'
   output:
     fixed_start: '19:00'
-
 - input: 'modify: {"name": "standup", "fixed_time": true, "fixed_start": "09:30",
     "category": "work"} │ moved to 8:30am'
   output:
-    fixed_start: '08:30'
-
-- input: 'modify: {"name": "exam", "fixed_time": true, "fixed_start": "09:00",
-    "category": "study"} │ moved to 2pm'
+    fixed_start: 08:30
+- input: 'modify: {"name": "exam", "fixed_time": true, "fixed_start": "09:00", "category":
+    "study"} │ moved to 2pm'
   output:
     fixed_start: '14:00'
-
-# ─── MODIFY: change multiple fields ──────────────────────────────────────────
-
-- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.5,
-    "importance": 0.7, "duration": "60 minutes"} │ it''s urgent and will take 3 hours'
+- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.5, "importance":
+    0.7, "duration": "60 minutes"} │ it''s urgent and will take 3 hours'
   output:
     importance: 0.95
     duration: 180 minutes
-
 - input: 'modify: {"name": "study session", "category": "study", "difficulty": 0.5,
-    "importance": 0.7, "duration": "60 minutes", "location": "home"} │ do it at the library for 2 hours'
+    "importance": 0.7, "duration": "60 minutes", "location": "home"} │ do it at the
+    library for 2 hours'
   output:
     duration: 120 minutes
     location: library
-
-- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6,
-    "importance": 0.5, "duration": "60 minutes"} │ light 30 min session at home'
+- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance":
+    0.5, "duration": "60 minutes"} │ light 30 min session at home'
   output:
     difficulty: 0.2
     duration: 30 minutes
     location: home
-
 - input: 'modify: {"name": "write report", "category": "work", "difficulty": 0.5,
     "importance": 0.75, "deadline": "Friday"} │ very important, due tomorrow'
   output:
     importance: 0.95
     deadline: tomorrow
-
 - input: 'modify: {"name": "team meeting", "category": "work", "fixed_time": true,
-    "fixed_start": "15:00", "duration": "60 minutes"} │ move to 2pm and cut to 30 min'
+    "fixed_start": "15:00", "duration": "60 minutes"} │ move to 2pm and cut to 30
+    min'
   output:
     fixed_start: '14:00'
     duration: 30 minutes
-
-- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1,
-    "importance": 0.55, "duration": "15 minutes"} │ 30 minutes and it''s very important today'
+- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1, "importance":
+    0.55, "duration": "15 minutes"} │ 30 minutes and it''s very important today'
   output:
     duration: 30 minutes
     importance: 0.82
-
 - input: 'modify: {"name": "go to gym", "category": "fitness", "difficulty": 0.6,
     "importance": 0.5} │ actually this is a hard competition prep session, very important'
   output:
     difficulty: 0.9
     importance: 0.85
-
-- input: 'modify: {"name": "client presentation", "category": "work", "difficulty": 0.7,
-    "importance": 0.85, "deadline": "next week"} │ moved to Thursday, still very important'
+- input: 'modify: {"name": "client presentation", "category": "work", "difficulty":
+    0.7, "importance": 0.85, "deadline": "next week"} │ moved to Thursday, still very
+    important'
   output:
     deadline: Thursday
-
 - input: 'modify: {"name": "read article", "category": "personal", "difficulty": 0.2,
     "importance": 0.3} │ this is core research for my thesis, very important and hard'
   output:
     difficulty: 0.6
     importance: 0.88
     category: study
-
-- input: 'modify: {"name": "clean house", "category": "home", "difficulty": 0.4,
-    "importance": 0.55, "duration": "120 minutes"} │ just a quick tidy, 20 minutes'
+- input: 'modify: {"name": "clean house", "category": "home", "difficulty": 0.4, "importance":
+    0.55, "duration": "120 minutes"} │ just a quick tidy, 20 minutes'
   output:
     difficulty: 0.15
     duration: 20 minutes
-
 - input: webinar at 3:30pm about AI trends
   output:
     name: webinar about AI trends
     fixed_time: true
     fixed_start: '15:30'
     recurrent: false
-
 - input: therapy session at 4pm
   output:
     name: therapy session
     fixed_time: true
     fixed_start: '16:00'
     recurrent: false
-
 - input: haircut at 11:30am
   output:
     name: haircut
     fixed_time: true
     fixed_start: '11:30'
     recurrent: false
-
 - input: flight at 6:45pm
   output:
     name: flight
     fixed_time: true
     fixed_start: '18:45'
     recurrent: false
-
 - input: concert starts at 8pm
   output:
     name: concert
     fixed_time: true
     fixed_start: '20:00'
     recurrent: false
-
 - input: school pick up at 2:15pm
   output:
     name: school pick up
     fixed_time: true
     fixed_start: '14:15'
     recurrent: false
-
 - input: morning meeting at 9am
   output:
     name: morning meeting
     fixed_time: true
-    fixed_start: '09:00'
+    fixed_start: 09:00
     recurrent: false
-
 - input: lunch with Sarah at 12:30pm
   output:
     name: lunch with Sarah
     fixed_time: true
     fixed_start: '12:30'
     recurrent: false
-
 - input: deadline at midnight
   output:
     name: deadline
     fixed_time: true
-    fixed_start: '00:00'
+    fixed_start: 00:00
     recurrent: false
-
-# ─── FIX FOR DIFFICULTY MAPPING ───────────────────────────────────────────────
-
 - input: this is a very hard problem
   output:
     name: solve hard problem
@@ -1992,7 +1718,6 @@ examples:
     duration: 120
     fixed_time: false
     recurrent: false
-
 - input: quick and easy task
   output:
     name: quick easy task
@@ -2000,7 +1725,6 @@ examples:
     importance: 0.4
     fixed_time: false
     recurrent: false
-
 - input: extremely challenging assignment
   output:
     name: challenging assignment
@@ -2010,7 +1734,6 @@ examples:
     duration: 180
     fixed_time: false
     recurrent: false
-
 - input: simple routine check
   output:
     name: routine check
@@ -2018,9 +1741,6 @@ examples:
     importance: 0.5
     fixed_time: false
     recurrent: false
-
-# ─── FIX FOR IMPORTANCE MAPPING ───────────────────────────────────────────────
-
 - input: this is critical, do it now
   output:
     name: critical task
@@ -2028,30 +1748,24 @@ examples:
     importance: 0.99
     fixed_time: false
     recurrent: false
-
 - input: very low priority, whenever
   output:
     name: low priority task
     importance: 0.1
     fixed_time: false
     recurrent: false
-
 - input: asap, needs immediate attention
   output:
     name: asap task
     importance: 0.95
     fixed_time: false
     recurrent: false
-
 - input: not important at all
   output:
     name: not important
     importance: 0.05
     fixed_time: false
     recurrent: false
-
-# ─── FIX FOR RECURRENT TASKS ──────────────────────────────────────────────────
-
 - input: water plants every morning
   output:
     name: water plants
@@ -2068,7 +1782,6 @@ examples:
     - Friday
     - Saturday
     - Sunday
-
 - input: team sync every Monday
   output:
     name: team sync
@@ -2079,7 +1792,6 @@ examples:
     recurrent: true
     recurrence_days:
     - Monday
-
 - input: gym every Tuesday and Thursday
   output:
     name: gym
@@ -2091,7 +1803,6 @@ examples:
     recurrence_days:
     - Tuesday
     - Thursday
-
 - input: weekly review every Friday
   output:
     name: weekly review
@@ -2102,7 +1813,6 @@ examples:
     recurrent: true
     recurrence_days:
     - Friday
-
 - input: daily standup every weekday
   output:
     name: daily standup
@@ -2117,9 +1827,6 @@ examples:
     - Wednesday
     - Thursday
     - Friday
-
-# ─── FIX FOR LOCATION EXTRACTION ─────────────────────────────────────────────
-
 - input: meet at the coffee shop downtown
   output:
     name: meet at coffee shop
@@ -2130,7 +1837,6 @@ examples:
     duration: 60
     fixed_time: false
     recurrent: false
-
 - input: study session at the public library
   output:
     name: study session
@@ -2141,7 +1847,6 @@ examples:
     duration: 120
     fixed_time: false
     recurrent: false
-
 - input: work from home today
   output:
     name: work from home
@@ -2152,7 +1857,6 @@ examples:
     duration: 480
     fixed_time: false
     recurrent: false
-
 - input: pick up package from the post office
   output:
     name: pick up package
@@ -2163,9 +1867,6 @@ examples:
     duration: 20
     fixed_time: false
     recurrent: false
-
-# ─── FIX FOR COMBINED FIELDS ─────────────────────────────────────────────────
-
 - input: urgent meeting at 2pm in the conference room
   output:
     name: meeting
@@ -2176,7 +1877,6 @@ examples:
     category: work
     duration: 60
     recurrent: false
-
 - input: hard study session every Tuesday at 6pm
   output:
     name: study session
@@ -2188,7 +1888,6 @@ examples:
     - Tuesday
     category: study
     duration: 120
-
 - input: call the client before Friday, very important
   output:
     name: call client
@@ -2198,7 +1897,6 @@ examples:
     duration: 30
     fixed_time: false
     recurrent: false
-
 - input: easy task, do it at home by tomorrow
   output:
     name: easy task
@@ -2207,33 +1905,29 @@ examples:
     deadline: tomorrow
     fixed_time: false
     recurrent: false
-
-# ─── FIX FOR MODIFY EXAMPLES ─────────────────────────────────────────────────
-
-- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "14:00"} │ move to 3pm'
+- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "14:00"}
+    │ move to 3pm'
   output:
     fixed_start: '15:00'
-
-- input: 'modify: {"name": "gym", "recurrent": true, "recurrence_days": ["Monday", "Wednesday"]} │ change to Tuesday and Thursday'
+- input: 'modify: {"name": "gym", "recurrent": true, "recurrence_days": ["Monday",
+    "Wednesday"]} │ change to Tuesday and Thursday'
   output:
     recurrence_days:
     - Tuesday
     - Thursday
-
-- input: 'modify: {"name": "report", "deadline": "Friday", "difficulty": 0.5} │ its urgent, due tomorrow'
+- input: 'modify: {"name": "report", "deadline": "Friday", "difficulty": 0.5} │ its
+    urgent, due tomorrow'
   output:
     deadline: tomorrow
     importance: 0.95
-
 - input: 'modify: {"name": "study", "location": "home"} │ do it at the library instead'
   output:
     location: library
-
 - input: 'modify: {"name": "workout", "duration": "60 minutes"} │ make it 30 minutes'
   output:
     duration: 30 minutes
-
-- input: 'modify: {"name": "call", "fixed_time": true, "fixed_start": "15:00"} │ cancel fixed time'
+- input: 'modify: {"name": "call", "fixed_time": true, "fixed_start": "15:00"} │ cancel
+    fixed time'
   output:
     fixed_time: false
     fixed_start: null
@@ -2242,320 +1936,249 @@ examples:
     name: go to school
     fixed_time: false
     recurrent: false
-
 - input: finish the report
   output:
     name: finish the report
     fixed_time: false
     recurrent: false
-
 - input: buy groceries
   output:
     name: buy groceries
     fixed_time: false
     recurrent: false
-
-# ============================================
-# LOCATION EXTRACTION (Completely missing)
-# ============================================
 - input: study at the library
   output:
     name: study
     location: library
     fixed_time: false
     recurrent: false
-
 - input: meet at the coffee shop
   output:
     name: meet
     location: coffee shop
     fixed_time: false
     recurrent: false
-
 - input: work from home
   output:
     name: work
     location: home
     fixed_time: false
     recurrent: false
-
 - input: pick up groceries from the supermarket
   output:
     name: pick up groceries
     location: supermarket
     fixed_time: false
     recurrent: false
-
 - input: have lunch at the restaurant
   output:
     name: have lunch
     location: restaurant
     fixed_time: false
     recurrent: false
-
 - input: attend meeting in the conference room
   output:
     name: attend meeting
     location: conference room
     fixed_time: false
     recurrent: false
-
 - input: workout at the gym
   output:
     name: workout
     location: gym
     fixed_time: false
     recurrent: false
-
 - input: study at the coffee shop
   output:
     name: study
     location: coffee shop
     fixed_time: false
     recurrent: false
-
 - input: meet client at the office
   output:
     name: meet client
     location: office
     fixed_time: false
     recurrent: false
-
 - input: pick up prescription from pharmacy
   output:
     name: pick up prescription
     location: pharmacy
     fixed_time: false
     recurrent: false
-
-# ============================================
-# DIFFICULTY EXTRACTION
-# ============================================
 - input: this is a very hard task
   output:
     name: very hard task
     difficulty: 0.85
     fixed_time: false
     recurrent: false
-
 - input: easy quick job
   output:
     name: quick job
     difficulty: 0.2
     fixed_time: false
     recurrent: false
-
 - input: challenging assignment
   output:
     name: assignment
     difficulty: 0.9
     fixed_time: false
     recurrent: false
-
 - input: simple routine check
   output:
     name: routine check
     difficulty: 0.1
     fixed_time: false
     recurrent: false
-
 - input: extremely complex problem
   output:
     name: complex problem
     difficulty: 0.95
     fixed_time: false
     recurrent: false
-
 - input: moderate difficulty task
   output:
     name: moderate task
     difficulty: 0.5
     fixed_time: false
     recurrent: false
-
 - input: light work, nothing heavy
   output:
     name: light work
     difficulty: 0.25
     fixed_time: false
     recurrent: false
-
-# ============================================
-# IMPORTANCE EXTRACTION
-# ============================================
 - input: this is critical, do it now
   output:
     name: critical task
     importance: 0.99
     fixed_time: false
     recurrent: false
-
-- input: very low priority, whenever
-  output:
-    name: low priority task
-    importance: 0.1
-    fixed_time: false
-    recurrent: false
-
 - input: urgent, needs immediate attention
   output:
     name: urgent task
     importance: 0.95
     fixed_time: false
     recurrent: false
-
-- input: not important at all
-  output:
-    name: not important
-    importance: 0.05
-    fixed_time: false
-    recurrent: false
-
 - input: high priority item
   output:
     name: high priority item
     importance: 0.85
     fixed_time: false
     recurrent: false
-
 - input: asap, before everything else
   output:
     name: asap task
     importance: 0.92
     fixed_time: false
     recurrent: false
-
 - input: medium priority, can wait a bit
   output:
     name: medium priority
     importance: 0.5
     fixed_time: false
     recurrent: false
-
-# ============================================
-# DURATION EXTRACTION
-# ============================================
 - input: meeting for 30 minutes
   output:
     name: meeting
     duration: 30
     fixed_time: false
     recurrent: false
-
 - input: task takes 2 hours
   output:
     name: task
     duration: 120
     fixed_time: false
     recurrent: false
-
 - input: quick 15 minute call
   output:
     name: call
     duration: 15
     fixed_time: false
     recurrent: false
-
 - input: block 90 minutes for coding
   output:
     name: coding
     duration: 90
     fixed_time: false
     recurrent: false
-
 - input: one hour workout
   output:
     name: workout
     duration: 60
     fixed_time: false
     recurrent: false
-
-# ============================================
-# FIXED TIME (already works but reinforce)
-# ============================================
 - input: webinar at 3:30pm about AI
   output:
     name: webinar about AI
     fixed_time: true
     fixed_start: '15:30'
     recurrent: false
-
 - input: therapy at 4pm
   output:
     name: therapy
     fixed_time: true
     fixed_start: '16:00'
     recurrent: false
-
-- input: haircut at 11:30am
-  output:
-    name: haircut
-    fixed_time: true
-    fixed_start: '11:30'
-    recurrent: false
-
-- input: flight at 6:45pm
-  output:
-    name: flight
-    fixed_time: true
-    fixed_start: '18:45'
-    recurrent: false
-
-- input: school pick up at 2:15pm
-  output:
-    name: school pick up
-    fixed_time: true
-    fixed_start: '14:15'
-    recurrent: false
-
-# ============================================
-# RECURRENCE (fix missing recurrence_days)
-# ============================================
 - input: meditate every morning
   output:
     name: meditate
     recurrent: true
-    recurrence_days: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
     fixed_time: false
-
 - input: team sync every Monday
   output:
     name: team sync
     recurrent: true
-    recurrence_days: [Monday]
+    recurrence_days:
+    - Monday
     fixed_time: false
-
 - input: gym every Tuesday and Thursday
   output:
     name: gym
     recurrent: true
-    recurrence_days: [Tuesday, Thursday]
+    recurrence_days:
+    - Tuesday
+    - Thursday
     fixed_time: false
-
 - input: weekly review every Friday
   output:
     name: weekly review
     recurrent: true
-    recurrence_days: [Friday]
+    recurrence_days:
+    - Friday
     fixed_time: false
-
 - input: daily standup every weekday
   output:
     name: daily standup
     recurrent: true
-    recurrence_days: [Monday, Tuesday, Wednesday, Thursday, Friday]
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
     fixed_time: false
-
 - input: water plants daily
   output:
     name: water plants
     recurrent: true
-    recurrence_days: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
     fixed_time: false
-
-# ============================================
-# COMBINED FIELDS (multiple at once)
-# ============================================
 - input: urgent meeting at 2pm in the conference room
   output:
     name: meeting
@@ -2564,7 +2187,6 @@ examples:
     location: conference room
     importance: 0.9
     recurrent: false
-
 - input: hard study session every Tuesday at 6pm
   output:
     name: study session
@@ -2572,8 +2194,8 @@ examples:
     fixed_time: true
     fixed_start: '18:00'
     recurrent: true
-    recurrence_days: [Tuesday]
-
+    recurrence_days:
+    - Tuesday
 - input: call client before Friday, very important
   output:
     name: call client
@@ -2581,16 +2203,6 @@ examples:
     importance: 0.9
     fixed_time: false
     recurrent: false
-
-- input: easy task, do it at home by tomorrow
-  output:
-    name: easy task
-    difficulty: 0.2
-    location: home
-    deadline: tomorrow
-    fixed_time: false
-    recurrent: false
-
 - input: critical bug fix, takes 2 hours, due today
   output:
     name: bug fix
@@ -2599,178 +2211,136 @@ examples:
     deadline: today
     fixed_time: false
     recurrent: false
-
-# ============================================
-# MODIFY EXAMPLES (completely broken currently)
-# ============================================
-- input: 'modify: {"name": "go to the gym", "fixed_time": true, "fixed_start": "06:00"} │ move to 7am'
+- input: 'modify: {"name": "go to the gym", "fixed_time": true, "fixed_start": "06:00"}
+    │ move to 7am'
   output:
-    fixed_start: '07:00'
-
-- input: 'modify: {"name": "go to the gym", "fixed_time": true, "fixed_start": "06:00"} │ at 8am instead'
+    fixed_start: 07:00
+- input: 'modify: {"name": "go to the gym", "fixed_time": true, "fixed_start": "06:00"}
+    │ at 8am instead'
   output:
-    fixed_start: '08:00'
-
-- input: 'modify: {"name": "finish report", "deadline": "Friday"} │ its urgent, due tomorrow'
+    fixed_start: 08:00
+- input: 'modify: {"name": "finish report", "deadline": "Friday"} │ its urgent, due
+    tomorrow'
   output:
     deadline: tomorrow
     importance: 0.95
-
-- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "15:00"} │ cancel fixed time'
+- input: 'modify: {"name": "team meeting", "fixed_time": true, "fixed_start": "15:00"}
+    │ cancel fixed time'
   output:
     fixed_time: false
     fixed_start: null
-
-- input: 'modify: {"name": "study", "location": "home"} │ do it at the library instead'
-  output:
-    location: library
-
 - input: 'modify: {"name": "workout", "duration": "60"} │ make it 30 minutes'
   output:
     duration: 30
-
-- input: 'modify: {"name": "gym", "recurrent": true, "recurrence_days": ["Monday", "Wednesday"]} │ change to Tuesday and Thursday'
-  output:
-    recurrence_days: [Tuesday, Thursday]
-
-- input: 'modify: {"name": "meditate", "difficulty": "0.1"} │ it''s actually very hard'
+- input: 'modify: {"name": "meditate", "difficulty": "0.1"} │ it''s actually very
+    hard'
   output:
     difficulty: 0.85
-
 - input: 'modify: {"name": "call client", "importance": "0.5"} │ very important now'
   output:
     importance: 0.95
-
 - input: 'modify: {"name": "write report", "duration": "120"} │ only need 45 minutes'
   output:
     duration: 45
-
 - input: 'modify: {"name": "meeting", "location": "office"} │ do it remotely'
   output:
     location: online
-
-- input: 'modify: {"name": "submit assignment", "deadline": "Monday"} │ pushed to Friday'
+- input: 'modify: {"name": "submit assignment", "deadline": "Monday"} │ pushed to
+    Friday'
   output:
     deadline: Friday
-
-# ============================================
-# DEADLINE VARIATIONS
-# ============================================
 - input: submit report by end of day
   output:
     name: submit report
     deadline: end of day
     fixed_time: false
     recurrent: false
-
 - input: finish project before weekend
   output:
     name: finish project
     deadline: weekend
     fixed_time: false
     recurrent: false
-
 - input: pay bill by midnight
   output:
     name: pay bill
     deadline: midnight
     fixed_time: false
     recurrent: false
-
 - input: file taxes by April 15th
   output:
     name: file taxes
     deadline: April 15th
     fixed_time: false
     recurrent: false
-
-# ============================================
-# CASUAL/CONVERSATIONAL PHRASING
-# ============================================
 - input: gotta fix that nasty bug
   output:
     name: fix nasty bug
     fixed_time: false
     recurrent: false
-
 - input: need to hit the gym today
   output:
     name: go to the gym
     fixed_time: false
     recurrent: false
-
 - input: can't forget to pay the bill
   output:
     name: pay the bill
     fixed_time: false
     recurrent: false
-
 - input: really need to clean the apartment
   output:
     name: clean apartment
     fixed_time: false
     recurrent: false
-
 - input: almost forgot, need to submit timesheet
   output:
     name: submit timesheet
     fixed_time: false
     recurrent: false
-
 - input: don't let me forget to water plants
   output:
     name: water plants
     fixed_time: false
     recurrent: false
-
 - input: reminder to take medication tonight
   output:
     name: take medication
     fixed_time: false
     recurrent: false
-
 - input: heads up - prepare for sprint review
   output:
     name: prepare for sprint review
     fixed_time: false
     recurrent: false
-
 - input: todo - update resume
   output:
     name: update resume
     fixed_time: false
     recurrent: false
-
 - input: quick thing, email recruiter back
   output:
     name: email recruiter
     fixed_time: false
     recurrent: false
-
-# ============================================
-# CATEGORY EXTRACTION (if you want it)
-# ============================================
 - input: work on the quarterly report
   output:
     name: quarterly report
     category: work
     fixed_time: false
     recurrent: false
-
 - input: study for final exam
   output:
     name: study for final exam
     category: study
     fixed_time: false
     recurrent: false
-
 - input: go for a run
   output:
     name: go for a run
     category: fitness
     fixed_time: false
     recurrent: false
-
 - input: buy groceries for the week
   output:
     name: buy groceries

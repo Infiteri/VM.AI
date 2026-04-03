@@ -19,6 +19,7 @@ labels:
 - B-RECURRENCE
 - I-RECURRENCE
 templates:
+# ── Basic task templates ─────────────────────────────────────────────────────
 - '[TASK] by [DEADLINE].'
 - I need to [TASK] at [TIME].
 - '[TASK] at [LOCATION] on [DATE].'
@@ -29,31 +30,10 @@ templates:
 - Do [TASK] at [LOCATION].
 - '[TASK] is due [DEADLINE].'
 - Complete [TASK] by [DATE] at [TIME].
-- '[TASK] is a [DIFFICULTY] task.'
-- '[TASK] by [DEADLINE], [DIFFICULTY] difficulty.'
-- '[TASK] is [DIFFICULTY], give it [DURATION].'
-- '[TASK] at [LOCATION], [DIFFICULTY] difficulty.'
-- '[TASK] scheduled for [DATE], [DIFFICULTY] level.'
-- '[CATEGORY] session: [TASK] at [TIME].'
-- '[CATEGORY] - [TASK] at [LOCATION].'
-- '[TASK] for [CATEGORY] on [DATE].'
-- 'Schedule [CATEGORY]: [TASK] by [DEADLINE].'
-- '[CATEGORY] - [TASK] for [DURATION].'
-- Urgent [TASK] by [DEADLINE].
-- '[TASK] at [TIME], very important.'
-- '[TASK] is high priority, due [DATE].'
-- '[TASK] at [LOCATION], important.'
-- '[TASK] for [DURATION], low priority.'
 - '[TASK] at [LOCATION] by [DEADLINE].'
 - Go to [LOCATION] to [TASK] at [TIME].
-- '[TASK] at [LOCATION] on [DATE].'
 - Do [TASK] at [LOCATION] for [DURATION].
-- '[CATEGORY] - [TASK] at [LOCATION] by [DEADLINE].'
-- '[TASK] at [TIME], takes [DURATION].'
-- '[TASK] by [DEADLINE], [DIFFICULTY].'
 - '[TASK] at [LOCATION] on [DATE] at [TIME].'
-- '[TASK] for [DURATION], [DIFFICULTY].'
-- '[TASK] at [LOCATION] by [DEADLINE], important.'
 - can you remind me to [TASK]
 - i need to [TASK] by [DEADLINE]
 - don't forget to [TASK] at [LOCATION]
@@ -96,47 +76,108 @@ templates:
 - schedule [TASK] for [DATE] at [TIME]
 - book [DURATION] for [TASK] on [DATE]
 - reserve [DURATION] for [TASK]
-- '[TASK] is important'
-- '[TASK] is urgent'
-- '[TASK] can wait'
-- '[TASK] - low priority'
-- '[TASK] - [DIFFICULTY] - [DURATION]'
 - '[TASK] won''t take long, maybe [DURATION]'
 - '[TASK] might take [DURATION]'
-- '[TASK] is going to be [DIFFICULTY]'
-- '[CATEGORY]: [TASK] - [DATE]'
-- '[CATEGORY]: [TASK] at [LOCATION]'
-- '[CATEGORY] - [TASK] - [DEADLINE]'
-- 'for [CATEGORY]: [TASK] by [DEADLINE]'
-- '[TASK] for [CATEGORY], takes [DURATION]'
-- '[TASK] for [CATEGORY] at [TIME]'
-- '[TASK] with [DURATION] at [LOCATION] on [DATE]'
-- '[TASK] by [DEADLINE], hard one'
-- 'heads up: [TASK] by [DEADLINE]'
-- 'note: [TASK] at [TIME] on [DATE]'
-- 'todo: [TASK]'
-- 'todo: [TASK] by [DEADLINE]'
-- 'task: [TASK]'
-- 'action item: [TASK] by [DEADLINE]'
-- 'reminder: [TASK] at [TIME]'
-- 'don''t let me forget: [TASK]'
-- 'flag this: [TASK] due [DEADLINE]'
-- '[TASK] - flagged as important'
-- '[TASK] - [DIFFICULTY]'
-- '[TASK] - est. [DURATION]'
-- '[TASK] - due [DEADLINE]'
-- '[TASK] - [TIME] [DATE] [LOCATION]'
+- '[TASK] needs to happen at [LOCATION] on [DATE]'
+- '[TASK] has to be done at [LOCATION]'
+- '[TASK] is scheduled at [LOCATION] on [DATE] at [TIME]'
 - low key need to [TASK] by [DEADLINE]
-- 'super important: [TASK] before [DEADLINE]'
 - oh also [TASK] on [DATE]
 - 'almost forgot: [TASK] at [TIME]'
 - 'quick thing: [TASK] at [LOCATION]'
 - '[TASK] should only take [DURATION]'
 - '[TASK] could take up to [DURATION]'
 - '[TASK] will probably need [DURATION]'
-- '[TASK] needs to happen at [LOCATION] on [DATE]'
-- '[TASK] has to be done at [LOCATION]'
-- '[TASK] is scheduled at [LOCATION] on [DATE] at [TIME]'
+
+# ── Difficulty-focused templates ─────────────────────────────────────────────
+- '[TASK] is a [DIFFICULTY] task.'
+- '[TASK] by [DEADLINE], [DIFFICULTY] difficulty.'
+- '[TASK] is [DIFFICULTY], give it [DURATION].'
+- '[TASK] at [LOCATION], [DIFFICULTY] difficulty.'
+- '[TASK] scheduled for [DATE], [DIFFICULTY] level.'
+- '[TASK] by [DEADLINE], [DIFFICULTY].'
+- '[TASK] for [DURATION], [DIFFICULTY].'
+- '[TASK] - [DIFFICULTY] - [DURATION]'
+- '[TASK] is going to be [DIFFICULTY]'
+- '[TASK] - [DIFFICULTY]'
+- '[TASK] by [DEADLINE], hard one'
+- '[TASK] by [DEADLINE], easy one'
+- '[TASK] by [DEADLINE], moderate difficulty'
+- '[TASK] is pretty [DIFFICULTY]'
+- '[TASK] seems [DIFFICULTY]'
+- '[TASK] looks [DIFFICULTY] to me'
+- 'this [TASK] is [DIFFICULTY]'
+- '[TASK] is somewhat [DIFFICULTY]'
+- '[TASK] is quite [DIFFICULTY]'
+- '[TASK] is rather [DIFFICULTY]'
+
+# ── Importance/priority-focused templates ─────────────────────────────────────
+- '[TASK] at [TIME], very important.'
+- '[TASK] is high priority, due [DATE].'
+- '[TASK] at [LOCATION], important.'
+- '[TASK] for [DURATION], low priority.'
+- '[TASK] at [LOCATION] by [DEADLINE], important.'
+- '[TASK] is important'
+- '[TASK] is urgent'
+- '[TASK] can wait'
+- '[TASK] - low priority'
+- '[TASK] - flagged as important'
+- '[TASK] - high priority'
+- '[TASK] - critical'
+- '[TASK] - not urgent'
+- 'super important: [TASK] before [DEADLINE]'
+- '[TASK] is a priority'
+- '[TASK] is top priority'
+- '[TASK] is not a priority'
+- '[TASK] is somewhat important'
+- '[TASK] is absolutely critical'
+- '[TASK] is mildly important'
+- '[TASK] is essential'
+- '[TASK] is optional'
+- '[TASK] is mandatory'
+- '[TASK] is nice to have'
+
+# ── Category-focused templates ────────────────────────────────────────────────
+- '[CATEGORY] session: [TASK] at [TIME].'
+- '[CATEGORY] - [TASK] at [LOCATION].'
+- '[TASK] for [CATEGORY] on [DATE].'
+- 'Schedule [CATEGORY]: [TASK] by [DEADLINE].'
+- '[CATEGORY] - [TASK] for [DURATION].'
+- '[CATEGORY] - [TASK] at [LOCATION] by [DEADLINE].'
+- '[CATEGORY]: [TASK] - [DATE]'
+- '[CATEGORY]: [TASK] at [LOCATION]'
+- '[CATEGORY] - [TASK] - [DEADLINE]'
+- 'for [CATEGORY]: [TASK] by [DEADLINE]'
+- '[TASK] for [CATEGORY], takes [DURATION]'
+- '[TASK] for [CATEGORY] at [TIME]'
+- '[TASK] for [CATEGORY], [DIFFICULTY]'
+- '[TASK] for [CATEGORY], [PRIORITY] priority'
+- '[TASK] for [CATEGORY], [DURATION] long'
+- 'my [CATEGORY] task: [TASK]'
+- '[CATEGORY] item: [TASK] by [DEADLINE]'
+- '[CATEGORY] todo: [TASK]'
+- '[CATEGORY] - [TASK] - [DIFFICULTY]'
+- '[CATEGORY] - [TASK] - [PRIORITY]'
+
+# ── Combined multi-field templates ────────────────────────────────────────────
+- '[TASK] with [DURATION] at [LOCATION] on [DATE]'
+- '[TASK] for [CATEGORY] at [LOCATION] by [DEADLINE]'
+- '[TASK] for [CATEGORY], [DIFFICULTY], [DURATION]'
+- '[TASK] at [LOCATION], [DIFFICULTY], [PRIORITY]'
+- '[TASK] by [DEADLINE], [DIFFICULTY], [PRIORITY]'
+- '[TASK] for [DURATION], [DIFFICULTY], [CATEGORY]'
+- '[TASK] at [TIME], [DIFFICULTY], [CATEGORY]'
+- '[TASK] at [LOCATION], [DURATION], [CATEGORY]'
+- '[TASK] by [DEADLINE], [DURATION], [CATEGORY]'
+- '[TASK] for [CATEGORY], [DIFFICULTY], [PRIORITY], [DURATION]'
+- '[TASK] at [LOCATION], [DIFFICULTY], [PRIORITY], [DURATION]'
+- '[TASK] by [DEADLINE], [DIFFICULTY], [PRIORITY], [DURATION]'
+- '[CATEGORY] [TASK] at [LOCATION] for [DURATION], [DIFFICULTY]'
+- '[CATEGORY] [TASK] by [DEADLINE], [DIFFICULTY], [PRIORITY]'
+- '[CATEGORY] [TASK] at [TIME], [DIFFICULTY]'
+- '[CATEGORY] [TASK] for [DURATION], [PRIORITY]'
+
+# ── Recurrence templates ──────────────────────────────────────────────────────
 - '[TASK] every [RECURRENCE_DAY]'
 - '[TASK] every [RECURRENCE_DAY] at [TIME]'
 - '[TASK] every [RECURRENCE_DAY] for [DURATION]'
@@ -145,7 +186,29 @@ templates:
 - '[TASK] every evening'
 - weekly [TASK] on [RECURRENCE_DAY]
 - '[TASK] every [RECURRENCE_DAY] and [RECURRENCE_DAY]'
+- '[TASK] every weekday'
+- '[TASK] every day'
+- '[TASK] daily for [DURATION]'
+- '[TASK] every [RECURRENCE_DAY], [DIFFICULTY]'
+- '[TASK] every [RECURRENCE_DAY] at [LOCATION]'
+- '[CATEGORY] [TASK] every [RECURRENCE_DAY]'
+- '[CATEGORY] [TASK] every [RECURRENCE_DAY] for [DURATION]'
+
+# ── Casual/conversational templates ───────────────────────────────────────────
+- 'todo: [TASK]'
+- 'todo: [TASK] by [DEADLINE]'
+- 'task: [TASK]'
+- 'action item: [TASK] by [DEADLINE]'
+- 'reminder: [TASK] at [TIME]'
+- 'don''t let me forget: [TASK]'
+- 'flag this: [TASK] due [DEADLINE]'
+- '[TASK] - due [DEADLINE]'
+- '[TASK] - est. [DURATION]'
+- 'heads up: [TASK] by [DEADLINE]'
+- 'note: [TASK] at [TIME] on [DATE]'
+- '[TASK] - [TIME] [DATE] [LOCATION]'
 tasks:
+# ── Work tasks ────────────────────────────────────────────────────────────────
 - finish the report
 - submit the assignment
 - send the email
@@ -165,7 +228,6 @@ tasks:
 - attend the meeting
 - read the article
 - clean the desk
-- buy groceries
 - draft the proposal
 - review the contract
 - sign the documents
@@ -196,27 +258,27 @@ tasks:
 - update the config
 - fix the crash
 - write the spec
+- debug the issue
+- refactor the code
+- merge the branch
+- resolve the conflict
+- optimize the query
+- write the API
+- document the endpoint
+- review the architecture
+- prepare the demo
+- run the migration
+- check the logs
+- monitor the server
+- update the dependencies
+- fix the typo
+- respond to the PR comment
+- create the ticket
+- close the issue
+# ── Study tasks ───────────────────────────────────────────────────────────────
 - pay the rent
 - pay the bill
 - pay the invoice
-- call the doctor
-- book the dentist
-- pick up the kids
-- drop off the package
-- go to the gym
-- go for a run
-- cook dinner
-- do the laundry
-- clean the house
-- water the plants
-- walk the dog
-- buy medicine
-- renew the subscription
-- cancel the subscription
-- file the taxes
-- apply for the job
-- send the application
-- prepare for the interview
 - study for the exam
 - finish the homework
 - submit the project
@@ -225,38 +287,193 @@ tasks:
 - write the essay
 - revise the notes
 - meet with the tutor
+- prepare for the interview
+- apply for the internship
+- review the textbook
+- solve the exercises
+- write the thesis chapter
+- practice the problems
+- memorize the formulas
+- complete the quiz
+- submit the lab report
+- attend the seminar
+- discuss with the study group
+- watch the lecture recording
+- take the practice test
+- outline the paper
+- cite the sources
+- format the bibliography
+# ── Fitness tasks ─────────────────────────────────────────────────────────────
+- go to the gym
+- go for a run
+- do yoga
+- swim laps
+- go cycling
+- do a home workout
+- heavy leg day
+- go for a walk
+- stretch
+- morning jog
+- do pushups
+- do squats
+- lift weights
+- do cardio
+- practice calisthenics
+- do pilates
+- go hiking
+- play tennis
+- play basketball
+- do HIIT training
+- foam roll
+- do core exercises
+- do arm workout
+- do abs workout
+- run intervals
+- do warmup exercises
+- cool down after workout
+# ── Health tasks ──────────────────────────────────────────────────────────────
+- take the medication
+- go to the doctor
+- pick up the prescription
+- book the dentist appointment
+- meditate
+- measure blood pressure
+- schedule the annual checkup
+- log my calories
+- go to the physio appointment
+- buy vitamins from the pharmacy
+- go to the therapist
+- get a massage
+- do breathing exercises
+- track my sleep
+- drink more water
+- prepare healthy meals
+- go for a health screening
+- refill the prescription
+- apply sunscreen
+- do a health checkup
+- schedule the eye exam
+- book the blood test
+# ── Finance tasks ─────────────────────────────────────────────────────────────
+- file the taxes
+- transfer money to savings
+- check the bank account
+- review the monthly budget
+- renew the car insurance
+- pay the credit card bill
+- set up auto-pay
+- check investment portfolio
+- update the expense tracker
+- cancel the subscription
+- renew the subscription
+- apply for the loan
+- compare insurance plans
+- review bank statements
+- deposit the check
+- wire the payment
+- split the bill
+- calculate the tip
+- track monthly spending
+- set savings goal
+# ── Home tasks ────────────────────────────────────────────────────────────────
+- cook dinner
+- do the laundry
+- clean the house
+- water the plants
+- fix the leaking tap
+- take out the trash
+- organize the desk
+- vacuum the floor
+- mop the kitchen
+- clean the bathroom
+- wash the dishes
+- fold the clothes
+- iron the shirts
+- make the bed
+- tidy the living room
+- clean the windows
+- dust the shelves
+- organize the closet
+- change the bed sheets
+- clean the fridge
+- defrost the freezer
+- replace the light bulb
+- unclog the drain
+- paint the wall
+- assemble the furniture
+# ── Family/Social tasks ───────────────────────────────────────────────────────
+- pick up the kids from school
+- call mom
+- buy a birthday gift for Sarah
+- plan the weekend
+- meet friends for coffee
+- attend the family dinner
+- visit the grandparents
+- host a game night
+- plan the anniversary dinner
+- send the holiday cards
+- organize the family photo album
+- book the family vacation
+- attend the wedding
+- go to the birthday party
+- have lunch with a friend
+- call the sister
+- video chat with parents
+- plan the date night
+- invite neighbors over
+- walk the dog together
+# ── Errands/Shopping tasks ────────────────────────────────────────────────────
+- buy groceries
+- go to the bank
+- send the package
+- return the item to the store
+- pick up the order
+- drop off the package
+- buy medicine
+- get gas at the station
+- go to the post office
+- pick up dry cleaning
+- buy new shoes
+- return the library book
+- renew the passport
+- apply for the visa
 - book the flight
 - book the hotel
 - pack for the trip
-- renew the passport
-- apply for the visa
 - buy a gift
 - send the birthday card
-- plan the party
 - make the reservation
-- pick up the order
-- return the item
-- call the bank
-- transfer the money
-- check the account
-- update the password
-- back up the phone
-- charge the laptop
-- take the medication
-- go to the pharmacy
-- schedule the checkup
-- measure blood pressure
-- log the calories
-- meditate
-- stretch
-- journal
-- read
+- pick up the groceries
+- buy household supplies
+- order pizza delivery
+- get the keys cut
+- buy a phone case
+# ── Creative/Learning tasks ───────────────────────────────────────────────────
 - practice guitar
+- write the blog post
+- draw for a bit
+- record the podcast episode
 - study Spanish
 - learn piano
-- draw
 - write in the diary
 - review flashcards
+- journal
+- read for pleasure
+- paint a picture
+- edit the photos
+- compose music
+- write a short story
+- sketch the landscape
+- learn a new recipe
+- practice photography
+- watch a documentary
+- take an online course
+- learn a magic trick
+- practice calligraphy
+- design a logo
+- create a playlist
+- write a song
+- build a model
 deadlines:
 - tomorrow
 - today

@@ -74,14 +74,50 @@ class TaskPlannerPredictor:
         text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
         return text
 
+    @staticmethod
+    def _normalize_time(time_str: str) -> str | None:
+        """Convert various time formats to HH:MM."""
+        if not time_str:
+            return None
+        time_str = time_str.strip().lower()
+
+        # Handle "6am", "6 am", "6:30pm" format
+        match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm)', time_str)
+        if match:
+            hour = int(match.group(1))
+            minute = int(match.group(2)) if match.group(2) else 0
+            ampm = match.group(3)
+            if ampm == "pm" and hour != 12:
+                hour += 12
+            elif ampm == "am" and hour == 12:
+                hour = 0
+            return f"{hour:02d}:{minute:02d}"
+
+        # Handle "morning", "afternoon", "evening", "noon"
+        if "morning" in time_str:
+            return "08:00"
+        if "afternoon" in time_str:
+            return "13:00"
+        if "evening" in time_str:
+            return "18:00"
+        if "noon" in time_str:
+            return "12:00"
+        if "midnight" in time_str:
+            return "00:00"
+
+        # Already HH:MM
+        if re.match(r'^\d{1,2}:\d{2}$', time_str):
+            return time_str
+
+        return None
+
     def _sanity_check(self, schema: Dict, original_sentence: str) -> Dict:
         """
         Post-generation guard:
         - fixed_time should only be True if the input sentence contains an
           explicit clock time (HH:MM, Xam/pm, @Xpm).  If the model hallucinated
           it, reset to False and clear fixed_start.
-        - fixed_start values that are clearly not times (day names, dates,
-          percentages, raw numbers like '45') are cleared.
+        - fixed_start values are normalized to HH:MM format.
         """
         # ── fix fixed_time hallucination ────────────────────────────────────
         ft = schema.get("fixed_time", {})
@@ -91,13 +127,14 @@ class TaskPlannerPredictor:
                 schema["fixed_time"]["value"] = False
                 schema["fixed_start"]["value"] = None
 
-        # ── fix bad fixed_start values ───────────────────────────────────────
+        # ── normalize and validate fixed_start ──────────────────────────────
         fs = schema.get("fixed_start", {})
         fs_val = fs.get("value") if isinstance(fs, dict) else fs
         if fs_val is not None:
-            fs_str = str(fs_val).strip()
-            # Valid: HH:MM format only (after normalisation by model)
-            if not re.match(r'^\d{1,2}:\d{2}$', fs_str):
+            normalized = self._normalize_time(str(fs_val))
+            if normalized:
+                schema["fixed_start"]["value"] = normalized
+            else:
                 schema["fixed_start"]["value"] = None
 
         return schema
@@ -107,8 +144,7 @@ class TaskPlannerPredictor:
             input_text,
             return_tensors="pt",
             truncation=True,
-            padding="max_length",
-            max_length=256
+            padding=True,
         ).to(self.device)
 
         decoder_input = self.tokenizer(
@@ -139,9 +175,12 @@ class TaskPlannerPredictor:
                 continue
             k, _, v = part.partition("=")
             k, v = k.strip(), v.strip()
-            if v.lower() == "null":    v = None
-            elif v.lower() == "false": v = False
-            elif v.lower() == "true":  v = True
+            if v.lower() == "null":
+                v = None
+            elif v.lower() in ("true", "tru", "t"):
+                v = True
+            elif v.lower().startswith("fals"):
+                v = False
             if k not in raw:
                 raw[k] = v
         schema = {}
@@ -158,9 +197,12 @@ class TaskPlannerPredictor:
                 continue
             k, _, v = part.partition("=")
             k, v = k.strip(), v.strip()
-            if v.lower() == "null":   v = None
-            elif v.lower() == "true":  v = True
-            elif v.lower() == "false": v = False
+            if v.lower() == "null":
+                v = None
+            elif v.lower() in ("true", "tru", "t"):
+                v = True
+            elif v.lower().startswith("fals"):
+                v = False
             if k and k not in changed:
                 changed[k] = {"value": v, "predicted": False}
         return changed

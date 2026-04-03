@@ -166,15 +166,52 @@ CHANGE_TEMPLATES = [
 ]
 
 
+def _normalize_duration_to_minutes(val) -> str:
+    """Convert any duration value to integer minutes string."""
+    if val is None:
+        return None
+    val = str(val).lower().strip()
+    # Already a plain number
+    if val.isdigit():
+        return val
+    # "X hours" / "X hour"
+    match = re.search(r'(\d+(?:\.\d+)?)\s*hours?', val)
+    if match:
+        return str(int(float(match.group(1)) * 60))
+    # "X minutes" / "X min"
+    match = re.search(r'(\d+(?:\.\d+)?)\s*(?:minutes?|min)', val)
+    if match:
+        return str(int(float(match.group(1))))
+    # "half a day"
+    if "half" in val and "day" in val:
+        return "720"
+    # "all day"
+    if "all day" in val:
+        return "960"
+    # Fallback: try to extract any number
+    match = re.search(r'(\d+(?:\.\d+)?)', val)
+    if match:
+        num = float(match.group(1))
+        # If <= 24, assume hours; otherwise assume minutes
+        return str(int(num * 60)) if num <= 24 else str(int(num))
+    return None
+
+
 def schema_to_pipe(schema: dict) -> str:
     parts = []
     for field, entry in schema.items():
         val = entry["value"]
+        if val is None:
+            continue
+        if field == "duration":
+            val = _normalize_duration_to_minutes(val)
+            if val is None:
+                continue
         if isinstance(val, bool):
             parts.append(f"{field}={'true' if val else 'false'}")
         elif isinstance(val, list):
             parts.append(f"{field}={','.join(val)}")
-        elif val is not None:
+        else:
             parts.append(f"{field}={val}")
     return " | ".join(parts)
 
@@ -183,9 +220,15 @@ def changed_to_pipe(changed: dict) -> str:
     parts = []
     for field, entry in changed.items():
         val = entry["value"]
+        if val is None:
+            continue
+        if field == "duration":
+            val = _normalize_duration_to_minutes(val)
+            if val is None:
+                continue
         if isinstance(val, bool):
             parts.append(f"{field}={'true' if val else 'false'}")
-        elif val is not None:
+        else:
             parts.append(f"{field}={val}")
     return " | ".join(parts)
 
@@ -286,6 +329,91 @@ class DataGenerator:
         ]
         return any(re.search(p, s) for p in patterns)
 
+    # Keyword-to-category mapping for inference simulation
+    _TASK_CATEGORY_MAP = {
+        "report": "work", "presentation": "work", "meeting": "work",
+        "bug": "work", "test": "work", "deploy": "work", "code": "work",
+        "client": "work", "email": "work", "invoice": "work", "budget": "work",
+        "contract": "work", "proposal": "work", "sprint": "work",
+        "exam": "study", "homework": "study", "lecture": "study",
+        "thesis": "study", "assignment": "study", "tutor": "study",
+        "gym": "fitness", "run": "fitness", "yoga": "fitness",
+        "workout": "fitness", "swim": "fitness", "cycle": "fitness",
+        "doctor": "health", "medication": "health", "dentist": "health",
+        "pharmacy": "health", "checkup": "health", "meditate": "health",
+        "rent": "finance", "bill": "finance", "tax": "finance",
+        "bank": "finance", "invoice": "finance", "budget": "finance",
+        "clean": "home", "laundry": "home", "cook": "home",
+        "dinner": "home", "lunch": "home", "breakfast": "home",
+        "kids": "family", "children": "family", "school": "family",
+        "friend": "social", "party": "social", "movie": "social",
+        "cinema": "social", "flight": "travel", "hotel": "travel",
+        "passport": "travel", "trip": "travel", "pack": "travel",
+        "guitar": "creative", "draw": "creative", "blog": "creative",
+        "podcast": "creative", "video": "creative", "design": "creative",
+        "spanish": "learning", "piano": "learning", "learn": "learning",
+        "flashcard": "learning", "study": "learning",
+        "groceries": "shopping", "gift": "shopping", "buy": "shopping",
+        "order": "shopping", "return": "errands", "package": "errands",
+        "post office": "errands", "bank": "errands",
+        "password": "admin", "backup": "admin", "config": "admin",
+        "files": "admin", "document": "admin", "form": "admin",
+    }
+
+    _DIFFICULTY_KEYWORDS = {
+        "hard": 0.8, "difficult": 0.85, "challenging": 0.8, "complex": 0.75,
+        "intense": 0.9, "heavy": 0.85, "tough": 0.75,
+        "easy": 0.15, "simple": 0.2, "light": 0.25, "quick": 0.2,
+        "moderate": 0.5, "medium": 0.5,
+    }
+
+    _IMPORTANCE_KEYWORDS = {
+        "urgent": 0.9, "critical": 0.95, "asap": 0.92, "emergency": 0.98,
+        "important": 0.75, "high priority": 0.8, "must": 0.85,
+        "low priority": 0.2, "not urgent": 0.2, "minor": 0.25,
+        "can wait": 0.3, "whenever": 0.15,
+    }
+
+    def _infer_category(self, sentence: str) -> str:
+        s = sentence.lower()
+        for keyword, cat in self._TASK_CATEGORY_MAP.items():
+            if keyword in s:
+                return cat
+        return random.choice(["work", "personal", "home", "errands"])
+
+    def _infer_difficulty(self, sentence: str) -> str:
+        s = sentence.lower()
+        for keyword, val in self._DIFFICULTY_KEYWORDS.items():
+            if keyword in s:
+                return str(round(val + random.uniform(-0.05, 0.05), 2))
+        return str(round(random.uniform(0.3, 0.7), 2))
+
+    def _infer_importance(self, sentence: str) -> str:
+        s = sentence.lower()
+        for keyword, val in self._IMPORTANCE_KEYWORDS.items():
+            if keyword in s:
+                return str(round(val + random.uniform(-0.05, 0.05), 2))
+        return str(round(random.uniform(0.3, 0.7), 2))
+
+    def _infer_duration(self, sentence: str) -> str:
+        s = sentence.lower()
+        match = re.search(r'(\d+)\s*(?:minute|min|hour|hr)', s)
+        if match:
+            val = int(match.group(1))
+            if "hour" in s or "hr" in s:
+                return str(val * 60)
+            return str(val)
+        # Default based on task type
+        if any(w in s for w in ["meeting", "call", "review"]):
+            return str(random.choice([30, 45, 60]))
+        if any(w in s for w in ["report", "write", "prepare", "presentation"]):
+            return str(random.choice([60, 90, 120]))
+        if any(w in s for w in ["run", "gym", "workout", "yoga"]):
+            return str(random.choice([30, 45, 60]))
+        if any(w in s for w in ["quick", "send", "check", "pay"]):
+            return str(random.choice([5, 10, 15]))
+        return str(random.choice([30, 45, 60]))
+
     def _build_schema(self, placeholder_map, sentence=""):
         schema = {
             "name":            {"value": None,  "predicted": False},
@@ -311,6 +439,16 @@ class DataGenerator:
 
         s = sentence.lower()
 
+        # ALWAYS populate predicted fields via inference
+        if schema["category"]["value"] is None:
+            schema["category"]["value"] = self._infer_category(s)
+        if schema["difficulty"]["value"] is None:
+            schema["difficulty"]["value"] = self._infer_difficulty(s)
+        if schema["importance"]["value"] is None:
+            schema["importance"]["value"] = self._infer_importance(s)
+        if schema["duration"]["value"] is None:
+            schema["duration"]["value"] = self._infer_duration(s)
+
         at_time_patterns = [
             r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',
             r'at\s+\d{1,2}\s*(?:am|pm)',
@@ -333,7 +471,6 @@ class DataGenerator:
             schema["fixed_time"]["value"]     = False
             schema["fixed_start"]["value"]    = None
 
-            # Extract abstract time label for recurrent tasks
             time_label = None
             if "morning" in s:
                 time_label = "morning"
@@ -346,7 +483,6 @@ class DataGenerator:
             elif "noon" in s:
                 time_label = "noon"
 
-            # Set start and deadline to the abstract label (or null if not specified)
             if time_label:
                 schema["start"]["value"]     = time_label
                 schema["start"]["predicted"] = False
@@ -392,18 +528,44 @@ class DataGenerator:
             parts = []
             for k, v in output.items():
                 if v is not None:
+                    # Normalize booleans
+                    if isinstance(v, bool):
+                        v = "true" if v else "false"
                     parts.append(f"{k}={v}")
             return sentence, " | ".join(parts)
+
+        # Fill missing predicted fields via inference so model ALWAYS sees them
+        difficulty = output.get("difficulty")
+        if difficulty is None:
+            difficulty = self._infer_difficulty(sentence)
+        else:
+            difficulty = str(difficulty)
+
+        importance = output.get("importance")
+        if importance is None:
+            importance = self._infer_importance(sentence)
+        else:
+            importance = str(importance)
+
+        category = output.get("category")
+        if category is None:
+            category = self._infer_category(sentence)
+
+        duration = output.get("duration")
+        if duration is None:
+            duration = self._infer_duration(sentence)
+        else:
+            duration = _normalize_duration_to_minutes(duration) or self._infer_duration(sentence)
 
         schema = {
             "name":            {"value": output.get("name"),               "predicted": False},
             "start":           {"value": output.get("start"),              "predicted": False},
             "deadline":        {"value": output.get("deadline"),           "predicted": False},
-            "difficulty":      {"value": output.get("difficulty"),         "predicted": True},
-            "duration":        {"value": output.get("duration"),           "predicted": True},
-            "category":        {"value": output.get("category"),           "predicted": True},
+            "difficulty":      {"value": difficulty,                       "predicted": True},
+            "duration":        {"value": duration,                         "predicted": True},
+            "category":        {"value": category,                         "predicted": True},
             "location":        {"value": output.get("location"),           "predicted": True},
-            "importance":      {"value": output.get("importance"),         "predicted": True},
+            "importance":      {"value": importance,                       "predicted": True},
             "fixed_time":      {"value": output.get("fixed_time",  False), "predicted": False},
             "fixed_start":     {"value": output.get("fixed_start"),        "predicted": False},
             "recurrent":       {"value": output.get("recurrent",   False), "predicted": False},
