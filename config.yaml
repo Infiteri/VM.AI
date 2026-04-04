@@ -4,7 +4,7 @@ paths:
   synthetic_data: data/VMAI_SYNTHETIC_Data.yaml
   real_data: data/VMAI_REAL_Data.yaml
   specific_data: data/VMAI_SPECIFIC_Data.yaml
-  
+
 defaults:
   per_device_eval_batch_size: 8
   logging_steps: 50
@@ -45,7 +45,6 @@ modes:
     gradient_accumulation_steps: 16
     learning_rate_fresh: 5e-6
     learning_rate_resume: 5e-6
-  # Fallback for unknown modes
   default:
     num_train_epochs: 5
     max_limit: 9000

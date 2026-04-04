@@ -1032,7 +1032,6 @@ class DataGenerator:
         }
 
         input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
-        # Output the FULL updated task, not just changed fields
         target_text = schema_to_pipe(existing)
         return input_text, target_text
 
@@ -1049,6 +1048,7 @@ if __name__ == "__main__":
 
     cfg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
 
+    # todo remove vars ENTIRELY
     yp = VMAI_YamlParser(os.path.join(cfg_path, vars.SYNTHETIC_DATASET))
     yp.load_yaml()
     training_data = yp.parse()
