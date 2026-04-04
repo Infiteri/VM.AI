@@ -476,3 +476,44 @@
     name: '15'
   error: null
 
+- timestamp: '2026-04-04T15:36:29.400323'
+  mode: modify
+  input: move to 7am
+  raw_output: name=gym
+  parsed:
+    name: gym
+  error: null
+
+- timestamp: '2026-04-04T15:36:29.478340'
+  mode: modify
+  input: push deadline to next Monday
+  raw_output: name=next Monday
+  parsed:
+    name: next Monday
+  error: null
+
+- timestamp: '2026-04-04T15:36:29.533352'
+  mode: modify
+  input: make it a hard session
+  raw_output: name=hard
+  parsed:
+    name: hard
+  error: null
+
+- timestamp: '2026-04-04T15:36:29.584364'
+  mode: modify
+  input: make it 15 minutes instead
+  raw_output: name=15
+  parsed:
+    name: '15'
+  error: null
+
+- timestamp: '2026-04-04T15:36:29.854423'
+  mode: modify
+  input: cancel fixed time
+  raw_output: name=cancel fixed_time=true | fixed_start=14:00
+  parsed:
+    name: cancel fixed_time=true
+    fixed_start: '14:00'
+  error: null
+

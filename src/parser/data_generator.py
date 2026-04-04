@@ -161,6 +161,9 @@ CHANGE_TEMPLATES = [
     ("duration", lambda v: f"block {v} minutes for this",               _rand_duration),
     ("duration", lambda v: f"give it {v} minutes",                      _rand_duration),
     ("duration", lambda v: f"it'll only take {v} minutes",              _rand_duration),
+    ("duration", lambda v: f"make it last {v} minutes",                 _rand_duration),
+    ("duration", lambda v: f"change it to {v} minutes",                 _rand_duration),
+    ("duration", lambda v: f"adjust duration to {v} minutes",           _rand_duration),
 
     # ── deadline ──────────────────────────────────────────────────────────────
     ("deadline", lambda v: f"push deadline to {v}",                     _rand_deadline),
@@ -170,6 +173,13 @@ CHANGE_TEMPLATES = [
     ("deadline", lambda v: f"needs to be done by {v}",                 _rand_deadline),
     ("deadline", lambda v: f"deadline is {v}",                         _rand_deadline),
     ("deadline", lambda v: f"extend the deadline to {v}",              _rand_deadline),
+    ("deadline", lambda v: f"move the due date to {v}",                _rand_deadline),
+    ("deadline", lambda v: f"push the due date to {v}",                _rand_deadline),
+    ("deadline", lambda v: f"change deadline to {v}",                  _rand_deadline),
+    ("deadline", lambda v: f"shift deadline to {v}",                   _rand_deadline),
+    ("deadline", lambda v: f"delay to {v}",                            _rand_deadline),
+    ("deadline", lambda v: f"move it to {v}",                          _rand_deadline),
+    ("deadline", lambda v: f"reschedule to {v}",                       _rand_deadline),
 
     # ── location ──────────────────────────────────────────────────────────────
     ("location", lambda v: f"do it at {v}",                             _rand_location),
@@ -178,6 +188,10 @@ CHANGE_TEMPLATES = [
     ("location", lambda v: f"move it to {v}",                          _rand_location),
     ("location", lambda v: f"it's happening at {v}",                   _rand_location),
     ("location", lambda v: f"do this from {v}",                        _rand_location),
+    ("location", lambda v: f"move the location to {v}",                _rand_location),
+    ("location", lambda v: f"change venue to {v}",                     _rand_location),
+    ("location", lambda v: f"do it from {v} instead",                  _rand_location),
+    ("location", lambda v: f"switch location to {v}",                  _rand_location),
 
     # ── difficulty ────────────────────────────────────────────────────────────
     ("difficulty", lambda v: f"it's a {'hard' if float(v) > 0.5 else 'light'} session",     _rand_difficulty),
@@ -185,6 +199,11 @@ CHANGE_TEMPLATES = [
     ("difficulty", lambda v: f"mark it as {'hard' if float(v) > 0.5 else 'easy'}",          _rand_difficulty),
     ("difficulty", lambda v: f"difficulty is {'high' if float(v) > 0.6 else 'low'}",        _rand_difficulty),
     ("difficulty", lambda v: f"it's going to be {'tough' if float(v) > 0.6 else 'simple'}", _rand_difficulty),
+    ("difficulty", lambda v: f"make it {'harder' if float(v) > 0.5 else 'easier'}",         _rand_difficulty),
+    ("difficulty", lambda v: f"it's actually {'difficult' if float(v) > 0.5 else 'simple'}", _rand_difficulty),
+    ("difficulty", lambda v: f"change difficulty to {'high' if float(v) > 0.5 else 'low'}",  _rand_difficulty),
+    ("difficulty", lambda v: f"adjust it to {'challenging' if float(v) > 0.5 else 'easy'}",  _rand_difficulty),
+    ("difficulty", lambda v: f"this should be {'intense' if float(v) > 0.5 else 'light'}",   _rand_difficulty),
 
     # ── importance ────────────────────────────────────────────────────────────
     ("importance", lambda v: f"it's {'very important' if float(v) > 0.5 else 'not urgent'}",        _rand_importance),
@@ -192,6 +211,11 @@ CHANGE_TEMPLATES = [
     ("importance", lambda v: f"this is {'critical' if float(v) > 0.7 else 'optional'}",             _rand_importance),
     ("importance", lambda v: f"set priority to {'high' if float(v) > 0.5 else 'low'}",              _rand_importance),
     ("importance", lambda v: f"it's {'urgent' if float(v) > 0.6 else 'not a priority'}",            _rand_importance),
+    ("importance", lambda v: f"make it {'more important' if float(v) > 0.5 else 'less urgent'}",    _rand_importance),
+    ("importance", lambda v: f"it's actually {'essential' if float(v) > 0.5 else 'nice to have'}",  _rand_importance),
+    ("importance", lambda v: f"change importance to {'critical' if float(v) > 0.5 else 'low'}",     _rand_importance),
+    ("importance", lambda v: f"this needs to be {'a priority' if float(v) > 0.5 else 'optional'}",  _rand_importance),
+    ("importance", lambda v: f"set it as {'top priority' if float(v) > 0.5 else 'low priority'}",   _rand_importance),
 
     # ── category ──────────────────────────────────────────────────────────────
     ("category", lambda v: f"categorize it as {v}",                    _rand_category),
@@ -200,30 +224,56 @@ CHANGE_TEMPLATES = [
     ("category", lambda v: f"move it to {v}",                          _rand_category),
     ("category", lambda v: f"change category to {v}",                  _rand_category),
     ("category", lambda v: f"this belongs in {v}",                     _rand_category),
+    ("category", lambda v: f"actually it's a {v} thing",               _rand_category),
+    ("category", lambda v: f"reclassify as {v}",                       _rand_category),
+    ("category", lambda v: f"make it a {v} task",                      _rand_category),
+    ("category", lambda v: f"it's really {v}",                         _rand_category),
 
     # ── name ──────────────────────────────────────────────────────────────────
     ("name", lambda v: f"rename it to {v}",                            _rand_name),
     ("name", lambda v: f"change the name to {v}",                      _rand_name),
     ("name", lambda v: f"call it {v} instead",                         _rand_name),
     ("name", lambda v: f"the task is actually {v}",                    _rand_name),
+    ("name", lambda v: f"update name to {v}",                          _rand_name),
+    ("name", lambda v: f"let's call it {v}",                           _rand_name),
+    ("name", lambda v: f"change it to {v}",                            _rand_name),
+    ("name", lambda v: f"rename to {v}",                               _rand_name),
 
     # ── fixed_time / fixed_start ──────────────────────────────────────────────
-    # These always come as a pair — we handle them together via a special sentinel
     ("fixed_time+fixed_start", lambda v: f"set it for {v}",            _rand_time),
     ("fixed_time+fixed_start", lambda v: f"schedule it at {v}",        _rand_time),
     ("fixed_time+fixed_start", lambda v: f"it starts at {v}",          _rand_time),
     ("fixed_time+fixed_start", lambda v: f"pin it to {v}",             _rand_time),
     ("fixed_time+fixed_start", lambda v: f"lock it in at {v}",         _rand_time),
     ("fixed_time+fixed_start", lambda v: f"the time is {v}",           _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"move it to {v}",            _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"reschedule to {v}",         _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"change time to {v}",        _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"shift it to {v}",           _rand_time),
+
+    # ── cancel fixed_time ─────────────────────────────────────────────────────
+    ("cancel_fixed_time", lambda v: "cancel fixed time",              lambda: "false"),
+    ("cancel_fixed_time", lambda v: "remove the fixed time",          lambda: "false"),
+    ("cancel_fixed_time", lambda v: "no longer needs a fixed time",   lambda: "false"),
+    ("cancel_fixed_time", lambda v: "make it flexible",               lambda: "false"),
 
     # ── recurrent / recurrence_days ───────────────────────────────────────────
-    # Same paired approach
     ("recurrent+recurrence_days", lambda v: f"make it repeat every {v}",             _rand_recurrence_days),
     ("recurrent+recurrence_days", lambda v: f"schedule it every {v}",                _rand_recurrence_days),
     ("recurrent+recurrence_days", lambda v: f"it should happen each {v}",            _rand_recurrence_days),
     ("recurrent+recurrence_days", lambda v: f"set it as recurring on {v}",           _rand_recurrence_days),
     ("recurrent+recurrence_days", lambda v: f"repeat this on {v}",                   _rand_recurrence_days),
     ("recurrent+recurrence_days", lambda v: f"it recurs on {v}",                     _rand_recurrence_days),
+    ("recurrent+recurrence_days", lambda v: f"make it recurring every {v}",          _rand_recurrence_days),
+    ("recurrent+recurrence_days", lambda v: f"change recurrence to {v}",             _rand_recurrence_days),
+    ("recurrent+recurrence_days", lambda v: f"set recurrence days to {v}",           _rand_recurrence_days),
+    ("recurrent+recurrence_days", lambda v: f"it should be every {v}",               _rand_recurrence_days),
+
+    # ── cancel recurrent ───────────────────────────────────────────────────────
+    ("cancel_recurrent", lambda v: "cancel recurrence",               lambda: "false"),
+    ("cancel_recurrent", lambda v: "make it one-time",                lambda: "false"),
+    ("cancel_recurrent", lambda v: "no longer recurring",             lambda: "false"),
+    ("cancel_recurrent", lambda v: "stop the recurrence",             lambda: "false"),
 ]
 
 
@@ -767,6 +817,12 @@ class DataGenerator:
             elif field_name == "recurrent+recurrence_days":
                 changed_fields["recurrent"]       = {"value": True}
                 changed_fields["recurrence_days"] = {"value": new_value}
+            elif field_name == "cancel_fixed_time":
+                changed_fields["fixed_time"]  = {"value": False}
+                changed_fields["fixed_start"] = {"value": None}
+            elif field_name == "cancel_recurrent":
+                changed_fields["recurrent"]       = {"value": False}
+                changed_fields["recurrence_days"] = {"value": None}
             else:
                 changed_fields[field_name] = {"value": new_value}
 
