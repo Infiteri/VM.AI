@@ -31,12 +31,73 @@ FIELD_MAP = {
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 DAYS_LOWER = {d.lower(): d for d in DAYS}
 
-RECURRENT_KEYWORDS = ["every", "daily", "each", "weekday", "weekly"]
+RECURRENT_KEYWORDS = [
+    "every", "daily", "each", "weekday", "weekly",
+    "every morning", "every evening", "every night", "every afternoon",
+]
+
+# Fixed vocab for start/deadline normalization
+_VALID_RELATIVE_TIMES = {
+    "today", "tomorrow", "tonight", "this weekend", "next week",
+    "this week", "next month",
+}
+_VALID_DAYS = set(DAYS + [d.lower() for d in DAYS])
 
 # ── value generators ──────────────────────────────────────────────────────────
 
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
+
+def _normalize_deadline(val) -> str | None:
+    """Normalize deadline/start to a small fixed vocabulary."""
+    if val is None:
+        return None
+    s = str(val).lower().strip()
+    # Already valid relative time
+    if s in _VALID_RELATIVE_TIMES:
+        return s
+    # Day name (exact match)
+    if s in _VALID_DAYS:
+        for d in DAYS:
+            if d.lower() == s:
+                return d
+    # "next X" patterns
+    for d in DAYS:
+        if f"next {d.lower()}" in s:
+            return f"next {d}"
+    if "next week" in s:
+        return "next week"
+    if "tomorrow" in s:
+        return "tomorrow"
+    if "today" in s:
+        return "today"
+    if "tonight" in s:
+        return "tonight"
+    if "this weekend" in s or "weekend" in s:
+        return "this weekend"
+    if "end of day" in s or "eod" in s:
+        return "today"
+    if "end of week" in s:
+        return "this weekend"
+    if "end of month" in s:
+        return "next week"
+    # Strip specific dates like "January 15th" -> "next week"
+    month_names = [
+        "january", "february", "march", "april", "may", "june",
+        "july", "august", "september", "october", "november", "december"
+    ]
+    for m in month_names:
+        if m in s:
+            return "next week"
+    if "q1" in s or "q2" in s or "q3" in s or "q4" in s:
+        return "next week"
+    if "asap" in s or "soon" in s:
+        return "tomorrow"
+    # Strip day names embedded in longer strings
+    for d in DAYS:
+        if d.lower() in s:
+            return d
+    return s
 
 def _rand_deadline():
     return random.choice([
@@ -171,29 +232,56 @@ def _normalize_duration_to_minutes(val) -> str:
     if val is None:
         return None
     val = str(val).lower().strip()
-    # Already a plain number
     if val.isdigit():
         return val
-    # "X hours" / "X hour"
     match = re.search(r'(\d+(?:\.\d+)?)\s*hours?', val)
     if match:
         return str(int(float(match.group(1)) * 60))
-    # "X minutes" / "X min"
     match = re.search(r'(\d+(?:\.\d+)?)\s*(?:minutes?|min)', val)
     if match:
         return str(int(float(match.group(1))))
-    # "half a day"
     if "half" in val and "day" in val:
         return "720"
-    # "all day"
     if "all day" in val:
         return "960"
-    # Fallback: try to extract any number
     match = re.search(r'(\d+(?:\.\d+)?)', val)
     if match:
         num = float(match.group(1))
-        # If <= 24, assume hours; otherwise assume minutes
         return str(int(num * 60)) if num <= 24 else str(int(num))
+    return None
+
+
+def _normalize_time_standalone(time_str: str) -> str | None:
+    """Convert various time formats to HH:MM."""
+    if not time_str:
+        return None
+    time_str = str(time_str).strip().lower()
+    match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm)', time_str)
+    if match:
+        hour = int(match.group(1))
+        minute = int(match.group(2)) if match.group(2) else 0
+        ampm = match.group(3)
+        if ampm == "pm" and hour != 12:
+            hour += 12
+        elif ampm == "am" and hour == 12:
+            hour = 0
+        return f"{hour:02d}:{minute:02d}"
+    if "morning" in time_str:
+        return "08:00"
+    if "afternoon" in time_str:
+        return "13:00"
+    if "evening" in time_str:
+        return "18:00"
+    if "noon" in time_str:
+        return "12:00"
+    if "midnight" in time_str:
+        return "00:00"
+    if re.match(r'^\d{1,2}:\d{2}$', time_str):
+        # Validate hour range
+        parts = time_str.split(":")
+        h = int(parts[0])
+        if 0 <= h <= 23:
+            return time_str
     return None
 
 
@@ -449,6 +537,19 @@ class DataGenerator:
         if schema["duration"]["value"] is None:
             schema["duration"]["value"] = self._infer_duration(s)
 
+        # Normalize duration to integer minutes
+        dur = schema["duration"]["value"]
+        if dur is not None:
+            schema["duration"]["value"] = _normalize_duration_to_minutes(dur)
+
+        # Normalize start and deadline to fixed vocab
+        start_val = schema["start"]["value"]
+        if start_val is not None:
+            schema["start"]["value"] = _normalize_deadline(start_val)
+        deadline_val = schema["deadline"]["value"]
+        if deadline_val is not None:
+            schema["deadline"]["value"] = _normalize_deadline(deadline_val)
+
         at_time_patterns = [
             r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',
             r'at\s+\d{1,2}\s*(?:am|pm)',
@@ -520,6 +621,28 @@ class DataGenerator:
 
         return schema
 
+    # Valid category enum
+    _VALID_CATEGORIES = {
+        "work", "study", "fitness", "health", "personal",
+        "finance", "home", "family", "social", "errands",
+        "travel", "creative", "learning", "admin", "shopping",
+    }
+
+    def _clamp_category(self, cat):
+        if cat is None:
+            return None
+        cat = cat.lower().strip()
+        if cat in self._VALID_CATEGORIES:
+            return cat
+        return "personal"
+
+    @staticmethod
+    def _normalize_fixed_start(val) -> str | None:
+        """Normalize fixed_start to HH:MM or None."""
+        if val is None:
+            return None
+        return _normalize_time_standalone(val)
+
     def _convert_real(self, example: dict):
         sentence = example["input"]
         output   = example["output"]
@@ -531,6 +654,24 @@ class DataGenerator:
                     # Normalize booleans
                     if isinstance(v, bool):
                         v = "true" if v else "false"
+                    # Normalize duration
+                    if k == "duration":
+                        v = _normalize_duration_to_minutes(v) or v
+                    # Normalize fixed_start
+                    if k == "fixed_start":
+                        v = self._normalize_fixed_start(v)
+                    # Normalize deadline/start
+                    if k in ("deadline", "start"):
+                        v = _normalize_deadline(v)
+                    # Clamp category
+                    if k == "category":
+                        v = self._clamp_category(v)
+                    # Round floats
+                    if k in ("difficulty", "importance"):
+                        try:
+                            v = str(round(float(v), 2))
+                        except (ValueError, TypeError):
+                            pass
                     parts.append(f"{k}={v}")
             return sentence, " | ".join(parts)
 
@@ -539,17 +680,19 @@ class DataGenerator:
         if difficulty is None:
             difficulty = self._infer_difficulty(sentence)
         else:
-            difficulty = str(difficulty)
+            difficulty = str(round(float(difficulty), 2))
 
         importance = output.get("importance")
         if importance is None:
             importance = self._infer_importance(sentence)
         else:
-            importance = str(importance)
+            importance = str(round(float(importance), 2))
 
         category = output.get("category")
         if category is None:
             category = self._infer_category(sentence)
+        else:
+            category = self._clamp_category(category)
 
         duration = output.get("duration")
         if duration is None:
@@ -557,17 +700,29 @@ class DataGenerator:
         else:
             duration = _normalize_duration_to_minutes(duration) or self._infer_duration(sentence)
 
+        start = output.get("start")
+        if start is not None:
+            start = _normalize_deadline(start)
+
+        deadline = output.get("deadline")
+        if deadline is not None:
+            deadline = _normalize_deadline(deadline)
+
+        fixed_start = output.get("fixed_start")
+        if fixed_start is not None:
+            fixed_start = self._normalize_fixed_start(fixed_start)
+
         schema = {
             "name":            {"value": output.get("name"),               "predicted": False},
-            "start":           {"value": output.get("start"),              "predicted": False},
-            "deadline":        {"value": output.get("deadline"),           "predicted": False},
+            "start":           {"value": start,                            "predicted": False},
+            "deadline":        {"value": deadline,                         "predicted": False},
             "difficulty":      {"value": difficulty,                       "predicted": True},
             "duration":        {"value": duration,                         "predicted": True},
             "category":        {"value": category,                         "predicted": True},
             "location":        {"value": output.get("location"),           "predicted": True},
             "importance":      {"value": importance,                       "predicted": True},
             "fixed_time":      {"value": output.get("fixed_time",  False), "predicted": False},
-            "fixed_start":     {"value": output.get("fixed_start"),        "predicted": False},
+            "fixed_start":     {"value": fixed_start,                      "predicted": False},
             "recurrent":       {"value": output.get("recurrent",   False), "predicted": False},
             "recurrence_days": {"value": output.get("recurrence_days"),    "predicted": False},
         }

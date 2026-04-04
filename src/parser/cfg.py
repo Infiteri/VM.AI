@@ -47,7 +47,7 @@ class Config:
             self.learning_rate_resume        = 2e-5
 
         elif mode == "real":
-            self.num_train_epochs            = 3
+            self.num_train_epochs            = 5
             self.per_device_train_batch_size = 4
             self.per_device_eval_batch_size  = 8
             self.gradient_accumulation_steps = 32
@@ -65,7 +65,7 @@ class Config:
             self.learning_rate_resume        = 5e-6
 
         elif mode == "both":
-            self.num_train_epochs            = 7
+            self.num_train_epochs            = 3
             self.per_device_train_batch_size = 6
             self.per_device_eval_batch_size  = 8
             self.gradient_accumulation_steps = 24
