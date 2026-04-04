@@ -158,7 +158,7 @@ class TaskPlannerPredictor:
                 inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
                 decoder_input_ids=decoder_input,
-                max_new_tokens=128,
+                max_new_tokens=256,
                 no_repeat_ngram_size=4,
                 repetition_penalty=1.5,
             )
@@ -225,16 +225,52 @@ class TaskPlannerPredictor:
         for k, v in existing_task.items():
             val = v["value"] if isinstance(v, dict) else v
             if val is not None:
+                # Convert booleans for JSON
+                if isinstance(val, bool):
+                    val = "true" if val else "false"
                 summary[k] = val
         input_text = f"modify: {json.dumps(summary, ensure_ascii=False)} \u2502 {self._normalize(change_prompt)}"
         output = self._run_model(input_text)
-        changed = self._pipe_to_changed(output)
-        if not changed:
+
+        # Model outputs FULL task in pipe format, parse it
+        new_task = self._pipe_to_schema(output)
+        if "error" in new_task:
             result = {"error": "parse_failed", "raw": output}
+            log_entry("modify", change_prompt, self._last_raw_output, result)
+            return result
+
+        # Diff old vs new → return only changed fields
+        changed = self._diff_schemas(existing_task, new_task)
+        if not changed:
+            result = {"error": "no_changes", "raw": output}
         else:
             result = changed
         log_entry("modify", change_prompt, self._last_raw_output, result)
         return result
+
+    @staticmethod
+    def _diff_schemas(old_task: Dict, new_task: Dict) -> Dict:
+        """Compare old and new task schemas, return only changed fields."""
+        changed = {}
+        for field, new_entry in new_task.items():
+            new_val = new_entry.get("value") if isinstance(new_entry, dict) else new_entry
+            old_entry = old_task.get(field)
+            old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
+
+            # Normalize for comparison
+            if isinstance(old_val, bool):
+                old_val = old_val
+            elif isinstance(new_val, bool):
+                new_val = new_val
+            else:
+                # String comparison
+                old_val = str(old_val).lower() if old_val is not None else None
+                new_val = str(new_val).lower() if new_val is not None else None
+
+            if old_val != new_val:
+                changed[field] = {"value": new_val, "predicted": new_entry.get("predicted", False) if isinstance(new_entry, dict) else False}
+
+        return changed
 
 
 def format_output(result: Dict) -> str:

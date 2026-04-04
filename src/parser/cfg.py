@@ -56,7 +56,7 @@ class Config:
             self.learning_rate_resume        = 5e-6
 
         elif mode == "specific":
-            self.num_train_epochs            = 2
+            self.num_train_epochs            = 10
             self.per_device_train_batch_size = 4
             self.per_device_eval_batch_size  = 8
             self.gradient_accumulation_steps = 32
@@ -65,7 +65,7 @@ class Config:
             self.learning_rate_resume        = 5e-6
 
         elif mode == "both":
-            self.num_train_epochs            = 3
+            self.num_train_epochs            = 7
             self.per_device_train_batch_size = 6
             self.per_device_eval_batch_size  = 8
             self.gradient_accumulation_steps = 24
@@ -74,12 +74,12 @@ class Config:
             self.learning_rate_resume        = 5e-6
 
         elif mode == "modify_only":
-            self.num_train_epochs            = 3
+            self.num_train_epochs            = 10
             self.per_device_train_batch_size = 4
             self.per_device_eval_batch_size  = 8
             self.gradient_accumulation_steps = 16
-            self.max_limit                   = 5000   
-            self.learning_rate_fresh         = 5e-6   
+            self.max_limit                   = 3000
+            self.learning_rate_fresh         = 5e-6
             self.learning_rate_resume        = 5e-6
 
         else:

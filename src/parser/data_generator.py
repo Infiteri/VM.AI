@@ -416,13 +416,14 @@ class DataGenerator:
         """
         Generate a modify-only dataset for targeted fine-tuning.
         Produces purely modify: examples — no add: examples at all.
+        Target output is the FULL updated task (not just changed fields).
         Real modify examples (if any exist in real/specific data) are
         included with 3× repetition for extra weight.
         """
         data = {"input_text": [], "target_text": []}
 
         for _ in range(max_examples):
-            inp, tgt = self._generate_modify()
+            inp, tgt = self._generate_modify_full()
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
@@ -431,7 +432,7 @@ class DataGenerator:
             if not isinstance(example.get("input"), str):
                 continue
             if example["input"].startswith("modify:"):
-                inp, tgt = self._convert_real(example)
+                inp, tgt = self._convert_real_modify_full(example)
                 for _ in range(3):
                     data["input_text"].append(inp)
                     data["target_text"].append(tgt)
@@ -467,35 +468,79 @@ class DataGenerator:
         ]
         return any(re.search(p, s) for p in patterns)
 
+    # Keyword-to-location mapping
+    _LOCATION_KEYWORDS = {
+        "at the library": "library", "at library": "library", "library": "library",
+        "at the gym": "gym", "at gym": "gym", "gym": "gym",
+        "at the office": "office", "at office": "office", "office": "office",
+        "at home": "home", "from home": "home", "home": "home",
+        "at the coffee shop": "coffee shop", "coffee shop": "coffee shop",
+        "at the park": "park", "park": "park",
+        "at school": "school", "school": "school",
+        "at the store": "store", "store": "store",
+        "at the supermarket": "supermarket", "supermarket": "supermarket",
+        "at the restaurant": "restaurant", "restaurant": "restaurant",
+        "online": "online", "remotely": "online",
+        "at the hospital": "hospital", "hospital": "hospital",
+        "at the bank": "bank", "bank": "bank",
+        "at the pharmacy": "pharmacy", "pharmacy": "pharmacy",
+    }
+
     # Keyword-to-category mapping for inference simulation
+    # Checked in order: longer/more-specific phrases first
     _TASK_CATEGORY_MAP = {
-        "report": "work", "presentation": "work", "meeting": "work",
-        "bug": "work", "test": "work", "deploy": "work", "code": "work",
-        "client": "work", "email": "work", "invoice": "work", "budget": "work",
-        "contract": "work", "proposal": "work", "sprint": "work",
+        # Work - specific task names
+        "migration": "work", "deploy": "work", "refactor": "work", "optimize": "work",
+        "code": "work", "bug": "work", "crash": "work", "fix": "work",
+        "presentation": "work", "meeting": "work", "standup": "work",
+        "report": "work", "email": "work", "client": "work", "invoice": "work",
+        "budget": "work", "contract": "work", "proposal": "work", "sprint": "work",
+        "test": "work", "review": "work", "document": "work",
+        # Study
         "exam": "study", "homework": "study", "lecture": "study",
         "thesis": "study", "assignment": "study", "tutor": "study",
-        "gym": "fitness", "run": "fitness", "yoga": "fitness",
-        "workout": "fitness", "swim": "fitness", "cycle": "fitness",
+        "study session": "study",
+        # Fitness
+        "foam roll": "fitness", "gym": "fitness", "run": "fitness",
+        "yoga": "fitness", "workout": "fitness", "swim": "fitness",
+        "cycle": "fitness", "jog": "fitness", "stretch": "fitness",
+        "meditation": "fitness",
+        # Health
         "doctor": "health", "medication": "health", "dentist": "health",
         "pharmacy": "health", "checkup": "health", "meditate": "health",
+        "prescription": "health",
+        # Finance
         "rent": "finance", "bill": "finance", "tax": "finance",
-        "bank": "finance", "invoice": "finance", "budget": "finance",
+        "bank": "finance", "payment": "finance", "budget": "finance",
+        # Home
         "clean": "home", "laundry": "home", "cook": "home",
         "dinner": "home", "lunch": "home", "breakfast": "home",
+        # Family
         "kids": "family", "children": "family", "school": "family",
+        # Social
         "friend": "social", "party": "social", "movie": "social",
-        "cinema": "social", "flight": "travel", "hotel": "travel",
-        "passport": "travel", "trip": "travel", "pack": "travel",
-        "guitar": "creative", "draw": "creative", "blog": "creative",
-        "podcast": "creative", "video": "creative", "design": "creative",
+        "cinema": "social",
+        # Travel
+        "flight": "travel", "hotel": "travel", "passport": "travel",
+        "trip": "travel", "pack": "travel",
+        # Creative
+        "write": "creative", "guitar": "creative", "draw": "creative",
+        "blog": "creative", "podcast": "creative", "video": "creative",
+        "design": "creative", "song": "creative", "photography": "creative",
+        "paint": "creative",
+        # Learning
         "spanish": "learning", "piano": "learning", "learn": "learning",
-        "flashcard": "learning", "study": "learning",
+        "flashcard": "learning",
+        # Shopping
         "groceries": "shopping", "gift": "shopping", "buy": "shopping",
-        "order": "shopping", "return": "errands", "package": "errands",
-        "post office": "errands", "bank": "errands",
+        "shopping": "shopping", "supermarket": "shopping", "grocery": "shopping",
+        "household supplies": "shopping",
+        # Errands
+        "return": "errands", "package": "errands",
+        "post office": "errands",
+        # Admin
         "password": "admin", "backup": "admin", "config": "admin",
-        "files": "admin", "document": "admin", "form": "admin",
+        "files": "admin", "form": "admin",
     }
 
     _DIFFICULTY_KEYWORDS = {
@@ -514,9 +559,10 @@ class DataGenerator:
 
     def _infer_category(self, sentence: str) -> str:
         s = sentence.lower()
-        for keyword, cat in self._TASK_CATEGORY_MAP.items():
+        # Check multi-word phrases first (more specific)
+        for keyword in sorted(self._TASK_CATEGORY_MAP.keys(), key=len, reverse=True):
             if keyword in s:
-                return cat
+                return self._TASK_CATEGORY_MAP[keyword]
         return random.choice(["work", "personal", "home", "errands"])
 
     def _infer_difficulty(self, sentence: str) -> str:
@@ -524,33 +570,80 @@ class DataGenerator:
         for keyword, val in self._DIFFICULTY_KEYWORDS.items():
             if keyword in s:
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        return str(round(random.uniform(0.3, 0.7), 2))
+        # Task-type based defaults when no keyword present
+        if any(w in s for w in ["crash", "bug", "fix", "emergency", "critical"]):
+            return str(round(random.uniform(0.7, 0.9), 2))
+        if any(w in s for w in ["workout", "gym", "heavy", "hard"]):
+            return str(round(random.uniform(0.6, 0.85), 2))
+        if any(w in s for w in ["report", "presentation", "exam", "study"]):
+            return str(round(random.uniform(0.5, 0.7), 2))
+        if any(w in s for w in ["quick", "easy", "simple", "stretch"]):
+            return str(round(random.uniform(0.1, 0.25), 2))
+        if any(w in s for w in ["call", "email", "meeting", "pay", "clean"]):
+            return str(round(random.uniform(0.1, 0.4), 2))
+        return str(round(random.uniform(0.3, 0.6), 2))
 
     def _infer_importance(self, sentence: str) -> str:
         s = sentence.lower()
         for keyword, val in self._IMPORTANCE_KEYWORDS.items():
             if keyword in s:
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        return str(round(random.uniform(0.3, 0.7), 2))
+        # Task-type based defaults when no keyword present
+        if any(w in s for w in ["crash", "emergency", "critical", "urgent", "asap"]):
+            return str(round(random.uniform(0.9, 0.98), 2))
+        if any(w in s for w in ["taxes", "rent", "bill", "pay", "exam"]):
+            return str(round(random.uniform(0.8, 0.95), 2))
+        if any(w in s for w in ["meeting", "presentation", "report"]):
+            return str(round(random.uniform(0.5, 0.7), 2))
+        if any(w in s for w in ["quick", "easy", "optional", "low priority"]):
+            return str(round(random.uniform(0.1, 0.3), 2))
+        if any(w in s for w in ["workout", "gym", "run", "yoga", "meditate"]):
+            return str(round(random.uniform(0.4, 0.6), 2))
+        return str(round(random.uniform(0.4, 0.6), 2))
 
     def _infer_duration(self, sentence: str) -> str:
         s = sentence.lower()
+        # First check for explicit duration in the sentence
         match = re.search(r'(\d+)\s*(?:minute|min|hour|hr)', s)
         if match:
             val = int(match.group(1))
             if "hour" in s or "hr" in s:
                 return str(val * 60)
             return str(val)
-        # Default based on task type
-        if any(w in s for w in ["meeting", "call", "review"]):
-            return str(random.choice([30, 45, 60]))
+        # Task-type based duration inference
+        if any(w in s for w in ["crash", "bug", "fix", "critical"]):
+            return str(random.choice([60, 90, 120]))
         if any(w in s for w in ["report", "write", "prepare", "presentation"]):
             return str(random.choice([60, 90, 120]))
-        if any(w in s for w in ["run", "gym", "workout", "yoga"]):
-            return str(random.choice([30, 45, 60]))
-        if any(w in s for w in ["quick", "send", "check", "pay"]):
+        if any(w in s for w in ["workout", "gym", "yoga"]):
+            return str(random.choice([45, 60, 90]))
+        if any(w in s for w in ["meeting", "standup", "call"]):
+            return str(random.choice([15, 30, 45, 60]))
+        if any(w in s for w in ["run", "jog", "stretch"]):
+            return str(random.choice([15, 30, 45]))
+        if any(w in s for w in ["meditate", "meditation"]):
+            return str(random.choice([10, 15, 20]))
+        if any(w in s for w in ["pay", "bill", "rent", "tax"]):
             return str(random.choice([5, 10, 15]))
+        if any(w in s for w in ["clean", "laundry", "cook"]):
+            return str(random.choice([30, 45, 60]))
+        if any(w in s for w in ["exam", "study session", "study"]):
+            return str(random.choice([60, 90, 120]))
+        if any(w in s for w in ["quick", "easy", "simple"]):
+            return str(random.choice([5, 10, 15]))
+        if any(w in s for w in ["shopping", "grocery"]):
+            return str(random.choice([30, 45, 60]))
+        if any(w in s for w in ["flight", "trip", "travel"]):
+            return str(random.choice([30, 60, 120]))
         return str(random.choice([30, 45, 60]))
+
+    def _infer_location(self, sentence: str) -> str | None:
+        s = sentence.lower()
+        # Check multi-word phrases first (more specific)
+        for keyword in sorted(self._LOCATION_KEYWORDS.keys(), key=len, reverse=True):
+            if keyword in s:
+                return self._LOCATION_KEYWORDS[keyword]
+        return None
 
     def _build_schema(self, placeholder_map, sentence=""):
         schema = {
@@ -572,20 +665,26 @@ class DataGenerator:
             field = FIELD_MAP.get(yaml_key)
             if not field:
                 continue
+            # For predicted fields, IGNORE placeholder values — infer from sentence instead
+            # This ensures the model learns keyword->value mappings, not random placeholder values
+            if field in PREDICTED_FIELDS:
+                continue
             schema[field]["value"]     = value
             schema[field]["predicted"] = field in PREDICTED_FIELDS
 
         s = sentence.lower()
 
-        # ALWAYS populate predicted fields via inference
-        if schema["category"]["value"] is None:
-            schema["category"]["value"] = self._infer_category(s)
-        if schema["difficulty"]["value"] is None:
-            schema["difficulty"]["value"] = self._infer_difficulty(s)
-        if schema["importance"]["value"] is None:
-            schema["importance"]["value"] = self._infer_importance(s)
-        if schema["duration"]["value"] is None:
-            schema["duration"]["value"] = self._infer_duration(s)
+        # ALWAYS infer predicted fields from the actual sentence content
+        # This is the key fix: the model sees sentences with keywords and learns
+        # to output the correct values based on those keywords
+        schema["category"]["value"]    = self._infer_category(s)
+        schema["difficulty"]["value"]  = self._infer_difficulty(s)
+        schema["importance"]["value"]  = self._infer_importance(s)
+        schema["duration"]["value"]    = self._infer_duration(s)
+
+        # Location: infer from keywords if not from placeholder
+        if schema["location"]["value"] is None:
+            schema["location"]["value"] = self._infer_location(s)
 
         # Normalize duration to integer minutes
         dur = schema["duration"]["value"]
@@ -662,7 +761,10 @@ class DataGenerator:
                 elif "afternoon" in time_str: schema["fixed_start"]["value"] = "13:00"
                 elif "evening"   in time_str: schema["fixed_start"]["value"] = "18:00"
                 elif "noon"      in time_str: schema["fixed_start"]["value"] = "12:00"
-                else:                         schema["fixed_start"]["value"] = time_str.strip()
+                else:
+                    # Normalize raw time like "3:30pm" -> "15:30"
+                    normalized = _normalize_time_standalone(time_str.strip())
+                    schema["fixed_start"]["value"] = normalized if normalized else time_str.strip()
 
         if "today" in s and not has_recurrent and not has_explicit_time:
             if schema["start"]["value"] is None:
@@ -779,6 +881,62 @@ class DataGenerator:
 
         return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
 
+    def _convert_real_modify_full(self, example: dict):
+        """Convert a modify example to input -> FULL updated task output."""
+        sentence = example["input"]
+        output = example["output"]
+
+        # Parse the JSON from the modify input
+        try:
+            json_str = sentence.replace("modify:", "").split("\u2502")[0].strip()
+            original = json.loads(json_str)
+        except (json.JSONDecodeError, IndexError):
+            return sentence, ""
+
+        # Apply changes from output
+        task = dict(original)
+        for k, v in output.items():
+            if v is not None:
+                # Normalize booleans
+                if isinstance(v, bool):
+                    task[k] = "true" if v else "false"
+                elif k == "duration":
+                    task[k] = _normalize_duration_to_minutes(v) or v
+                elif k == "fixed_start":
+                    task[k] = _normalize_time_standalone(str(v)) or v
+                elif k in ("deadline", "start"):
+                    task[k] = _normalize_deadline(v) or v
+                elif k == "category":
+                    task[k] = self._clamp_category(v)
+                elif k in ("difficulty", "importance"):
+                    try:
+                        task[k] = str(round(float(v), 2))
+                    except (ValueError, TypeError):
+                        task[k] = v
+                else:
+                    task[k] = v
+            else:
+                # null values → remove the field
+                task.pop(k, None)
+
+        # Build full schema from the updated task
+        schema = {
+            "name":            {"value": task.get("name"),               "predicted": False},
+            "start":           {"value": task.get("start"),              "predicted": False},
+            "deadline":        {"value": task.get("deadline"),           "predicted": False},
+            "difficulty":      {"value": task.get("difficulty"),         "predicted": True},
+            "duration":        {"value": task.get("duration"),           "predicted": True},
+            "category":        {"value": task.get("category"),           "predicted": True},
+            "location":        {"value": task.get("location"),           "predicted": True},
+            "importance":      {"value": task.get("importance"),         "predicted": True},
+            "fixed_time":      {"value": task.get("fixed_time", False),  "predicted": False},
+            "fixed_start":     {"value": task.get("fixed_start"),        "predicted": False},
+            "recurrent":       {"value": task.get("recurrent", False),   "predicted": False},
+            "recurrence_days": {"value": task.get("recurrence_days"),    "predicted": False},
+        }
+
+        return sentence, schema_to_pipe(schema)
+
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
         schema = self._build_schema(placeholder_map, sentence)
@@ -832,6 +990,50 @@ class DataGenerator:
 
         input_text  = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
         target_text = changed_to_pipe(changed_fields)
+        return input_text, target_text
+
+    def _generate_modify_full(self):
+        """Generate modify example where target is the FULL updated task."""
+        sentence, placeholder_map = self._fill_template()
+        existing = self._build_schema(placeholder_map, sentence)
+
+        # Sample 1-3 changes
+        num_changes = random.randint(1, 3)
+        sampled = random.sample(CHANGE_TEMPLATES, k=num_changes)
+        changed_fields = {}
+        change_phrases = []
+
+        for field_name, phrase_fn, value_fn in sampled:
+            new_value = value_fn()
+            change_phrases.append(phrase_fn(new_value))
+
+            if field_name == "fixed_time+fixed_start":
+                changed_fields["fixed_time"] = {"value": True}
+                changed_fields["fixed_start"] = {"value": new_value}
+            elif field_name == "recurrent+recurrence_days":
+                changed_fields["recurrent"] = {"value": True}
+                changed_fields["recurrence_days"] = {"value": new_value}
+            elif field_name == "cancel_fixed_time":
+                changed_fields["fixed_time"] = {"value": False}
+                changed_fields["fixed_start"] = {"value": None}
+            elif field_name == "cancel_recurrent":
+                changed_fields["recurrent"] = {"value": False}
+                changed_fields["recurrence_days"] = {"value": None}
+            else:
+                changed_fields[field_name] = {"value": new_value}
+
+        # Apply changes to existing schema
+        for field_name, change_entry in changed_fields.items():
+            if field_name in existing:
+                existing[field_name]["value"] = change_entry["value"]
+
+        existing_summary = {
+            k: v["value"] for k, v in existing.items() if v["value"] is not None
+        }
+
+        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
+        # Output the FULL updated task, not just changed fields
+        target_text = schema_to_pipe(existing)
         return input_text, target_text
 
 
