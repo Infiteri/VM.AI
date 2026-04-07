@@ -1,7 +1,9 @@
 """
-    VM.AI Parser — Full Test Suite Runner
+    VM-AI - Full Test Suite Runner
     Runs all 4 test scripts independently.
     Run: python tests/test_llm_full.py
+
+    Written by: Vanea
 """
 
 import sys

@@ -1,6 +1,8 @@
 """
-    VM.AI — Scatter Plot: Difficulty vs Importance by Category
+    VM-AI - Scatter Plot: Difficulty vs Importance by Category
     Run: python scripts/plot_scatter.py
+
+    Written by: Vanea
 """
 
 import sys

@@ -1,3 +1,11 @@
+"""
+    VM-AI - Data Generator Tests
+    Tests data generation functionality.
+    Run: python tests/test_generator.py
+
+    Written by: Vanea
+"""
+
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
 from data_generator import DataGenerator

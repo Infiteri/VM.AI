@@ -1,8 +1,9 @@
 """
-    VM.AI Training Data Validator and Fixer
-    Checks and corrects issues in training data YAML files
+    VM-AI - Training Data Validator and Fixer
+    Checks and corrects issues in training data YAML files.
+    Run: python src/parser/validate_dataset.py
 
-    Written by: Vanea @ 25-03-2026
+    Written by: Vanea
 """
 
 import yaml

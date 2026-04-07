@@ -1,3 +1,11 @@
+"""
+    VM-AI - Add Mode Tests
+    Tests add functionality for new tasks.
+    Run: python tests/test_add.py
+
+    Written by: Vanea
+"""
+
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
 from chat import TaskPlannerPredictor

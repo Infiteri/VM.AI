@@ -1,6 +1,9 @@
 """
-Normalize VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats.
-Run this script to fix all data files before training.
+    VM-AI - Data Normalizer
+    Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats.
+    Run: python src/parser/normalize_data.py
+
+    Written by: Vanea
 """
 import sys
 import os

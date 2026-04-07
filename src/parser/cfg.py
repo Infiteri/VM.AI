@@ -1,3 +1,10 @@
+"""
+    VM-AI - Configuration Manager
+    Loads and manages training config from config.yaml.
+
+    Written by: Vanea
+"""
+
 import os
 import torch
 import yaml

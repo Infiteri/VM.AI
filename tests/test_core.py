@@ -1,3 +1,11 @@
+"""
+    VM-AI - Core Parser Tests
+    Tests parsing accuracy, predicted fields, and change detection.
+    Run: python tests/test_core.py
+
+    Written by: Vanea
+"""
+
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
 

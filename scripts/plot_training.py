@@ -1,6 +1,8 @@
 """
-    VM.AI — Training Loss Plot from HuggingFace trainer logs
+    VM-AI - Training Loss Plot from HuggingFace trainer logs
     Run after training: python scripts/plot_training.py
+
+    Written by: Vanea
 """
 
 import sys

@@ -1,6 +1,9 @@
 """
-    Upload trained model to Hugging Face Hub
+    VM-AI - HuggingFace Model Uploader
+    Uploads trained model to Hugging Face Hub.
     Usage: python upload_to_hf.py [token]
+
+    Written by: Vanea
 """
 
 import os

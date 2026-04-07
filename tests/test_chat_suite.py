@@ -1,7 +1,9 @@
 """
-    VM.AI — Automated Test Suite for Chat Interface
+    VM-AI - Automated Test Suite for Chat Interface
     Runs Add and Modify tests, captures outputs for comparison.
     Run: python tests/test_chat_suite.py
+
+    Written by: Vanea
 """
 
 import sys

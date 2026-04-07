@@ -1,7 +1,9 @@
 """
-    VM.AI — Plot Real Data
+    VM-AI - Plot Real Data Visualizations
     Visualizes VMAI_REAL_Data.yaml specifically.
     Run: python scripts/plot_real.py
+
+    Written by: Vanea
 """
 import sys, os, yaml
 from collections import Counter

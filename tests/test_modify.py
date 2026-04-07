@@ -1,3 +1,11 @@
+"""
+    VM-AI - Modify Mode Tests
+    Tests modify functionality for task updates.
+    Run: python tests/test_modify.py
+
+    Written by: Vanea
+"""
+
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
 from chat import TaskPlannerPredictor

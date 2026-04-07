@@ -1,7 +1,9 @@
 """
-    VM.AI — Data Visualization Scripts (Individual Plots)
+    VM-AI - Data Visualization Scripts (Individual Plots)
     Run: python scripts/plot_categories.py
     Outputs individual images for each metric in scripts/output/
+
+    Written by: Vanea
 """
 
 import sys

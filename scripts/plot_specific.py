@@ -1,7 +1,9 @@
 """
-    VM.AI — Plot Specific Fixes
+    VM-AI - Plot Specific Visualizations
     Visualizes VMAI_SPECIFIC_Data.yaml to prove targeted fixes.
     Run: python scripts/plot_specific.py
+
+    Written by: Vanea
 """
 import sys, os, yaml
 from collections import Counter

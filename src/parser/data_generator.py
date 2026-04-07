@@ -1,11 +1,9 @@
 """
-    VM.AI Data Generator
+    VM-AI - Data Generator
     Generates training data in pipe format: name=x | deadline=y | difficulty=0.75
+    Run: python src/parser/data_generator.py
 
-    Written by: Vanea @ 06-03-2026
-    Updated by: Vanea @ 21-03-2026 — full rewrite, pipe format output
-    Updated by: Vanea @ 21-03-2026 — keyword-driven recurrent/fixed_time, no random guessing
-    Updated by: Vanea @ 01-04-2026 — expanded CHANGE_TEMPLATES (all fields), generate_modify_only()
+    Written by: Vanea
 """
 
 import vars

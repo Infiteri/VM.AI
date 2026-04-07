@@ -27,12 +27,12 @@ modes:
     learning_rate_resume: 2e-5
 
   real:
-    num_train_epochs: 5
-    max_limit: 5000
+    num_train_epochs: 12
+    max_limit: 500
     per_device_train_batch_size: 4
-    gradient_accumulation_steps: 32
-    learning_rate_fresh: 1e-5
-    learning_rate_resume: 5e-6
+    gradient_accumulation_steps: 16
+    learning_rate_fresh: 2e-5
+    learning_rate_resume: 1e-5
 
   specific:
     num_train_epochs: 15

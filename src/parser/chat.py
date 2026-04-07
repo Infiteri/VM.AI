@@ -1,7 +1,9 @@
 """
-    VM.AI Chat Testing Interface
+    VM-AI - Chat Testing Interface
+    Tests add and modify modes with pipe format output.
+    Run: python src/parser/chat.py
 
-    Written by: Vanea @ 21-03-2026 — full rewrite, pipe format
+    Written by: Vanea
 """
 
 import torch

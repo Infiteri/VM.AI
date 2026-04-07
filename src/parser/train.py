@@ -1,11 +1,9 @@
 """
-    VM.AI Parser — Training Script
+    VM-AI - Parser Training Script
+    Trains the parser model locally with pipe format data.
+    Run: python src/parser/train.py
 
-    Written by: Vanea @ 07-03-2026
-    Updated by: Vanea @ 21-03-2026 — full rewrite, local only, pipe format
-    Updated by: Vanea @ 21-03-2026 — added specific mode
-    Updated by: Vanea @ 25-03-2026 — compute_metrics, target length fix, Windows fix
-    Updated by: Vanea @ 01-04-2026 — added modify_only mode
+    Written by: Vanea
 """
 
 import os

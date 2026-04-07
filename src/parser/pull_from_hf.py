@@ -1,8 +1,10 @@
 """
-    Download model from Hugging Face
+    VM-AI - HuggingFace Model Downloader
+    Downloads model from Hugging Face.
     Usage: python pull_from_hf.py [token]
-    
     ALWAYS backs up existing model to finetuned_parser_backup before downloading
+
+    Written by: Vanea
 """
 
 import os
