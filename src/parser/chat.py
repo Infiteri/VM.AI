@@ -139,7 +139,7 @@ class TaskPlannerPredictor:
 
         return schema
 
-    def _run_model(self, input_text: str) -> str:
+    def _run_model(self, input_text: str, start_token: str = "name=") -> str:
         inputs = self.tokenizer(
             input_text,
             return_tensors="pt",
@@ -147,11 +147,17 @@ class TaskPlannerPredictor:
             padding=True,
         ).to(self.device)
 
-        decoder_input = self.tokenizer(
-            "name=",
-            return_tensors="pt",
-            add_special_tokens=False
-        ).input_ids.to(self.device)
+        # Use start_token to guide generation.
+        # For 'add', we force "name=" to start the output.
+        # For 'modify', we use an empty string so the model can output any field first.
+        if start_token:
+            decoder_input = self.tokenizer(
+                start_token,
+                return_tensors="pt",
+                add_special_tokens=False
+            ).input_ids.to(self.device)
+        else:
+            decoder_input = None
 
         with torch.no_grad():
             output_ids = self.model.generate(
@@ -230,21 +236,19 @@ class TaskPlannerPredictor:
                     val = "true" if val else "false"
                 summary[k] = val
         input_text = f"modify: {json.dumps(summary, ensure_ascii=False)} \u2502 {self._normalize(change_prompt)}"
-        output = self._run_model(input_text)
+        output = self._run_model(input_text, start_token="")
 
-        # Model outputs FULL task in pipe format, parse it
+        # Model outputs FULL task in pipe format — parse it fully
         new_task = self._pipe_to_schema(output)
         if "error" in new_task:
             result = {"error": "parse_failed", "raw": output}
-            log_entry("modify", change_prompt, self._last_raw_output, result)
-            return result
-
-        # Diff old vs new → return only changed fields
-        changed = self._diff_schemas(existing_task, new_task)
-        if not changed:
-            result = {"error": "no_changes", "raw": output}
         else:
-            result = changed
+            # Diff old vs new → return only changed fields
+            changed = self._diff_schemas(existing_task, new_task)
+            if not changed:
+                result = {"error": "no_changes", "raw": output}
+            else:
+                result = changed
         log_entry("modify", change_prompt, self._last_raw_output, result)
         return result
 
@@ -257,17 +261,15 @@ class TaskPlannerPredictor:
             old_entry = old_task.get(field)
             old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
 
-            # Normalize for comparison
-            if isinstance(old_val, bool):
-                old_val = old_val
-            elif isinstance(new_val, bool):
-                new_val = new_val
-            else:
-                # String comparison
-                old_val = str(old_val).lower() if old_val is not None else None
-                new_val = str(new_val).lower() if new_val is not None else None
+            # Skip fields where model output None (missing from output)
+            if new_val is None:
+                continue
 
-            if old_val != new_val:
+            # Normalize both to comparable strings
+            old_str = str(old_val).lower() if old_val is not None else ""
+            new_str = str(new_val).lower()
+
+            if old_str != new_str:
                 changed[field] = {"value": new_val, "predicted": new_entry.get("predicted", False) if isinstance(new_entry, dict) else False}
 
         return changed

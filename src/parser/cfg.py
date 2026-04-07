@@ -24,6 +24,9 @@ class Config:
         
         mode_data = cfg.get("modes", {}).get(mode, cfg["modes"]["default"])
         for key, val in mode_data.items():
+            # Force learning rates to be floats to prevent YAML string errors
+            if "learning_rate" in key:
+                val = float(val)
             setattr(self, key, val)
             
         print(f"Config loaded for mode: {mode}")

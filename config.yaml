@@ -17,6 +17,7 @@ modes:
     gradient_accumulation_steps: 24
     learning_rate_fresh: 2e-5
     learning_rate_resume: 5e-6
+
   synthetic:
     num_train_epochs: 10
     max_limit: 10000
@@ -24,6 +25,7 @@ modes:
     gradient_accumulation_steps: 16
     learning_rate_fresh: 2e-5
     learning_rate_resume: 2e-5
+
   real:
     num_train_epochs: 5
     max_limit: 5000
@@ -31,13 +33,15 @@ modes:
     gradient_accumulation_steps: 32
     learning_rate_fresh: 1e-5
     learning_rate_resume: 5e-6
+
   specific:
-    num_train_epochs: 10
-    max_limit: 2000
+    num_train_epochs: 15
+    max_limit: 200
     per_device_train_batch_size: 4
-    gradient_accumulation_steps: 32
+    gradient_accumulation_steps: 16
     learning_rate_fresh: 1e-5
-    learning_rate_resume: 5e-6
+    learning_rate_resume: 1e-5
+
   modify_only:
     num_train_epochs: 10
     max_limit: 3000
@@ -45,6 +49,7 @@ modes:
     gradient_accumulation_steps: 16
     learning_rate_fresh: 5e-6
     learning_rate_resume: 5e-6
+
   default:
     num_train_epochs: 5
     max_limit: 9000

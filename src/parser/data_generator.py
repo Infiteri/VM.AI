@@ -495,11 +495,13 @@ class DataGenerator:
         "presentation": "work", "meeting": "work", "standup": "work",
         "report": "work", "email": "work", "client": "work", "invoice": "work",
         "budget": "work", "contract": "work", "proposal": "work", "sprint": "work",
-        "test": "work", "review": "work", "document": "work",
+        "test": "work", "review": "work", "document": "work", "urgent": "work",
+        "deadline": "work", "project": "work",
         # Study
         "exam": "study", "homework": "study", "lecture": "study",
         "thesis": "study", "assignment": "study", "tutor": "study",
-        "study session": "study",
+        "study session": "study", "study": "study",
+        "library": "study", "reading": "study", "research": "study",
         # Fitness
         "foam roll": "fitness", "gym": "fitness", "run": "fitness",
         "yoga": "fitness", "workout": "fitness", "swim": "fitness",
@@ -508,14 +510,16 @@ class DataGenerator:
         # Health
         "doctor": "health", "medication": "health", "dentist": "health",
         "pharmacy": "health", "checkup": "health", "meditate": "health",
-        "prescription": "health",
+        "prescription": "health", "massage": "health",
         # Finance
-        "rent": "finance", "bill": "finance", "tax": "finance",
+        "rent": "finance", "bill": "finance", "tax": "finance", "taxes": "finance",
         "bank": "finance", "payment": "finance", "budget": "finance",
+        "invest": "finance", "insurance": "finance", "savings": "finance",
         # Home
         "clean": "home", "laundry": "home", "cook": "home",
         "dinner": "home", "lunch": "home", "breakfast": "home",
-        # Family
+        # Family - higher priority for personal calls
+        "call mom": "personal", "call dad": "personal", "call parents": "personal",
         "kids": "family", "children": "family", "school": "family",
         # Social
         "friend": "social", "party": "social", "movie": "social",
@@ -545,7 +549,7 @@ class DataGenerator:
 
     _DIFFICULTY_KEYWORDS = {
         "hard": 0.8, "difficult": 0.85, "challenging": 0.8, "complex": 0.75,
-        "intense": 0.9, "heavy": 0.85, "tough": 0.75,
+        "intense": 0.9, "heavy": 0.85, "tough": 0.75, "urgent": 0.75,
         "easy": 0.15, "simple": 0.2, "light": 0.25, "quick": 0.2,
         "moderate": 0.5, "medium": 0.5,
     }
@@ -559,36 +563,80 @@ class DataGenerator:
 
     def _infer_category(self, sentence: str) -> str:
         s = sentence.lower()
-        # Check multi-word phrases first (more specific)
+        # Check multi-word phrases first (more specific), using word boundary matching
         for keyword in sorted(self._TASK_CATEGORY_MAP.keys(), key=len, reverse=True):
-            if keyword in s:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
                 return self._TASK_CATEGORY_MAP[keyword]
         return random.choice(["work", "personal", "home", "errands"])
 
     def _infer_difficulty(self, sentence: str) -> str:
         s = sentence.lower()
+        
+        # FIRST: Check for text keywords (highest priority)
         for keyword, val in self._DIFFICULTY_KEYWORDS.items():
-            if keyword in s:
+            match = re.search(r'\b' + re.escape(keyword) + r'\b', s)
+            if match:
+                # Check for negation
+                prefix = s[:match.start()].strip()
+                if prefix.endswith("not") or prefix.endswith("non") or prefix.endswith("never"):
+                    return str(round(0.15 + random.uniform(-0.05, 0.05), 2))
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        # Task-type based defaults when no keyword present
-        if any(w in s for w in ["crash", "bug", "fix", "emergency", "critical"]):
+        
+        # SECOND: Check for numeric difficulty values in the sentence (template fallback)
+        numeric_matches = re.findall(r'(?:^|[,\-–—\s])(0\.\d{1,2}|1\.0)(?:\s*,|\s*$|\s)', s)
+        for match in numeric_matches:
+            val = float(match)
+            if 0.0 <= val <= 1.0:
+                return str(val)
+        
+        all_numbers = re.findall(r'(?:^|\s)(0\.\d{1,2}|1\.0)(?:\s|$|,)', s)
+        for match in all_numbers:
+            val = float(match)
+            if 0.0 <= val <= 1.0:
+                return str(val)
+        
+        # THIRD: Task-type based defaults
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix", "emergency", "critical"]):
             return str(round(random.uniform(0.7, 0.9), 2))
-        if any(w in s for w in ["workout", "gym", "heavy", "hard"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["taxes", "tax", "deadline", "exam"]):
             return str(round(random.uniform(0.6, 0.85), 2))
-        if any(w in s for w in ["report", "presentation", "exam", "study"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["workout", "gym", "heavy", "hard"]):
+            return str(round(random.uniform(0.6, 0.85), 2))
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation", "exam", "study"]):
             return str(round(random.uniform(0.5, 0.7), 2))
-        if any(w in s for w in ["quick", "easy", "simple", "stretch"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["quick", "easy", "simple", "stretch"]):
             return str(round(random.uniform(0.1, 0.25), 2))
-        if any(w in s for w in ["call", "email", "meeting", "pay", "clean"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["call", "email", "meeting", "pay", "clean"]):
             return str(round(random.uniform(0.1, 0.4), 2))
         return str(round(random.uniform(0.3, 0.6), 2))
 
     def _infer_importance(self, sentence: str) -> str:
         s = sentence.lower()
+        
+        # FIRST: Check for text keywords (highest priority)
+        # Skip "urgent" if preceded by "not" or "non"
         for keyword, val in self._IMPORTANCE_KEYWORDS.items():
-            if keyword in s:
+            match = re.search(r'\b' + re.escape(keyword) + r'\b', s)
+            if match:
+                # Check for negation
+                prefix = s[:match.start()].strip()
+                if prefix.endswith("not") or prefix.endswith("non") or prefix.endswith("never"):
+                    # Return low importance for negated keywords
+                    return str(round(0.15 + random.uniform(-0.05, 0.05), 2))
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        # Task-type based defaults when no keyword present
+        
+        # SECOND: Check for numeric importance values in the sentence (template fallback)
+        all_decimals = re.findall(r'(0\.\d{1,2}|1\.0)', s)
+        if len(all_decimals) >= 2:
+            val = float(all_decimals[1])
+            if 0.0 <= val <= 1.0:
+                return str(val)
+        elif len(all_decimals) == 1:
+            val = float(all_decimals[0])
+            if 0.2 <= val <= 1.0:
+                return str(val)
+        
+        # THIRD: Task-type based defaults
         if any(w in s for w in ["crash", "emergency", "critical", "urgent", "asap"]):
             return str(round(random.uniform(0.9, 0.98), 2))
         if any(w in s for w in ["taxes", "rent", "bill", "pay", "exam"]):
@@ -639,9 +687,9 @@ class DataGenerator:
 
     def _infer_location(self, sentence: str) -> str | None:
         s = sentence.lower()
-        # Check multi-word phrases first (more specific)
+        # Check multi-word phrases first (more specific), using word boundary matching
         for keyword in sorted(self._LOCATION_KEYWORDS.keys(), key=len, reverse=True):
-            if keyword in s:
+            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
                 return self._LOCATION_KEYWORDS[keyword]
         return None
 

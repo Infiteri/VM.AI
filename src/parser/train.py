@@ -194,7 +194,29 @@ def tokenize(train_ds, test_ds, tokenizer):
     return tok_train, tok_test
 
 
-def train(model, tokenizer, cfg, tok_train, tok_test, lr):
+def find_latest_checkpoint(output_dir):
+    """Finds the latest checkpoint folder and returns its path."""
+    import re
+    if not os.path.exists(output_dir):
+        return None
+    
+    checkpoints = []
+    for d in os.listdir(output_dir):
+        # Match pattern "checkpoint-1234"
+        if d.startswith("checkpoint-") and os.path.isdir(os.path.join(output_dir, d)):
+            match = re.match(r"checkpoint-(\d+)", d)
+            if match:
+                checkpoints.append((int(match.group(1)), os.path.join(output_dir, d)))
+    
+    if not checkpoints:
+        return None
+    
+    # Return the one with the highest step count
+    checkpoints.sort(key=lambda x: x[0])
+    return checkpoints[-1][1]
+
+
+def train(model, tokenizer, cfg, tok_train, tok_test, lr, resume_from=None):
     args = Seq2SeqTrainingArguments(
         output_dir=                  cfg.output_dir,
         eval_strategy=               "epoch",
@@ -227,7 +249,12 @@ def train(model, tokenizer, cfg, tok_train, tok_test, lr):
     )
 
     print("Starting training...")
-    trainer.train()
+    if resume_from:
+        print(f"  → Resuming from: {resume_from}")
+    else:
+        print("  → Starting fresh (no checkpoints found)")
+        
+    trainer.train(resume_from_checkpoint=resume_from)
 
 
 def parse_args():
@@ -274,8 +301,11 @@ def main():
 
     train_ds, test_ds   = build_dataset(cfg, args.mode)
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
+    
+    # Check for checkpoint to resume from
+    resume_path = find_latest_checkpoint(cfg.output_dir)
 
-    train(model, tokenizer, cfg, tok_train, tok_test, lr)
+    train(model, tokenizer, cfg, tok_train, tok_test, lr, resume_from=resume_path)
     save_model(model, tokenizer, cfg)
 
     elapsed = int(time.time() - start)
