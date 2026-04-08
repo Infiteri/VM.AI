@@ -1,12 +1,4 @@
-# VM.AI Real Training Data — Comprehensive & Contextually Accurate
-# Includes diverse difficulty, importance, duration, and category mappings.
-# All values are contextually consistent.
-
 examples:
-
-# ─── ADD EXAMPLES (150 High-Quality Entries) ────────────────────────────────
-
-# ── Work ─────────────────────────────────────────────────────────────────────
 - input: write the weekly status report
   output:
     name: write weekly report
@@ -14,7 +6,6 @@ examples:
     importance: 0.7
     category: work
     duration: 45
-
 - input: fix the critical server crash immediately
   output:
     name: fix server crash
@@ -22,7 +13,6 @@ examples:
     importance: 0.99
     category: work
     duration: 120
-
 - input: reply to the internal slack message
   output:
     name: reply to slack
@@ -30,7 +20,6 @@ examples:
     importance: 0.2
     category: work
     duration: 5
-
 - input: prepare the quarterly presentation
   output:
     name: prepare quarterly presentation
@@ -38,7 +27,6 @@ examples:
     importance: 0.85
     category: work
     duration: 180
-
 - input: attend the daily standup meeting
   output:
     name: daily standup
@@ -46,7 +34,6 @@ examples:
     importance: 0.6
     category: work
     duration: 15
-
 - input: debug the login page issue
   output:
     name: debug login page
@@ -54,7 +41,6 @@ examples:
     importance: 0.75
     category: work
     duration: 90
-
 - input: send the invoice to the client
   output:
     name: send invoice
@@ -62,7 +48,6 @@ examples:
     importance: 0.85
     category: work
     duration: 10
-
 - input: update the project documentation
   output:
     name: update documentation
@@ -70,7 +55,6 @@ examples:
     importance: 0.5
     category: work
     duration: 45
-
 - input: review the pull request
   output:
     name: review pull request
@@ -78,7 +62,6 @@ examples:
     importance: 0.7
     category: work
     duration: 30
-
 - input: plan the sprint for next week
   output:
     name: plan sprint
@@ -86,8 +69,6 @@ examples:
     importance: 0.8
     category: work
     duration: 60
-
-# ── Finance ──────────────────────────────────────────────────────────────────
 - input: pay the rent
   output:
     name: pay rent
@@ -95,7 +76,6 @@ examples:
     importance: 0.95
     category: finance
     duration: 10
-
 - input: review the investment portfolio
   output:
     name: review portfolio
@@ -103,7 +83,6 @@ examples:
     importance: 0.8
     category: finance
     duration: 60
-
 - input: cancel the unused subscription
   output:
     name: cancel subscription
@@ -111,7 +90,6 @@ examples:
     importance: 0.4
     category: finance
     duration: 10
-
 - input: file the annual taxes
   output:
     name: file taxes
@@ -119,7 +97,6 @@ examples:
     importance: 0.95
     category: finance
     duration: 180
-
 - input: pay the electricity bill
   output:
     name: pay electricity bill
@@ -127,7 +104,6 @@ examples:
     importance: 0.85
     category: finance
     duration: 10
-
 - input: transfer money to savings
   output:
     name: transfer to savings
@@ -135,7 +111,6 @@ examples:
     importance: 0.7
     category: finance
     duration: 5
-
 - input: check the credit card balance
   output:
     name: check credit card
@@ -143,8 +118,6 @@ examples:
     importance: 0.45
     category: finance
     duration: 5
-
-# ── Health ───────────────────────────────────────────────────────────────────
 - input: take daily vitamins
   output:
     name: take vitamins
@@ -152,7 +125,6 @@ examples:
     importance: 0.5
     category: health
     duration: 2
-
 - input: schedule the dentist appointment
   output:
     name: dentist appointment
@@ -160,7 +132,6 @@ examples:
     importance: 0.7
     category: health
     duration: 15
-
 - input: do a intense HIIT workout
   output:
     name: HIIT workout
@@ -168,7 +139,6 @@ examples:
     importance: 0.6
     category: fitness
     duration: 30
-
 - input: meditate for ten minutes
   output:
     name: meditate
@@ -176,7 +146,6 @@ examples:
     importance: 0.4
     category: health
     duration: 10
-
 - input: pick up the prescription
   output:
     name: pick up prescription
@@ -184,7 +153,6 @@ examples:
     importance: 0.85
     category: health
     duration: 20
-
 - input: go for a light jog
   output:
     name: light jog
@@ -192,7 +160,6 @@ examples:
     importance: 0.4
     category: fitness
     duration: 20
-
 - input: do a heavy leg day at the gym
   output:
     name: heavy leg day
@@ -200,7 +167,6 @@ examples:
     importance: 0.5
     category: fitness
     duration: 75
-
 - input: stretch after working out
   output:
     name: post-workout stretch
@@ -208,8 +174,6 @@ examples:
     importance: 0.3
     category: fitness
     duration: 10
-
-# ── Study ────────────────────────────────────────────────────────────────────
 - input: study for the final exam
   output:
     name: study for final exam
@@ -217,7 +181,6 @@ examples:
     importance: 0.95
     category: study
     duration: 120
-
 - input: read the textbook chapter
   output:
     name: read textbook chapter
@@ -225,7 +188,6 @@ examples:
     importance: 0.6
     category: study
     duration: 45
-
 - input: review flashcards for spanish
   output:
     name: review flashcards
@@ -233,7 +195,6 @@ examples:
     importance: 0.4
     category: study
     duration: 15
-
 - input: write the thesis proposal
   output:
     name: write thesis proposal
@@ -241,7 +202,6 @@ examples:
     importance: 0.9
     category: study
     duration: 180
-
 - input: submit the assignment
   output:
     name: submit assignment
@@ -249,7 +209,6 @@ examples:
     importance: 0.85
     category: study
     duration: 30
-
 - input: practice the piano for an hour
   output:
     name: practice piano
@@ -257,8 +216,6 @@ examples:
     importance: 0.35
     category: learning
     duration: 60
-
-# ── Home & Chores ────────────────────────────────────────────────────────────
 - input: cook dinner
   output:
     name: cook dinner
@@ -266,7 +223,6 @@ examples:
     importance: 0.6
     category: home
     duration: 45
-
 - input: clean the bathroom
   output:
     name: clean bathroom
@@ -274,7 +230,6 @@ examples:
     importance: 0.5
     category: home
     duration: 30
-
 - input: water the indoor plants
   output:
     name: water plants
@@ -282,7 +237,6 @@ examples:
     importance: 0.3
     category: home
     duration: 5
-
 - input: do the laundry
   output:
     name: do laundry
@@ -290,7 +244,6 @@ examples:
     importance: 0.6
     category: home
     duration: 60
-
 - input: take out the trash
   output:
     name: take out trash
@@ -298,7 +251,6 @@ examples:
     importance: 0.5
     category: home
     duration: 5
-
 - input: fix the leaking kitchen tap
   output:
     name: fix leaking tap
@@ -306,8 +258,6 @@ examples:
     importance: 0.75
     category: home
     duration: 45
-
-# ── Creative ─────────────────────────────────────────────────────────────────
 - input: write a blog post
   output:
     name: write blog post
@@ -315,7 +265,6 @@ examples:
     importance: 0.4
     category: creative
     duration: 60
-
 - input: paint a landscape
   output:
     name: paint landscape
@@ -323,7 +272,6 @@ examples:
     importance: 0.3
     category: creative
     duration: 90
-
 - input: edit the youtube video
   output:
     name: edit youtube video
@@ -331,7 +279,6 @@ examples:
     importance: 0.6
     category: creative
     duration: 120
-
 - input: record a podcast episode
   output:
     name: record podcast
@@ -339,7 +286,6 @@ examples:
     importance: 0.5
     category: creative
     duration: 60
-
 - input: sketch a quick design
   output:
     name: sketch design
@@ -347,8 +293,6 @@ examples:
     importance: 0.35
     category: creative
     duration: 30
-
-# ── Personal & Social & Family ───────────────────────────────────────────────
 - input: call mom
   output:
     name: call mom
@@ -356,7 +300,6 @@ examples:
     importance: 0.6
     category: personal
     duration: 15
-
 - input: meet friends for coffee
   output:
     name: coffee with friends
@@ -364,7 +307,6 @@ examples:
     importance: 0.4
     category: social
     duration: 60
-
 - input: plan the family vacation
   output:
     name: plan family vacation
@@ -372,7 +314,6 @@ examples:
     importance: 0.7
     category: family
     duration: 45
-
 - input: pick up kids from school
   output:
     name: pick up kids
@@ -380,7 +321,6 @@ examples:
     importance: 0.9
     category: family
     duration: 30
-
 - input: go for a walk in the park
   output:
     name: walk in park
@@ -388,7 +328,6 @@ examples:
     importance: 0.3
     category: personal
     duration: 30
-
 - input: read a novel for pleasure
   output:
     name: read novel
@@ -396,8 +335,6 @@ examples:
     importance: 0.25
     category: personal
     duration: 45
-
-# ── Errands & Admin & Travel ─────────────────────────────────────────────────
 - input: buy groceries at the supermarket
   output:
     name: buy groceries
@@ -405,7 +342,6 @@ examples:
     importance: 0.6
     category: shopping
     duration: 45
-
 - input: send the package via post office
   output:
     name: send package
@@ -413,7 +349,6 @@ examples:
     importance: 0.5
     category: errands
     duration: 20
-
 - input: return the shoes to the store
   output:
     name: return shoes
@@ -421,7 +356,6 @@ examples:
     importance: 0.4
     category: errands
     duration: 30
-
 - input: backup the hard drive to the cloud
   output:
     name: cloud backup
@@ -429,7 +363,6 @@ examples:
     importance: 0.6
     category: admin
     duration: 30
-
 - input: organize the email inbox
   output:
     name: organize email inbox
@@ -437,7 +370,6 @@ examples:
     importance: 0.35
     category: admin
     duration: 30
-
 - input: book a flight to paris
   output:
     name: book flight to paris
@@ -445,8 +377,6 @@ examples:
     importance: 0.7
     category: travel
     duration: 30
-
-# ── Fixed Time Examples ─────────────────────────────────────────────────────
 - input: team meeting at 3pm
   output:
     name: team meeting
@@ -455,8 +385,7 @@ examples:
     category: work
     duration: 60
     fixed_time: true
-    fixed_start: "15:00"
-
+    fixed_start: '15:00'
 - input: gym session at 6am
   output:
     name: gym session
@@ -465,8 +394,7 @@ examples:
     category: fitness
     duration: 60
     fixed_time: true
-    fixed_start: "06:00"
-
+    fixed_start: 06:00
 - input: dentist at 10:30am
   output:
     name: dentist
@@ -475,8 +403,7 @@ examples:
     category: health
     duration: 60
     fixed_time: true
-    fixed_start: "10:30"
-
+    fixed_start: '10:30'
 - input: lunch with the team at noon
   output:
     name: team lunch
@@ -485,9 +412,7 @@ examples:
     category: social
     duration: 60
     fixed_time: true
-    fixed_start: "12:00"
-
-# ── Recurrent Examples ──────────────────────────────────────────────────────
+    fixed_start: '12:00'
 - input: take medication every morning
   output:
     name: take medication
@@ -497,14 +422,13 @@ examples:
     duration: 5
     recurrent: true
     recurrence_days:
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
-      - Sunday
-
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
 - input: daily standup every weekday
   output:
     name: daily standup
@@ -514,12 +438,11 @@ examples:
     duration: 15
     recurrent: true
     recurrence_days:
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
 - input: go to the gym every monday and thursday
   output:
     name: go to the gym
@@ -529,182 +452,192 @@ examples:
     duration: 60
     recurrent: true
     recurrence_days:
-      - Monday
-      - Thursday
-
-# ─── MODIFY EXAMPLES (50 High-Quality Entries) ──────────────────────────────
-
-# ── Difficulty Changes ───────────────────────────────────────────────────────
-- input: 'modify: {"name": "workout", "difficulty": 0.3, "duration": 45, "category": "fitness", "importance": 0.5, "fixed_time": false, "recurrent": false} │ make it harder'
+    - Monday
+    - Thursday
+- input: 'modify: {"name": "workout", "difficulty": 0.3, "duration": 45, "category":
+    "fitness", "importance": 0.5, "fixed_time": false, "recurrent": false} │ make
+    it harder'
   output:
     difficulty: 0.85
-
-- input: 'modify: {"name": "workout", "difficulty": 0.8, "duration": 45, "category": "fitness", "importance": 0.5, "fixed_time": false, "recurrent": false} │ make it easier'
+- input: 'modify: {"name": "workout", "difficulty": 0.8, "duration": 45, "category":
+    "fitness", "importance": 0.5, "fixed_time": false, "recurrent": false} │ make
+    it easier'
   output:
     difficulty: 0.2
-
-- input: 'modify: {"name": "coding task", "difficulty": 0.5, "duration": 90, "category": "work", "importance": 0.6, "fixed_time": false, "recurrent": false} │ its actually very complex'
+- input: 'modify: {"name": "coding task", "difficulty": 0.5, "duration": 90, "category":
+    "work", "importance": 0.6, "fixed_time": false, "recurrent": false} │ its actually
+    very complex'
   output:
     difficulty: 0.9
-
-- input: 'modify: {"name": "reply to email", "difficulty": 0.3, "duration": 15, "category": "work", "importance": 0.4, "fixed_time": false, "recurrent": false} │ just a quick reply'
+- input: 'modify: {"name": "reply to email", "difficulty": 0.3, "duration": 15, "category":
+    "work", "importance": 0.4, "fixed_time": false, "recurrent": false} │ just a quick
+    reply'
   output:
     difficulty: 0.1
-
-# ── Importance Changes ───────────────────────────────────────────────────────
-- input: 'modify: {"name": "client call", "importance": 0.5, "duration": 30, "category": "work", "difficulty": 0.3, "fixed_time": false, "recurrent": false} │ make it urgent'
+- input: 'modify: {"name": "client call", "importance": 0.5, "duration": 30, "category":
+    "work", "difficulty": 0.3, "fixed_time": false, "recurrent": false} │ make it
+    urgent'
   output:
     importance: 0.95
-
-- input: 'modify: {"name": "clean up", "importance": 0.5, "duration": 30, "category": "home", "difficulty": 0.3, "fixed_time": false, "recurrent": false} │ low priority'
+- input: 'modify: {"name": "clean up", "importance": 0.5, "duration": 30, "category":
+    "home", "difficulty": 0.3, "fixed_time": false, "recurrent": false} │ low priority'
   output:
     importance: 0.2
-
-- input: 'modify: {"name": "presentation", "importance": 0.6, "duration": 60, "category": "work", "difficulty": 0.6, "fixed_time": false, "recurrent": false} │ critical for the project'
+- input: 'modify: {"name": "presentation", "importance": 0.6, "duration": 60, "category":
+    "work", "difficulty": 0.6, "fixed_time": false, "recurrent": false} │ critical
+    for the project'
   output:
     importance: 0.99
-
-- input: 'modify: {"name": "buy groceries", "importance": 0.7, "duration": 45, "category": "shopping", "difficulty": 0.15, "fixed_time": false, "recurrent": false} │ not urgent, can wait'
+- input: 'modify: {"name": "buy groceries", "importance": 0.7, "duration": 45, "category":
+    "shopping", "difficulty": 0.15, "fixed_time": false, "recurrent": false} │ not
+    urgent, can wait'
   output:
     importance: 0.3
-
-# ── Duration Changes ─────────────────────────────────────────────────────────
-- input: 'modify: {"name": "meeting", "duration": 30, "category": "work", "difficulty": 0.2, "importance": 0.6, "fixed_time": false, "recurrent": false} │ make it 1 hour'
+- input: 'modify: {"name": "meeting", "duration": 30, "category": "work", "difficulty":
+    0.2, "importance": 0.6, "fixed_time": false, "recurrent": false} │ make it 1 hour'
   output:
     duration: 60
-
-- input: 'modify: {"name": "workout", "duration": 60, "category": "fitness", "difficulty": 0.6, "importance": 0.5, "fixed_time": false, "recurrent": false} │ shorten to 30 minutes'
+- input: 'modify: {"name": "workout", "duration": 60, "category": "fitness", "difficulty":
+    0.6, "importance": 0.5, "fixed_time": false, "recurrent": false} │ shorten to
+    30 minutes'
   output:
     duration: 30
-
-- input: 'modify: {"name": "study session", "duration": 60, "category": "study", "difficulty": 0.6, "importance": 0.7, "fixed_time": false, "recurrent": false} │ make it 2 hours'
+- input: 'modify: {"name": "study session", "duration": 60, "category": "study", "difficulty":
+    0.6, "importance": 0.7, "fixed_time": false, "recurrent": false} │ make it 2 hours'
   output:
     duration: 120
-
-- input: 'modify: {"name": "call", "duration": 30, "category": "work", "difficulty": 0.1, "importance": 0.4, "fixed_time": false, "recurrent": false} │ just 5 minutes'
+- input: 'modify: {"name": "call", "duration": 30, "category": "work", "difficulty":
+    0.1, "importance": 0.4, "fixed_time": false, "recurrent": false} │ just 5 minutes'
   output:
     duration: 5
-
-# ── Category Changes ─────────────────────────────────────────────────────────
-- input: 'modify: {"name": "yoga", "category": "work", "duration": 60, "difficulty": 0.35, "importance": 0.5, "fixed_time": false, "recurrent": false} │ categorize it as fitness'
+- input: 'modify: {"name": "yoga", "category": "work", "duration": 60, "difficulty":
+    0.35, "importance": 0.5, "fixed_time": false, "recurrent": false} │ categorize
+    it as fitness'
   output:
     category: fitness
-
-- input: 'modify: {"name": "pay rent", "category": "home", "duration": 10, "difficulty": 0.1, "importance": 0.9, "fixed_time": false, "recurrent": false} │ actually its finance'
+- input: 'modify: {"name": "pay rent", "category": "home", "duration": 10, "difficulty":
+    0.1, "importance": 0.9, "fixed_time": false, "recurrent": false} │ actually its
+    finance'
   output:
     category: finance
-
-- input: 'modify: {"name": "meditation", "category": "work", "duration": 15, "difficulty": 0.1, "importance": 0.5, "fixed_time": false, "recurrent": false} │ make it a health task'
+- input: 'modify: {"name": "meditation", "category": "work", "duration": 15, "difficulty":
+    0.1, "importance": 0.5, "fixed_time": false, "recurrent": false} │ make it a health
+    task'
   output:
     category: health
-
-- input: 'modify: {"name": "fix bug", "category": "home", "duration": 60, "difficulty": 0.6, "importance": 0.75, "fixed_time": false, "recurrent": false} │ this is a work task'
+- input: 'modify: {"name": "fix bug", "category": "home", "duration": 60, "difficulty":
+    0.6, "importance": 0.75, "fixed_time": false, "recurrent": false} │ this is a
+    work task'
   output:
     category: work
-
-# ── Time Changes ─────────────────────────────────────────────────────────────
-- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "06:00", "duration": 45, "category": "fitness", "difficulty": 0.6, "importance": 0.5, "recurrent": false} │ move to 7am'
+- input: 'modify: {"name": "gym", "fixed_time": true, "fixed_start": "06:00", "duration":
+    45, "category": "fitness", "difficulty": 0.6, "importance": 0.5, "recurrent":
+    false} │ move to 7am'
   output:
-    fixed_start: "07:00"
-
-- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "14:00", "duration": 30, "category": "work", "difficulty": 0.2, "importance": 0.6, "recurrent": false} │ move to 3pm'
+    fixed_start: 07:00
+- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "14:00",
+    "duration": 30, "category": "work", "difficulty": 0.2, "importance": 0.6, "recurrent":
+    false} │ move to 3pm'
   output:
-    fixed_start: "15:00"
-
-- input: 'modify: {"name": "dentist", "fixed_time": true, "fixed_start": "10:00", "duration": 60, "category": "health", "difficulty": 0.2, "importance": 0.8, "recurrent": false} │ reschedule to 2pm'
+    fixed_start: '15:00'
+- input: 'modify: {"name": "dentist", "fixed_time": true, "fixed_start": "10:00",
+    "duration": 60, "category": "health", "difficulty": 0.2, "importance": 0.8, "recurrent":
+    false} │ reschedule to 2pm'
   output:
-    fixed_start: "14:00"
-
-- input: 'modify: {"name": "standup", "fixed_time": true, "fixed_start": "09:00", "duration": 15, "category": "work", "difficulty": 0.1, "importance": 0.7, "recurrent": false} │ move to 9:30am'
+    fixed_start: '14:00'
+- input: 'modify: {"name": "standup", "fixed_time": true, "fixed_start": "09:00",
+    "duration": 15, "category": "work", "difficulty": 0.1, "importance": 0.7, "recurrent":
+    false} │ move to 9:30am'
   output:
-    fixed_start: "09:30"
-
-- input: 'modify: {"name": "dinner", "fixed_time": true, "fixed_start": "18:00", "duration": 45, "category": "personal", "difficulty": 0.2, "importance": 0.6, "recurrent": false} │ change to 7pm'
+    fixed_start: 09:30
+- input: 'modify: {"name": "dinner", "fixed_time": true, "fixed_start": "18:00", "duration":
+    45, "category": "personal", "difficulty": 0.2, "importance": 0.6, "recurrent":
+    false} │ change to 7pm'
   output:
-    fixed_start: "19:00"
-
-# ── Cancel Fixed Time ────────────────────────────────────────────────────────
-- input: 'modify: {"name": "dentist", "fixed_time": true, "fixed_start": "14:00", "duration": 60, "category": "health", "difficulty": 0.2, "importance": 0.8, "recurrent": false} │ cancel fixed time'
+    fixed_start: '19:00'
+- input: 'modify: {"name": "dentist", "fixed_time": true, "fixed_start": "14:00",
+    "duration": 60, "category": "health", "difficulty": 0.2, "importance": 0.8, "recurrent":
+    false} │ cancel fixed time'
   output:
     fixed_time: false
-    fixed_start: null
-
-- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "15:00", "duration": 60, "category": "work", "difficulty": 0.2, "importance": 0.6, "recurrent": false} │ make it flexible'
+- input: 'modify: {"name": "meeting", "fixed_time": true, "fixed_start": "15:00",
+    "duration": 60, "category": "work", "difficulty": 0.2, "importance": 0.6, "recurrent":
+    false} │ make it flexible'
   output:
     fixed_time: false
-    fixed_start: null
-
-# ── Deadline Changes ─────────────────────────────────────────────────────────
-- input: 'modify: {"name": "report", "deadline": "Friday", "duration": 120, "category": "work", "difficulty": 0.5, "importance": 0.7, "fixed_time": false, "recurrent": false} │ push deadline to next Monday'
+- input: 'modify: {"name": "report", "deadline": "Friday", "duration": 120, "category":
+    "work", "difficulty": 0.5, "importance": 0.7, "fixed_time": false, "recurrent":
+    false} │ push deadline to next Monday'
   output:
     deadline: next Monday
-
-- input: 'modify: {"name": "assignment", "deadline": "tomorrow", "duration": 90, "category": "study", "difficulty": 0.6, "importance": 0.85, "fixed_time": false, "recurrent": false} │ extend to next week'
+- input: 'modify: {"name": "assignment", "deadline": "tomorrow", "duration": 90, "category":
+    "study", "difficulty": 0.6, "importance": 0.85, "fixed_time": false, "recurrent":
+    false} │ extend to next week'
   output:
     deadline: next week
-
-# ── Location Changes ─────────────────────────────────────────────────────────
-- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.6, "importance": 0.7, "location": "home"} │ do it at the library instead'
+- input: 'modify: {"name": "study", "category": "study", "difficulty": 0.6, "importance":
+    0.7, "location": "home"} │ do it at the library instead'
   output:
     location: library
-
-- input: 'modify: {"name": "work", "category": "work", "difficulty": 0.5, "importance": 0.75, "location": "office"} │ working from home today'
+- input: 'modify: {"name": "work", "category": "work", "difficulty": 0.5, "importance":
+    0.75, "location": "office"} │ working from home today'
   output:
     location: home
-
-- input: 'modify: {"name": "meet client", "category": "work", "difficulty": 0.3, "importance": 0.8, "location": "office"} │ meeting at the coffee shop instead'
+- input: 'modify: {"name": "meet client", "category": "work", "difficulty": 0.3, "importance":
+    0.8, "location": "office"} │ meeting at the coffee shop instead'
   output:
     location: coffee shop
-
-- input: 'modify: {"name": "gym session", "category": "fitness", "difficulty": 0.6, "importance": 0.5, "location": "gym"} │ do it at home'
+- input: 'modify: {"name": "gym session", "category": "fitness", "difficulty": 0.6,
+    "importance": 0.5, "location": "gym"} │ do it at home'
   output:
     location: home
-
-- input: 'modify: {"name": "team lunch", "category": "social", "difficulty": 0.1, "importance": 0.55} │ do it at the restaurant on main street'
+- input: 'modify: {"name": "team lunch", "category": "social", "difficulty": 0.1,
+    "importance": 0.55} │ do it at the restaurant on main street'
   output:
     location: restaurant
-
-- input: 'modify: {"name": "call", "category": "work", "difficulty": 0.25, "importance": 0.75} │ take it remotely'
+- input: 'modify: {"name": "call", "category": "work", "difficulty": 0.25, "importance":
+    0.75} │ take it remotely'
   output:
     location: online
-
-- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance": 0.5} │ change it to the park'
+- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance":
+    0.5} │ change it to the park'
   output:
     location: park
-
-# ── Multi-Field Changes ──────────────────────────────────────────────────────
-- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.5, "importance": 0.7, "duration": "60 minutes"} │ its urgent and will take 3 hours'
+- input: 'modify: {"name": "fix bug", "category": "work", "difficulty": 0.5, "importance":
+    0.7, "duration": "60 minutes"} │ its urgent and will take 3 hours'
   output:
     importance: 0.95
     duration: 180
-
-- input: 'modify: {"name": "study session", "category": "study", "difficulty": 0.5, "importance": 0.7, "duration": "60 minutes", "location": "home"} │ do it at the library for 2 hours'
+- input: 'modify: {"name": "study session", "category": "study", "difficulty": 0.5,
+    "importance": 0.7, "duration": "60 minutes", "location": "home"} │ do it at the
+    library for 2 hours'
   output:
     duration: 120
     location: library
-
-- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance": 0.5, "duration": "60 minutes"} │ light 30 min session at home'
+- input: 'modify: {"name": "gym", "category": "fitness", "difficulty": 0.6, "importance":
+    0.5, "duration": "60 minutes"} │ light 30 min session at home'
   output:
     difficulty: 0.2
     duration: 30
     location: home
-
-- input: 'modify: {"name": "write report", "category": "work", "difficulty": 0.5, "importance": 0.75, "deadline": "Friday"} │ very important, due tomorrow'
+- input: 'modify: {"name": "write report", "category": "work", "difficulty": 0.5,
+    "importance": 0.75, "deadline": "Friday"} │ very important, due tomorrow'
   output:
     importance: 0.95
     deadline: tomorrow
-
-- input: 'modify: {"name": "team meeting", "category": "work", "fixed_time": true, "fixed_start": "15:00", "duration": "60 minutes"} │ move to 2pm and cut to 30 min'
+- input: 'modify: {"name": "team meeting", "category": "work", "fixed_time": true,
+    "fixed_start": "15:00", "duration": "60 minutes"} │ move to 2pm and cut to 30
+    min'
   output:
-    fixed_start: "14:00"
+    fixed_start: '14:00'
     duration: 30
-
-- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1, "importance": 0.55, "duration": "15 minutes"} │ 30 minutes and its very important today'
+- input: 'modify: {"name": "meditate", "category": "health", "difficulty": 0.1, "importance":
+    0.55, "duration": "15 minutes"} │ 30 minutes and its very important today'
   output:
     duration: 30
     importance: 0.82
-
-- input: 'modify: {"name": "go to gym", "category": "fitness", "difficulty": 0.6, "importance": 0.5} │ actually this is a hard competition prep session, very important'
+- input: 'modify: {"name": "go to gym", "category": "fitness", "difficulty": 0.6,
+    "importance": 0.5} │ actually this is a hard competition prep session, very important'
   output:
     difficulty: 0.9
     importance: 0.85
