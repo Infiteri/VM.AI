@@ -1,9 +1,8 @@
 """
-    VM-AI - Data Generator
-    Generates training data in pipe format: name=x | deadline=y | difficulty=0.75
+    VM-AI - Data Generator with EXP/PRD Tag Support
+    Generates training data in pipe format with explicit/predicted tags:
+    name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
     Run: python src/parser/data_generator.py
-
-    Written by: Vanea
 """
 
 import vars
@@ -12,103 +11,27 @@ import random
 import argparse
 import re
 from datasets import Dataset
+from schemas import (
+    schema_to_pipe, changed_to_pipe, normalize_duration, 
+    normalize_deadline, normalize_time, clamp_category,
+    detect_explicit_fields, DIFFICULTY_KEYWORDS, IMPORTANCE_KEYWORDS,
+    CATEGORY_KEYWORDS, DURATION_KEYWORDS, TIME_KEYWORDS, RECURRENCE_KEYWORDS
+)
 
-PREDICTED_FIELDS = {"difficulty", "duration", "category", "location", "importance", "start"}
-FIELD_MAP = {
-    "TASK":       "name",
-    "DEADLINE":   "deadline",
-    "DATE":       "start",
-    "TIME":       "start",
-    "DURATION":   "duration",
-    "LOCATION":   "location",
-    "PRIORITY":   "importance",
-    "DIFFICULTY": "difficulty",
-    "CATEGORY":   "category",
-}
-
-DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+PREDICTED_FIELDS = vars.PREDICTED_FIELDS
+FIELD_MAP = vars.FIELD_MAP if hasattr(vars, 'FIELD_MAP') else {}
+DAYS = vars.DAYS
 DAYS_LOWER = {d.lower(): d for d in DAYS}
 
-RECURRENT_KEYWORDS = [
-    "every", "daily", "each", "weekday", "weekly",
-    "every morning", "every evening", "every night", "every afternoon",
-]
-
-# Fixed vocab for start/deadline normalization
-_VALID_RELATIVE_TIMES = {
-    "today", "tomorrow", "tonight", "this weekend", "next week",
-    "this week", "next month",
-}
-_VALID_DAYS = set(DAYS + [d.lower() for d in DAYS])
-
-# ── value generators ──────────────────────────────────────────────────────────
-
+# ── Random Generators ────────────────────────────────────────────────────────
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
 
-def _normalize_deadline(val) -> str | None:
-    """Normalize deadline/start to a small fixed vocabulary."""
-    if val is None:
-        return None
-    s = str(val).lower().strip()
-    # Already valid relative time
-    if s in _VALID_RELATIVE_TIMES:
-        return s
-    # Day name (exact match)
-    if s in _VALID_DAYS:
-        for d in DAYS:
-            if d.lower() == s:
-                return d
-    # "next X" patterns
-    for d in DAYS:
-        if f"next {d.lower()}" in s:
-            return f"next {d}"
-    if "next week" in s:
-        return "next week"
-    if "tomorrow" in s:
-        return "tomorrow"
-    if "today" in s:
-        return "today"
-    if "tonight" in s:
-        return "tonight"
-    if "this weekend" in s or "weekend" in s:
-        return "this weekend"
-    if "end of day" in s or "eod" in s:
-        return "today"
-    if "end of week" in s:
-        return "this weekend"
-    if "end of month" in s:
-        return "next week"
-    # Strip specific dates like "January 15th" -> "next week"
-    month_names = [
-        "january", "february", "march", "april", "may", "june",
-        "july", "august", "september", "october", "november", "december"
-    ]
-    for m in month_names:
-        if m in s:
-            return "next week"
-    if "q1" in s or "q2" in s or "q3" in s or "q4" in s:
-        return "next week"
-    if "asap" in s or "soon" in s:
-        return "tomorrow"
-    # Strip day names embedded in longer strings
-    for d in DAYS:
-        if d.lower() in s:
-            return d
-    return s
-
 def _rand_deadline():
-    return random.choice([
-        "Sunday", "next Monday", "Friday", "tomorrow", "tonight",
-        "end of day", "end of week", "next week", "this weekend",
-        "Wednesday", "Thursday", "next Friday", "in 2 days", "in 3 days",
-    ])
+    return random.choice(["Sunday", "next Monday", "Friday", "tomorrow", "next week", "this weekend", "Wednesday", "Thursday"])
 
 def _rand_location():
-    return random.choice([
-        "home", "office", "gym", "library", "online",
-        "school", "the coffee shop", "the park", "remotely", "university",
-    ])
+    return random.choice(["home", "office", "gym", "library", "online", "school", "the coffee shop", "the park"])
 
 def _rand_difficulty():
     return str(round(random.uniform(0.1, 0.95), 2))
@@ -117,268 +40,47 @@ def _rand_importance():
     return str(round(random.uniform(0.1, 0.99), 2))
 
 def _rand_category():
-    return random.choice([
-        "work", "study", "fitness", "health", "personal",
-        "finance", "home", "family", "social", "errands",
-        "travel", "creative", "learning", "admin", "shopping",
-    ])
+    return random.choice(list(vars.VALID_CATEGORIES))
 
 def _rand_name():
-    return random.choice([
-        "finish the report", "review the document", "send the email",
-        "prepare the presentation", "call the client", "fix the bug",
-        "write the summary", "update the spreadsheet", "run the tests",
-        "book the appointment", "draft the proposal", "pay the bill",
-        "go for a run", "cook dinner", "study for the exam",
-    ])
+    return random.choice(["finish the report", "review the document", "send the email", "prepare the presentation", "call the client", "fix the bug"])
 
 def _rand_time():
-    return random.choice([
-        "08:00", "09:00", "10:00", "11:00", "12:00",
-        "13:00", "14:00", "15:00", "16:00", "17:00",
-        "18:00", "19:00", "20:00",
-    ])
+    return random.choice(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"])
 
 def _rand_recurrence_days():
     count = random.randint(1, 3)
     return ",".join(random.sample(DAYS, k=count))
 
-
 # ── CHANGE_TEMPLATES ──────────────────────────────────────────────────────────
-# Each entry: (field_name, phrase_fn(value)->str, value_fn()->str)
-# Multiple phrase variants per field are listed as separate tuples so they get
-# sampled uniformly — the field just appears more than once in the list.
 
 CHANGE_TEMPLATES = [
-
-    # ── duration ──────────────────────────────────────────────────────────────
-    ("duration", lambda v: f"make it {v} minutes",                      _rand_duration),
-    ("duration", lambda v: f"change duration to {v} minutes",           _rand_duration),
-    ("duration", lambda v: f"it should take {v} minutes",               _rand_duration),
-    ("duration", lambda v: f"set the duration to {v} minutes",          _rand_duration),
-    ("duration", lambda v: f"block {v} minutes for this",               _rand_duration),
-    ("duration", lambda v: f"give it {v} minutes",                      _rand_duration),
-    ("duration", lambda v: f"it'll only take {v} minutes",              _rand_duration),
-    ("duration", lambda v: f"make it last {v} minutes",                 _rand_duration),
-    ("duration", lambda v: f"change it to {v} minutes",                 _rand_duration),
-    ("duration", lambda v: f"adjust duration to {v} minutes",           _rand_duration),
-
-    # ── deadline ──────────────────────────────────────────────────────────────
-    ("deadline", lambda v: f"push deadline to {v}",                     _rand_deadline),
-    ("deadline", lambda v: f"move the deadline to {v}",                 _rand_deadline),
-    ("deadline", lambda v: f"it's due {v} now",                        _rand_deadline),
-    ("deadline", lambda v: f"change the due date to {v}",              _rand_deadline),
-    ("deadline", lambda v: f"needs to be done by {v}",                 _rand_deadline),
-    ("deadline", lambda v: f"deadline is {v}",                         _rand_deadline),
-    ("deadline", lambda v: f"extend the deadline to {v}",              _rand_deadline),
-    ("deadline", lambda v: f"move the due date to {v}",                _rand_deadline),
-    ("deadline", lambda v: f"push the due date to {v}",                _rand_deadline),
-    ("deadline", lambda v: f"change deadline to {v}",                  _rand_deadline),
-    ("deadline", lambda v: f"shift deadline to {v}",                   _rand_deadline),
-    ("deadline", lambda v: f"delay to {v}",                            _rand_deadline),
-    ("deadline", lambda v: f"move it to {v}",                          _rand_deadline),
-    ("deadline", lambda v: f"reschedule to {v}",                       _rand_deadline),
-
-    # ── location ──────────────────────────────────────────────────────────────
-    ("location", lambda v: f"do it at {v}",                             _rand_location),
-    ("location", lambda v: f"change location to {v}",                   _rand_location),
-    ("location", lambda v: f"it'll be at {v}",                         _rand_location),
-    ("location", lambda v: f"move it to {v}",                          _rand_location),
-    ("location", lambda v: f"it's happening at {v}",                   _rand_location),
-    ("location", lambda v: f"do this from {v}",                        _rand_location),
-    ("location", lambda v: f"move the location to {v}",                _rand_location),
-    ("location", lambda v: f"change venue to {v}",                     _rand_location),
-    ("location", lambda v: f"do it from {v} instead",                  _rand_location),
-    ("location", lambda v: f"switch location to {v}",                  _rand_location),
-
-    # ── difficulty ────────────────────────────────────────────────────────────
-    ("difficulty", lambda v: f"it's a {'hard' if float(v) > 0.5 else 'light'} session",     _rand_difficulty),
-    ("difficulty", lambda v: f"this is {'very difficult' if float(v) > 0.7 else 'pretty easy'}",  _rand_difficulty),
-    ("difficulty", lambda v: f"mark it as {'hard' if float(v) > 0.5 else 'easy'}",          _rand_difficulty),
-    ("difficulty", lambda v: f"difficulty is {'high' if float(v) > 0.6 else 'low'}",        _rand_difficulty),
-    ("difficulty", lambda v: f"it's going to be {'tough' if float(v) > 0.6 else 'simple'}", _rand_difficulty),
-    ("difficulty", lambda v: f"make it {'harder' if float(v) > 0.5 else 'easier'}",         _rand_difficulty),
-    ("difficulty", lambda v: f"it's actually {'difficult' if float(v) > 0.5 else 'simple'}", _rand_difficulty),
-    ("difficulty", lambda v: f"change difficulty to {'high' if float(v) > 0.5 else 'low'}",  _rand_difficulty),
-    ("difficulty", lambda v: f"adjust it to {'challenging' if float(v) > 0.5 else 'easy'}",  _rand_difficulty),
-    ("difficulty", lambda v: f"this should be {'intense' if float(v) > 0.5 else 'light'}",   _rand_difficulty),
-
-    # ── importance ────────────────────────────────────────────────────────────
-    ("importance", lambda v: f"it's {'very important' if float(v) > 0.5 else 'not urgent'}",        _rand_importance),
+    ("duration", lambda v: f"make it {v} minutes", _rand_duration),
+    ("duration", lambda v: f"change duration to {v} minutes", _rand_duration),
+    ("duration", lambda v: f"it should take {v} minutes", _rand_duration),
+    ("deadline", lambda v: f"push deadline to {v}", _rand_deadline),
+    ("deadline", lambda v: f"move the deadline to {v}", _rand_deadline),
+    ("location", lambda v: f"do it at {v}", _rand_location),
+    ("location", lambda v: f"change location to {v}", _rand_location),
+    ("difficulty", lambda v: f"mark it as {'hard' if float(v) > 0.5 else 'easy'}", _rand_difficulty),
     ("importance", lambda v: f"mark it as {'high priority' if float(v) > 0.5 else 'low priority'}", _rand_importance),
-    ("importance", lambda v: f"this is {'critical' if float(v) > 0.7 else 'optional'}",             _rand_importance),
-    ("importance", lambda v: f"set priority to {'high' if float(v) > 0.5 else 'low'}",              _rand_importance),
-    ("importance", lambda v: f"it's {'urgent' if float(v) > 0.6 else 'not a priority'}",            _rand_importance),
-    ("importance", lambda v: f"make it {'more important' if float(v) > 0.5 else 'less urgent'}",    _rand_importance),
-    ("importance", lambda v: f"it's actually {'essential' if float(v) > 0.5 else 'nice to have'}",  _rand_importance),
-    ("importance", lambda v: f"change importance to {'critical' if float(v) > 0.5 else 'low'}",     _rand_importance),
-    ("importance", lambda v: f"this needs to be {'a priority' if float(v) > 0.5 else 'optional'}",  _rand_importance),
-    ("importance", lambda v: f"set it as {'top priority' if float(v) > 0.5 else 'low priority'}",   _rand_importance),
-
-    # ── category ──────────────────────────────────────────────────────────────
-    ("category", lambda v: f"categorize it as {v}",                    _rand_category),
-    ("category", lambda v: f"it's a {v} task",                         _rand_category),
-    ("category", lambda v: f"put it under {v}",                        _rand_category),
-    ("category", lambda v: f"move it to {v}",                          _rand_category),
-    ("category", lambda v: f"change category to {v}",                  _rand_category),
-    ("category", lambda v: f"this belongs in {v}",                     _rand_category),
-    ("category", lambda v: f"actually it's a {v} thing",               _rand_category),
-    ("category", lambda v: f"reclassify as {v}",                       _rand_category),
-    ("category", lambda v: f"make it a {v} task",                      _rand_category),
-    ("category", lambda v: f"it's really {v}",                         _rand_category),
-
-    # ── name ──────────────────────────────────────────────────────────────────
-    ("name", lambda v: f"rename it to {v}",                            _rand_name),
-    ("name", lambda v: f"change the name to {v}",                      _rand_name),
-    ("name", lambda v: f"call it {v} instead",                         _rand_name),
-    ("name", lambda v: f"the task is actually {v}",                    _rand_name),
-    ("name", lambda v: f"update name to {v}",                          _rand_name),
-    ("name", lambda v: f"let's call it {v}",                           _rand_name),
-    ("name", lambda v: f"change it to {v}",                            _rand_name),
-    ("name", lambda v: f"rename to {v}",                               _rand_name),
-
-    # ── fixed_time / fixed_start ──────────────────────────────────────────────
-    ("fixed_time+fixed_start", lambda v: f"set it for {v}",            _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"schedule it at {v}",        _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"it starts at {v}",          _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"pin it to {v}",             _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"lock it in at {v}",         _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"the time is {v}",           _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"move it to {v}",            _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"reschedule to {v}",         _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"change time to {v}",        _rand_time),
-    ("fixed_time+fixed_start", lambda v: f"shift it to {v}",           _rand_time),
-
-    # ── cancel fixed_time ─────────────────────────────────────────────────────
-    ("cancel_fixed_time", lambda v: "cancel fixed time",              lambda: "false"),
-    ("cancel_fixed_time", lambda v: "remove the fixed time",          lambda: "false"),
-    ("cancel_fixed_time", lambda v: "no longer needs a fixed time",   lambda: "false"),
-    ("cancel_fixed_time", lambda v: "make it flexible",               lambda: "false"),
-
-    # ── recurrent / recurrence_days ───────────────────────────────────────────
-    ("recurrent+recurrence_days", lambda v: f"make it repeat every {v}",             _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"schedule it every {v}",                _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"it should happen each {v}",            _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"set it as recurring on {v}",           _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"repeat this on {v}",                   _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"it recurs on {v}",                     _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"make it recurring every {v}",          _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"change recurrence to {v}",             _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"set recurrence days to {v}",           _rand_recurrence_days),
-    ("recurrent+recurrence_days", lambda v: f"it should be every {v}",               _rand_recurrence_days),
-
-    # ── cancel recurrent ───────────────────────────────────────────────────────
-    ("cancel_recurrent", lambda v: "cancel recurrence",               lambda: "false"),
-    ("cancel_recurrent", lambda v: "make it one-time",                lambda: "false"),
-    ("cancel_recurrent", lambda v: "no longer recurring",             lambda: "false"),
-    ("cancel_recurrent", lambda v: "stop the recurrence",             lambda: "false"),
+    ("category", lambda v: f"categorize it as {v}", _rand_category),
+    ("name", lambda v: f"rename it to {v}", _rand_name),
+    ("fixed_time+fixed_start", lambda v: f"set it for {v}", _rand_time),
+    ("cancel_fixed_time", lambda v: "cancel fixed time", lambda: "false"),
+    ("recurrent+recurrence_days", lambda v: f"make it repeat every {v}", _rand_recurrence_days),
+    ("cancel_recurrent", lambda v: "cancel recurrence", lambda: "false"),
 ]
-
-
-def _normalize_duration_to_minutes(val) -> str:
-    """Convert any duration value to integer minutes string."""
-    if val is None:
-        return None
-    val = str(val).lower().strip()
-    if val.isdigit():
-        return val
-    match = re.search(r'(\d+(?:\.\d+)?)\s*hours?', val)
-    if match:
-        return str(int(float(match.group(1)) * 60))
-    match = re.search(r'(\d+(?:\.\d+)?)\s*(?:minutes?|min)', val)
-    if match:
-        return str(int(float(match.group(1))))
-    if "half" in val and "day" in val:
-        return "720"
-    if "all day" in val:
-        return "960"
-    match = re.search(r'(\d+(?:\.\d+)?)', val)
-    if match:
-        num = float(match.group(1))
-        return str(int(num * 60)) if num <= 24 else str(int(num))
-    return None
-
-
-def _normalize_time_standalone(time_str: str) -> str | None:
-    """Convert various time formats to HH:MM."""
-    if not time_str:
-        return None
-    time_str = str(time_str).strip().lower()
-    match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm)', time_str)
-    if match:
-        hour = int(match.group(1))
-        minute = int(match.group(2)) if match.group(2) else 0
-        ampm = match.group(3)
-        if ampm == "pm" and hour != 12:
-            hour += 12
-        elif ampm == "am" and hour == 12:
-            hour = 0
-        return f"{hour:02d}:{minute:02d}"
-    if "morning" in time_str:
-        return "08:00"
-    if "afternoon" in time_str:
-        return "13:00"
-    if "evening" in time_str:
-        return "18:00"
-    if "noon" in time_str:
-        return "12:00"
-    if "midnight" in time_str:
-        return "00:00"
-    if re.match(r'^\d{1,2}:\d{2}$', time_str):
-        # Validate hour range
-        parts = time_str.split(":")
-        h = int(parts[0])
-        if 0 <= h <= 23:
-            return time_str
-    return None
-
-
-def schema_to_pipe(schema: dict) -> str:
-    parts = []
-    for field, entry in schema.items():
-        val = entry["value"]
-        if val is None:
-            continue
-        if field == "duration":
-            val = _normalize_duration_to_minutes(val)
-            if val is None:
-                continue
-        if isinstance(val, bool):
-            parts.append(f"{field}={'true' if val else 'false'}")
-        elif isinstance(val, list):
-            parts.append(f"{field}={','.join(val)}")
-        else:
-            parts.append(f"{field}={val}")
-    return " | ".join(parts)
-
-
-def changed_to_pipe(changed: dict) -> str:
-    parts = []
-    for field, entry in changed.items():
-        val = entry["value"]
-        if val is None:
-            continue
-        if field == "duration":
-            val = _normalize_duration_to_minutes(val)
-            if val is None:
-                continue
-        if isinstance(val, bool):
-            parts.append(f"{field}={'true' if val else 'false'}")
-        else:
-            parts.append(f"{field}={val}")
-    return " | ".join(parts)
 
 
 class DataGenerator:
     def __init__(self, training_data, real_examples=None, specific_examples=None):
-        self.training_data     = training_data
-        self.real_examples     = real_examples or []
+        self.training_data = training_data
+        self.real_examples = real_examples or []
         self.specific_examples = specific_examples or []
 
-    # ── public generate methods ───────────────────────────────────────────────
-
     def generate(self, max_examples=10000):
-        """Standard mixed add+modify generation (original behaviour)."""
+        """Generate mixed add+modify dataset with EXP/PRD tags."""
         half = max_examples // 2
         data = {"input_text": [], "target_text": []}
 
@@ -392,7 +94,6 @@ class DataGenerator:
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
-        # real examples included twice for extra weight
         for example in self.real_examples:
             inp, tgt = self._convert_real(example)
             data["input_text"].append(inp)
@@ -411,21 +112,12 @@ class DataGenerator:
         return Dataset.from_dict(data)
 
     def generate_modify_only(self, max_examples=5000):
-        """
-        Generate a modify-only dataset for targeted fine-tuning.
-        Produces purely modify: examples — no add: examples at all.
-        Target output is the FULL updated task (not just changed fields).
-        Real modify examples (if any exist in real/specific data) are
-        included with 3× repetition for extra weight.
-        """
         data = {"input_text": [], "target_text": []}
-
         for _ in range(max_examples):
             inp, tgt = self._generate_modify_full()
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
-        # Pull real modify examples from labeled data (3× weight)
         for example in self.real_examples + self.specific_examples:
             if not isinstance(example.get("input"), str):
                 continue
@@ -434,17 +126,14 @@ class DataGenerator:
                 for _ in range(3):
                     data["input_text"].append(inp)
                     data["target_text"].append(tgt)
-
         return Dataset.from_dict(data)
 
-    # ── internal helpers ──────────────────────────────────────────────────────
-
     def _fill_template(self):
-        templates        = self.training_data.templates
+        templates = self.training_data.templates
         all_placeholders = self.training_data.get_placeholder_map()
-        template         = random.choice(templates)
-        sentence         = template
-        placeholder_map  = {}
+        template = random.choice(templates)
+        sentence = template
+        placeholder_map = {}
         for ph, options in all_placeholders.items():
             tag = f"[{ph}]"
             while tag in sentence:
@@ -453,115 +142,38 @@ class DataGenerator:
                 placeholder_map[ph] = value
         return sentence.lower().strip(), placeholder_map
 
-    def _has_explicit_time(self, sentence: str) -> bool:
-        s = sentence.lower()
-        patterns = [
-            r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',
-            r'at\s+\d{1,2}\s*(?:am|pm)',
-            r'at\s+(morning|afternoon|evening|noon|midnight)',
-            r'\d{1,2}:\d{2}\s*(?:am|pm)',
-            r'\d{1,2}\s*(?:am|pm)',
-            r'(morning|afternoon|evening|noon|midnight)(?!\s+(?:at|in|on))',
-            r'sharp',
-        ]
-        return any(re.search(p, s) for p in patterns)
+    # ── Keyword-based Inference ───────────────────────────────────────────────
 
-    # Keyword-to-location mapping
-    _LOCATION_KEYWORDS = {
-        "at the library": "library", "at library": "library", "library": "library",
-        "at the gym": "gym", "at gym": "gym", "gym": "gym",
-        "at the office": "office", "at office": "office", "office": "office",
-        "at home": "home", "from home": "home", "home": "home",
-        "at the coffee shop": "coffee shop", "coffee shop": "coffee shop",
-        "at the park": "park", "park": "park",
-        "at school": "school", "school": "school",
-        "at the store": "store", "store": "store",
-        "at the supermarket": "supermarket", "supermarket": "supermarket",
-        "at the restaurant": "restaurant", "restaurant": "restaurant",
-        "online": "online", "remotely": "online",
-        "at the hospital": "hospital", "hospital": "hospital",
-        "at the bank": "bank", "bank": "bank",
-        "at the pharmacy": "pharmacy", "pharmacy": "pharmacy",
-    }
-
-    # Keyword-to-category mapping for inference simulation
-    # Checked in order: longer/more-specific phrases first
     _TASK_CATEGORY_MAP = {
-        # Work - specific task names
         "migration": "work", "deploy": "work", "refactor": "work", "optimize": "work",
         "code": "work", "bug": "work", "crash": "work", "fix": "work",
         "presentation": "work", "meeting": "work", "standup": "work",
         "report": "work", "email": "work", "client": "work", "invoice": "work",
-        "budget": "work", "contract": "work", "proposal": "work", "sprint": "work",
-        "test": "work", "review": "work", "document": "work", "urgent": "work",
-        "deadline": "work", "project": "work",
-        # Study
         "exam": "study", "homework": "study", "lecture": "study",
         "thesis": "study", "assignment": "study", "tutor": "study",
         "study session": "study", "study": "study",
-        "library": "study", "reading": "study", "research": "study",
-        # Fitness
-        "foam roll": "fitness", "gym": "fitness", "run": "fitness",
-        "yoga": "fitness", "workout": "fitness", "swim": "fitness",
-        "cycle": "fitness", "jog": "fitness", "stretch": "fitness",
-        "meditation": "fitness",
-        # Health
+        "gym": "fitness", "run": "fitness", "yoga": "fitness",
+        "workout": "fitness", "swim": "fitness", "cycle": "fitness",
         "doctor": "health", "medication": "health", "dentist": "health",
-        "pharmacy": "health", "checkup": "health", "meditate": "health",
-        "prescription": "health", "massage": "health",
-        # Finance
+        "meditate": "health", "prescription": "health",
         "rent": "finance", "bill": "finance", "tax": "finance", "taxes": "finance",
-        "bank": "finance", "payment": "finance", "budget": "finance",
-        "invest": "finance", "insurance": "finance", "savings": "finance",
-        # Home
+        "bank": "finance", "payment": "finance",
         "clean": "home", "laundry": "home", "cook": "home",
         "dinner": "home", "lunch": "home", "breakfast": "home",
-        # Family - higher priority for personal calls
-        "call mom": "personal", "call dad": "personal", "call parents": "personal",
-        "kids": "family", "children": "family", "school": "family",
-        # Social
+        "call mom": "personal", "call dad": "personal",
+        "kids": "family", "children": "family",
         "friend": "social", "party": "social", "movie": "social",
-        "cinema": "social",
-        # Travel
         "flight": "travel", "hotel": "travel", "passport": "travel",
-        "trip": "travel", "pack": "travel",
-        # Creative
-        "write": "creative", "guitar": "creative", "draw": "creative",
-        "blog": "creative", "podcast": "creative", "video": "creative",
-        "design": "creative", "song": "creative", "photography": "creative",
-        "paint": "creative",
-        # Learning
+        "guitar": "creative", "draw": "creative", "blog": "creative",
         "spanish": "learning", "piano": "learning", "learn": "learning",
-        "flashcard": "learning",
-        # Shopping
         "groceries": "shopping", "gift": "shopping", "buy": "shopping",
-        "shopping": "shopping", "supermarket": "shopping", "grocery": "shopping",
-        "household supplies": "shopping",
-        # Errands
+        "shopping": "shopping", "supermarket": "shopping",
         "return": "errands", "package": "errands",
-        "post office": "errands",
-        # Admin
         "password": "admin", "backup": "admin", "config": "admin",
-        "files": "admin", "form": "admin",
-    }
-
-    _DIFFICULTY_KEYWORDS = {
-        "hard": 0.8, "difficult": 0.85, "challenging": 0.8, "complex": 0.75,
-        "intense": 0.9, "heavy": 0.85, "tough": 0.75, "urgent": 0.75,
-        "easy": 0.15, "simple": 0.2, "light": 0.25, "quick": 0.2,
-        "moderate": 0.5, "medium": 0.5,
-    }
-
-    _IMPORTANCE_KEYWORDS = {
-        "urgent": 0.9, "critical": 0.95, "asap": 0.92, "emergency": 0.98,
-        "important": 0.75, "high priority": 0.8, "must": 0.85,
-        "low priority": 0.2, "not urgent": 0.2, "minor": 0.25,
-        "can wait": 0.3, "whenever": 0.15,
     }
 
     def _infer_category(self, sentence: str) -> str:
         s = sentence.lower()
-        # Check multi-word phrases first (more specific), using word boundary matching
         for keyword in sorted(self._TASK_CATEGORY_MAP.keys(), key=len, reverse=True):
             if re.search(r'\b' + re.escape(keyword) + r'\b', s):
                 return self._TASK_CATEGORY_MAP[keyword]
@@ -569,224 +181,117 @@ class DataGenerator:
 
     def _infer_difficulty(self, sentence: str) -> str:
         s = sentence.lower()
-        
-        # FIRST: Check for text keywords (highest priority)
-        for keyword, val in self._DIFFICULTY_KEYWORDS.items():
-            match = re.search(r'\b' + re.escape(keyword) + r'\b', s)
-            if match:
-                # Check for negation
-                prefix = s[:match.start()].strip()
-                if prefix.endswith("not") or prefix.endswith("non") or prefix.endswith("never"):
-                    return str(round(0.15 + random.uniform(-0.05, 0.05), 2))
+        # Use local keywords since imported ones are sets
+        local_keywords = {"hard": 0.8, "difficult": 0.85, "challenging": 0.8, "complex": 0.75, "intense": 0.9, "heavy": 0.85, "tough": 0.75, "urgent": 0.75, "easy": 0.15, "simple": 0.2, "light": 0.25, "quick": 0.2, "moderate": 0.5, "medium": 0.5}
+        for keyword, val in local_keywords.items():
+            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        
-        # SECOND: Check for numeric difficulty values in the sentence (template fallback)
-        numeric_matches = re.findall(r'(?:^|[,\-–—\s])(0\.\d{1,2}|1\.0)(?:\s*,|\s*$|\s)', s)
-        for match in numeric_matches:
-            val = float(match)
-            if 0.0 <= val <= 1.0:
-                return str(val)
-        
-        all_numbers = re.findall(r'(?:^|\s)(0\.\d{1,2}|1\.0)(?:\s|$|,)', s)
-        for match in all_numbers:
-            val = float(match)
-            if 0.0 <= val <= 1.0:
-                return str(val)
-        
-        # THIRD: Task-type based defaults
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix", "emergency", "critical"]):
-            return str(round(random.uniform(0.7, 0.9), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["taxes", "tax", "deadline", "exam"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix", "emergency", "critical", "taxes", "tax", "exam"]):
             return str(round(random.uniform(0.6, 0.85), 2))
         if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["workout", "gym", "heavy", "hard"]):
             return str(round(random.uniform(0.6, 0.85), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation", "exam", "study"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation", "study"]):
             return str(round(random.uniform(0.5, 0.7), 2))
         if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["quick", "easy", "simple", "stretch"]):
             return str(round(random.uniform(0.1, 0.25), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["call", "email", "meeting", "pay", "clean"]):
-            return str(round(random.uniform(0.1, 0.4), 2))
         return str(round(random.uniform(0.3, 0.6), 2))
 
     def _infer_importance(self, sentence: str) -> str:
         s = sentence.lower()
-        
-        # FIRST: Check for text keywords (highest priority)
-        # Skip "urgent" if preceded by "not" or "non"
-        for keyword, val in self._IMPORTANCE_KEYWORDS.items():
-            match = re.search(r'\b' + re.escape(keyword) + r'\b', s)
-            if match:
-                # Check for negation
-                prefix = s[:match.start()].strip()
-                if prefix.endswith("not") or prefix.endswith("non") or prefix.endswith("never"):
-                    # Return low importance for negated keywords
-                    return str(round(0.15 + random.uniform(-0.05, 0.05), 2))
+        # Use local keywords since imported ones are sets
+        local_keywords = {"urgent": 0.9, "critical": 0.95, "asap": 0.92, "emergency": 0.98, "important": 0.75, "high priority": 0.8, "must": 0.85, "low priority": 0.2, "not urgent": 0.2, "minor": 0.25, "can wait": 0.3, "whenever": 0.15, "optional": 0.15}
+        for keyword, val in local_keywords.items():
+            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        
-        # SECOND: Check for numeric importance values in the sentence (template fallback)
-        all_decimals = re.findall(r'(0\.\d{1,2}|1\.0)', s)
-        if len(all_decimals) >= 2:
-            val = float(all_decimals[1])
-            if 0.0 <= val <= 1.0:
-                return str(val)
-        elif len(all_decimals) == 1:
-            val = float(all_decimals[0])
-            if 0.2 <= val <= 1.0:
-                return str(val)
-        
-        # THIRD: Task-type based defaults
-        if any(w in s for w in ["crash", "emergency", "critical", "urgent", "asap"]):
-            return str(round(random.uniform(0.9, 0.98), 2))
-        if any(w in s for w in ["taxes", "rent", "bill", "pay", "exam"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "emergency", "critical", "urgent", "asap", "taxes", "rent", "bill", "pay", "exam"]):
             return str(round(random.uniform(0.8, 0.95), 2))
-        if any(w in s for w in ["meeting", "presentation", "report"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meeting", "presentation", "report"]):
             return str(round(random.uniform(0.5, 0.7), 2))
-        if any(w in s for w in ["quick", "easy", "optional", "low priority"]):
-            return str(round(random.uniform(0.1, 0.3), 2))
-        if any(w in s for w in ["workout", "gym", "run", "yoga", "meditate"]):
-            return str(round(random.uniform(0.4, 0.6), 2))
         return str(round(random.uniform(0.4, 0.6), 2))
 
     def _infer_duration(self, sentence: str) -> str:
         s = sentence.lower()
-        # First check for explicit duration in the sentence
         match = re.search(r'(\d+)\s*(?:minute|min|hour|hr)', s)
         if match:
             val = int(match.group(1))
             if "hour" in s or "hr" in s:
                 return str(val * 60)
             return str(val)
-        # Task-type based duration inference
-        if any(w in s for w in ["crash", "bug", "fix", "critical"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix"]):
             return str(random.choice([60, 90, 120]))
-        if any(w in s for w in ["report", "write", "prepare", "presentation"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation"]):
             return str(random.choice([60, 90, 120]))
-        if any(w in s for w in ["workout", "gym", "yoga"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["workout", "gym", "yoga"]):
             return str(random.choice([45, 60, 90]))
-        if any(w in s for w in ["meeting", "standup", "call"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meeting", "call"]):
             return str(random.choice([15, 30, 45, 60]))
-        if any(w in s for w in ["run", "jog", "stretch"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["run", "jog", "stretch"]):
             return str(random.choice([15, 30, 45]))
-        if any(w in s for w in ["meditate", "meditation"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meditate", "meditation"]):
             return str(random.choice([10, 15, 20]))
-        if any(w in s for w in ["pay", "bill", "rent", "tax"]):
+        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["pay", "bill", "rent", "tax"]):
             return str(random.choice([5, 10, 15]))
-        if any(w in s for w in ["clean", "laundry", "cook"]):
-            return str(random.choice([30, 45, 60]))
-        if any(w in s for w in ["exam", "study session", "study"]):
-            return str(random.choice([60, 90, 120]))
-        if any(w in s for w in ["quick", "easy", "simple"]):
-            return str(random.choice([5, 10, 15]))
-        if any(w in s for w in ["shopping", "grocery"]):
-            return str(random.choice([30, 45, 60]))
-        if any(w in s for w in ["flight", "trip", "travel"]):
-            return str(random.choice([30, 60, 120]))
         return str(random.choice([30, 45, 60]))
 
     def _infer_location(self, sentence: str) -> str | None:
         s = sentence.lower()
-        # Check multi-word phrases first (more specific), using word boundary matching
-        for keyword in sorted(self._LOCATION_KEYWORDS.keys(), key=len, reverse=True):
-            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
-                return self._LOCATION_KEYWORDS[keyword]
+        locs = {"at the library": "library", "at the gym": "gym", "at home": "home", 
+                "from home": "home", "at the coffee shop": "coffee shop", 
+                "at the office": "office", "at the supermarket": "supermarket"}
+        for phrase, loc in sorted(locs.items(), key=len, reverse=True):
+            if phrase in s:
+                return loc
         return None
 
     def _build_schema(self, placeholder_map, sentence=""):
+        s = sentence.lower()
+        explicit_fields = detect_explicit_fields(sentence)
+        
         schema = {
-            "name":            {"value": None,  "predicted": False},
-            "start":           {"value": None,  "predicted": True},
-            "deadline":        {"value": None,  "predicted": False},
-            "difficulty":      {"value": None,  "predicted": True},
-            "duration":        {"value": None,  "predicted": True},
-            "category":        {"value": None,  "predicted": True},
-            "location":        {"value": None,  "predicted": True},
-            "importance":      {"value": None,  "predicted": True},
-            "fixed_time":      {"value": False, "predicted": False},
-            "fixed_start":     {"value": None,  "predicted": False},
-            "recurrent":       {"value": False, "predicted": False},
-            "recurrence_days": {"value": None,  "predicted": False},
+            "name": {"value": None, "predicted": "name" not in explicit_fields},
+            "start": {"value": None, "predicted": "start" not in explicit_fields},
+            "deadline": {"value": None, "predicted": "deadline" not in explicit_fields},
+            "difficulty": {"value": None, "predicted": "difficulty" not in explicit_fields},
+            "duration": {"value": None, "predicted": "duration" not in explicit_fields},
+            "category": {"value": None, "predicted": "category" not in explicit_fields},
+            "location": {"value": None, "predicted": "location" not in explicit_fields},
+            "importance": {"value": None, "predicted": "importance" not in explicit_fields},
+            "fixed_time": {"value": False, "predicted": "fixed_time" not in explicit_fields},
+            "fixed_start": {"value": None, "predicted": "fixed_start" not in explicit_fields},
+            "recurrent": {"value": False, "predicted": "recurrent" not in explicit_fields},
+            "recurrence_days": {"value": None, "predicted": "recurrence_days" not in explicit_fields},
         }
 
         for yaml_key, value in placeholder_map.items():
             field = FIELD_MAP.get(yaml_key)
             if not field:
                 continue
-            # For predicted fields, IGNORE placeholder values — infer from sentence instead
-            # This ensures the model learns keyword->value mappings, not random placeholder values
             if field in PREDICTED_FIELDS:
                 continue
-            schema[field]["value"]     = value
-            schema[field]["predicted"] = field in PREDICTED_FIELDS
+            schema[field]["value"] = value
+            schema[field]["predicted"] = False
 
-        s = sentence.lower()
+        # Always infer predicted fields from sentence content
+        schema["category"]["value"] = self._infer_category(s)
+        schema["difficulty"]["value"] = self._infer_difficulty(s)
+        schema["importance"]["value"] = self._infer_importance(s)
+        schema["duration"]["value"] = self._infer_duration(s)
+        
+        loc = self._infer_location(s)
+        if loc:
+            schema["location"]["value"] = loc
 
-        # ALWAYS infer predicted fields from the actual sentence content
-        # This is the key fix: the model sees sentences with keywords and learns
-        # to output the correct values based on those keywords
-        schema["category"]["value"]    = self._infer_category(s)
-        schema["difficulty"]["value"]  = self._infer_difficulty(s)
-        schema["importance"]["value"]  = self._infer_importance(s)
-        schema["duration"]["value"]    = self._infer_duration(s)
+        # Handle time/explicit time
+        time_match = re.search(r'(\d{1,2}(?::\d{2})?\s*(?:am|pm))', s)
+        if time_match:
+            schema["fixed_time"]["value"] = True
+            schema["fixed_start"]["value"] = normalize_time(time_match.group(0))
+            schema["start"]["value"] = None
+            schema["deadline"]["value"] = None
 
-        # Location: infer from keywords if not from placeholder
-        if schema["location"]["value"] is None:
-            schema["location"]["value"] = self._infer_location(s)
-
-        # Normalize duration to integer minutes
-        dur = schema["duration"]["value"]
-        if dur is not None:
-            schema["duration"]["value"] = _normalize_duration_to_minutes(dur)
-
-        # Normalize start and deadline to fixed vocab
-        start_val = schema["start"]["value"]
-        if start_val is not None:
-            schema["start"]["value"] = _normalize_deadline(start_val)
-        deadline_val = schema["deadline"]["value"]
-        if deadline_val is not None:
-            schema["deadline"]["value"] = _normalize_deadline(deadline_val)
-
-        at_time_patterns = [
-            r'at\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)',
-            r'at\s+\d{1,2}\s*(?:am|pm)',
-            r'at\s+(morning|afternoon|evening|noon|midnight)',
-        ]
-        has_at_time = any(re.search(p, s) for p in at_time_patterns)
-
-        other_time_patterns = [
-            r'\d{1,2}:\d{2}\s*(?:am|pm)',
-            r'\d{1,2}\s*(?:am|pm)',
-            r'(morning|afternoon|evening|noon|midnight)(?!\s+(?:at|in|on))',
-            r'sharp',
-        ]
-        has_other_time = any(re.search(p, s) for p in other_time_patterns)
-        has_explicit_time = has_at_time or has_other_time
-        has_recurrent     = any(kw in s for kw in RECURRENT_KEYWORDS)
-
-        if has_recurrent:
-            schema["recurrent"]["value"]      = True
-            schema["fixed_time"]["value"]     = False
-            schema["fixed_start"]["value"]    = None
-
-            time_label = None
-            if "morning" in s:
-                time_label = "morning"
-            elif "evening" in s:
-                time_label = "evening"
-            elif "night" in s:
-                time_label = "night"
-            elif "afternoon" in s:
-                time_label = "afternoon"
-            elif "noon" in s:
-                time_label = "noon"
-
-            if time_label:
-                schema["start"]["value"]     = time_label
-                schema["start"]["predicted"] = False
-                schema["deadline"]["value"]  = time_label
-            else:
-                schema["start"]["value"]     = None
-                schema["deadline"]["value"]  = None
-
+        # Handle recurrence
+        if any(kw in s for kw in ["every", "daily", "each", "weekday"]):
+            schema["recurrent"]["value"] = True
             if "every day" in s or "daily" in s:
                 schema["recurrence_days"]["value"] = DAYS.copy()
             elif "weekday" in s:
@@ -795,255 +300,33 @@ class DataGenerator:
                 mentioned = [DAYS_LOWER[d] for d in DAYS_LOWER if d in s]
                 schema["recurrence_days"]["value"] = mentioned if mentioned else random.sample(DAYS, k=random.randint(1, 3))
 
-        elif has_explicit_time:
-            schema["fixed_time"]["value"]  = True
-            schema["start"]["value"]       = None
-            schema["deadline"]["value"]    = None
+        # Handle deadline/start keywords
+        for d in DAYS:
+            if d.lower() in s:
+                schema["deadline"]["value"] = d
+                break
+        if "tomorrow" in s:
+            schema["deadline"]["value"] = "tomorrow"
+        if "next week" in s:
+            schema["deadline"]["value"] = "next week"
 
-            time_match = re.search(r'(\d{1,2}(?::\d{2})?\s*(?:am|pm))|(morning|afternoon|evening|noon)', s)
-            if time_match:
-                time_str = time_match.group(0)
-                if   "morning"   in time_str: schema["fixed_start"]["value"] = "08:00"
-                elif "afternoon" in time_str: schema["fixed_start"]["value"] = "13:00"
-                elif "evening"   in time_str: schema["fixed_start"]["value"] = "18:00"
-                elif "noon"      in time_str: schema["fixed_start"]["value"] = "12:00"
-                else:
-                    # Normalize raw time like "3:30pm" -> "15:30"
-                    normalized = _normalize_time_standalone(time_str.strip())
-                    schema["fixed_start"]["value"] = normalized if normalized else time_str.strip()
-
-        if "today" in s and not has_recurrent and not has_explicit_time:
-            if schema["start"]["value"] is None:
-                schema["start"]["value"]     = "today"
-                schema["start"]["predicted"] = False
+        # Update predicted flags based on what was actually found
+        for field in ["fixed_time", "fixed_start", "recurrent", "recurrence_days", "deadline", "start"]:
+            if schema[field]["value"] is not None and schema[field]["value"] is not False:
+                schema[field]["predicted"] = False
+            elif field in ["fixed_time", "recurrent"] and schema[field]["value"] is False:
+                schema[field]["predicted"] = False
 
         return schema
-
-    # Valid category enum
-    _VALID_CATEGORIES = {
-        "work", "study", "fitness", "health", "personal",
-        "finance", "home", "family", "social", "errands",
-        "travel", "creative", "learning", "admin", "shopping",
-    }
-
-    def _clamp_category(self, cat):
-        if cat is None:
-            return None
-        cat = cat.lower().strip()
-        if cat in self._VALID_CATEGORIES:
-            return cat
-        return "personal"
-
-    @staticmethod
-    def _normalize_fixed_start(val) -> str | None:
-        """Normalize fixed_start to HH:MM or None."""
-        if val is None:
-            return None
-        return _normalize_time_standalone(val)
-
-    def _convert_real(self, example: dict):
-        sentence = example["input"]
-        output   = example["output"]
-
-        if sentence.startswith("modify:"):
-            parts = []
-            for k, v in output.items():
-                if v is not None:
-                    # Normalize booleans
-                    if isinstance(v, bool):
-                        v = "true" if v else "false"
-                    # Normalize duration
-                    if k == "duration":
-                        v = _normalize_duration_to_minutes(v) or v
-                    # Normalize fixed_start
-                    if k == "fixed_start":
-                        v = self._normalize_fixed_start(v)
-                    # Normalize deadline/start
-                    if k in ("deadline", "start"):
-                        v = _normalize_deadline(v)
-                    # Clamp category
-                    if k == "category":
-                        v = self._clamp_category(v)
-                    # Round floats
-                    if k in ("difficulty", "importance"):
-                        try:
-                            v = str(round(float(v), 2))
-                        except (ValueError, TypeError):
-                            pass
-                    parts.append(f"{k}={v}")
-            return sentence, " | ".join(parts)
-
-        # Fill missing predicted fields via inference so model ALWAYS sees them
-        difficulty = output.get("difficulty")
-        if difficulty is None:
-            difficulty = self._infer_difficulty(sentence)
-        else:
-            difficulty = str(round(float(difficulty), 2))
-
-        importance = output.get("importance")
-        if importance is None:
-            importance = self._infer_importance(sentence)
-        else:
-            importance = str(round(float(importance), 2))
-
-        category = output.get("category")
-        if category is None:
-            category = self._infer_category(sentence)
-        else:
-            category = self._clamp_category(category)
-
-        duration = output.get("duration")
-        if duration is None:
-            duration = self._infer_duration(sentence)
-        else:
-            duration = _normalize_duration_to_minutes(duration) or self._infer_duration(sentence)
-
-        start = output.get("start")
-        if start is not None:
-            start = _normalize_deadline(start)
-
-        deadline = output.get("deadline")
-        if deadline is not None:
-            deadline = _normalize_deadline(deadline)
-
-        fixed_start = output.get("fixed_start")
-        if fixed_start is not None:
-            fixed_start = self._normalize_fixed_start(fixed_start)
-
-        schema = {
-            "name":            {"value": output.get("name"),               "predicted": False},
-            "start":           {"value": start,                            "predicted": False},
-            "deadline":        {"value": deadline,                         "predicted": False},
-            "difficulty":      {"value": difficulty,                       "predicted": True},
-            "duration":        {"value": duration,                         "predicted": True},
-            "category":        {"value": category,                         "predicted": True},
-            "location":        {"value": output.get("location"),           "predicted": True},
-            "importance":      {"value": importance,                       "predicted": True},
-            "fixed_time":      {"value": output.get("fixed_time",  False), "predicted": False},
-            "fixed_start":     {"value": fixed_start,                      "predicted": False},
-            "recurrent":       {"value": output.get("recurrent",   False), "predicted": False},
-            "recurrence_days": {"value": output.get("recurrence_days"),    "predicted": False},
-        }
-
-        return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
-
-    def _convert_real_modify_full(self, example: dict):
-        """Convert a modify example to input -> FULL updated task output."""
-        sentence = example["input"]
-        output = example["output"]
-
-        # Parse the JSON from the modify input
-        try:
-            json_str = sentence.replace("modify:", "").split("\u2502")[0].strip()
-            original = json.loads(json_str)
-        except (json.JSONDecodeError, IndexError):
-            return sentence, ""
-
-        # Apply changes from output
-        task = dict(original)
-        for k, v in output.items():
-            if v is not None:
-                # Normalize booleans
-                if isinstance(v, bool):
-                    task[k] = "true" if v else "false"
-                elif k == "duration":
-                    task[k] = _normalize_duration_to_minutes(v) or v
-                elif k == "fixed_start":
-                    task[k] = _normalize_time_standalone(str(v)) or v
-                elif k in ("deadline", "start"):
-                    task[k] = _normalize_deadline(v) or v
-                elif k == "category":
-                    task[k] = self._clamp_category(v)
-                elif k in ("difficulty", "importance"):
-                    try:
-                        task[k] = str(round(float(v), 2))
-                    except (ValueError, TypeError):
-                        task[k] = v
-                else:
-                    task[k] = v
-            else:
-                # null values → remove the field
-                task.pop(k, None)
-
-        # Build full schema from the updated task
-        schema = {
-            "name":            {"value": task.get("name"),               "predicted": False},
-            "start":           {"value": task.get("start"),              "predicted": False},
-            "deadline":        {"value": task.get("deadline"),           "predicted": False},
-            "difficulty":      {"value": task.get("difficulty"),         "predicted": True},
-            "duration":        {"value": task.get("duration"),           "predicted": True},
-            "category":        {"value": task.get("category"),           "predicted": True},
-            "location":        {"value": task.get("location"),           "predicted": True},
-            "importance":      {"value": task.get("importance"),         "predicted": True},
-            "fixed_time":      {"value": task.get("fixed_time", False),  "predicted": False},
-            "fixed_start":     {"value": task.get("fixed_start"),        "predicted": False},
-            "recurrent":       {"value": task.get("recurrent", False),   "predicted": False},
-            "recurrence_days": {"value": task.get("recurrence_days"),    "predicted": False},
-        }
-
-        return sentence, schema_to_pipe(schema)
 
     def _generate_add(self):
         sentence, placeholder_map = self._fill_template()
         schema = self._build_schema(placeholder_map, sentence)
-
-        s = sentence.lower()
-        has_explicit_time = (
-            "sharp" in s or
-            re.search(r'\d{1,2}(?::\d{2})?\s*(?:am|pm)', s) is not None or
-            any(w in s for w in ("morning", "afternoon", "evening", "noon")) or
-            re.search(r'at\s+\d{1,2}', s) is not None
-        )
-        if not has_explicit_time and schema["fixed_time"]["value"]:
-            schema["fixed_time"]["value"]  = False
-            schema["fixed_start"]["value"] = None
-
         return f"add: {sentence}", schema_to_pipe(schema)
 
     def _generate_modify(self):
         sentence, placeholder_map = self._fill_template()
         existing = self._build_schema(placeholder_map, sentence)
-
-        # Sample 1–3 changes (richer variety now that we have more templates)
-        num_changes    = random.randint(1, 3)
-        sampled        = random.sample(CHANGE_TEMPLATES, k=num_changes)
-        changed_fields = {}
-        change_phrases = []
-
-        for field_name, phrase_fn, value_fn in sampled:
-            new_value = value_fn()
-            change_phrases.append(phrase_fn(new_value))
-
-            # Handle paired fields
-            if field_name == "fixed_time+fixed_start":
-                changed_fields["fixed_time"]  = {"value": True}
-                changed_fields["fixed_start"] = {"value": new_value}
-            elif field_name == "recurrent+recurrence_days":
-                changed_fields["recurrent"]       = {"value": True}
-                changed_fields["recurrence_days"] = {"value": new_value}
-            elif field_name == "cancel_fixed_time":
-                changed_fields["fixed_time"]  = {"value": False}
-                changed_fields["fixed_start"] = {"value": None}
-            elif field_name == "cancel_recurrent":
-                changed_fields["recurrent"]       = {"value": False}
-                changed_fields["recurrence_days"] = {"value": None}
-            else:
-                changed_fields[field_name] = {"value": new_value}
-
-        existing_summary = {
-            k: v["value"] for k, v in existing.items() if v["value"] is not None
-        }
-
-        input_text  = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
-        target_text = changed_to_pipe(changed_fields)
-        return input_text, target_text
-
-    def _generate_modify_full(self):
-        """Generate modify example where target is the FULL updated task."""
-        sentence, placeholder_map = self._fill_template()
-        existing = self._build_schema(placeholder_map, sentence)
-
-        # Sample 1-3 changes
         num_changes = random.randint(1, 3)
         sampled = random.sample(CHANGE_TEMPLATES, k=num_changes)
         changed_fields = {}
@@ -1052,65 +335,223 @@ class DataGenerator:
         for field_name, phrase_fn, value_fn in sampled:
             new_value = value_fn()
             change_phrases.append(phrase_fn(new_value))
+            if field_name == "fixed_time+fixed_start":
+                changed_fields["fixed_time"] = {"value": True, "predicted": False}
+                changed_fields["fixed_start"] = {"value": normalize_time(new_value), "predicted": False}
+            elif field_name == "recurrent+recurrence_days":
+                changed_fields["recurrent"] = {"value": True, "predicted": False}
+                changed_fields["recurrence_days"] = {"value": new_value, "predicted": False}
+            elif field_name == "cancel_fixed_time":
+                changed_fields["fixed_time"] = {"value": False, "predicted": False}
+                changed_fields["fixed_start"] = {"value": None, "predicted": False}
+            elif field_name == "cancel_recurrent":
+                changed_fields["recurrent"] = {"value": False, "predicted": False}
+                changed_fields["recurrence_days"] = {"value": None, "predicted": False}
+            else:
+                changed_fields[field_name] = {"value": new_value, "predicted": True}
 
+        existing_summary = {k: v["value"] for k, v in existing.items() if v["value"] is not None}
+        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
+        return input_text, changed_to_pipe(changed_fields)
+
+    def _generate_modify_full(self):
+        sentence, placeholder_map = self._fill_template()
+        existing = self._build_schema(placeholder_map, sentence)
+        num_changes = random.randint(1, 3)
+        sampled = random.sample(CHANGE_TEMPLATES, k=num_changes)
+        changed_fields = {}
+        change_phrases = []
+
+        for field_name, phrase_fn, value_fn in sampled:
+            new_value = value_fn()
+            change_phrases.append(phrase_fn(new_value))
             if field_name == "fixed_time+fixed_start":
                 changed_fields["fixed_time"] = {"value": True}
-                changed_fields["fixed_start"] = {"value": new_value}
+                changed_fields["fixed_start"] = {"value": normalize_time(new_value)}
             elif field_name == "recurrent+recurrence_days":
                 changed_fields["recurrent"] = {"value": True}
                 changed_fields["recurrence_days"] = {"value": new_value}
             elif field_name == "cancel_fixed_time":
                 changed_fields["fixed_time"] = {"value": False}
                 changed_fields["fixed_start"] = {"value": None}
-            elif field_name == "cancel_recurrent":
-                changed_fields["recurrent"] = {"value": False}
-                changed_fields["recurrence_days"] = {"value": None}
             else:
                 changed_fields[field_name] = {"value": new_value}
 
-        # Apply changes to existing schema
-        for field_name, change_entry in changed_fields.items():
-            if field_name in existing:
-                existing[field_name]["value"] = change_entry["value"]
+        task = dict(existing)
+        for k, v in changed_fields.items():
+            if isinstance(v, dict):
+                task[k] = v["value"]
+            else:
+                task[k] = v
 
-        existing_summary = {
-            k: v["value"] for k, v in existing.items() if v["value"] is not None
+        schema = {
+            "name": {"value": task.get("name"), "predicted": False},
+            "start": {"value": task.get("start"), "predicted": False},
+            "deadline": {"value": task.get("deadline"), "predicted": False},
+            "difficulty": {"value": task.get("difficulty"), "predicted": True},
+            "duration": {"value": task.get("duration"), "predicted": True},
+            "category": {"value": task.get("category"), "predicted": True},
+            "location": {"value": task.get("location"), "predicted": True},
+            "importance": {"value": task.get("importance"), "predicted": True},
+            "fixed_time": {"value": task.get("fixed_time", False), "predicted": False},
+            "fixed_start": {"value": task.get("fixed_start"), "predicted": False},
+            "recurrent": {"value": task.get("recurrent", False), "predicted": False},
+            "recurrence_days": {"value": task.get("recurrence_days"), "predicted": False},
         }
 
-        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
-        target_text = schema_to_pipe(existing)
-        return input_text, target_text
+        input_text = f"modify: {json.dumps({k: v for k, v in existing.items() if v['value'] is not None}, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
+        return input_text, schema_to_pipe(schema)
+
+    def _convert_real(self, example: dict):
+        sentence = example["input"]
+        output = example["output"]
+
+        if sentence.startswith("modify:"):
+            parts = []
+            for k, v in output.items():
+                if v is not None:
+                    if isinstance(v, bool):
+                        v = "true" if v else "false"
+                    if k == "duration":
+                        v = normalize_duration(v) or v
+                    if k == "fixed_start":
+                        v = normalize_time(str(v)) or v
+                    if k in ("deadline", "start"):
+                        v = normalize_deadline(v)
+                    if k == "category":
+                        v = clamp_category(v)
+                    if k in ("difficulty", "importance"):
+                        try:
+                            v = str(round(float(v), 2))
+                        except (ValueError, TypeError):
+                            pass
+                    parts.append(f"{k}={v}")
+            return sentence, " | ".join(parts)
+
+        # Detect explicit fields from input
+        explicit_fields = detect_explicit_fields(sentence)
+        
+        difficulty = output.get("difficulty")
+        if difficulty is None:
+            difficulty = self._infer_difficulty(sentence)
+            explicit_fields.discard("difficulty")
+        else:
+            difficulty = str(round(float(difficulty), 2))
+
+        importance = output.get("importance")
+        if importance is None:
+            importance = self._infer_importance(sentence)
+            explicit_fields.discard("importance")
+        else:
+            importance = str(round(float(importance), 2))
+
+        category = output.get("category")
+        if category is None:
+            category = self._infer_category(sentence)
+            explicit_fields.discard("category")
+        else:
+            category = clamp_category(category)
+
+        duration = output.get("duration")
+        if duration is None:
+            duration = self._infer_duration(sentence)
+            explicit_fields.discard("duration")
+        else:
+            duration = normalize_duration(duration) or self._infer_duration(sentence)
+
+        start = output.get("start")
+        if start is not None:
+            start = normalize_deadline(start)
+
+        deadline = output.get("deadline")
+        if deadline is not None:
+            deadline = normalize_deadline(deadline)
+
+        fixed_start = output.get("fixed_start")
+        if fixed_start is not None:
+            fixed_start = normalize_time(fixed_start)
+
+        schema = {
+            "name": {"value": output.get("name"), "predicted": "name" not in explicit_fields},
+            "start": {"value": start, "predicted": "start" not in explicit_fields},
+            "deadline": {"value": deadline, "predicted": "deadline" not in explicit_fields},
+            "difficulty": {"value": difficulty, "predicted": "difficulty" not in explicit_fields},
+            "duration": {"value": duration, "predicted": "duration" not in explicit_fields},
+            "category": {"value": category, "predicted": "category" not in explicit_fields},
+            "location": {"value": output.get("location"), "predicted": "location" not in explicit_fields},
+            "importance": {"value": importance, "predicted": "importance" not in explicit_fields},
+            "fixed_time": {"value": output.get("fixed_time", False), "predicted": "fixed_time" not in explicit_fields},
+            "fixed_start": {"value": fixed_start, "predicted": "fixed_start" not in explicit_fields},
+            "recurrent": {"value": output.get("recurrent", False), "predicted": "recurrent" not in explicit_fields},
+            "recurrence_days": {"value": output.get("recurrence_days"), "predicted": "recurrence_days" not in explicit_fields},
+        }
+
+        return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
+
+    def _convert_real_modify_full(self, example: dict):
+        sentence = example["input"]
+        output = example["output"]
+
+        try:
+            json_str = sentence.replace("modify:", "").split("\u2502")[0].strip()
+            original = json.loads(json_str)
+        except (json.JSONDecodeError, IndexError):
+            return sentence, ""
+
+        task = dict(original)
+        for k, v in output.items():
+            if v is not None:
+                if isinstance(v, bool):
+                    task[k] = "true" if v else "false"
+                elif k == "duration":
+                    task[k] = normalize_duration(v) or v
+                elif k == "fixed_start":
+                    task[k] = normalize_time(str(v)) or v
+                elif k in ("deadline", "start"):
+                    task[k] = normalize_deadline(v) or v
+                elif k == "category":
+                    task[k] = clamp_category(v)
+                elif k in ("difficulty", "importance"):
+                    try:
+                        task[k] = str(round(float(v), 2))
+                    except (ValueError, TypeError):
+                        task[k] = v
+                else:
+                    task[k] = v
+            else:
+                task.pop(k, None)
+
+        schema = {
+            "name": {"value": task.get("name"), "predicted": False},
+            "start": {"value": task.get("start"), "predicted": False},
+            "deadline": {"value": task.get("deadline"), "predicted": False},
+            "difficulty": {"value": task.get("difficulty"), "predicted": True},
+            "duration": {"value": task.get("duration"), "predicted": True},
+            "category": {"value": task.get("category"), "predicted": True},
+            "location": {"value": task.get("location"), "predicted": True},
+            "importance": {"value": task.get("importance"), "predicted": True},
+            "fixed_time": {"value": task.get("fixed_time", False), "predicted": False},
+            "fixed_start": {"value": task.get("fixed_start"), "predicted": False},
+            "recurrent": {"value": task.get("recurrent", False), "predicted": False},
+            "recurrence_days": {"value": task.get("recurrence_days"), "predicted": False},
+        }
+
+        return sentence, schema_to_pipe(schema)
 
 
 if __name__ == "__main__":
-    from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
-    import os
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--sentences", type=int, default=10)
+    args = parser.parse_args()
 
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("--sentences", type=int, default=10)
-    arg_parser.add_argument("--modify-only", action="store_true",
-                            help="Preview modify-only samples instead of mixed")
-    args = arg_parser.parse_args()
-
-    cfg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data")
-
-    # todo remove vars ENTIRELY
-    yp = VMAI_YamlParser(os.path.join(cfg_path, vars.SYNTHETIC_DATASET))
+    from yaml_parser import VMAI_YamlParser
+    yp = VMAI_YamlParser(f"./data/{vars.SYNTHETIC_DATASET}")
     yp.load_yaml()
     training_data = yp.parse()
+    gen = DataGenerator(training_data)
 
-    rp = VMAI_RealDataParser(os.path.join(cfg_path, vars.REAL_DATASET))
-    rp.load_yaml()
-    real_data = rp.parse()
-
-    gen = DataGenerator(training_data, real_data)
-
-    if args.modify_only:
-        ds = gen.generate_modify_only(args.sentences)
-    else:
-        ds = gen.generate(args.sentences)
-
-    for i in range(min(100, len(ds))):
-        print("IN: ", ds["input_text"][i])
-        print("OUT:", ds["target_text"][i])
+    for _ in range(args.sentences):
+        inp, tgt = gen._generate_add()
+        print(f"IN:  {inp}")
+        print(f"OUT: {tgt}")
         print()

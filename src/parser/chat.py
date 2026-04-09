@@ -1,9 +1,7 @@
 """
     VM-AI - Chat Testing Interface
-    Tests add and modify modes with pipe format output.
+    Tests add and modify modes with EXP/PRD tag format.
     Run: python src/parser/chat.py
-
-    Written by: Vanea
 """
 
 import torch
@@ -15,23 +13,7 @@ import yaml
 from datetime import datetime
 from transformers import AutoTokenizer, T5ForConditionalGeneration
 from typing import Dict
-
-PREDICTED_FIELDS = {"difficulty", "duration", "category", "location", "importance", "start"}
-
-ALL_FIELDS = {
-    "name":            None,
-    "start":           None,
-    "deadline":        None,
-    "difficulty":      None,
-    "duration":        None,
-    "category":        None,
-    "location":        None,
-    "importance":      None,
-    "fixed_time":      False,
-    "fixed_start":     None,
-    "recurrent":       False,
-    "recurrence_days": None,
-}
+from schemas import pipe_to_schema, schema_to_pipe, normalize_time, detect_explicit_fields, ALWAYS_EXPLICIT
 
 LOG_FILE = "performance_log.yaml"
 
@@ -66,7 +48,6 @@ class TaskPlannerPredictor:
         self._last_raw_output = ""
         print(f"✓ Model ready ({self.device})")
 
-    # Regex that matches an explicit clock time in the raw sentence
     _TIME_RE = re.compile(
         r'\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b', re.IGNORECASE
     )
@@ -76,52 +57,8 @@ class TaskPlannerPredictor:
         text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
         return text
 
-    @staticmethod
-    def _normalize_time(time_str: str) -> str | None:
-        """Convert various time formats to HH:MM."""
-        if not time_str:
-            return None
-        time_str = time_str.strip().lower()
-
-        # Handle "6am", "6 am", "6:30pm" format
-        match = re.search(r'(\d{1,2})(?::(\d{2}))?\s*(am|pm)', time_str)
-        if match:
-            hour = int(match.group(1))
-            minute = int(match.group(2)) if match.group(2) else 0
-            ampm = match.group(3)
-            if ampm == "pm" and hour != 12:
-                hour += 12
-            elif ampm == "am" and hour == 12:
-                hour = 0
-            return f"{hour:02d}:{minute:02d}"
-
-        # Handle "morning", "afternoon", "evening", "noon"
-        if "morning" in time_str:
-            return "08:00"
-        if "afternoon" in time_str:
-            return "13:00"
-        if "evening" in time_str:
-            return "18:00"
-        if "noon" in time_str:
-            return "12:00"
-        if "midnight" in time_str:
-            return "00:00"
-
-        # Already HH:MM
-        if re.match(r'^\d{1,2}:\d{2}$', time_str):
-            return time_str
-
-        return None
-
     def _sanity_check(self, schema: Dict, original_sentence: str) -> Dict:
-        """
-        Post-generation guard:
-        - fixed_time should only be True if the input sentence contains an
-          explicit clock time (HH:MM, Xam/pm, @Xpm).  If the model hallucinated
-          it, reset to False and clear fixed_start.
-        - fixed_start values are normalized to HH:MM format.
-        """
-        # ── fix fixed_time hallucination ────────────────────────────────────
+        """Post-generation guard for fixed_time hallucinations."""
         ft = schema.get("fixed_time", {})
         ft_val = ft.get("value") if isinstance(ft, dict) else ft
         if ft_val is True:
@@ -129,11 +66,10 @@ class TaskPlannerPredictor:
                 schema["fixed_time"]["value"] = False
                 schema["fixed_start"]["value"] = None
 
-        # ── normalize and validate fixed_start ──────────────────────────────
         fs = schema.get("fixed_start", {})
         fs_val = fs.get("value") if isinstance(fs, dict) else fs
         if fs_val is not None:
-            normalized = self._normalize_time(str(fs_val))
+            normalized = normalize_time(str(fs_val))
             if normalized:
                 schema["fixed_start"]["value"] = normalized
             else:
@@ -149,9 +85,6 @@ class TaskPlannerPredictor:
             padding=True,
         ).to(self.device)
 
-        # Use start_token to guide generation.
-        # For 'add', we force "name=" to start the output.
-        # For 'modify', we use an empty string so the model can output any field first.
         if start_token:
             decoder_input = self.tokenizer(
                 start_token,
@@ -175,52 +108,12 @@ class TaskPlannerPredictor:
         self._last_raw_output = raw
         return raw
 
-    def _pipe_to_schema(self, flat: str) -> Dict:
-        raw = {}
-        for part in flat.split("|"):
-            part = part.strip()
-            if "=" not in part:
-                continue
-            k, _, v = part.partition("=")
-            k, v = k.strip(), v.strip()
-            if v.lower() == "null":
-                v = None
-            elif v.lower() in ("true", "tru", "t"):
-                v = True
-            elif v.lower().startswith("fals"):
-                v = False
-            if k not in raw:
-                raw[k] = v
-        schema = {}
-        for field, default in ALL_FIELDS.items():
-            val = raw.get(field, default)
-            schema[field] = {"value": val, "predicted": field in PREDICTED_FIELDS}
-        return schema
-
-    def _pipe_to_changed(self, flat: str) -> Dict:
-        changed = {}
-        for part in flat.split("|"):
-            part = part.strip()
-            if "=" not in part:
-                continue
-            k, _, v = part.partition("=")
-            k, v = k.strip(), v.strip()
-            if v.lower() == "null":
-                v = None
-            elif v.lower() in ("true", "tru", "t"):
-                v = True
-            elif v.lower().startswith("fals"):
-                v = False
-            if k and k not in changed:
-                changed[k] = {"value": v, "predicted": False}
-        return changed
-
     def predict_add(self, sentence: str) -> Dict:
         output = self._run_model(f"add: {self._normalize(sentence)}")
         if "=" not in output:
             result = {"error": "parse_failed", "raw": output}
         else:
-            result = self._pipe_to_schema(output)
+            result = pipe_to_schema(output, input_text=sentence)
             if not result.get("name", {}).get("value"):
                 result = {"error": "parse_failed", "raw": output}
             else:
@@ -233,19 +126,16 @@ class TaskPlannerPredictor:
         for k, v in existing_task.items():
             val = v["value"] if isinstance(v, dict) else v
             if val is not None:
-                # Convert booleans for JSON
                 if isinstance(val, bool):
                     val = "true" if val else "false"
                 summary[k] = val
         input_text = f"modify: {json.dumps(summary, ensure_ascii=False)} \u2502 {self._normalize(change_prompt)}"
         output = self._run_model(input_text, start_token="")
 
-        # Model outputs FULL task in pipe format — parse it fully
-        new_task = self._pipe_to_schema(output)
+        new_task = pipe_to_schema(output, input_text=change_prompt)
         if "error" in new_task:
             result = {"error": "parse_failed", "raw": output}
         else:
-            # Diff old vs new → return only changed fields
             changed = self._diff_schemas(existing_task, new_task)
             if not changed:
                 result = {"error": "no_changes", "raw": output}
@@ -263,11 +153,9 @@ class TaskPlannerPredictor:
             old_entry = old_task.get(field)
             old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
 
-            # Skip fields where model output None (missing from output)
             if new_val is None:
                 continue
 
-            # Normalize both to comparable strings
             old_str = str(old_val).lower() if old_val is not None else ""
             new_str = str(new_val).lower()
 
@@ -297,7 +185,7 @@ def format_output(result: Dict) -> str:
             value     = entry
             predicted = False
         value_str     = str(value).lower() if isinstance(value, bool) else (str(value) if value is not None else "-")
-        predicted_str = "predicted" if predicted else "explicit"
+        predicted_str = "PRD" if predicted else "EXP"
         rows.append((field, value_str, predicted_str))
 
     col_field = max(len(r[0]) for r in rows)
@@ -308,7 +196,7 @@ def format_output(result: Dict) -> str:
     for field, value_str, predicted_str in rows:
         lines.append(f"│  {field:<{col_field}}  {value_str:<{col_value}}  {predicted_str:<{col_pred}}  │")
     lines.append("└" + "─" * inner + "┘")
-    lines.append("  predicted = inferred by model | explicit = stated by user")
+    lines.append("  EXP = explicit (user stated) | PRD = predicted (model inferred)")
     return "\n" + "\n".join(lines)
 
 
@@ -367,7 +255,6 @@ def main():
                 count += 1
 
             elif user_input.lower().startswith("modify:"):
-                # inline: modify: {...} │ change prompt
                 rest = user_input[7:].strip()
                 if "│" not in rest:
                     print("   Missing │ separator.")
