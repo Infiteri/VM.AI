@@ -198,3 +198,242 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-04-09T09:00:27.068892'
+  mode: add
+  input: go to school
+  raw_output: name=go to school | category=school | fixed_time=false | recurrent=falser
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: school
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:00:33.433771'
+  mode: add
+  input: go to school at 6 pm
+  raw_output: name=go to school | fixed_time=true | fixed_start=6 pm | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:00:45.326085'
+  mode: add
+  input: go to school at 6 pm everyday
+  raw_output: name=go to school | fixed_time=true | fixed_start=6 pm | recurrent=false
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:00:53.238886'
+  mode: add
+  input: go to the gym
+  raw_output: name=go to the gym | fixed_time=false | recurrent=true | upcoming=False
+  parsed:
+    name: go to the gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:07:14.553969'
+  mode: add
+  input: gym at 6am
+  raw_output: name=gym | fixed_time=true | fixed_start=6 am | recurrent=false
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:07:14.951055'
+  mode: add
+  input: urgent client call
+  raw_output: name=call | fixed_time=false | recurrent=true | upcoming=False
+  parsed:
+    name: call
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T09:07:15.623246'
+  mode: add
+  input: pay the rent
+  raw_output: name=pay the rent | fixed_time=false | recurrent=true | omitting_start=18:00
+    | recurrence_days=False
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: false
+  error: null
+
+- timestamp: '2026-04-09T09:07:16.031339'
+  mode: add
+  input: meditate every morning
+  raw_output: name=meditation | fixed_time=true | fixed_start=18:00 | recurrent=false
+  parsed:
+    name: meditation
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T22:03:59.787879'
+  mode: add
+  input: go to school
+  raw_output: name=go to school[EXP] | difficulty=0.37[PRD] | duration=45[PRD], difficulty=0.47[PRDD]
+    | category=education[PRD]. importance=0.56[PRD|EXP].
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: education[PRD]. importance=0.56[PRD
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T22:04:11.183001'
+  mode: add
+  input: go to school for 30 minutes
+  raw_output: name=go to school[EXP] | difficulty=0.47[PRD] | duration=30[PRD], difficulty=0.56[PRD].
+    category=education[PRD|English[PRDJ] | importance=0.43[PRDQ] | fixed_time=false[EXC]
+    | recurrent=falsity[EXCLUDED]
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.47'
+    duration: 30[PRD], difficulty=0.56[PRD]. category=education[PRD
+    category: null
+    location: null
+    importance: '0.43'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T22:04:21.311992'
+  mode: add
+  input: go to the gym
+  raw_output: name=go to the gym[EXP] | difficulty=0.37[PRD] | duration=45[PRD], difficulty=0.48[PRD].
+    category=work[PRD|fitness[PRDQ] | importance=0.54[PRDq] | fixed_time=false[EXC]
+    | recurrent=falsity[EXCLUDED]
+  parsed:
+    name: go to the gym
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: 45[PRD], difficulty=0.48[PRD]. category=work[PRD
+    category: null
+    location: null
+    importance: '0.54'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-09T22:04:27.345278'
+  mode: modify
+  input: for 30 minutes
+  raw_output: duration=30[PRD]
+  parsed:
+    duration: '30'
+  error: null
+
+- timestamp: '2026-04-09T22:04:35.188011'
+  mode: modify
+  input: 40 minutes
+  raw_output: duration=40[PRD]
+  parsed:
+    duration: '40'
+  error: null
+
+- timestamp: '2026-04-09T22:04:41.481466'
+  mode: modify
+  input: 40 minutes, really hard
+  raw_output: duration=40[PRD] | difficulty=0.47[PRD].
+  parsed:
+    difficulty: 0.47[PRD].
+  error: null
+

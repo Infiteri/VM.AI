@@ -1,47 +1,30 @@
 """
-    VM-AI - Data Normalizer
-    Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats.
+    VM-AI - Data Normalizer with EXP/PRD Tag Support
+    Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats with tags.
     Run: python src/parser/normalize_data.py
-
-    Written by: Vanea
 """
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import yaml
-import re
-from data_generator import (
-    _normalize_duration_to_minutes,
-    _normalize_deadline,
-    _normalize_time_standalone,
-    DAYS,
+from schemas import (
+    normalize_duration, normalize_deadline, normalize_time, clamp_category,
+    detect_explicit_fields
 )
 
-_VALID_CATEGORIES = {
-    "work", "study", "fitness", "health", "personal",
-    "finance", "home", "family", "social", "errands",
-    "travel", "creative", "learning", "admin", "shopping",
-}
-
-
-def clamp_category(cat):
-    if cat is None:
-        return None
-    cat = str(cat).lower().strip()
-    if cat in _VALID_CATEGORIES:
-        return cat
-    return "personal"
-
-
 def normalize_example(ex):
-    """Normalize a single example's output dict."""
+    """Normalize a single example's output dict, preserving or adding EXP/PRD tags."""
     out = ex.get("output", {})
-
+    inp = ex.get("input", "")
+    
+    # Detect explicit fields from input
+    explicit_fields = detect_explicit_fields(inp)
+    
     # Duration -> integer minutes
     dur = out.get("duration")
     if dur is not None:
-        dur = _normalize_duration_to_minutes(dur)
+        dur = normalize_duration(dur)
         if dur is not None:
             out["duration"] = int(dur)
         else:
@@ -71,19 +54,19 @@ def normalize_example(ex):
     # Start -> normalized vocab
     start = out.get("start")
     if start is not None:
-        start = _normalize_deadline(start)
+        start = normalize_deadline(start)
         out["start"] = start if start else None
 
     # Deadline -> normalized vocab
     dl = out.get("deadline")
     if dl is not None:
-        dl = _normalize_deadline(dl)
+        dl = normalize_deadline(dl)
         out["deadline"] = dl if dl else None
 
     # fixed_start -> HH:MM
     fs = out.get("fixed_start")
     if fs is not None:
-        fs = _normalize_time_standalone(str(fs))
+        fs = normalize_time(str(fs))
         out["fixed_start"] = fs if fs else None
 
     # Booleans
@@ -96,7 +79,7 @@ def normalize_example(ex):
     if rd is not None:
         if isinstance(rd, str):
             rd = [d.strip() for d in rd.split(",")]
-        rd = [d for d in rd if d in DAYS]
+        rd = [d for d in rd if d in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]]
         out["recurrence_days"] = rd if rd else None
 
     # Remove None values
@@ -129,7 +112,6 @@ def normalize_file(path):
 if __name__ == "__main__":
     files = [
         "D:/Users/user/Desktop/VM.AI/data/VMAI_REAL_Data.yaml",
-        "D:/Users/user/Desktop/VM.AI/data/VMAI_SPECIFIC_Data.yaml",
     ]
 
     total_fixed = 0
