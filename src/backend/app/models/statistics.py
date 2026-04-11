@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Float, ForeignKey, Integer, Text
-from sqlalchemy.dialects.postgresql import FLOAT, UUID
+from sqlalchemy.dialects.postgresql import FLOAT, UUID, JSONB
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -32,7 +32,7 @@ class TaskStatistics(BaseModel):
     records = Column(Integer, default=0, nullable=False)
 
     # Time preferences (kept as JSONB — sparse time series)
-    task_time_scores = Column(Text, nullable=True)  # Stored as JSON string
+    task_time_scores = Column(JSONB, nullable=True)
 
     # Relationships
     tasks = relationship(
@@ -69,8 +69,8 @@ class CategoryStatistics(BaseModel):
     category_name = Column(Text, nullable=False, unique=True)
 
     # Plan averages keyed by difficulty bucket
-    avg_duration = Column(Text, nullable=True)  # JSONB as string
-    avg_duration_delta = Column(Text, nullable=True)
+    avg_duration = Column(JSONB, nullable=True)  # {"0.5": 35, "1.0": 55}
+    avg_duration_delta = Column(JSONB, nullable=True)
     avg_difficulty = Column(Float, nullable=True)
     avg_difficulty_delta = Column(Float, nullable=True)
 
@@ -80,7 +80,7 @@ class CategoryStatistics(BaseModel):
     records = Column(Integer, default=0, nullable=False)
 
     # Time preferences (kept as JSONB — sparse time series)
-    category_time_scores = Column(Text, nullable=True)  # Stored as JSON string
+    category_time_scores = Column(JSONB, nullable=True)
 
     # Relationships
     locations = relationship(

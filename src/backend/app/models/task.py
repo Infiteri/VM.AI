@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, Text, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -31,8 +31,8 @@ class Task(BaseModel):
 
     # Core task fields
     name = Column(Text, nullable=False)
-    start = Column(Text, nullable=True)  # ISO timestamp string (resolved by Enrichment)
-    deadline = Column(Text, nullable=True)  # ISO timestamp string (resolved by Enrichment)
+    start = Column(DateTime(timezone=True), nullable=True)  # ISO timestamp string (resolved by Enrichment)
+    deadline = Column(DateTime(timezone=True), nullable=True)  # ISO timestamp string (resolved by Enrichment)
     difficulty = Column(Float, nullable=True)  # 0.0–1.0
     duration = Column(Integer, nullable=True)  # Minutes
 
@@ -50,7 +50,7 @@ class Task(BaseModel):
 
     # Fixed-time task flags
     fixed_time = Column(Boolean, default=False, nullable=False)
-    fixed_start = Column(Text, nullable=True)  # Raw time string (e.g., "Monday 09:00")
+    fixed_start = Column(DateTime(timezone=True), nullable=True)  # Raw time string (e.g., "Monday 09:00")
 
     # User rating tracking
     rated = Column(Boolean, default=False, nullable=False)
