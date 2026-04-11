@@ -47,3 +47,8 @@ markupsafe = { index = "pypi" }
 torch = { index = "pytorch" }
 torchvision = { index = "pytorch" }
 torchaudio = { index = "pytorch" }
+
+[tool.uv.workspace]
+members = [
+    "src/backend",
+]
