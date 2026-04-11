@@ -7,19 +7,22 @@ import os
 import torch
 import yaml
 
+# for colab easier setup, set to "/content/" if running in colab, otherwise keep as "" for local runs
+ROOT = ""
+
 class Config:
-    def __init__(self, mode="both", config_path="config.yaml"):
+    def __init__(self, mode="both", config_path=ROOT + "config.yaml"):
         root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
         yaml_path = os.path.join(root, config_path)
         with open(yaml_path, "r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
 
-        self.model_cache        = os.path.join(root, cfg["paths"]["model_cache"])
-        self.output_dir         = os.path.join(root, cfg["paths"]["output_dir"])
-        self.data_path          = os.path.join(root, cfg["paths"]["synthetic_data"])
-        self.real_data_path     = os.path.join(root, cfg["paths"]["real_data"])
-        self.specific_data_path = os.path.join(root, cfg["paths"]["specific_data"])
+        self.model_cache        = os.path.join(root, ROOT, cfg["paths"]["model_cache"])
+        self.output_dir         = os.path.join(root, ROOT, cfg["paths"]["output_dir"])
+        self.data_path          = os.path.join(root, ROOT, cfg["paths"]["synthetic_data"])
+        self.real_data_path     = os.path.join(root, ROOT, cfg["paths"]["real_data"])
+        self.specific_data_path = os.path.join(root, ROOT, cfg["paths"]["specific_data"])
 
         self.fp16                   = torch.cuda.is_available()
         self.dataloader_num_workers = 4 if torch.cuda.is_available() else 0
