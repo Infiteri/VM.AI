@@ -122,8 +122,8 @@ export default function TaskModifyView({ taskData }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-                <div className="flex flex-col gap-3 p-4 border border-main-font/20 rounded-xl min-h-[100px]">
+            <div className="grid gap-3">
+                <div className="flex flex-col gap-3 p-4 border border-main-font/20 rounded-xl min-h-[20px]">
                     <Toggle
                         name="Fixed"
                         checked={task.fixed}
@@ -136,32 +136,6 @@ export default function TaskModifyView({ taskData }) {
                     )}
                 </div>
 
-                <div className="flex flex-col gap-3 p-4 border border-main-font/20 rounded-xl min-h-[100px]">
-                    <Toggle
-                        name="Recurrent"
-                        checked={task.recurrent}
-                        onChange={(e) => setTask({ ...task, recurrent: e.target.checked })}
-                    />
-                    {task.recurrent && (
-                        <div className="flex justify-between gap-1 mt-2">
-                            {days.map((day, i) => {
-                                const isSelected = task.recurrency.includes(i);
-                                return (
-                                    <button
-                                        key={i}
-                                        onClick={() => handleDayToggle(i)}
-                                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all ${isSelected
-                                                ? "bg-main-font text-background"
-                                                : "bg-sec/40 text-main-font/60 hover:bg-main-font/20"
-                                            }`}
-                                    >
-                                        {day}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
             </div>
 
             {!task.fixed && (
