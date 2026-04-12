@@ -1,0 +1,174 @@
+# VM.AI Backend - Complete Endpoint Test Suite
+# Use these in Swagger UI: http://localhost:8000/docs
+# NOTE: Ensure all JSON keys use DOUBLE QUOTES (") not single quotes (').
+
+================================================================================
+1. GET /schedule
+   Description: Fetches tasks for a specific date.
+   
+   Query Parameter:
+   date = 2026-04-15
+
+================================================================================
+2. POST /schedule/batch
+   Description: Triggers the scheduler to move tasks from unscheduled to provisional.
+   
+   Request Body:
+   {}
+
+================================================================================
+3. POST /tasks/parse/add
+   Description: NLP extracts task fields from text.
+   
+   Request Body:
+   {
+     "prompt": "Finish math homework before Friday at 5pm, it's hard"
+   }
+
+================================================================================
+4. POST /tasks/parse/modify
+   Description: NLP extracts modification fields.
+   
+   Request Body:
+   {
+     "task_id": "550e8400-e29b-41d4-a716-446655440001",
+     "prompt": "Change deadline to next Monday"
+   }
+
+================================================================================
+5. POST /tasks (Valid Flexible Task)
+   Description: Creates a flexible task. 
+   MUST have: start + deadline. fixed_start must be null.
+   
+   Request Body:
+   {
+     "task": {
+       "name": { "value": "Chemistry Project", "predicted": false },
+       "start": { "value": "2026-04-19T09:00:00", "predicted": false },
+       "deadline": { "value": "2026-04-20T17:00:00", "predicted": false },
+       "difficulty": { "value": 0.8, "predicted": true },
+       "duration": { "value": 120, "predicted": true },
+       "category": { "value": ["study", "project"], "predicted": true },
+       "location": { "value": "Library", "predicted": true },
+       "importance": { "value": 0.9, "predicted": true },
+       "fixed_time": { "value": false, "predicted": false },
+       "fixed_start": { "value": null, "predicted": false }
+     }
+   }
+
+================================================================================
+6. POST /tasks (Invalid Flexible Task)
+   Description: Intentionally WRONG. 'start' is null.
+   EXPECTED RESULT: 422 Validation Error ("For flexible tasks, BOTH 'start' and 'deadline' must be provided.")
+   
+   Request Body:
+   {
+     "task": {
+       "name": { "value": "Bad Task", "predicted": false },
+       "start": { "value": null, "predicted": false },
+       "deadline": { "value": "2026-04-20T17:00:00", "predicted": false },
+       "difficulty": { "value": 0.5, "predicted": true },
+       "duration": { "value": 60, "predicted": true },
+       "category": { "value": ["study"], "predicted": true },
+       "location": { "value": "Home", "predicted": true },
+       "importance": { "value": 0.5, "predicted": true },
+       "fixed_time": { "value": false, "predicted": false },
+       "fixed_start": { "value": null, "predicted": false }
+     }
+   }
+
+================================================================================
+7. POST /tasks (Valid Fixed Task)
+   Description: Creates a fixed-time task.
+   MUST have: fixed_start. start & deadline must be null.
+   
+   Request Body:
+   {
+     "task": {
+       "name": { "value": "Math Class", "predicted": false },
+       "start": { "value": null, "predicted": false },
+       "deadline": { "value": null, "predicted": false },
+       "difficulty": { "value": 0.5, "predicted": true },
+       "duration": { "value": 60, "predicted": true },
+       "category": { "value": ["study"], "predicted": true },
+       "location": { "value": "Room 101", "predicted": true },
+       "importance": { "value": 0.7, "predicted": true },
+       "fixed_time": { "value": true, "predicted": false },
+       "fixed_start": { "value": "2026-04-15T10:00:00", "predicted": false }
+     }
+   }
+
+================================================================================
+8. POST /tasks/{id}/update
+   Description: Updates an existing task.
+   
+   Path Parameter:
+   id = 550e8400-e29b-41d4-a716-446655440001
+   
+   Query Parameter:
+   source = main_schedule
+   
+   Request Body:
+   {
+     "task": {
+       "name": { "value": "Updated Math Homework", "predicted": false },
+       "start": { "value": "2026-04-18T09:00:00", "predicted": false },
+       "deadline": { "value": "2026-04-18T17:00:00", "predicted": false },
+       "difficulty": { "value": 0.6, "predicted": true },
+       "duration": { "value": 60, "predicted": true },
+       "category": { "value": ["study"], "predicted": true },
+       "location": { "value": "Home", "predicted": true },
+       "importance": { "value": 0.7, "predicted": true },
+       "fixed_time": { "value": false, "predicted": false },
+       "fixed_start": { "value": null, "predicted": false }
+     }
+   }
+
+================================================================================
+9. DELETE /tasks/{id}
+   Description: Deletes a task.
+   
+   Path Parameter:
+   id = 550e8400-e29b-41d4-a716-446655440001
+   
+   Query Parameter:
+   source = main_schedule
+
+================================================================================
+10. GET /tasks/unscheduled
+    Description: Fetches the queue of tasks waiting for scheduling.
+    
+    Query Parameter:
+    limit = 50
+
+================================================================================
+11. POST /tasks/{id}/rate
+    Description: Rates a completed task and updates stats.
+    
+    Path Parameter:
+    id = 550e8400-e29b-41d4-a716-446655440001
+    
+    Request Body:
+    {
+      "completed": true,
+      "actual_duration": 55,
+      "actual_difficulty": 0.7
+    }
+
+================================================================================
+12. GET /provisional/changes
+    Description: Fetches pending schedule changes.
+
+================================================================================
+13. POST /provisional/commit
+    Description: Commits provisional changes to main schedule.
+    
+    Request Body:
+    {}
+
+================================================================================
+14. POST /provisional/reset
+    Description: Discards provisional changes and resets to main schedule.
+    
+    Request Body:
+    {}
