@@ -1,4 +1,4 @@
-./models/
+models/
 logs/
 __pycache__/
 *.py[cod]

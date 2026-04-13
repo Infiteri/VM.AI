@@ -437,3 +437,43 @@
     difficulty: 0.47[PRD].
   error: null
 
+- timestamp: '2026-04-10T08:39:52.143550'
+  mode: add
+  input: go to school
+  raw_output: name=go to school[EXP] | difficulty=0.37[PRD] | duration=45[PRD], difficulty=0.47[PRDD]
+    | category=education[PRD]. importance=0.56[PRD|EXP].
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: education[PRD]. importance=0.56[PRD
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-10T08:40:02.344356'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.37[PRD] | duration=45[PRD], difficulty=0.47[PRd]
+    | category=home[PRD]. importance=0.56[PRD|EXP].
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: home[PRD]. importance=0.56[PRD
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
