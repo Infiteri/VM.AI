@@ -45,7 +45,12 @@ class TaskPayload(BaseModel):
 
 # 2. Request Wrappers
 class TaskCreateRequest(BaseModel):
-    """Input for POST /tasks"""
+    """Input for POST /tasks (Commit Phase)"""
+    draft_id: str  # Mandatory: Identifies which draft to finalize
+    task: TaskPayload
+
+class TaskUpdateRequest(BaseModel):
+    """Input for POST /tasks/{id}/update"""
     task: TaskPayload
 
 class ParseAddRequest(BaseModel):
@@ -66,6 +71,7 @@ class TaskResponse(SuccessResponse):
 
 class ParseAddResponse(BaseModel):
     """Response for POST /tasks/parse/add"""
+    draft_id: str  # ID to use when committing later
     task: TaskPayload
 
 class ParseModifyResponse(BaseModel):

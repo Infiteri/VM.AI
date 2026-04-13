@@ -18,6 +18,7 @@ from app.models.statistics import (
 )
 from app.models.schedule import MainScheduleSlot, ProvisionalSlot
 from app.models.workflow import UnscheduledTask, ScheduleChange
+from app.models.draft import TaskDraft
 
 __all__ = [
     "BaseModel",
@@ -33,4 +34,5 @@ __all__ = [
     "ProvisionalSlot",
     "UnscheduledTask",
     "ScheduleChange",
+    "TaskDraft",
 ]

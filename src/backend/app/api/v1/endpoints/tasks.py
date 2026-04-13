@@ -5,6 +5,7 @@ from uuid import UUID
 from app.core.database import get_db
 from app.schemas.task import (
     TaskCreateRequest, 
+    TaskUpdateRequest,
     TaskResponse, 
     ParseAddRequest, 
     ParseModifyRequest,
@@ -33,6 +34,7 @@ def parse_add_task(
     # TODO: Call NLP Parser Service
     
     return ParseAddResponse(
+        draft_id="draft-550e8400-e29b-41d4-a716-446655440001",
         task=TaskPayload(
             name="Example Task",
             start="2026-04-14T09:00:00", # Must have start for flexible tasks
@@ -101,10 +103,10 @@ def create_task(
 
 @router.post("/{id}/update", response_model=TaskResponse)
 def update_task(
+    body: TaskUpdateRequest,
+    db: Session = Depends(get_db),
     id: UUID = Path(..., description="ID of the task to update"),
     source: str = Query(..., description="main_schedule | unscheduled | provisional"),
-    body: TaskCreateRequest = None, 
-    db: Session = Depends(get_db),
 ):
     """
     POST /tasks/{id}/update

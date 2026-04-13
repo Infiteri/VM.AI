@@ -44,6 +44,7 @@ class TaskStatistics(BaseModel):
     associated_tasks = relationship(
         "Task",
         foreign_keys="[Task.associated_task_statistics_id]",
+        overlaps="associated_statistics",  # Silence warning about FK overlap
         lazy="select",
     )
     locations = relationship(
