@@ -11,8 +11,7 @@ from app.schemas.task import (
     ParseAddResponse,
     ParseModifyResponse,
     UnscheduledResponse,
-    TaskPayload,
-    TaskField
+    TaskPayload
 )
 
 router = APIRouter()
@@ -34,17 +33,17 @@ def parse_add_task(
     # TODO: Call NLP Parser Service
     
     return ParseAddResponse(
-        enriched_task=TaskPayload(
-            name=TaskField(value="Example Task", predicted=False),
-            start=TaskField(value="2026-04-12T00:00:00", predicted=False),
-            deadline=TaskField(value="2026-04-15T00:00:00", predicted=True),
-            difficulty=TaskField(value=0.5, predicted=True),
-            duration=TaskField(value=60, predicted=True),
-            category=TaskField(value=["study"], predicted=True),
-            location=TaskField(value="Home", predicted=True),
-            importance=TaskField(value=0.5, predicted=True),
-            fixed_time=TaskField(value=False, predicted=False),
-            fixed_start=TaskField(value=None, predicted=False),
+        task=TaskPayload(
+            name="Example Task",
+            start="2026-04-14T09:00:00", # Must have start for flexible tasks
+            deadline="2026-04-15T00:00:00",
+            difficulty=0.5,
+            duration=60,
+            category=["study"],
+            location="Home",
+            importance=0.5,
+            fixed_time=False,
+            fixed_start=None,
         )
     )
 
@@ -62,17 +61,17 @@ def parse_modify_task(
     
     return ParseModifyResponse(
         task_id=str(body.task_id),
-        enriched_task=TaskPayload(
-            name=TaskField(value="Modified Task", predicted=True),
-            start=TaskField(value="2026-04-10T00:00:00", predicted=False),
-            deadline=TaskField(value="2026-04-20T00:00:00", predicted=True),
-            difficulty=TaskField(value=0.5, predicted=True),
-            duration=TaskField(value=60, predicted=True),
-            category=TaskField(value=["study"], predicted=True),
-            location=TaskField(value="Home", predicted=True),
-            importance=TaskField(value=0.5, predicted=True),
-            fixed_time=TaskField(value=False, predicted=False),
-            fixed_start=TaskField(value=None, predicted=False),
+        task=TaskPayload(
+            name="Modified Task",
+            start="2026-04-19T09:00:00",  # ✅ Must provide start for flexible tasks
+            deadline="2026-04-20T00:00:00",
+            difficulty=0.5,
+            duration=60,
+            category=["study"],
+            location="Home",
+            importance=0.5,
+            fixed_time=False,
+            fixed_start=None,
         ),
     )
 

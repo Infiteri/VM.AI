@@ -43,16 +43,16 @@
    Request Body:
    {
      "task": {
-       "name": { "value": "Chemistry Project", "predicted": false },
-       "start": { "value": "2026-04-19T09:00:00", "predicted": false },
-       "deadline": { "value": "2026-04-20T17:00:00", "predicted": false },
-       "difficulty": { "value": 0.8, "predicted": true },
-       "duration": { "value": 120, "predicted": true },
-       "category": { "value": ["study", "project"], "predicted": true },
-       "location": { "value": "Library", "predicted": true },
-       "importance": { "value": 0.9, "predicted": true },
-       "fixed_time": { "value": false, "predicted": false },
-       "fixed_start": { "value": null, "predicted": false }
+       "name": "Chemistry Project",
+       "start": "2026-04-19T09:00:00",
+       "deadline": "2026-04-20T17:00:00",
+       "difficulty": 0.8,
+       "duration": 120,
+       "category": ["study", "project"],
+       "location": "Library",
+       "importance": 0.9,
+       "fixed_time": false,
+       "fixed_start": null
      }
    }
 
@@ -64,16 +64,16 @@
    Request Body:
    {
      "task": {
-       "name": { "value": "Bad Task", "predicted": false },
-       "start": { "value": null, "predicted": false },
-       "deadline": { "value": "2026-04-20T17:00:00", "predicted": false },
-       "difficulty": { "value": 0.5, "predicted": true },
-       "duration": { "value": 60, "predicted": true },
-       "category": { "value": ["study"], "predicted": true },
-       "location": { "value": "Home", "predicted": true },
-       "importance": { "value": 0.5, "predicted": true },
-       "fixed_time": { "value": false, "predicted": false },
-       "fixed_start": { "value": null, "predicted": false }
+       "name": "Bad Task",
+       "start": null,
+       "deadline": "2026-04-20T17:00:00",
+       "difficulty": 0.5,
+       "duration": 60,
+       "category": ["study"],
+       "location": "Home",
+       "importance": 0.5,
+       "fixed_time": false,
+       "fixed_start": null
      }
    }
 
@@ -85,16 +85,16 @@
    Request Body:
    {
      "task": {
-       "name": { "value": "Math Class", "predicted": false },
-       "start": { "value": null, "predicted": false },
-       "deadline": { "value": null, "predicted": false },
-       "difficulty": { "value": 0.5, "predicted": true },
-       "duration": { "value": 60, "predicted": true },
-       "category": { "value": ["study"], "predicted": true },
-       "location": { "value": "Room 101", "predicted": true },
-       "importance": { "value": 0.7, "predicted": true },
-       "fixed_time": { "value": true, "predicted": false },
-       "fixed_start": { "value": "2026-04-15T10:00:00", "predicted": false }
+       "name": "Math Class",
+       "start": null,
+       "deadline": null,
+       "difficulty": 0.5,
+       "duration": 60,
+       "category": ["study"],
+       "location": "Room 101",
+       "importance": 0.7,
+       "fixed_time": true,
+       "fixed_start": "2026-04-15T10:00:00"
      }
    }
 
@@ -111,16 +111,16 @@
    Request Body:
    {
      "task": {
-       "name": { "value": "Updated Math Homework", "predicted": false },
-       "start": { "value": "2026-04-18T09:00:00", "predicted": false },
-       "deadline": { "value": "2026-04-18T17:00:00", "predicted": false },
-       "difficulty": { "value": 0.6, "predicted": true },
-       "duration": { "value": 60, "predicted": true },
-       "category": { "value": ["study"], "predicted": true },
-       "location": { "value": "Home", "predicted": true },
-       "importance": { "value": 0.7, "predicted": true },
-       "fixed_time": { "value": false, "predicted": false },
-       "fixed_start": { "value": null, "predicted": false }
+       "name": "Updated Math Homework",
+       "start": "2026-04-18T09:00:00",
+       "deadline": "2026-04-18T17:00:00",
+       "difficulty": 0.6,
+       "duration": 60,
+       "category": ["study"],
+       "location": "Home",
+       "importance": 0.7,
+       "fixed_time": false,
+       "fixed_start": null
      }
    }
 

@@ -4,62 +4,46 @@ from uuid import UUID
 from app.schemas.shared import SuccessResponse
 
 
-# 1. The building block for every field
-class TaskField(BaseModel):
-    """
-    Represents a single field in a task request.
-    Now supports Lists for categories!
-    """
-    value: Union[str, int, float, bool, List[str], None]
-    predicted: bool
-
-
-# 2. The input structure for creating/updating tasks
+# 1. The input structure for creating/updating tasks
 class TaskPayload(BaseModel):
     """
-    The specific fields a task must have.
-    Includes validation logic for fixed_time vs start/deadline.
+    Clean task data without predicted flags.
+    Matches the display fields agreed upon.
     """
-    name: TaskField
-    start: TaskField
-    deadline: TaskField
-    difficulty: TaskField
-    duration: TaskField
-    category: TaskField
-    location: TaskField
-    importance: TaskField
-    fixed_time: TaskField
-    fixed_start: TaskField
+    name: str
+    start: Optional[str] = None
+    deadline: Optional[str] = None
+    difficulty: float
+    duration: int
+    category: List[str]
+    location: Optional[str] = None
+    importance: float
+    fixed_time: bool = False
+    fixed_start: Optional[str] = None
 
     @model_validator(mode="after")
     def check_fixed_time_logic(self):
         """
-        Validates that the task is either a 'Fixed' task OR a 'Flexible' task,
-        but not a mix of both.
+        Validates that the task is either a 'Fixed' task OR a 'Flexible' task.
         """
-        is_fixed = self.fixed_time.value
-        has_fixed_start = self.fixed_start.value is not None
-        has_start = self.start.value is not None
-        has_deadline = self.deadline.value is not None
-
-        # CASE 1: FIXED TIME TASK
-        if is_fixed:
-            if not has_fixed_start:
-                raise ValueError("For fixed tasks, 'fixed_start' must be provided.")
-            if has_start or has_deadline:
-                raise ValueError("For fixed tasks, 'start' and 'deadline' must be null.")
-        
-        # CASE 2: FLEXIBLE (NORMAL) TASK
-        else:
-            if has_fixed_start:
+        # Flexible Task: Must have start AND deadline. Fixed fields must be null.
+        if not self.fixed_time:
+            if self.fixed_start is not None:
                 raise ValueError("For flexible tasks, 'fixed_start' must be null.")
-            if not has_start or not has_deadline:
+            if self.start is None or self.deadline is None:
                 raise ValueError("For flexible tasks, BOTH 'start' and 'deadline' must be provided.")
+        
+        # Fixed Task: Must have fixed_start. Flexible fields must be null.
+        else:
+            if self.fixed_start is None:
+                raise ValueError("For fixed tasks, 'fixed_start' must be provided.")
+            if self.start is not None or self.deadline is not None:
+                raise ValueError("For fixed tasks, 'start' and 'deadline' must be null.")
 
         return self
 
 
-# 3. Request Wrappers
+# 2. Request Wrappers
 class TaskCreateRequest(BaseModel):
     """Input for POST /tasks"""
     task: TaskPayload
@@ -74,7 +58,7 @@ class ParseModifyRequest(BaseModel):
     prompt: str
 
 
-# 4. Response Wrappers
+# 3. Response Wrappers
 class TaskResponse(SuccessResponse):
     """Response for POST /tasks and POST /tasks/{id}/update"""
     task_id: str
@@ -82,15 +66,15 @@ class TaskResponse(SuccessResponse):
 
 class ParseAddResponse(BaseModel):
     """Response for POST /tasks/parse/add"""
-    enriched_task: TaskPayload
+    task: TaskPayload
 
 class ParseModifyResponse(BaseModel):
     """Response for POST /tasks/parse/modify"""
     task_id: str
-    enriched_task: TaskPayload
+    task: TaskPayload
 
 
-# 5. Unscheduled Queue Schemas
+# 4. Unscheduled Queue Schemas
 class UnscheduledTaskItem(BaseModel):
     """A single task in the unscheduled queue."""
     id: str
