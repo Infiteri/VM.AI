@@ -477,3 +477,159 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-04-13T14:19:55.407859'
+  mode: add
+  input: set 4pm
+  raw_output: name=set 4 pm[EXP] | difficulty=0.47[PRD] | duration=60[PRD], category=work[PRD].
+  parsed:
+    name: set 4 pm
+    start: null
+    deadline: null
+    difficulty: '0.47'
+    duration: 60[PRD], category=work[PRD].
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T14:20:01.584333'
+  mode: add
+  input: move to 4 pm
+  raw_output: name=move to 4 pm[EXP] | difficulty=0.47[PRD] | duration=45[PRD], category=work[PRD].
+  parsed:
+    name: move to 4 pm
+    start: null
+    deadline: null
+    difficulty: '0.47'
+    duration: 45[PRD], category=work[PRD].
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T14:20:06.321093'
+  mode: modify
+  input: make it 4 pm
+  raw_output: fixed_time=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-13T17:05:05.894315'
+  mode: add
+  input: go to school
+  raw_output: name=go to school[EXP] | difficulty=0.37[PRD] | duration=45[PRD], category=home[PRD].
+    importance=0.43[PRD*] | fixed_time=false[EXPERIENCED] | recurrent=falser[EXPL]
+  parsed:
+    name: go to school
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T17:05:26.127476'
+  mode: add
+  input: urgent gym session tomorrow at 9am for 60 minutes
+  raw_output: name=gym session[EXP] | difficulty=0.37[PRD] | duration=60[EXPL] | category=fitness[PRD],
+    importance=0.43[PRD]. | fixed_time=true[EXPERIENCE] | fixed_start=9:00[EXC] |
+    recurrent=false[EYE]
+  parsed:
+    name: gym session
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '60'
+    category: fitness[PRD], importance=0.43[PRD].
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '9:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T18:08:32.869870'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.37[PRD] | duration=45[PRD], category=home[PRD].
+    importance=0.43[PRD*] | fixed_time=false[EXPERT] | recurrent=falser[EXPL]
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T18:08:44.924551'
+  mode: modify
+  input: at 6 pm
+  raw_output: name=seating_time=true[EXP] | fixed_start=18:00[EXPL]
+  parsed:
+    name: seating_time=true
+    fixed_start: '18:00'
+  error: null
+
+- timestamp: '2026-04-13T18:09:07.566114'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.37[PRD] | duration=45[PRD], category=home[PRD].
+    importance=0.43[PRD*] | fixed_time=false[EXPERT] | recurrent=falser[EXPL]
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.37'
+    duration: '45'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-13T18:09:11.522582'
+  mode: add
+  input: go home at 6 pm
+  raw_output: name=go home[EXP] | difficulty=0.47[PRD] | duration=45[PRD], category=home[PRD].
+    importance=0.55[PRD|EXP) | fixed_time=true[EXPL] | fixed_start=18:00[EXPERIENCE]
+    | recurrent=false[EYP]
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.47'
+    duration: 45[PRD], category=home[PRD]. importance=0.55[PRD
+    category: null
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+

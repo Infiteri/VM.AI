@@ -100,8 +100,8 @@ class TaskPlannerPredictor:
                 attention_mask=inputs["attention_mask"],
                 decoder_input_ids=decoder_input,
                 max_new_tokens=256,
-                no_repeat_ngram_size=4,
-                repetition_penalty=1.5,
+                no_repeat_ngram_size=3,
+                repetition_penalty=1.1,
             )
 
         raw = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
@@ -122,21 +122,32 @@ class TaskPlannerPredictor:
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:
-        summary = {}
-        for k, v in existing_task.items():
-            val = v["value"] if isinstance(v, dict) else v
-            if val is not None:
-                if isinstance(val, bool):
-                    val = "true" if val else "false"
-                summary[k] = val
-        input_text = f"modify: {json.dumps(summary, ensure_ascii=False)} \u2502 {self._normalize(change_prompt)}"
-        output = self._run_model(input_text, start_token="")
+        """Apply changes to existing task using direct instruction format.
+        
+        The model was trained on: "push deadline to wednesday" → "deadline=wednesday[PRD]"
+        No JSON context needed — the model learns to map instructions directly to fields.
+        """
+        # Direct instruction — matches training format
+        output = self._run_model(change_prompt.lower())
 
-        new_task = pipe_to_schema(output, input_text=change_prompt)
-        if "error" in new_task:
+        new_fields = pipe_to_schema(output, input_text=change_prompt)
+        if "error" in new_fields:
             result = {"error": "parse_failed", "raw": output}
         else:
-            changed = self._diff_schemas(existing_task, new_task)
+            # Merge changed fields into existing task
+            changed = {}
+            for field, entry in new_fields.items():
+                if not isinstance(entry, dict):
+                    continue
+                val = entry.get("value")
+                if val is None:
+                    continue
+                old_entry = existing_task.get(field, {})
+                old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
+
+                if str(val).lower() != str(old_val).lower():
+                    changed[field] = entry
+
             if not changed:
                 result = {"error": "no_changes", "raw": output}
             else:
@@ -207,7 +218,6 @@ def main():
     print("  add: <prompt>          — extract a new task")
     print("  modify                 — modify last add result")
     print("  modify json            — paste JSON then type change")
-    print("  modify: {..} │ <change> — paste full modify string")
     print("  end                    — exit")
     print("=" * 60)
     print(f"  Logging to: {os.path.abspath(LOG_FILE)}")
@@ -244,30 +254,6 @@ def main():
                     continue
                 change = input("   What to change? > ").strip()
                 if not change:
-                    continue
-                changes = predictor.predict_modify(pasted, change)
-                print("\n   Changed fields:")
-                print(format_output(changes))
-                last_result = pasted
-                for field, entry in changes.items():
-                    if isinstance(entry, dict):
-                        last_result[field] = entry
-                count += 1
-
-            elif user_input.lower().startswith("modify:"):
-                rest = user_input[7:].strip()
-                if "│" not in rest:
-                    print("   Missing │ separator.")
-                    continue
-                json_part, _, change_part = rest.partition("│")
-                try:
-                    pasted = json.loads(json_part.strip())
-                except json.JSONDecodeError:
-                    print("   Invalid JSON in modify string.")
-                    continue
-                change = change_part.strip()
-                if not change:
-                    print("   Missing change prompt after │.")
                     continue
                 changes = predictor.predict_modify(pasted, change)
                 print("\n   Changed fields:")

@@ -104,6 +104,15 @@ def load_model(cfg, device):
     return T5ForConditionalGeneration.from_pretrained(cfg.model_cache).to(device)
 
 
+def add_special_tokens(tokenizer, model):
+    """Add [EXP] and [PRD] as special tokens to prevent subword fragmentation."""
+    special_tokens = ["[EXP]", "[PRD]"]
+    tokenizer.add_special_tokens({"additional_special_tokens": special_tokens})
+    model.resize_token_embeddings(len(tokenizer))
+    print(f"Added special tokens: {special_tokens} (vocab size: {len(tokenizer)})")
+    return tokenizer, model
+
+
 def save_model(model, tokenizer, cfg):
     model.save_pretrained(cfg.output_dir)
     tokenizer.save_pretrained(cfg.output_dir)
@@ -286,6 +295,7 @@ def main():
 
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_cache)
     model     = load_model(cfg, device)
+    tokenizer, model = add_special_tokens(tokenizer, model)
 
     train_ds, test_ds   = build_dataset(cfg, args.mode)
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
