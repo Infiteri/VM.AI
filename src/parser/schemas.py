@@ -191,7 +191,14 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
     Parse pipe-format string with EXP/PRD tags into schema dict.
     Format: name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
     If no tags present, auto-detect based on input_text.
+    Handles T5 sentinel tokens (<extra_id_*>) — strips them entirely.
     """
+    # Strip T5 sentinel tokens entirely (they appear as artifacts after tags/values)
+    flat = re.sub(r'<extra_id_\d+>', '', flat)
+    # Also handle any that replaced pipe separators
+    flat = re.sub(r'\s*\|\s*<extra_id_\d+>\s*\|\s*', ' | ', flat)
+    flat = re.sub(r'\s*\|\s*\|\s*', ' | ', flat)
+
     raw = {}
     for part in flat.split("|"):
         part = part.strip()

@@ -104,7 +104,10 @@ class TaskPlannerPredictor:
                 repetition_penalty=1.1,
             )
 
-        raw = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+        # Strip only padding tokens, keep [EXP]/[PRD] special tokens
+        pad_id = self.tokenizer.pad_token_id
+        out = [t for t in output_ids[0] if t != pad_id]
+        raw = self.tokenizer.decode(out, skip_special_tokens=False)
         self._last_raw_output = raw
         return raw
 
