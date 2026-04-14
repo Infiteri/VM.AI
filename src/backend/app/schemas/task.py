@@ -46,7 +46,7 @@ class TaskPayload(BaseModel):
 # 2. Request Wrappers
 class TaskCreateRequest(BaseModel):
     """Input for POST /tasks (Commit Phase)"""
-    draft_id: str  # Mandatory: Identifies which draft to finalize
+    draft_id: Optional[str] = None  # Optional: Only required if committing from Chat/AI
     task: TaskPayload
 
 class TaskUpdateRequest(BaseModel):
@@ -101,3 +101,22 @@ class UnscheduledResponse(BaseModel):
     """Response for GET /tasks/unscheduled"""
     tasks: List[UnscheduledTaskItem]
     total_count: int
+
+
+class TaskDetailResponse(BaseModel):
+    """Detailed task data returned when fetching a single task."""
+    id: str
+    name: str
+    start: Optional[str] = None
+    deadline: Optional[str] = None
+    difficulty: float
+    duration: int
+    category: List[str]
+    location: Optional[str] = None
+    importance: float
+    fixed_time: bool
+    fixed_start: Optional[str] = None
+    rated: bool
+    value: Optional[float] = None
+    urgency: Optional[float] = None
+    created_at: str

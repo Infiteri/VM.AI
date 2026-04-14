@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, Query, status, Path
+from fastapi import APIRouter, Depends, Query, status, Path, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
 
 from app.core.database import get_db
 from app.schemas.task import (
-    TaskCreateRequest, 
+    TaskCreateRequest,
     TaskUpdateRequest,
-    TaskResponse, 
-    ParseAddRequest, 
+    TaskResponse,
+    TaskDetailResponse,
+    ParseAddRequest,
     ParseModifyRequest,
     ParseAddResponse,
     ParseModifyResponse,
@@ -91,8 +92,15 @@ def create_task(
     POST /tasks
     Creates a new task in the database.
     """
-    # TODO: Wire to Task Matching -> Enrichment -> DB
-    
+    # TODO: Logic Fork
+    # If body.draft_id is present:
+    #   1. Fetch draft from DB.
+    #   2. Update draft data with body.task edits.
+    #   3. Save to main DB, delete draft.
+    # Else (Manual Creation):
+    #   1. Run Task Matching & Enrichment pipeline on body.task.
+    #   2. Save to main DB.
+
     return TaskResponse(
         success=True,
         task_id="550e8400-e29b-41d4-a716-446655440001",
@@ -134,7 +142,44 @@ def delete_task(
 
 
 # ---------------------------------------------------------
-# 3. Queue Endpoint
+# 4. Task Fetching Endpoint
+# ---------------------------------------------------------
+
+@router.get("/{id}", response_model=TaskDetailResponse)
+def get_task(
+    id: UUID,
+    db: Session = Depends(get_db),
+):
+    """
+    GET /tasks/{id}
+    Fetches details of a specific task by ID.
+    """
+    # TODO: Implement DB query
+    # task = db.query(Task).filter(Task.id == id).first()
+    # if not task: raise HTTPException(status_code=404, detail="Task not found")
+
+    # Stub Response
+    return TaskDetailResponse(
+        id=str(id),
+        name="Stub Task for Display",
+        start="2026-04-19T09:00:00",
+        deadline="2026-04-20T17:00:00",
+        difficulty=0.5,
+        duration=60,
+        category=["study"],
+        location="Home",
+        importance=0.5,
+        fixed_time=False,
+        fixed_start=None,
+        rated=False,
+        value=0.5,
+        urgency=0.3,
+        created_at="2026-04-10T12:00:00",
+    )
+
+
+# ---------------------------------------------------------
+# 5. Queue Endpoint
 # ---------------------------------------------------------
 
 @router.get("/unscheduled", response_model=UnscheduledResponse)
