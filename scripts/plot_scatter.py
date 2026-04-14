@@ -1,64 +1,77 @@
 """
-    VM-AI - Scatter Plot: Difficulty vs Importance by Category
+    VM.AI - Difficulty vs Importance Scatter for Specific Dataset
     Run: python scripts/plot_scatter.py
-
-    Written by: Vanea
 """
 
 import sys
 import os
 import yaml
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = os.path.join(ROOT, "data")
 
-plt.style.use("dark_background")
-plt.rcParams.update({
-    "figure.facecolor": "#0d1117", "axes.facecolor": "#0d1117",
-    "axes.edgecolor": "#30363d", "axes.labelcolor": "#c9d1d9",
-    "text.color": "#c9d1d9", "xtick.color": "#8b949e", "ytick.color": "#8b949e",
-})
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except ImportError:
+    print("Install: pip install matplotlib")
+    sys.exit(1)
 
-def load_examples(path):
-    with open(path, "r", encoding="utf-8") as f:
+
+def main():
+    data_path = os.path.join(ROOT, "data", "VMAI_SPECIFIC_Data.yaml")
+    if not os.path.exists(data_path):
+        print(f"No specific data found at {data_path}")
+        sys.exit(0)
+
+    with open(data_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    return data.get("examples", [])
 
-examples = load_examples(os.path.join(DATA, "VMAI_REAL_Data.yaml"))
+    examples = data.get("examples", [])
+    adds = [
+        ex for ex in examples
+        if "name" in ex.get("output", {}) and ex["output"].get("difficulty") is not None
+    ]
 
-cats = {}
-for ex in examples:
-    out = ex.get("output", {})
-    try:
-        d = float(out.get("difficulty", 0))
-        i = float(out.get("importance", 0))
-    except: continue
-    cat = out.get("category", "unknown").lower()
-    cats.setdefault(cat, {"d": [], "i": []})
-    cats[cat]["d"].append(d)
-    cats[cat]["i"].append(i)
+    if not adds:
+        print("No add examples with difficulty found.")
+        sys.exit(0)
 
-fig, ax = plt.subplots(figsize=(14, 9))
-colors = plt.cm.tab10(range(len(cats)))
-for idx, (cat, vals) in enumerate(cats.items()):
-    ax.scatter(vals["d"], vals["i"], label=cat, color=colors[idx], alpha=0.7, s=60, edgecolors="#30363d")
+    diffs = [float(ex["output"]["difficulty"]) for ex in adds]
+    imps = [float(ex["output"]["importance"]) for ex in adds]
+    cats = [str(ex["output"].get("category", "unknown")).lower() for ex in adds]
 
-ax.set_title("Difficulty vs Importance by Category (Real Data)", color="#f0f6fc", fontsize=14, fontweight="bold")
-ax.set_xlabel("Difficulty", color="#8b949e", fontsize=12)
-ax.set_ylabel("Importance", color="#8b949e", fontsize=12)
-ax.set_xlim(0, 1)
-ax.set_ylim(0, 1)
-ax.legend(loc="upper right", fontsize=8, framealpha=0.3)
-ax.grid(True, alpha=0.15)
+    plt.style.use("dark_background")
+    plt.rcParams.update({
+        "figure.facecolor": "#0d1117", "axes.facecolor": "#0d1117",
+        "axes.edgecolor": "#30363d", "axes.labelcolor": "#c9d1d9",
+        "text.color": "#c9d1d9", "xtick.color": "#8b949e", "ytick.color": "#8b949e",
+    })
 
-out = os.path.join(ROOT, "scripts", "output", "scatter_diff_imp.png")
-os.makedirs(os.path.dirname(out), exist_ok=True)
-plt.tight_layout()
-plt.savefig(out, dpi=150, bbox_inches="tight")
-print(f"Saved: {out}")
-print(f"Categories plotted: {len(cats)}")
-for cat, vals in sorted(cats.items()):
-    print(f"  {cat:15s}: {len(vals['d'])} points")
+    fig, ax = plt.subplots(figsize=(10, 7))
+    unique_cats = sorted(set(cats))
+    for cat in unique_cats:
+        mask = [c == cat for c in cats]
+        ax.scatter(
+            [d for d, m in zip(diffs, mask) if m],
+            [i for i, m in zip(imps, mask) if m],
+            label=cat, s=60, alpha=0.7, edgecolors="#30363d",
+        )
+
+    ax.set_title("Difficulty vs Importance (Specific Data)", color="#f0f6fc", fontweight="bold")
+    ax.set_xlabel("Difficulty", color="#8b949e")
+    ax.set_ylabel("Importance", color="#8b949e")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.legend(fontsize=9, framealpha=0.3)
+    ax.grid(True, alpha=0.2)
+
+    out = os.path.join(ROOT, "scripts", "output", "specific_scatter.png")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(out, dpi=150, bbox_inches="tight")
+    print(f"Saved: {out}")
+
+
+if __name__ == "__main__":
+    main()

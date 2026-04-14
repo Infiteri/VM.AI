@@ -10,6 +10,7 @@ import json
 import random
 import argparse
 import re
+import os
 from datasets import Dataset
 from schemas import (
     schema_to_pipe, changed_to_pipe, normalize_duration, 
@@ -48,28 +49,69 @@ def _rand_name():
 def _rand_time():
     return random.choice(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"])
 
+def _rand_start():
+    return random.choice(["tomorrow", "next week", "Monday", "Friday", "today", "next Monday", "Wednesday", "this weekend"])
+
 def _rand_recurrence_days():
     count = random.randint(1, 3)
     return ",".join(random.sample(DAYS, k=count))
 
 # ── CHANGE_TEMPLATES ──────────────────────────────────────────────────────────
+# Format: (field_name, phrase_function, value_generator)
+# These generate natural language modify instructions for training.
 
 CHANGE_TEMPLATES = [
+    # ── Duration ──────────────────────────────────────────────────────
     ("duration", lambda v: f"make it {v} minutes", _rand_duration),
     ("duration", lambda v: f"change duration to {v} minutes", _rand_duration),
     ("duration", lambda v: f"it should take {v} minutes", _rand_duration),
+    ("duration", lambda v: f"set it to {v} minutes", _rand_duration),
+    ("duration", lambda v: f"{v} minutes instead", _rand_duration),
+    # ── Deadline ──────────────────────────────────────────────────────
     ("deadline", lambda v: f"push deadline to {v}", _rand_deadline),
     ("deadline", lambda v: f"move the deadline to {v}", _rand_deadline),
+    ("deadline", lambda v: f"due {v} now", _rand_deadline),
+    ("deadline", lambda v: f"change deadline to {v}", _rand_deadline),
+    ("deadline", lambda v: f"i need it by {v}", _rand_deadline),
+    # ── Start ─────────────────────────────────────────────────────────
+    ("start", lambda v: f"start on {v}", _rand_start),
+    ("start", lambda v: f"begin {v}", _rand_start),
+    ("start", lambda v: f"kick off {v}", _rand_start),
+    ("start", lambda v: f"move start to {v}", _rand_start),
+    # ── Location ──────────────────────────────────────────────────────
     ("location", lambda v: f"do it at {v}", _rand_location),
     ("location", lambda v: f"change location to {v}", _rand_location),
+    ("location", lambda v: f"move it to {v}", _rand_location),
+    ("location", lambda v: f"at {v} instead", _rand_location),
+    # ── Difficulty ────────────────────────────────────────────────────
     ("difficulty", lambda v: f"mark it as {'hard' if float(v) > 0.5 else 'easy'}", _rand_difficulty),
+    ("difficulty", lambda v: f"make it {'harder' if float(v) > 0.5 else 'easier'}", _rand_difficulty),
+    ("difficulty", lambda v: f"{'more' if float(v) > 0.5 else 'less'} challenging", _rand_difficulty),
+    # ── Importance ────────────────────────────────────────────────────
     ("importance", lambda v: f"mark it as {'high priority' if float(v) > 0.5 else 'low priority'}", _rand_importance),
+    ("importance", lambda v: f"make it {'urgent' if float(v) > 0.7 else 'optional'}", _rand_importance),
+    ("importance", lambda v: f"{'very' if float(v) > 0.5 else 'not very'} important", _rand_importance),
+    # ── Category ──────────────────────────────────────────────────────
     ("category", lambda v: f"categorize it as {v}", _rand_category),
+    ("category", lambda v: f"put it under {v}", _rand_category),
+    ("category", lambda v: f"it's {v} not work", _rand_category),
+    ("category", lambda v: f"change category to {v}", _rand_category),
+    # ── Name ──────────────────────────────────────────────────────────
     ("name", lambda v: f"rename it to {v}", _rand_name),
+    ("name", lambda v: f"call it {v}", _rand_name),
+    # ── Fixed Time ────────────────────────────────────────────────────
     ("fixed_time+fixed_start", lambda v: f"set it for {v}", _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"at {v} instead", _rand_time),
+    ("fixed_time+fixed_start", lambda v: f"scheduled for {v}", _rand_time),
     ("cancel_fixed_time", lambda v: "cancel fixed time", lambda: "false"),
+    ("cancel_fixed_time", lambda v: "remove the time", lambda: "false"),
+    ("cancel_fixed_time", lambda v: "no specific time", lambda: "false"),
+    # ── Recurrence ────────────────────────────────────────────────────
     ("recurrent+recurrence_days", lambda v: f"make it repeat every {v}", _rand_recurrence_days),
+    ("recurrent+recurrence_days", lambda v: f"repeat on {v}", _rand_recurrence_days),
     ("cancel_recurrent", lambda v: "cancel recurrence", lambda: "false"),
+    ("cancel_recurrent", lambda v: "make it one-time", lambda: "false"),
+    ("cancel_recurrent", lambda v: "don't repeat it", lambda: "false"),
 ]
 
 
@@ -300,15 +342,66 @@ class DataGenerator:
                 mentioned = [DAYS_LOWER[d] for d in DAYS_LOWER if d in s]
                 schema["recurrence_days"]["value"] = mentioned if mentioned else random.sample(DAYS, k=random.randint(1, 3))
 
-        # Handle deadline/start keywords
-        for d in DAYS:
-            if d.lower() in s:
-                schema["deadline"]["value"] = d
-                break
-        if "tomorrow" in s:
-            schema["deadline"]["value"] = "tomorrow"
-        if "next week" in s:
-            schema["deadline"]["value"] = "next week"
+        # Handle deadline/start keywords (only if not already set from placeholders)
+        deadline_keywords = ["by", "due", "before", "deadline", "until", "no later than"]
+        start_keywords = ["start", "begin", "from", "starting", "kick off", "commence"]
+        
+        has_deadline_kw = any(kw in s for kw in deadline_keywords)
+        has_start_kw = any(kw in s for kw in start_keywords)
+
+        # Only set day-based values if not already populated from placeholders
+        if not schema["deadline"]["value"] and not schema["start"]["value"]:
+            day_found = None
+            for d in DAYS:
+                if d.lower() in s:
+                    day_found = d
+                    break
+            
+            if day_found:
+                if has_start_kw:
+                    schema["start"]["value"] = day_found
+                elif has_deadline_kw:
+                    schema["deadline"]["value"] = day_found
+                else:
+                    # No keyword: mostly start, some deadline for variety
+                    if random.random() < 0.6:
+                        schema["start"]["value"] = day_found
+                    else:
+                        schema["deadline"]["value"] = day_found
+        
+        if not schema["deadline"]["value"] and not schema["start"]["value"]:
+            if "tomorrow" in s:
+                if has_start_kw:
+                    schema["start"]["value"] = "tomorrow"
+                elif has_deadline_kw:
+                    schema["deadline"]["value"] = "tomorrow"
+                else:
+                    if random.random() < 0.6:
+                        schema["start"]["value"] = "tomorrow"
+                    else:
+                        schema["deadline"]["value"] = "tomorrow"
+            
+            if not schema["deadline"]["value"] and not schema["start"]["value"] and "next week" in s:
+                if has_start_kw:
+                    schema["start"]["value"] = "next week"
+                elif has_deadline_kw:
+                    schema["deadline"]["value"] = "next week"
+                else:
+                    if random.random() < 0.6:
+                        schema["start"]["value"] = "next week"
+                    else:
+                        schema["deadline"]["value"] = "next week"
+            
+            if not schema["deadline"]["value"] and not schema["start"]["value"] and "today" in s:
+                if has_start_kw:
+                    schema["start"]["value"] = "today"
+                elif has_deadline_kw:
+                    schema["deadline"]["value"] = "today"
+                else:
+                    if random.random() < 0.6:
+                        schema["start"]["value"] = "today"
+                    else:
+                        schema["deadline"]["value"] = "today"
 
         # Update predicted flags based on what was actually found
         for field in ["fixed_time", "fixed_start", "recurrent", "recurrence_days", "deadline", "start"]:
@@ -325,6 +418,10 @@ class DataGenerator:
         return f"add: {sentence}", schema_to_pipe(schema)
 
     def _generate_modify(self):
+        """Generate modify training sample with direct instruction format.
+        Input: just the change instruction (e.g., 'push deadline to wednesday')
+        Output: changed fields only (e.g., 'deadline=wednesday[PRD]')
+        """
         sentence, placeholder_map = self._fill_template()
         existing = self._build_schema(placeholder_map, sentence)
         num_changes = random.randint(1, 3)
@@ -347,14 +444,22 @@ class DataGenerator:
             elif field_name == "cancel_recurrent":
                 changed_fields["recurrent"] = {"value": False, "predicted": False}
                 changed_fields["recurrence_days"] = {"value": None, "predicted": False}
-            else:
+            elif field_name in ("deadline", "start", "duration", "location", "name", "recurrence_days"):
+                # User stated a specific value — explicit
+                changed_fields[field_name] = {"value": new_value, "predicted": False}
+            elif field_name in ("difficulty", "importance"):
+                # Model must infer from vague language like "hard", "urgent" — predicted
                 changed_fields[field_name] = {"value": new_value, "predicted": True}
+            else:
+                # Category — keyword stated but exact value assigned — explicit
+                changed_fields[field_name] = {"value": new_value, "predicted": False}
 
-        existing_summary = {k: v["value"] for k, v in existing.items() if v["value"] is not None}
-        input_text = f"modify: {json.dumps(existing_summary, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
-        return input_text, changed_to_pipe(changed_fields)
+        # Direct instruction — no JSON prefix
+        instruction = ", ".join(change_phrases)
+        return instruction.lower(), changed_to_pipe(changed_fields)
 
     def _generate_modify_full(self):
+        """Generate full schema modify sample with clean pipe format."""
         sentence, placeholder_map = self._fill_template()
         existing = self._build_schema(placeholder_map, sentence)
         num_changes = random.randint(1, 3)
@@ -366,67 +471,40 @@ class DataGenerator:
             new_value = value_fn()
             change_phrases.append(phrase_fn(new_value))
             if field_name == "fixed_time+fixed_start":
-                changed_fields["fixed_time"] = {"value": True}
-                changed_fields["fixed_start"] = {"value": normalize_time(new_value)}
+                changed_fields["fixed_time"] = {"value": True, "predicted": False}
+                changed_fields["fixed_start"] = {"value": normalize_time(new_value), "predicted": False}
             elif field_name == "recurrent+recurrence_days":
-                changed_fields["recurrent"] = {"value": True}
-                changed_fields["recurrence_days"] = {"value": new_value}
+                changed_fields["recurrent"] = {"value": True, "predicted": False}
+                changed_fields["recurrence_days"] = {"value": new_value, "predicted": False}
             elif field_name == "cancel_fixed_time":
-                changed_fields["fixed_time"] = {"value": False}
-                changed_fields["fixed_start"] = {"value": None}
+                changed_fields["fixed_time"] = {"value": False, "predicted": False}
+                changed_fields["fixed_start"] = {"value": None, "predicted": False}
+            elif field_name == "cancel_recurrent":
+                changed_fields["recurrent"] = {"value": False, "predicted": False}
+                changed_fields["recurrence_days"] = {"value": None, "predicted": False}
+            elif field_name in ("deadline", "start", "duration", "location", "name", "recurrence_days"):
+                changed_fields[field_name] = {"value": new_value, "predicted": False}
+            elif field_name in ("difficulty", "importance"):
+                changed_fields[field_name] = {"value": new_value, "predicted": True}
             else:
-                changed_fields[field_name] = {"value": new_value}
+                changed_fields[field_name] = {"value": new_value, "predicted": False}
 
-        task = dict(existing)
+        # Merge changes into existing schema
+        schema = dict(existing)
         for k, v in changed_fields.items():
-            if isinstance(v, dict):
-                task[k] = v["value"]
-            else:
-                task[k] = v
+            schema[k] = v
 
-        schema = {
-            "name": {"value": task.get("name"), "predicted": False},
-            "start": {"value": task.get("start"), "predicted": False},
-            "deadline": {"value": task.get("deadline"), "predicted": False},
-            "difficulty": {"value": task.get("difficulty"), "predicted": True},
-            "duration": {"value": task.get("duration"), "predicted": True},
-            "category": {"value": task.get("category"), "predicted": True},
-            "location": {"value": task.get("location"), "predicted": True},
-            "importance": {"value": task.get("importance"), "predicted": True},
-            "fixed_time": {"value": task.get("fixed_time", False), "predicted": False},
-            "fixed_start": {"value": task.get("fixed_start"), "predicted": False},
-            "recurrent": {"value": task.get("recurrent", False), "predicted": False},
-            "recurrence_days": {"value": task.get("recurrence_days"), "predicted": False},
-        }
-
-        input_text = f"modify: {json.dumps({k: v for k, v in existing.items() if v['value'] is not None}, ensure_ascii=False)} \u2502 {', '.join(change_phrases)}"
-        return input_text, schema_to_pipe(schema)
+        # Direct instruction format — matches new modify format
+        instruction = ", ".join(change_phrases)
+        return instruction.lower(), schema_to_pipe(schema)
 
     def _convert_real(self, example: dict):
         sentence = example["input"]
         output = example["output"]
 
+        # Route modify examples to the new direct-instruction handler
         if sentence.startswith("modify:"):
-            parts = []
-            for k, v in output.items():
-                if v is not None:
-                    if isinstance(v, bool):
-                        v = "true" if v else "false"
-                    if k == "duration":
-                        v = normalize_duration(v) or v
-                    if k == "fixed_start":
-                        v = normalize_time(str(v)) or v
-                    if k in ("deadline", "start"):
-                        v = normalize_deadline(v)
-                    if k == "category":
-                        v = clamp_category(v)
-                    if k in ("difficulty", "importance"):
-                        try:
-                            v = str(round(float(v), 2))
-                        except (ValueError, TypeError):
-                            pass
-                    parts.append(f"{k}={v}")
-            return sentence, " | ".join(parts)
+            return self._convert_real_modify(example)
 
         # Detect explicit fields from input
         explicit_fields = detect_explicit_fields(sentence)
@@ -488,70 +566,108 @@ class DataGenerator:
 
         return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
 
-    def _convert_real_modify_full(self, example: dict):
+    def _convert_real_modify(self, example: dict):
+        """Convert a real modify example from the dataset to direct instruction format.
+
+        Expected input format: modify: {"name":"task", ...} │ change instruction
+        Output: change instruction  →  changed_fields in pipe format
+        """
         sentence = example["input"]
         output = example["output"]
 
-        try:
-            json_str = sentence.replace("modify:", "").split("\u2502")[0].strip()
-            original = json.loads(json_str)
-        except (json.JSONDecodeError, IndexError):
-            return sentence, ""
+        # Extract the change instruction after the │ separator
+        if "\u2502" in sentence:
+            _, _, change_part = sentence.partition("\u2502")
+            instruction = change_part.strip().lower()
+        else:
+            # Fallback: use the whole sentence as instruction
+            instruction = sentence.replace("modify:", "").strip().lower()
 
-        task = dict(original)
-        for k, v in output.items():
-            if v is not None:
-                if isinstance(v, bool):
-                    task[k] = "true" if v else "false"
-                elif k == "duration":
-                    task[k] = normalize_duration(v) or v
-                elif k == "fixed_start":
-                    task[k] = normalize_time(str(v)) or v
-                elif k in ("deadline", "start"):
-                    task[k] = normalize_deadline(v) or v
-                elif k == "category":
-                    task[k] = clamp_category(v)
-                elif k in ("difficulty", "importance"):
-                    try:
-                        task[k] = str(round(float(v), 2))
-                    except (ValueError, TypeError):
-                        task[k] = v
-                else:
-                    task[k] = v
+        # Build changed_fields from the output
+        changed = {}
+        for field, value in output.items():
+            if value is None:
+                continue
+            if isinstance(value, bool):
+                changed[field] = {"value": value, "predicted": False}
+            elif field == "duration":
+                normalized = normalize_duration(value)
+                changed[field] = {"value": normalized or value, "predicted": True}
+            elif field == "fixed_start":
+                normalized = normalize_time(str(value))
+                changed[field] = {"value": normalized or value, "predicted": False}
+            elif field in ("deadline", "start"):
+                normalized = normalize_deadline(value)
+                changed[field] = {"value": normalized or value, "predicted": True}
+            elif field == "category":
+                changed[field] = {"value": clamp_category(value), "predicted": True}
+            elif field in ("difficulty", "importance"):
+                try:
+                    changed[field] = {"value": str(round(float(value), 2)), "predicted": True}
+                except (ValueError, TypeError):
+                    changed[field] = {"value": str(value), "predicted": True}
             else:
-                task.pop(k, None)
+                changed[field] = {"value": value, "predicted": True}
 
-        schema = {
-            "name": {"value": task.get("name"), "predicted": False},
-            "start": {"value": task.get("start"), "predicted": False},
-            "deadline": {"value": task.get("deadline"), "predicted": False},
-            "difficulty": {"value": task.get("difficulty"), "predicted": True},
-            "duration": {"value": task.get("duration"), "predicted": True},
-            "category": {"value": task.get("category"), "predicted": True},
-            "location": {"value": task.get("location"), "predicted": True},
-            "importance": {"value": task.get("importance"), "predicted": True},
-            "fixed_time": {"value": task.get("fixed_time", False), "predicted": False},
-            "fixed_start": {"value": task.get("fixed_start"), "predicted": False},
-            "recurrent": {"value": task.get("recurrent", False), "predicted": False},
-            "recurrence_days": {"value": task.get("recurrence_days"), "predicted": False},
-        }
+        return instruction, changed_to_pipe(changed)
 
-        return sentence, schema_to_pipe(schema)
+    def _convert_real_modify_full(self, example: dict):
+        """Deprecated: old modify format. Real data now uses direct instruction."""
+        return example.get("input", ""), ""
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--sentences", type=int, default=10)
+    parser = argparse.ArgumentParser(description="Test data generator output")
+    parser.add_argument("--samples", type=int, default=10, help="Number of samples per mode")
+    parser.add_argument("--mode", choices=["add", "modify", "both"], default="both")
     args = parser.parse_args()
 
-    from yaml_parser import VMAI_YamlParser
-    yp = VMAI_YamlParser(f"./data/{vars.SYNTHETIC_DATASET}")
+    import os
+    from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
+    # Navigate to project root from src/parser/
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    data_dir = os.path.join(project_root, "data")
+    yp = VMAI_YamlParser(os.path.join(data_dir, vars.SYNTHETIC_DATASET))
     yp.load_yaml()
     training_data = yp.parse()
-    gen = DataGenerator(training_data)
 
-    for _ in range(args.sentences):
-        inp, tgt = gen._generate_add()
-        print(f"IN:  {inp}")
-        print(f"OUT: {tgt}")
-        print()
+    real = []
+    real_path = os.path.join(data_dir, vars.REAL_DATASET)
+    if os.path.exists(real_path):
+        rp = VMAI_RealDataParser(real_path)
+        rp.load_yaml()
+        real = rp.parse()
+
+    gen = DataGenerator(training_data, real)
+
+    if args.mode in ("add", "both"):
+        print("=" * 70)
+        print(f"  ADD SAMPLES ({args.samples})")
+        print("=" * 70)
+        for i in range(args.samples):
+            inp, tgt = gen._generate_add()
+            print(f"[{i+1}] IN:  {inp}")
+            print(f"    OUT: {tgt}")
+            # Quick validation
+            if "[EXP]" not in tgt and "[PRD]" not in tgt:
+                print(f"    ⚠️ MISSING TAGS!")
+            if "= null" in tgt.lower():
+                print(f"    ⚠️ NULL VALUE!")
+            print()
+
+    if args.mode in ("modify", "both"):
+        print("=" * 70)
+        print(f"  MODIFY SAMPLES ({args.samples})")
+        print("=" * 70)
+        for i in range(args.samples):
+            inp, tgt = gen._generate_modify()
+            print(f"[{i+1}] IN:  {inp}")
+            print(f"    OUT: {tgt}")
+            # Quick validation
+            if "[EXP]" not in tgt and "[PRD]" not in tgt:
+                print(f"    ⚠️ MISSING TAGS!")
+            if "modify:" in inp.lower():
+                print(f"    ⚠️ STILL HAS modify: PREFIX!")
+            if "\u2502" in inp:
+                print(f"    ⚠️ STILL HAS │ SEPARATOR!")
+            print()

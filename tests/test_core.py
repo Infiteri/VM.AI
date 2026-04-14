@@ -1,148 +1,160 @@
 """
     VM-AI - Core Parser Tests
-    Tests parsing accuracy, predicted fields, and change detection.
+    Tests pipe format parsing, schema conversion, and diff logic.
+    No model required.
     Run: python tests/test_core.py
-
-    Written by: Vanea
 """
 
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
+from schemas import pipe_to_schema, schema_to_pipe, changed_to_pipe
 
-PREDICTED = {"difficulty","duration","category","location","importance","start"}
-ALL = {"name":None,"start":None,"deadline":None,"difficulty":None,"duration":None,"category":None,"location":None,"importance":None,"fixed_time":False,"fixed_start":None,"recurrent":False,"recurrence_days":None}
+passed = 0
+failed = 0
 
-def _pipe(flat):
-    raw = {}
-    for p in flat.split("|"):
-        p = p.strip()
-        if "=" not in p: continue
-        k, _, v = p.partition("="); k, v = k.strip(), v.strip()
-        if v.lower() == "null": v = None
-        elif v.lower() in ("true","tru","t"): v = True
-        elif v.lower().startswith("fals"): v = False
-        if k not in raw: raw[k] = v
-    return {f: {"value": raw.get(f, d), "predicted": f in PREDICTED} for f, d in ALL.items()}
 
-def _changed(flat):
-    ch = {}
-    for p in flat.split("|"):
-        p = p.strip()
-        if "=" not in p: continue
-        k, _, v = p.partition("="); k, v = k.strip(), v.strip()
-        if v.lower() == "null": v = None
-        elif v.lower() in ("true","tru","t"): v = True
-        elif v.lower().startswith("fals"): v = False
-        if k and k not in ch: ch[k] = {"value": v, "predicted": False}
-    return ch
-
-def _diff(old, new):
-    ch = {}
-    for f, ne in new.items():
-        nv = ne.get("value") if isinstance(ne, dict) else ne
-        oe = old.get(f); ov = oe.get("value") if isinstance(oe, dict) else oe
-        if nv is None: continue
-        ov_s = str(ov).lower() if ov is not None else ""
-        nv_s = str(nv).lower()
-        if ov_s != nv_s:
-            ch[f] = {"value": nv, "predicted": ne.get("predicted", False) if isinstance(ne, dict) else False}
-    return ch
-
-passed = 0; failed = 0
 def c(n, ok, d=""):
     global passed, failed
-    if ok: passed += 1; print(f"  PASS | {n}")
-    else: failed += 1; print(f"  FAIL | {n} | {d}")
+    if ok:
+        passed += 1
+        print(f"  PASS | {n}")
+    else:
+        failed += 1
+        print(f"  FAIL | {n} | {d}")
 
-print("="*80); print("  CORE COMPONENT TESTS"); print("="*80)
 
-r = _pipe("name=gym | difficulty=0.55 | duration=60 | category=fitness | importance=0.41 | fixed_time=true | fixed_start=06:30 | recurrent=false")
-c("name=gym", r["name"]["value"]=="gym")
-c("diff=0.55", r["difficulty"]["value"]=="0.55")
-c("dur=60", r["duration"]["value"]=="60")
-c("cat=fitness", r["category"]["value"]=="fitness")
-c("imp=0.41", r["importance"]["value"]=="0.41")
+print("=" * 80)
+print("  CORE COMPONENT TESTS")
+print("=" * 80)
+
+# ── pipe_to_schema: basic parsing ───────────────────────────────────────────
+print("\n[1] PIPE TO SCHEMA — BASIC PARSING")
+r = pipe_to_schema(
+    "name=gym[EXP] | difficulty=0.55[PRD] | duration=60[PRD] | category=fitness[PRD] | importance=0.41[PRD] | fixed_time=true[EXP] | fixed_start=06:30[EXP] | recurrent=false[EXP]"
+)
+c("name=gym", r["name"]["value"] == "gym")
+c("diff=0.55", r["difficulty"]["value"] == "0.55")
+c("dur=60", r["duration"]["value"] == "60")
+c("cat=fitness", r["category"]["value"] == "fitness")
+c("imp=0.41", r["importance"]["value"] == "0.41")
 c("ft=true", r["fixed_time"]["value"] is True)
-c("fs=06:30", r["fixed_start"]["value"]=="06:30")
+c("fs=06:30", r["fixed_start"]["value"] == "06:30")
 c("rec=false", r["recurrent"]["value"] is False)
 
-c("name explicit", r["name"]["predicted"] is False)
-c("diff predicted", r["difficulty"]["predicted"] is True)
-c("dur predicted", r["duration"]["predicted"] is True)
-c("cat predicted", r["category"]["predicted"] is True)
-c("loc predicted", r["location"]["predicted"] is True)
-c("imp predicted", r["importance"]["predicted"] is True)
-c("ft explicit", r["fixed_time"]["predicted"] is False)
-c("fs explicit", r["fixed_start"]["predicted"] is False)
-c("rec explicit", r["recurrent"]["predicted"] is False)
-c("rec_days explicit", r["recurrence_days"]["predicted"] is False)
-c("start predicted", r["start"]["predicted"] is True)
-c("deadline explicit", r["deadline"]["predicted"] is False)
+# ── pipe_to_schema: EXP/PRD tags ───────────────────────────────────────────
+print("\n[2] PIPE TO SCHEMA — EXP/PRD TAGS")
+c("name is EXP", r["name"]["predicted"] is False)
+c("diff is PRD", r["difficulty"]["predicted"] is True)
+c("dur is PRD", r["duration"]["predicted"] is True)
+c("cat is PRD", r["category"]["predicted"] is True)
+c("loc is PRD", r["location"]["predicted"] is True)
+c("imp is PRD", r["importance"]["predicted"] is True)
+c("ft is EXP", r["fixed_time"]["predicted"] is False)
+c("fs is EXP", r["fixed_start"]["predicted"] is False)
+c("rec is EXP", r["recurrent"]["predicted"] is False)
+c("rec_days is PRD", r["recurrence_days"]["predicted"] is True)
+c("start is PRD", r["start"]["predicted"] is True)
+c("deadline is PRD", r["deadline"]["predicted"] is True)
 
-r = _pipe("name=s | location=null | fs=null")
+# ── pipe_to_schema: null values ────────────────────────────────────────────
+print("\n[3] PIPE TO SCHEMA — NULL VALUES")
+r = pipe_to_schema("name=s[EXP] | location=null[PRD] | fixed_start=null[PRD]")
 c("null loc", r["location"]["value"] is None)
 c("null fs", r["fixed_start"]["value"] is None)
 
-r = _pipe("fixed_time=tru | recurrent=t")
-c("tru", r["fixed_time"]["value"] is True)
-c("t", r["recurrent"]["value"] is True)
-r = _pipe("fixed_time=false | recurrent=fals")
-c("false", r["fixed_time"]["value"] is False)
-c("fals", r["recurrent"]["value"] is False)
+# ── pipe_to_schema: bool edge cases ────────────────────────────────────────
+print("\n[4] PIPE TO SCHEMA — BOOL PARSING")
+r = pipe_to_schema("fixed_time=true[EXP] | recurrent=true[EXP]")
+c("true", r["fixed_time"]["value"] is True)
+c("true rec", r["recurrent"]["value"] is True)
 
-r = _pipe("name=x")
+r = pipe_to_schema("fixed_time=false[EXP] | recurrent=false[EXP]")
+c("false", r["fixed_time"]["value"] is False)
+c("false rec", r["recurrent"]["value"] is False)
+
+# ── pipe_to_schema: missing fields get defaults ────────────────────────────
+print("\n[5] PIPE TO SCHEMA — MISSING FIELDS")
+r = pipe_to_schema("name=x[EXP]")
 c("missing diff=None", r["difficulty"]["value"] is None)
 c("missing ft=False", r["fixed_time"]["value"] is False)
+c("missing name=x", r["name"]["value"] == "x")
 
-r = _changed("fixed_start=07:00 | duration=90")
-c("ch: fs", r["fixed_start"]["value"]=="07:00")
-c("ch: dur", r["duration"]["value"]=="90")
-c("ch: len=2", len(r)==2)
-r = _changed("diff=0.8 | imp=0.95 | cat=work")
-c("ch: diff", r.get("diff",{}).get("value")=="0.8")
-c("ch: imp", r.get("imp",{}).get("value")=="0.95")
-c("ch: cat", r.get("cat",{}).get("value")=="work")
-c("ch: len=3", len(r)==3)
+# ── schema_to_pipe: roundtrip ──────────────────────────────────────────────
+print("\n[6] SCHEMA TO PIPE — ROUNDTRIP")
+schema = {
+    "name": {"value": "gym session", "predicted": False},
+    "start": {"value": None, "predicted": True},
+    "deadline": {"value": "tomorrow", "predicted": False},
+    "difficulty": {"value": "0.7", "predicted": True},
+    "duration": {"value": "60", "predicted": True},
+    "category": {"value": "fitness", "predicted": False},
+    "location": {"value": "gym", "predicted": True},
+    "importance": {"value": "0.9", "predicted": False},
+    "fixed_time": {"value": True, "predicted": False},
+    "fixed_start": {"value": "09:00", "predicted": False},
+    "recurrent": {"value": False, "predicted": False},
+    "recurrence_days": {"value": None, "predicted": True},
+}
+pipe = schema_to_pipe(schema)
+parsed = pipe_to_schema(pipe, input_text="gym session")
+c("roundtrip name", parsed["name"]["value"] == "gym session")
+c("roundtrip deadline", parsed["deadline"]["value"] == "tomorrow")
+c("roundtrip difficulty", parsed["difficulty"]["value"] == "0.7")
+c("roundtrip category", parsed["category"]["value"] == "fitness")
+c("roundtrip fixed_time", parsed["fixed_time"]["value"] is True)
+c("roundtrip fixed_start", parsed["fixed_start"]["value"] == "09:00")
+c("roundtrip recurrent", parsed["recurrent"]["value"] is False)
+c("pipe has tags", "[EXP]" in pipe and "[PRD]" in pipe)
 
-old = {"name":{"value":"gym","predicted":False},"diff":{"value":"0.35","predicted":True},"fs":{"value":"06:00","predicted":False}}
-new = {"name":{"value":"gym","predicted":False},"diff":{"value":"0.8","predicted":True},"fs":{"value":"07:00","predicted":False}}
-ch = _diff(old, new)
-c("d:diff ch", "diff" in ch)
-c("d:diff val", ch.get("diff",{}).get("value")=="0.8")
-c("d:fs ch", "fs" in ch)
-c("d:fs val", ch.get("fs",{}).get("value")=="07:00")
-c("d:name skip", "name" not in ch)
+# ── changed_to_pipe ────────────────────────────────────────────────────────
+print("\n[7] CHANGED TO PIPE")
+changed = {
+    "fixed_start": {"value": "07:00", "predicted": False},
+    "duration": {"value": "90", "predicted": True},
+}
+pipe = changed_to_pipe(changed)
+r = pipe_to_schema(pipe, input_text="")
+c("ch fs", r["fixed_start"]["value"] == "07:00")
+c("ch dur", r["duration"]["value"] == "90")
+c("ch: has tags", "[EXP]" in pipe and "[PRD]" in pipe)
 
-old = {"name":{"value":"gym","predicted":False},"diff":{"value":"0.35","predicted":True}}
-new = {"name":{"value":"gym","predicted":False},"diff":{"value":None,"predicted":True}}
-c("d:none skip", len(_diff(old,new))==0)
+# ── Diff logic ─────────────────────────────────────────────────────────────
+print("\n[8] DIFF SCHEMA — CHANGE DETECTION")
+old = {
+    "name": {"value": "gym", "predicted": False},
+    "difficulty": {"value": "0.35", "predicted": True},
+    "fixed_start": {"value": "06:00", "predicted": False},
+}
+new = {
+    "name": {"value": "gym", "predicted": False},
+    "difficulty": {"value": "0.8", "predicted": True},
+    "fixed_start": {"value": "07:00", "predicted": False},
+}
+from chat import TaskPlannerPredictor
+ch = TaskPlannerPredictor._diff_schemas(old, new)
+c("d: diff changed", "difficulty" in ch)
+c("d: diff val", ch.get("difficulty", {}).get("value") == "0.8")
+c("d: fs changed", "fixed_start" in ch)
+c("d: fs val", ch.get("fixed_start", {}).get("value") == "07:00")
+c("d: name skipped", "name" not in ch)
 
-old = {"ft":{"value":True,"predicted":False}}
-new = {"ft":{"value":False,"predicted":False}}
-c("d:bool ch", "ft" in _diff(old,new))
+# None values skipped
+old = {"name": {"value": "gym", "predicted": False}, "difficulty": {"value": "0.35", "predicted": True}}
+new = {"name": {"value": "gym", "predicted": False}, "difficulty": {"value": None, "predicted": True}}
+c("d: none skip", len(TaskPlannerPredictor._diff_schemas(old, new)) == 0)
 
-old = {"name":{"value":"Gym","predicted":False},"cat":{"value":"FITNESS","predicted":True}}
-new = {"name":{"value":"gym","predicted":False},"cat":{"value":"fitness","predicted":True}}
-c("d:case skip", len(_diff(old,new))==0)
+# Bool changes
+old = {"fixed_time": {"value": True, "predicted": False}}
+new = {"fixed_time": {"value": False, "predicted": False}}
+c("d: bool change", "fixed_time" in TaskPlannerPredictor._diff_schemas(old, new))
 
-old = {"name":{"value":"w","predicted":False},"diff":{"value":"0.35","predicted":True},"dur":{"value":"45","predicted":True}}
-new = {"name":{"value":"w","predicted":False},"diff":{"value":"0.8","predicted":True},"dur":{"value":"45","predicted":True}}
-c("d:1 ch", len(_diff(old,new))==1 and "diff" in _diff(old,new))
+# Case insensitive
+old = {"name": {"value": "Gym", "predicted": False}, "category": {"value": "FITNESS", "predicted": True}}
+new = {"name": {"value": "gym", "predicted": False}, "category": {"value": "fitness", "predicted": True}}
+c("d: case skip", len(TaskPlannerPredictor._diff_schemas(old, new)) == 0)
 
-old = {"name":"gym","fixed_time":True,"fixed_start":"06:00","dur":"45","diff":"0.35","imp":"0.51","recurrent":False}
-old_s = {k:{"value":v,"predicted":k in PREDICTED} for k,v in old.items()}
-ns = {k:{"value":v,"predicted":k in PREDICTED} for k,v in old.items()}
-ns.update(_pipe("name=gym | fixed_time=true | fixed_start=07:00 | dur=45 | diff=0.35 | imp=0.51 | recurrent=false"))
-ch = _diff(old_s, ns)
-c("e2e: fs ch", "fixed_start" in ch and ch["fixed_start"]["value"]=="07:00")
-c("e2e: 1 ch", len(ch)==1)
-
-old = {"name":"gym","diff":"0.5","dur":"60","fixed_time":False,"recurrent":False}
-ns = _pipe("name=gym | diff=0.5 | dur=60 | fixed_time=false | recurrent=false")
-old = {k:{"value":v,"predicted":k in PREDICTED} for k,v in old.items()}
-c("e2e: no ch", len(_diff(old,ns))==0)
-
-print(f"\n{'='*80}")
-print(f"  RESULTS: {passed}/{passed+failed} passed ({100*passed//(passed+failed)}%)")
-print(f"{'='*80}")
-sys.exit(0 if failed==0 else 1)
+# ── Summary ─────────────────────────────────────────────────────────────────
+print(f"\n{'=' * 80}")
+print(f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)")
+print(f"{'=' * 80}")
+sys.exit(0 if failed == 0 else 1)

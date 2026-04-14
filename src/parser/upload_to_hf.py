@@ -1,7 +1,7 @@
 """
     VM-AI - HuggingFace Model Uploader
     Uploads trained model to Hugging Face Hub.
-    Usage: python upload_to_hf.py [token]
+    Usage: python upload_to_hf.py [--message "commit msg"]
 
     Written by: Vanea
 """
@@ -9,6 +9,8 @@
 import os
 import sys
 import shutil
+import argparse
+from getpass import getpass
 from huggingface_hub import HfApi, login
 
 # Configuration
@@ -25,13 +27,13 @@ DATA_COLAB = os.path.join(SCRIPT_DIR, "colab", "data")
 def copy_data_to_colab():
     """Copy data files from root to colab folder"""
     print("Copying data to colab folder...")
-    
+
     if not os.path.exists(DATA_SOURCE):
         print(f"  Source not found: {DATA_SOURCE}")
         return
-    
+
     os.makedirs(DATA_COLAB, exist_ok=True)
-    
+
     copied = 0
     for filename in os.listdir(DATA_SOURCE):
         if filename.endswith(".yaml"):
@@ -40,49 +42,49 @@ def copy_data_to_colab():
             shutil.copy2(src, dst)
             print(f"  Copied: {filename}")
             copied += 1
-    
+
     print(f"  Done: {copied} files copied")
     print()
 
 def main():
-    # First, sync data to colab folder
-    copy_data_to_colab()
-    
+    argp = argparse.ArgumentParser(description="Upload VM.AI parser to HuggingFace Hub")
+    argp.add_argument("--message", default="Upload VM.AI parser model", help="Commit message")
+    args = argp.parse_args()
+
     print("=" * 60)
     print("VM.AI Parser - Hugging Face Upload")
     print("=" * 60)
     print()
-    
-    # Get token from command line or prompt
-    if len(sys.argv) > 1:
-        token = sys.argv[1].strip()
-    else:
-        print("Enter your Hugging Face token:")
-        print("Get one at: https://huggingface.co/settings/tokens")
-        print("(Role must be 'Write')")
-        print()
-        token = input("Token: ").strip()
-    
+
+    # Get token via hidden input
+    token = getpass("Enter HuggingFace token (hidden): ").strip()
     if not token:
         print("Error: No token provided")
-        print("Usage: python upload_to_hf.py [your_token]")
+        print("Get one at: https://huggingface.co/settings/tokens")
         return
-    
+
     # Check model exists
     if not os.path.exists(MODEL_PATH):
         print(f"Error: Model not found at {MODEL_PATH}")
         return
-    
-    files = os.listdir(MODEL_PATH)
-    if not files:
+
+    # Count files (excluding checkpoints and .cache)
+    file_count = 0
+    for root, dirs, filenames in os.walk(MODEL_PATH):
+        dirs[:] = [d for d in dirs if not d.startswith("checkpoint-") and d != ".cache"]
+        file_count += len(filenames)
+
+    if file_count == 0:
         print(f"Error: Model folder is empty")
         return
-    
+
     print()
     print(f"Model: {MODEL_PATH}")
-    print(f"Files: {len(files)}")
+    print(f"Files to upload: {file_count} (excluding checkpoints)")
+    print(f"Repo: https://huggingface.co/{HF_USERNAME}/{REPO_NAME}")
+    print(f"Commit message: {args.message}")
     print()
-    
+
     # Login
     print("Logging in...")
     try:
@@ -92,15 +94,11 @@ def main():
         print(f"Login failed: {e}")
         print("Check your token at: https://huggingface.co/settings/tokens")
         return
-    
+
     # Create API
     api = HfApi()
     repo_id = f"{HF_USERNAME}/{REPO_NAME}"
-    
-    print()
-    print(f"Repository: https://huggingface.co/{repo_id}")
-    print()
-    
+
     # Check/create repo
     try:
         api.model_info(repo_id=repo_id)
@@ -113,7 +111,7 @@ def main():
         except Exception as e:
             print(f"Failed to create repo: {e}")
             return
-    
+
     # Upload
     print()
     print("Uploading files...")
@@ -122,7 +120,9 @@ def main():
             folder_path=MODEL_PATH,
             repo_id=repo_id,
             repo_type="model",
-            commit_message="Upload VM.AI parser model"
+            commit_message=args.message,
+            token=token,
+            ignore_patterns=["checkpoint-*", ".cache/*"],
         )
         print()
         print("=" * 60)

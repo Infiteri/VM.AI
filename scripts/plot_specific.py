@@ -1,72 +1,60 @@
 """
-    VM-AI - Plot Specific Visualizations
-    Visualizes VMAI_SPECIFIC_Data.yaml to prove targeted fixes.
+    VM.AI - Specific Dataset Category Distribution
     Run: python scripts/plot_specific.py
-
-    Written by: Vanea
 """
-import sys, os, yaml
+
+import sys
+import os
+import yaml
 from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT_DIR = os.path.join(ROOT, "scripts", "output")
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set_theme(style="darkgrid")
-plt.style.use("dark_background")
-plt.rcParams.update({"figure.facecolor": "#0d1117", "axes.facecolor": "#0d1117"})
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except ImportError:
+    print("Install: pip install matplotlib")
+    sys.exit(1)
 
-def load_data():
-    path = os.path.join(ROOT, "data", "VMAI_SPECIFIC_Data.yaml")
-    if not os.path.exists(path):
-        print("VMAI_SPECIFIC_Data.yaml not found. Creating empty.")
-        return []
-    with open(path, "r", encoding="utf-8") as f:
+
+def main():
+    data_path = os.path.join(ROOT, "data", "VMAI_SPECIFIC_Data.yaml")
+    if not os.path.exists(data_path):
+        print(f"No specific data found at {data_path}")
+        sys.exit(0)
+
+    with open(data_path, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
-    
-    records = []
-    for ex in data.get("examples", []):
-        out = ex.get("output", {})
-        try:
-            records.append({
-                "category": out.get("category", "unknown").lower(),
-                "difficulty": float(out.get("difficulty", 0)),
-                "importance": float(out.get("importance", 0)),
-                "duration": float(out.get("duration", 0)),
-            })
-        except: pass
-    return records
+
+    examples = data.get("examples", [])
+    categories = [str(ex.get("output", {}).get("category", "unknown")).lower() for ex in examples]
+    counts = Counter(categories)
+
+    plt.style.use("dark_background")
+    plt.rcParams.update({
+        "figure.facecolor": "#0d1117", "axes.facecolor": "#0d1117",
+        "axes.edgecolor": "#30363d", "axes.labelcolor": "#c9d1d9",
+        "text.color": "#c9d1d9", "xtick.color": "#8b949e", "ytick.color": "#8b949e",
+    })
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    labels, values = zip(*counts.most_common())
+    ax.barh(labels, values, color="#3fb950", edgecolor="#30363d")
+    ax.set_title("Category Distribution (Specific Data)", color="#f0f6fc", fontweight="bold")
+    ax.set_xlabel("Count", color="#8b949e")
+    ax.grid(True, alpha=0.15, axis="x")
+
+    for i, v in enumerate(values):
+        ax.text(v + 0.2, i, str(v), color="#c9d1d9", va="center")
+
+    out = os.path.join(ROOT, "scripts", "output", "specific_categories.png")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(out, dpi=150, bbox_inches="tight")
+    print(f"Saved: {out}")
+
 
 if __name__ == "__main__":
-    os.makedirs(OUT_DIR, exist_ok=True)
-    records = load_data()
-    if not records:
-        print("No specific examples found.")
-        sys.exit(0)
-        
-    import pandas as pd
-    df = pd.DataFrame(records)
-    print(f"Loaded {len(df)} specific records.")
-
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    
-    # Scatter: Importance vs Difficulty
-    sns.scatterplot(data=df, x="difficulty", y="importance", hue="category", ax=axes[0], palette="Set2", alpha=0.8, edgecolor="#30363d")
-    axes[0].set_title("Specific Fixes: Difficulty vs Importance", color="#f0f6fc", fontweight="bold")
-    axes[0].axhline(0.5, color="#f85149", linestyle="--", alpha=0.5)
-    axes[0].axvline(0.5, color="#f85149", linestyle="--", alpha=0.5)
-
-    # Histogram: Importance Focus (Show the fill of the gap)
-    sns.histplot(data=df, x="importance", bins=20, color="#d29922", ax=axes[1])
-    axes[1].set_title("Specific Fixes: Importance Distribution", color="#f0f6fc", fontweight="bold")
-    axes[1].set_xlabel("Importance", color="#8b949e")
-    axes[1].axvline(0.3, color="#3fb950", linestyle="--", alpha=0.5, label="Target 0.3")
-    axes[1].legend()
-
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUT_DIR, "specific_fixes.png"), dpi=150, bbox_inches="tight")
-    plt.close()
-    print("Saved: specific_fixes.png")
+    main()
