@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query, status, Path, HTTPException
 from sqlalchemy.orm import Session
 from uuid import UUID
+from datetime import datetime
 
 from app.core.database import get_db
 from app.schemas.task import (
@@ -8,12 +9,12 @@ from app.schemas.task import (
     TaskUpdateRequest,
     TaskResponse,
     TaskDetailResponse,
+    TaskPayload,
     ParseAddRequest,
     ParseModifyRequest,
     ParseAddResponse,
     ParseModifyResponse,
     UnscheduledResponse,
-    TaskPayload
 )
 
 router = APIRouter()
@@ -35,11 +36,11 @@ def parse_add_task(
     # TODO: Call NLP Parser Service
     
     return ParseAddResponse(
-        draft_id="draft-550e8400-e29b-41d4-a716-446655440001",
+        draft_id=UUID("00000000-0000-0000-0000-000000000000"),  # Stub UUID
         task=TaskPayload(
             name="Example Task",
-            start="2026-04-14T09:00:00", # Must have start for flexible tasks
-            deadline="2026-04-15T00:00:00",
+            start=datetime(2026, 4, 14, 9, 0),
+            deadline=datetime(2026, 4, 15, 17, 0),
             difficulty=0.5,
             duration=60,
             category=["study"],
@@ -63,11 +64,11 @@ def parse_modify_task(
     # TODO: Call NLP Parser Service
     
     return ParseModifyResponse(
-        task_id=str(body.task_id),
+        task_id=body.task_id,
         task=TaskPayload(
             name="Modified Task",
-            start="2026-04-19T09:00:00",  # ✅ Must provide start for flexible tasks
-            deadline="2026-04-20T00:00:00",
+            start=datetime(2026, 4, 19, 9, 0),
+            deadline=datetime(2026, 4, 20, 17, 0),
             difficulty=0.5,
             duration=60,
             category=["study"],
@@ -103,7 +104,7 @@ def create_task(
 
     return TaskResponse(
         success=True,
-        task_id="550e8400-e29b-41d4-a716-446655440001",
+        task_id=UUID("550e8400-e29b-41d4-a716-446655440001"),
         status="unscheduled",
         message="Task created successfully (stub)",
     )
@@ -122,7 +123,7 @@ def update_task(
     """
     return TaskResponse(
         success=True,
-        task_id="new-uuid-here",
+        task_id=id,
         status="unscheduled",
         message="Task updated successfully (stub)",
     )
@@ -142,7 +143,7 @@ def delete_task(
 
 
 # ---------------------------------------------------------
-# 4. Task Fetching Endpoint
+# 3. Task Fetching Endpoint
 # ---------------------------------------------------------
 
 @router.get("/{id}", response_model=TaskDetailResponse)
@@ -155,31 +156,27 @@ def get_task(
     Fetches details of a specific task by ID.
     """
     # TODO: Implement DB query
-    # task = db.query(Task).filter(Task.id == id).first()
-    # if not task: raise HTTPException(status_code=404, detail="Task not found")
-
-    # Stub Response
+    
     return TaskDetailResponse(
-        id=str(id),
-        name="Stub Task for Display",
-        start="2026-04-19T09:00:00",
-        deadline="2026-04-20T17:00:00",
-        difficulty=0.5,
-        duration=60,
-        category=["study"],
-        location="Home",
-        importance=0.5,
-        fixed_time=False,
-        fixed_start=None,
-        rated=False,
-        value=0.5,
-        urgency=0.3,
-        created_at="2026-04-10T12:00:00",
+        task_id=id,
+        payload=TaskPayload(
+            name="Stub Task for Display",
+            start=datetime(2026, 4, 19, 9, 0),
+            deadline=datetime(2026, 4, 20, 17, 0),
+            difficulty=0.5,
+            duration=60,
+            category=["study"],
+            location="Home",
+            importance=0.5,
+            fixed_time=False,
+            fixed_start=None,
+        ),
+        created_at=datetime(2026, 4, 10, 12, 0),
     )
 
 
 # ---------------------------------------------------------
-# 5. Queue Endpoint
+# 4. Queue Endpoint
 # ---------------------------------------------------------
 
 @router.get("/unscheduled", response_model=UnscheduledResponse)

@@ -1,6 +1,7 @@
 # VM.AI Backend - Complete Endpoint Test Suite
 # Use these in Swagger UI: http://localhost:8000/docs
 # NOTE: Ensure all JSON keys use DOUBLE QUOTES (") not single quotes (').
+# NOTE: Dates must be ISO 8601 format (YYYY-MM-DDTHH:MM:SS).
 
 ================================================================================
 1. GET /schedule
@@ -36,9 +37,9 @@
    }
 
 ================================================================================
-5. POST /tasks (Manual Creation - No Draft)
+5. POST /tasks (Manual Creation)
    Description: Creates a flexible task directly (Manual Form).
-   No draft_id is needed.
+   Note: 'location' is required. 'difficulty'/'importance' must be > 0.0.
    
    Request Body:
    {
@@ -57,49 +58,7 @@
    }
 
 ================================================================================
-6. POST /tasks (Commit from Draft)
-   Description: Creates a task from a Draft ID (Chat/AI flow).
-   
-   Request Body:
-   {
-     "draft_id": "draft-550e8400-e29b-41d4-a716-446655440001",
-     "task": {
-       "name": "Updated Chemistry Project",
-       "start": "2026-04-19T10:00:00",
-       "deadline": "2026-04-20T18:00:00",
-       "difficulty": 0.8,
-       "duration": 120,
-       "category": ["study"],
-       "location": "Library",
-       "importance": 0.9,
-       "fixed_time": false,
-       "fixed_start": null
-     }
-   }
-
-================================================================================
-7. POST /tasks (Invalid Flexible Task)
-   Description: Intentionally WRONG. 'start' is null.
-   EXPECTED RESULT: 422 Validation Error ("For flexible tasks, BOTH 'start' and 'deadline' must be provided.")
-   
-   Request Body:
-   {
-     "task": {
-       "name": "Bad Task",
-       "start": null,
-       "deadline": "2026-04-20T17:00:00",
-       "difficulty": 0.5,
-       "duration": 60,
-       "category": ["study"],
-       "location": "Home",
-       "importance": 0.5,
-       "fixed_time": false,
-       "fixed_start": null
-     }
-   }
-
-================================================================================
-8. POST /tasks (Valid Fixed Task)
+6. POST /tasks (Valid Fixed Task)
    Description: Creates a fixed-time task.
    MUST have: fixed_start. start & deadline must be null.
    
@@ -120,7 +79,35 @@
    }
 
 ================================================================================
-6. POST /tasks/{id}/update
+7. POST /tasks (Invalid Flexible Task)
+   Description: Intentionally WRONG. 'start' is null.
+   EXPECTED RESULT: 422 Validation Error ("If fixed_time is false, start and deadline are required.")
+   
+   Request Body:
+   {
+     "task": {
+       "name": "Bad Task",
+       "start": null,
+       "deadline": "2026-04-20T17:00:00",
+       "difficulty": 0.5,
+       "duration": 60,
+       "category": ["study"],
+       "location": "Home",
+       "importance": 0.5,
+       "fixed_time": false,
+       "fixed_start": null
+     }
+   }
+
+================================================================================
+8. GET /tasks/{id}
+   Description: Fetches details of a specific task.
+   
+   Path Parameter:
+   id = 550e8400-e29b-41d4-a716-446655440001
+
+================================================================================
+9. POST /tasks/{id}/update
    Description: Updates an existing task.
    
    Path Parameter:
@@ -146,31 +133,24 @@
    }
 
 ================================================================================
-8. GET /tasks/{id}
-   Description: Fetches details of a specific task.
-   
-   Path Parameter:
-   id = 550e8400-e29b-41d4-a716-446655440001
+10. DELETE /tasks/{id}
+    Description: Deletes a task.
+    
+    Path Parameter:
+    id = 550e8400-e29b-41d4-a716-446655440001
+    
+    Query Parameter:
+    source = main_schedule
 
 ================================================================================
-9. DELETE /tasks/{id}
-   Description: Deletes a task.
-   
-   Path Parameter:
-   id = 550e8400-e29b-41d4-a716-446655440001
-   
-   Query Parameter:
-   source = main_schedule
-
-================================================================================
-10. GET /tasks/unscheduled
+11. GET /tasks/unscheduled
     Description: Fetches the queue of tasks waiting for scheduling.
     
     Query Parameter:
     limit = 50
 
 ================================================================================
-11. POST /tasks/{id}/rate
+12. POST /tasks/{id}/rate
     Description: Rates a completed task and updates stats.
     
     Path Parameter:
@@ -184,18 +164,18 @@
     }
 
 ================================================================================
-12. GET /provisional/changes
+13. GET /provisional/changes
     Description: Fetches pending schedule changes.
 
 ================================================================================
-13. POST /provisional/commit
+14. POST /provisional/commit
     Description: Commits provisional changes to main schedule.
     
     Request Body:
     {}
 
 ================================================================================
-14. POST /provisional/reset
+15. POST /provisional/reset
     Description: Discards provisional changes and resets to main schedule.
     
     Request Body:
