@@ -302,6 +302,11 @@ def main():
 
     resume_path = find_latest_checkpoint(cfg.output_dir)
 
+    # Don't resume from checkpoint for specific mode — avoid torch.load version conflicts.
+    # The model weights are loaded from the saved safetensors files instead.
+    if args.mode == "specific":
+        resume_path = None
+
     train(model, tokenizer, cfg, tok_train, tok_test, lr, resume_from=resume_path)
     save_model(model, tokenizer, cfg)
 

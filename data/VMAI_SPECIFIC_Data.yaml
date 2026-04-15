@@ -1,0 +1,929 @@
+# VM.AI Specific Training Data
+# Hand-curated examples targeting model weaknesses.
+# Inputs have NO 'add:' prefix - the parser adds it automatically.
+
+examples:
+
+# Fixed Time Detection - "at Xam/pm" not being detected
+- input: gym at 6am
+  output:
+    name: gym
+    fixed_time: true
+    fixed_start: "06:00"
+    duration: 45
+    category: fitness
+    difficulty: 0.5
+    importance: 0.5
+    recurrent: false
+
+- input: team meeting at 3pm
+  output:
+    name: team meeting
+    fixed_time: true
+    fixed_start: "15:00"
+    duration: 60
+    category: work
+    difficulty: 0.3
+    importance: 0.7
+    recurrent: false
+
+- input: dinner at 7pm
+  output:
+    name: dinner
+    fixed_time: true
+    fixed_start: "19:00"
+    duration: 45
+    category: personal
+    difficulty: 0.1
+    importance: 0.5
+    recurrent: false
+
+- input: call client at 10:30am
+  output:
+    name: call client
+    fixed_time: true
+    fixed_start: "10:30"
+    duration: 30
+    category: work
+    difficulty: 0.3
+    importance: 0.7
+    recurrent: false
+
+- input: yoga at 8am
+  output:
+    name: yoga
+    fixed_time: true
+    fixed_start: "08:00"
+    duration: 45
+    category: fitness
+    difficulty: 0.3
+    importance: 0.4
+    recurrent: false
+
+- input: standup at 9am
+  output:
+    name: standup
+    fixed_time: true
+    fixed_start: "09:00"
+    duration: 15
+    category: work
+    difficulty: 0.1
+    importance: 0.6
+    recurrent: false
+
+- input: lunch at noon
+  output:
+    name: lunch
+    fixed_time: true
+    fixed_start: "12:00"
+    duration: 45
+    category: personal
+    difficulty: 0.1
+    importance: 0.4
+    recurrent: false
+
+- input: movie at 8pm
+  output:
+    name: movie
+    fixed_time: true
+    fixed_start: "20:00"
+    duration: 120
+    category: personal
+    difficulty: 0.1
+    importance: 0.3
+    recurrent: false
+
+# Duration Extraction
+- input: 30 minute stretch
+  output:
+    name: stretch
+    duration: 30
+    category: fitness
+    difficulty: 0.2
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+
+- input: 2 hour study session
+  output:
+    name: study session
+    duration: 120
+    category: study
+    difficulty: 0.6
+    importance: 0.7
+    fixed_time: false
+    recurrent: false
+
+- input: 15 minute meditation
+  output:
+    name: meditation
+    duration: 15
+    category: health
+    difficulty: 0.1
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+- input: 45 minute workout
+  output:
+    name: workout
+    duration: 45
+    category: fitness
+    difficulty: 0.6
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: 10 minute call
+  output:
+    name: call
+    duration: 10
+    category: work
+    difficulty: 0.2
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: 90 minute coding session
+  output:
+    name: coding session
+    duration: 90
+    category: work
+    difficulty: 0.7
+    importance: 0.7
+    fixed_time: false
+    recurrent: false
+
+# Difficulty Keywords - currently all ~0.59
+- input: hard workout
+  output:
+    name: workout
+    difficulty: 0.85
+    duration: 45
+    category: fitness
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: easy task
+  output:
+    name: task
+    difficulty: 0.15
+    duration: 30
+    category: personal
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+
+- input: challenging project
+  output:
+    name: project
+    difficulty: 0.8
+    duration: 120
+    category: work
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+
+- input: simple email reply
+  output:
+    name: email reply
+    difficulty: 0.1
+    duration: 5
+    category: work
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+
+- input: tough exam preparation
+  output:
+    name: exam preparation
+    difficulty: 0.9
+    duration: 120
+    category: study
+    importance: 0.8
+    fixed_time: false
+    recurrent: false
+
+- input: moderate reading
+  output:
+    name: reading
+    difficulty: 0.4
+    duration: 30
+    category: study
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+
+- input: complex data analysis
+  output:
+    name: data analysis
+    difficulty: 0.85
+    duration: 90
+    category: work
+    importance: 0.7
+    fixed_time: false
+    recurrent: false
+
+# Importance Keywords - currently all ~0.47
+- input: urgent fix
+  output:
+    name: fix
+    difficulty: 0.5
+    duration: 30
+    category: work
+    importance: 0.95
+    fixed_time: false
+    recurrent: false
+
+- input: critical bug
+  output:
+    name: bug
+    difficulty: 0.7
+    duration: 60
+    category: work
+    importance: 0.95
+    fixed_time: false
+    recurrent: false
+
+- input: low priority reading
+  output:
+    name: reading
+    difficulty: 0.2
+    duration: 30
+    category: personal
+    importance: 0.15
+    fixed_time: false
+    recurrent: false
+
+- input: very important presentation
+  output:
+    name: presentation
+    difficulty: 0.6
+    duration: 60
+    category: work
+    importance: 0.9
+    fixed_time: false
+    recurrent: false
+
+- input: asap fix
+  output:
+    name: fix
+    difficulty: 0.6
+    duration: 45
+    category: work
+    importance: 0.95
+    fixed_time: false
+    recurrent: false
+
+- input: optional cleanup
+  output:
+    name: cleanup
+    difficulty: 0.2
+    duration: 15
+    category: home
+    importance: 0.2
+    fixed_time: false
+    recurrent: false
+
+# Recurrence - currently 0% accuracy
+- input: gym every monday
+  output:
+    name: gym
+    duration: 45
+    category: fitness
+    difficulty: 0.5
+    importance: 0.5
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Monday
+
+- input: daily standup every weekday
+  output:
+    name: standup
+    duration: 15
+    category: work
+    difficulty: 0.1
+    importance: 0.6
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday
+
+- input: yoga every tuesday and thursday
+  output:
+    name: yoga
+    duration: 45
+    category: fitness
+    difficulty: 0.3
+    importance: 0.4
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Tuesday,Thursday
+
+- input: meeting every monday wednesday friday
+  output:
+    name: meeting
+    duration: 60
+    category: work
+    difficulty: 0.3
+    importance: 0.6
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Monday,Wednesday,Friday
+
+- input: weekly review every friday
+  output:
+    name: review
+    duration: 30
+    category: work
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Friday
+
+# Category - currently misclassified
+- input: meditate
+  output:
+    name: meditate
+    duration: 15
+    category: health
+    difficulty: 0.1
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+- input: grocery shopping
+  output:
+    name: grocery shopping
+    duration: 45
+    category: shopping
+    difficulty: 0.2
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: pay the rent
+  output:
+    name: pay the rent
+    duration: 10
+    category: finance
+    difficulty: 0.2
+    importance: 0.8
+    fixed_time: false
+    recurrent: false
+
+- input: file the taxes
+  output:
+    name: file the taxes
+    duration: 60
+    category: finance
+    difficulty: 0.7
+    importance: 0.85
+    fixed_time: false
+    recurrent: false
+
+- input: write blog post
+  output:
+    name: blog post
+    duration: 60
+    category: creative
+    difficulty: 0.5
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+- input: book flight to paris
+  output:
+    name: book flight
+    duration: 30
+    category: travel
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: call mom
+  output:
+    name: call mom
+    duration: 15
+    category: personal
+    difficulty: 0.1
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: pick up kids
+  output:
+    name: pick up kids
+    duration: 15
+    category: family
+    difficulty: 0.2
+    importance: 0.8
+    fixed_time: false
+    recurrent: false
+
+- input: practice guitar
+  output:
+    name: practice guitar
+    duration: 30
+    category: creative
+    difficulty: 0.3
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+# Location - currently not extracted
+- input: study at the library
+  output:
+    name: study
+    duration: 60
+    category: study
+    difficulty: 0.5
+    importance: 0.6
+    location: library
+    fixed_time: false
+    recurrent: false
+
+- input: meet at the coffee shop
+  output:
+    name: meet
+    duration: 30
+    category: social
+    difficulty: 0.1
+    importance: 0.4
+    location: coffee shop
+    fixed_time: false
+    recurrent: false
+
+- input: work from home
+  output:
+    name: work
+    duration: 480
+    category: work
+    difficulty: 0.5
+    importance: 0.6
+    location: home
+    fixed_time: false
+    recurrent: false
+
+- input: team meeting at the office
+  output:
+    name: team meeting
+    duration: 60
+    category: work
+    difficulty: 0.3
+    importance: 0.6
+    location: office
+    fixed_time: false
+    recurrent: false
+
+- input: buy groceries at the supermarket
+  output:
+    name: buy groceries
+    duration: 45
+    category: shopping
+    difficulty: 0.2
+    importance: 0.5
+    location: supermarket
+    fixed_time: false
+    recurrent: false
+
+- input: workout at the gym
+  output:
+    name: workout
+    duration: 45
+    category: fitness
+    difficulty: 0.5
+    importance: 0.5
+    location: gym
+    fixed_time: false
+    recurrent: false
+
+# Deadline
+- input: finish report by friday
+  output:
+    name: finish report
+    deadline: Friday
+    duration: 60
+    category: work
+    difficulty: 0.5
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+
+- input: pay bill tomorrow
+  output:
+    name: pay bill
+    deadline: tomorrow
+    duration: 10
+    category: finance
+    difficulty: 0.2
+    importance: 0.7
+    fixed_time: false
+    recurrent: false
+
+- input: submit by next week
+  output:
+    name: submit
+    deadline: next week
+    duration: 30
+    category: work
+    difficulty: 0.4
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+# Start field
+- input: project starting monday
+  output:
+    name: project
+    start: Monday
+    duration: 120
+    category: work
+    difficulty: 0.6
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+
+- input: begin next week
+  output:
+    name: begin
+    start: next week
+    duration: 60
+    category: work
+    difficulty: 0.4
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+# Multi-field Combinations
+- input: urgent 30 min gym at 7am tomorrow
+  output:
+    name: gym
+    fixed_time: true
+    fixed_start: "07:00"
+    duration: 30
+    deadline: tomorrow
+    category: fitness
+    difficulty: 0.7
+    importance: 0.9
+    recurrent: false
+
+- input: easy 15 min meditation every morning at home
+  output:
+    name: meditation
+    duration: 15
+    category: health
+    difficulty: 0.15
+    importance: 0.3
+    location: home
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+
+- input: hard 2 hour coding session at office by friday
+  output:
+    name: coding session
+    deadline: Friday
+    duration: 120
+    category: work
+    difficulty: 0.85
+    importance: 0.7
+    location: office
+    fixed_time: false
+    recurrent: false
+
+- input: weekly yoga every monday at 6pm for 45 minutes
+  output:
+    name: yoga
+    fixed_time: true
+    fixed_start: "18:00"
+    duration: 45
+    category: fitness
+    difficulty: 0.3
+    importance: 0.4
+    recurrent: true
+    recurrence_days: Monday
+
+- input: quick 10 min call at the coffee shop
+  output:
+    name: call
+    duration: 10
+    category: work
+    difficulty: 0.2
+    importance: 0.4
+    location: coffee shop
+    fixed_time: false
+    recurrent: false
+
+- input: finish the quarterly report by next week really hard and very important 3 hours
+  output:
+    name: quarterly report
+    deadline: next week
+    duration: 180
+    category: work
+    difficulty: 0.9
+    importance: 0.9
+    fixed_time: false
+    recurrent: false
+
+- input: every morning meditate for 20 minutes at home easy and not urgent
+  output:
+    name: meditate
+    duration: 20
+    category: health
+    difficulty: 0.15
+    importance: 0.25
+    location: home
+    fixed_time: false
+    recurrent: true
+    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday
+
+- input: team standup at office every monday wednesday friday at 9am for 30 minutes
+  output:
+    name: team standup
+    fixed_time: true
+    fixed_start: "09:00"
+    duration: 30
+    category: work
+    difficulty: 0.2
+    importance: 0.6
+    location: office
+    recurrent: true
+    recurrence_days: Monday,Wednesday,Friday
+
+# Short inputs
+- input: gym
+  output:
+    name: gym
+    duration: 45
+    category: fitness
+    difficulty: 0.5
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: meditate
+  output:
+    name: meditate
+    duration: 15
+    category: health
+    difficulty: 0.15
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+- input: study
+  output:
+    name: study
+    duration: 60
+    category: study
+    difficulty: 0.5
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+- input: pay rent
+  output:
+    name: pay rent
+    duration: 10
+    category: finance
+    difficulty: 0.2
+    importance: 0.8
+    fixed_time: false
+    recurrent: false
+
+# Long inputs
+- input: i need to go to the gym tomorrow morning at 7am it should be an hour long medium difficulty and important for health
+  output:
+    name: gym
+    deadline: tomorrow
+    fixed_time: true
+    fixed_start: "07:00"
+    duration: 60
+    category: fitness
+    difficulty: 0.5
+    importance: 0.7
+    recurrent: false
+
+- input: schedule a quick 15 minute standup meeting every monday at 9am with the team at the office
+  output:
+    name: standup meeting
+    duration: 15
+    category: work
+    difficulty: 0.1
+    importance: 0.6
+    location: office
+    fixed_time: true
+    fixed_start: "09:00"
+    recurrent: true
+    recurrence_days: Monday
+
+- input: its urgent that i finish this really hard coding project by next week should take about 4 hours working from home
+  output:
+    name: coding project
+    deadline: next week
+    duration: 240
+    category: work
+    difficulty: 0.9
+    importance: 0.95
+    location: home
+    fixed_time: false
+    recurrent: false
+
+# Modify: Direct instruction format
+- input: push deadline to friday
+  output:
+    deadline: Friday
+
+- input: move deadline to next week
+  output:
+    deadline: next week
+
+- input: due tomorrow now
+  output:
+    deadline: tomorrow
+
+- input: change deadline to next month
+  output:
+    deadline: next month
+
+- input: start on monday
+  output:
+    start: Monday
+
+- input: begin next week
+  output:
+    start: next week
+
+- input: kick off this weekend
+  output:
+    start: this weekend
+
+- input: move start to tomorrow
+  output:
+    start: tomorrow
+
+- input: set it for 3pm
+  output:
+    fixed_time: true
+    fixed_start: "15:00"
+
+- input: at 10:30am instead
+  output:
+    fixed_time: true
+    fixed_start: "10:30"
+
+- input: schedule for 18:00
+  output:
+    fixed_time: true
+    fixed_start: "18:00"
+
+- input: cancel fixed time
+  output:
+    fixed_time: false
+
+- input: make it flexible
+  output:
+    fixed_time: false
+
+- input: remove the time
+  output:
+    fixed_time: false
+
+- input: make it 90 minutes
+  output:
+    duration: 90
+
+- input: change to 2 hours
+  output:
+    duration: 120
+
+- input: shorten to 15 minutes
+  output:
+    duration: 15
+
+- input: make it 30 minutes
+  output:
+    duration: 30
+
+- input: make it harder
+  output:
+    difficulty: 0.85
+
+- input: make it easier
+  output:
+    difficulty: 0.15
+
+- input: make it more challenging
+  output:
+    difficulty: 0.8
+
+- input: make it very easy
+  output:
+    difficulty: 0.1
+
+- input: make it urgent
+  output:
+    importance: 0.95
+
+- input: make it very important
+  output:
+    importance: 0.9
+
+- input: make it low priority
+  output:
+    importance: 0.15
+
+- input: make it critical
+  output:
+    importance: 0.98
+
+- input: categorize it as fitness
+  output:
+    category: fitness
+
+- input: change to work
+  output:
+    category: work
+
+- input: make it a health task
+  output:
+    category: health
+
+- input: actually its finance
+  output:
+    category: finance
+
+- input: do it at home instead
+  output:
+    location: home
+
+- input: move to the library
+  output:
+    location: library
+
+- input: at the office
+  output:
+    location: office
+
+- input: do it at the coffee shop
+  output:
+    location: coffee shop
+
+- input: do it at the gym
+  output:
+    location: gym
+
+- input: make it repeat every monday
+  output:
+    recurrent: true
+    recurrence_days: Monday
+
+- input: repeat on monday wednesday and friday
+  output:
+    recurrent: true
+    recurrence_days: Monday,Wednesday,Friday
+
+- input: cancel recurrence
+  output:
+    recurrent: false
+
+- input: make it one-time
+  output:
+    recurrent: false
+
+- input: set it for 9am and make it 60 minutes
+  output:
+    fixed_time: true
+    fixed_start: "09:00"
+    duration: 60
+
+- input: change deadline to friday and categorize as work
+  output:
+    deadline: Friday
+    category: work
+
+- input: make it harder and change location to gym
+  output:
+    difficulty: 0.85
+    location: gym
+
+- input: push deadline to next week and make it 90 minutes
+  output:
+    deadline: next week
+    duration: 90
+
+- input: start on monday and make it repeat every wednesday
+  output:
+    start: Monday
+    recurrent: true
+    recurrence_days: Wednesday
+
+- input: make it at 3pm 45 minutes and urgent
+  output:
+    fixed_time: true
+    fixed_start: "15:00"
+    duration: 45
+    importance: 0.95
