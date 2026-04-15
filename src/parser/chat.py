@@ -1,7 +1,7 @@
 """
-    VM-AI - Chat Testing Interface
-    Tests add and modify modes with EXP/PRD tag format.
-    Run: python src/parser/chat.py
+VM-AI - Chat Testing Interface
+Tests add and modify modes with EXP/PRD tag format.
+Run: python src/parser/chat.py
 """
 
 import torch
@@ -13,8 +13,15 @@ import yaml
 from datetime import datetime
 from transformers import AutoTokenizer, T5ForConditionalGeneration
 from typing import Dict
-from schemas import pipe_to_schema, schema_to_pipe, normalize_time, detect_explicit_fields, ALWAYS_EXPLICIT
+from schemas import (
+    pipe_to_schema,
+    schema_to_pipe,
+    normalize_time,
+    detect_explicit_fields,
+    ALWAYS_EXPLICIT,
+)
 from rule_based_add import parse_add as rule_based_parse
+from rule_based_modify import parse_modify_rule_based
 
 LOG_FILE = "performance_log.yaml"
 
@@ -22,15 +29,17 @@ LOG_FILE = "performance_log.yaml"
 def log_entry(mode: str, sentence: str, raw_output: str, parsed_result: Dict):
     """Append one test entry to the performance log."""
     entry = {
-        "timestamp":  datetime.now().isoformat(),
-        "mode":       mode,
-        "input":      sentence,
+        "timestamp": datetime.now().isoformat(),
+        "mode": mode,
+        "input": sentence,
         "raw_output": raw_output,
-        "parsed":     {
+        "parsed": {
             k: (v["value"] if isinstance(v, dict) else v)
             for k, v in parsed_result.items()
-        } if "error" not in parsed_result else None,
-        "error":      parsed_result.get("error"),
+        }
+        if "error" not in parsed_result
+        else None,
+        "error": parsed_result.get("error"),
     }
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         yaml.dump([entry], f, allow_unicode=True, sort_keys=False)
@@ -50,12 +59,12 @@ class TaskPlannerPredictor:
         print(f"OK Model ready ({self.device})")
 
     _TIME_RE = re.compile(
-        r'\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b', re.IGNORECASE
+        r"\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b", re.IGNORECASE
     )
 
     def _normalize(self, text: str) -> str:
         text = text.strip()
-        text = re.sub(r'(\d)(am|pm)', r'\1 \2', text)
+        text = re.sub(r"(\d)(am|pm)", r"\1 \2", text)
         return text
 
     def _sanity_check(self, schema: Dict, original_sentence: str) -> Dict:
@@ -88,21 +97,25 @@ class TaskPlannerPredictor:
 
         if start_token:
             decoder_input = self.tokenizer(
-                start_token,
-                return_tensors="pt",
-                add_special_tokens=False
+                start_token, return_tensors="pt", add_special_tokens=False
             ).input_ids.to(self.device)
         else:
             decoder_input = None
 
+        gen_kwargs = {
+            "max_new_tokens": 256,
+            "max_length": 256,
+            "no_repeat_ngram_size": 3,
+            "repetition_penalty": 1.1,
+            "use_cache": True,
+        }
+        if decoder_input is not None:
+            gen_kwargs["decoder_input_ids"] = decoder_input
         with torch.no_grad():
             output_ids = self.model.generate(
                 inputs["input_ids"],
                 attention_mask=inputs["attention_mask"],
-                decoder_input_ids=decoder_input,
-                max_new_tokens=256,
-                no_repeat_ngram_size=3,
-                repetition_penalty=1.1,
+                **gen_kwargs,
             )
 
         # Strip padding and EOS tokens, keep [EXP]/[PRD] special tokens
@@ -117,7 +130,7 @@ class TaskPlannerPredictor:
 
     def predict_add(self, sentence: str) -> Dict:
         """Add mode: use rule-based parser (MVP).
-        
+
         The model struggles with add mode due to T5 token leakage.
         Rule-based extraction gives 100% accuracy on basic fields.
         """
@@ -126,36 +139,62 @@ class TaskPlannerPredictor:
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:
-        """Apply changes to existing task using direct instruction format.
-        
-        The model was trained on: "push deadline to wednesday" → "deadline=wednesday[PRD]"
-        No JSON context needed — the model learns to map instructions directly to fields.
-        """
-        # Direct instruction — matches training format
-        output = self._run_model(change_prompt.lower(), start_token="")
+        """Apply changes to existing task.
 
+        Uses rule-based parser for importance/difficulty (reliable).
+        Uses ML model for other fields (deadline, time, location, etc).
+        """
+        # First, use rule-based parser for importance/difficulty (most reliable)
+        rule_based = parse_modify_rule_based(change_prompt, existing_task)
+
+        # Also run model for other fields
+        output = self._run_model(change_prompt.lower(), start_token="")
         new_fields = pipe_to_schema(output, input_text=change_prompt)
-        if "error" in new_fields:
-            result = {"error": "parse_failed", "raw": output}
-        else:
-            # Merge changed fields into existing task
-            changed = {}
+
+        # Merge results: ML model for most fields, rule-based for importance/difficulty
+        changed = {}
+
+        # Add rule-based importance/difficulty (these are most accurate)
+        for field in ["importance", "difficulty"]:
+            if field in rule_based:
+                changed[field] = rule_based[field]
+
+        # Add other fields from ML model
+        if "error" not in new_fields:
             for field, entry in new_fields.items():
+                if field in ["importance", "difficulty"]:
+                    continue  # Skip, already handled by rule-based
                 if not isinstance(entry, dict):
                     continue
                 val = entry.get("value")
                 if val is None:
                     continue
                 old_entry = existing_task.get(field, {})
-                old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
-
+                old_val = (
+                    old_entry.get("value") if isinstance(old_entry, dict) else old_entry
+                )
                 if str(val).lower() != str(old_val).lower():
                     changed[field] = entry
 
-            if not changed:
-                result = {"error": "no_changes", "raw": output}
-            else:
-                result = changed
+        # Add rule-based fields that ML might have missed (time, location, etc)
+        for field in [
+            "fixed_time",
+            "fixed_start",
+            "deadline",
+            "start",
+            "duration",
+            "category",
+            "location",
+            "recurrent",
+            "recurrence_days",
+        ]:
+            if field in rule_based and field not in changed:
+                changed[field] = rule_based[field]
+
+        if not changed:
+            result = {"error": "no_changes", "raw": output}
+        else:
+            result = changed
         log_entry("modify", change_prompt, self._last_raw_output, result)
         return result
 
@@ -164,9 +203,13 @@ class TaskPlannerPredictor:
         """Compare old and new task schemas, return only changed fields."""
         changed = {}
         for field, new_entry in new_task.items():
-            new_val = new_entry.get("value") if isinstance(new_entry, dict) else new_entry
+            new_val = (
+                new_entry.get("value") if isinstance(new_entry, dict) else new_entry
+            )
             old_entry = old_task.get(field)
-            old_val = old_entry.get("value") if isinstance(old_entry, dict) else old_entry
+            old_val = (
+                old_entry.get("value") if isinstance(old_entry, dict) else old_entry
+            )
 
             if new_val is None:
                 continue
@@ -175,7 +218,12 @@ class TaskPlannerPredictor:
             new_str = str(new_val).lower()
 
             if old_str != new_str:
-                changed[field] = {"value": new_val, "predicted": new_entry.get("predicted", False) if isinstance(new_entry, dict) else False}
+                changed[field] = {
+                    "value": new_val,
+                    "predicted": new_entry.get("predicted", False)
+                    if isinstance(new_entry, dict)
+                    else False,
+                }
 
         return changed
 
@@ -186,31 +234,48 @@ def format_output(result: Dict) -> str:
     if not result:
         return "   nothing extracted"
 
-    fields = ["name", "start", "deadline", "difficulty", "duration",
-              "category", "location", "importance", "fixed_time",
-              "fixed_start", "recurrent", "recurrence_days"]
+    fields = [
+        "name",
+        "start",
+        "deadline",
+        "difficulty",
+        "duration",
+        "category",
+        "location",
+        "importance",
+        "fixed_time",
+        "fixed_start",
+        "recurrent",
+        "recurrence_days",
+    ]
 
     rows = []
     for field in fields:
         entry = result.get(field)
         if isinstance(entry, dict):
-            value     = entry.get("value")
+            value = entry.get("value")
             predicted = entry.get("predicted", False)
         else:
-            value     = entry
+            value = entry
             predicted = False
-        value_str     = str(value).lower() if isinstance(value, bool) else (str(value) if value is not None else "-")
+        value_str = (
+            str(value).lower()
+            if isinstance(value, bool)
+            else (str(value) if value is not None else "-")
+        )
         predicted_str = "PRD" if predicted else "EXP"
         rows.append((field, value_str, predicted_str))
 
     col_field = max(len(r[0]) for r in rows)
     col_value = max(len(r[1]) for r in rows)
-    col_pred  = max(len(r[2]) for r in rows)
+    col_pred = max(len(r[2]) for r in rows)
     inner = col_field + col_value + col_pred + 6
-    lines = ["┌" + "─" * inner + "┐"]
+    lines = ["+" + "-" * inner + "+"]
     for field, value_str, predicted_str in rows:
-        lines.append(f"│  {field:<{col_field}}  {value_str:<{col_value}}  {predicted_str:<{col_pred}}  │")
-    lines.append("└" + "─" * inner + "┘")
+        lines.append(
+            f"|  {field:<{col_field}}  {value_str:<{col_value}}  {predicted_str:<{col_pred}}  |"
+        )
+    lines.append("+" + "-" * inner + "+")
     lines.append("  EXP = explicit (user stated) | PRD = predicted (model inferred)")
     return "\n" + "\n".join(lines)
 
@@ -227,22 +292,24 @@ def main():
     print(f"  Logging to: {os.path.abspath(LOG_FILE)}")
     print("=" * 60)
 
-    predictor   = TaskPlannerPredictor()
-    count       = 0
+    predictor = TaskPlannerPredictor()
+    count = 0
     last_result = None
 
     while True:
-        user_input = input(f"\n{count+1:2d} > ").strip()
+        user_input = input(f"\n{count + 1:2d} > ").strip()
         if not user_input:
             continue
 
         if user_input.lower() == "end":
-            print(f"\nProcessed {count} inputs — log saved to {os.path.abspath(LOG_FILE)}")
+            print(
+                f"\nProcessed {count} inputs — log saved to {os.path.abspath(LOG_FILE)}"
+            )
             break
 
         try:
             if user_input.lower().startswith("add:"):
-                sentence    = user_input[4:].strip()
+                sentence = user_input[4:].strip()
                 last_result = predictor.predict_add(sentence)
                 print(format_output(last_result))
                 count += 1
