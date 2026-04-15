@@ -11,9 +11,6 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 LOG_FILE = LOG_DIR / "backend.log"
 
-# DEBUG: Print the exact location to the console so you can find it!
-print(f"📂 LOG FILE LOCATION: {LOG_FILE}")
-
 def setup_logging():
     """Configures the application-wide logger."""
     logger = logging.getLogger("vm_ai_backend")

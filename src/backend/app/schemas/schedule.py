@@ -1,50 +1,51 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
+from uuid import UUID
 from app.schemas.shared import SuccessResponse
+from app.schemas.task import TaskDetailResponse
 
 
 class ScheduleTask(BaseModel):
     """A single task shown on the calendar for a specific day."""
-    id: str
+    task_id: UUID
     name: str
     start: datetime
     end: datetime
-    location: Optional[str] = None
+    location: str  # Not optional
     rated: bool
 
 
 class ScheduleResponse(BaseModel):
     """Response for GET /schedule"""
-    date: str
-    tasks: List[ScheduleTask]  # ✅ Fixed: was "task" (singular)
+    date: date  # Strict date type
+    tasks: List[ScheduleTask]
 
 
 class BatchScheduleResponse(BaseModel):
     """Response for POST /schedule/batch"""
     success: bool
     scheduled_count: int
-    unscheduled_remaining: List[str]
+    unscheduled_remaining: List[TaskDetailResponse]  # Changed to TaskDetailResponse
     message: str
     provisional_changes: List[dict]
     execution_time_ms: int
 
 
 # ---------------------------------------------------------
-# Provisional Schemas (Added)
+# Provisional Schemas
 # ---------------------------------------------------------
 
 class ProvisionalChange(BaseModel):
     """A single pending change in the schedule."""
-    id: str
-    task_id: str
+    task_id: UUID
     task_name: str
-    change_type: str  # 'insert' or 'move'
+    change_type: Optional[str] = None
     new_slot_start: datetime
     new_slot_end: datetime
-    location: Optional[str] = None
-    value: float
-    fixed: bool
+    location: str  # Not optional
+
+    # Removed: id, value, fixed (as requested)
 
 
 class ProvisionalChangesResponse(BaseModel):

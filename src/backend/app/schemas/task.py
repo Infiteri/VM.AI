@@ -1,52 +1,53 @@
-from pydantic import BaseModel, model_validator
-from typing import Optional, Union, List
+from pydantic import BaseModel, model_validator, Field
+from typing import Optional, List
 from uuid import UUID
+from datetime import datetime
 from app.schemas.shared import SuccessResponse
 
 
 # 1. The input structure for creating/updating tasks
 class TaskPayload(BaseModel):
     """
-    Clean task data without predicted flags.
-    Matches the display fields agreed upon.
+    Clean task data with strict validation constraints.
     """
-    name: str
-    start: Optional[str] = None
-    deadline: Optional[str] = None
-    difficulty: float
-    duration: int
-    category: List[str]
-    location: Optional[str] = None
-    importance: float
+    name: str = Field(..., min_length=1, description="Task name cannot be empty")
+    
+    start: Optional[datetime] = None
+    deadline: Optional[datetime] = None
+    
+    difficulty: float = Field(..., gt=0.0, le=1.0, description="Must be between 0.0 and 1.0")
+    duration: int = Field(..., gt=0, lt=1440, description="Must be positive minutes < 1440")
+    
+    category: List[str] = Field(..., min_length=1, description="At least one category required")
+    location: str  # Not optional
+    
+    importance: float = Field(..., gt=0.0, le=1.0, description="Must be between 0.0 and 1.0")
+    
     fixed_time: bool = False
-    fixed_start: Optional[str] = None
+    fixed_start: Optional[datetime] = None
 
-    @model_validator(mode="after")
-    def check_fixed_time_logic(self):
+    @model_validator(mode='after')
+    def check_fixed_logic(self):
         """
-        Validates that the task is either a 'Fixed' task OR a 'Flexible' task.
+        Validates the relationship between fixed_time and temporal fields.
         """
-        # Flexible Task: Must have start AND deadline. Fixed fields must be null.
-        if not self.fixed_time:
-            if self.fixed_start is not None:
-                raise ValueError("For flexible tasks, 'fixed_start' must be null.")
-            if self.start is None or self.deadline is None:
-                raise ValueError("For flexible tasks, BOTH 'start' and 'deadline' must be provided.")
-        
-        # Fixed Task: Must have fixed_start. Flexible fields must be null.
-        else:
-            if self.fixed_start is None:
-                raise ValueError("For fixed tasks, 'fixed_start' must be provided.")
+        if self.fixed_time:
             if self.start is not None or self.deadline is not None:
-                raise ValueError("For fixed tasks, 'start' and 'deadline' must be null.")
-
+                raise ValueError("If fixed_time is true, start and deadline must be null.")
+            if self.fixed_start is None:
+                raise ValueError("If fixed_time is true, fixed_start is required.")
+        else:
+            if self.start is None or self.deadline is None:
+                raise ValueError("If fixed_time is false, start and deadline are required.")
+            if self.fixed_start is not None:
+                raise ValueError("If fixed_time is false, fixed_start must be null.")
         return self
 
 
 # 2. Request Wrappers
 class TaskCreateRequest(BaseModel):
     """Input for POST /tasks (Commit Phase)"""
-    draft_id: str  # Mandatory: Identifies which draft to finalize
+    draft_id: Optional[UUID] = None  # Optional: Only required if committing from Chat/AI
     task: TaskPayload
 
 class TaskUpdateRequest(BaseModel):
@@ -66,38 +67,30 @@ class ParseModifyRequest(BaseModel):
 # 3. Response Wrappers
 class TaskResponse(SuccessResponse):
     """Response for POST /tasks and POST /tasks/{id}/update"""
-    task_id: str
+    task_id: UUID
     status: str = "unscheduled"
 
 class ParseAddResponse(BaseModel):
     """Response for POST /tasks/parse/add"""
-    draft_id: str  # ID to use when committing later
+    draft_id: UUID 
     task: TaskPayload
 
 class ParseModifyResponse(BaseModel):
     """Response for POST /tasks/parse/modify"""
-    task_id: str
+    task_id: UUID
     task: TaskPayload
 
 
-# 4. Unscheduled Queue Schemas
-class UnscheduledTaskItem(BaseModel):
-    """A single task in the unscheduled queue."""
-    id: str
-    name: str
-    duration: int
-    deadline: str
-    difficulty: float
-    location: Optional[str] = None
-    category: List[str]
-    fixed_time: bool
-    fixed_start: Optional[str] = None
-    importance: float
-    urgency: float
-    value: float
-    created_at: str
+# 4. Task Detail (Read Model)
+class TaskDetailResponse(BaseModel):
+    """Detailed task data returned when fetching a single task or in queues."""
+    task_id: UUID
+    payload: TaskPayload
+    created_at: datetime
 
+
+# 5. Unscheduled Queue Schema
 class UnscheduledResponse(BaseModel):
     """Response for GET /tasks/unscheduled"""
-    tasks: List[UnscheduledTaskItem]
+    tasks: List[TaskDetailResponse]
     total_count: int
