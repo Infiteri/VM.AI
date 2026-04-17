@@ -1,11 +1,16 @@
+import dateparser
 from datetime import datetime
 from typing import Optional, Any, Tuple
 from uuid import UUID, uuid4
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.models.draft import TaskDraft
-from app.models.statistics import TaskStatistics, CategoryStatistics
-from app.models.statistics import TaskStatisticsLocation, CategoryStatisticsLocation
+from app.models.statistics import (
+    TaskStatistics,
+    CategoryStatistics,
+    TaskStatisticsLocation,
+    CategoryStatisticsLocation,
+)
 from app.services.task_matcher import task_matcher
 from app.core.logging_config import setup_logging
 
@@ -26,17 +31,6 @@ class EnrichmentService:
         merge_nlp_modify()   - NLP modify flow
         update_task()        - Update task with computed fields
     """
-
-    def __init__(self):
-        self._dateparser = None
-
-    @property
-    def dateparser(self):
-        if self._dateparser is None:
-            import dateparser
-
-            self._dateparser = dateparser
-        return self._dateparser
 
     # ================================================================
     # MAIN PUBLIC METHODS
@@ -87,26 +81,22 @@ class EnrichmentService:
         db: Session,
         request_task: dict[str, Any],
         draft_id: UUID,
-        match_result: dict[str, Any],
-    ) -> Tuple[dict[str, Any], dict[str, Any]]:
+    ) -> dict[str, Any]:
         """
         Draft commit flow (Phase 2 only).
 
         Input:
             request_task: Task data from frontend request (source of truth)
             draft_id: UUID of saved draft
-            match_result: Match result (passed for consistency)
 
         Returns:
-            (full_task_data, match_result)
-            - full_task_data: Complete task data with internal refs, ready for DB
-            - match_result: Passed through unchanged
+            full_task_data: Complete task data with internal refs, ready for DB
 
         Steps:
-            1. Load draft from DB
+            1. Load draft (including match_result) from DB
             2. Merge request with draft (request priority)
             3. Compute urgency/value
-            4. Add internal refs
+            4. Add internal refs (loaded from draft)
         """
         logger.info(f"Enrichment: commit_from_draft started for draft '{draft_id}'")
 
@@ -114,6 +104,8 @@ class EnrichmentService:
         if not draft_data:
             logger.warning(f"Draft {draft_id} not found, using request only")
             draft_data = {}
+
+        match_result = draft_data.get("match_result", {})
 
         merged_task = self._draft_merge(request_task, draft_data)
 
@@ -127,14 +119,14 @@ class EnrichmentService:
             f"Status: {match_result.get('association_status')}"
         )
         logger.debug(f"  full_task_data keys: {list(full_task_data.keys())}")
-        return full_task_data, match_result
+        return full_task_data
 
     def commit_manual(
         self,
         db: Session,
         task_payload: dict[str, Any],
         match_result: dict[str, Any],
-    ) -> Tuple[dict[str, Any], dict[str, Any]]:
+    ) -> dict[str, Any]:
         """
         Manual creation flow (Phase 1 + 2 combined).
 
@@ -143,9 +135,7 @@ class EnrichmentService:
             match_result: Result from task_matcher.find_match()
 
         Returns:
-            (full_task_data, match_result)
-            - full_task_data: Complete task data with internal refs, ready for DB
-            - match_result: Passed through unchanged
+            full_task_data: Complete task data with internal refs, ready for DB
 
         Steps:
             1. Compute urgency/value (no overwrite - all fields explicit)
@@ -164,7 +154,7 @@ class EnrichmentService:
             f"Value: {full_task_data.get('value')}, "
             f"Status: {match_result.get('association_status')}"
         )
-        return full_task_data, match_result
+        return full_task_data
 
     def merge_nlp_modify(
         self,
@@ -285,9 +275,22 @@ class EnrichmentService:
             if stats_id:
                 task_stats = self._get_task_stats(db, stats_id)
                 if task_stats:
-                    if field in ["difficulty", "duration"]:
+                    if field == "difficulty":
                         overwrite_value = self._get_value_from_task_stats(
                             task_stats, field
+                        )
+                        if overwrite_value is not None:
+                            overwrite_source = "task_statistics"
+                            logger.info(
+                                f"    Overwriting '{field}' from task_statistics: "
+                                f"{value} -> {overwrite_value}"
+                            )
+                    elif field == "duration":
+                        difficulty_val = self._get_value_from_task_stats(
+                            task_stats, "difficulty"
+                        )
+                        overwrite_value = self._get_value_from_task_stats(
+                            task_stats, field, difficulty_val
                         )
                         if overwrite_value is not None:
                             overwrite_source = "task_statistics"
@@ -306,9 +309,19 @@ class EnrichmentService:
                             )
 
             if overwrite_value is None and categories:
-                if field in ["difficulty", "duration"]:
+                if field == "difficulty":
                     overwrite_value = self._get_value_from_category_stats(
                         db, categories, field
+                    )
+                    if overwrite_value is not None:
+                        overwrite_source = "category_statistics"
+                        logger.info(
+                            f"    Overwriting '{field}' from category_statistics: "
+                            f"{value} -> {overwrite_value}"
+                        )
+                elif field == "duration":
+                    difficulty_val = self._get_value_from_category_stats(
+                        db, categories, "difficulty"
                     )
                     if overwrite_value is not None:
                         overwrite_source = "category_statistics"
@@ -354,6 +367,7 @@ class EnrichmentService:
         stats = db.query(TaskStatistics).filter(TaskStatistics.id == stats_id).first()
         if stats:
             return {
+                "id": stats.id,
                 "avg_difficulty": stats.avg_difficulty,
                 "avg_difficulty_delta": stats.avg_difficulty_delta,
                 "avg_duration": stats.avg_duration,
@@ -364,10 +378,20 @@ class EnrichmentService:
             }
         return None
 
+    def _calculate_bucket(self, difficulty: float) -> str:
+        """Calculate difficulty bucket: round(difficulty * 2) / 2"""
+        bucket = round(difficulty * 2) / 2
+        return str(bucket)
+
     def _get_value_from_task_stats(
-        self, task_stats: dict, field: str
+        self, task_stats: dict, field: str, difficulty: Optional[float] = None
     ) -> Optional[float]:
-        """Extract difficulty or duration value from task stats."""
+        """
+        Extract difficulty or duration value from task stats.
+
+        For difficulty: avg_difficulty + avg_difficulty_delta
+        For duration: uses difficulty bucket to lookup avg_duration[bucket] + delta
+        """
         if field == "difficulty":
             avg = task_stats.get("avg_difficulty")
             delta = task_stats.get("avg_difficulty_delta")
@@ -375,20 +399,42 @@ class EnrichmentService:
                 delta = delta if delta is not None else 0.0
                 return avg + delta
         elif field == "duration":
-            avg = task_stats.get("avg_duration")
-            delta = task_stats.get("avg_duration_delta")
-            if avg is not None:
-                delta = delta if delta is not None else 0
-                return avg + delta
+            if difficulty is None:
+                logger.warning("Duration lookup requires difficulty value")
+                return None
+
+            bucket = self._calculate_bucket(difficulty)
+            duration_map = task_stats.get("avg_duration")
+            duration_delta_map = task_stats.get("avg_duration_delta")
+
+            if not duration_map:
+                return None
+
+            if bucket in duration_map:
+                avg_val = duration_map[bucket]
+                delta_val = (
+                    duration_delta_map.get(bucket, 0) if duration_delta_map else 0
+                )
+                return avg_val + delta_val
+
+            for b, avg_val in duration_map.items():
+                delta_val = duration_delta_map.get(b, 0) if duration_delta_map else 0
+                return avg_val + delta_val
+
         return None
 
     def _get_value_from_category_stats(
-        self, db: Session, categories: list[str], field: str
+        self,
+        db: Session,
+        categories: list[str],
+        field: str,
+        difficulty: Optional[float] = None,
     ) -> Optional[float]:
         """
         Get value from category statistics, looping through categories by priority.
 
-        For duration, also loops through difficulty buckets.
+        For difficulty: avg_difficulty + avg_difficulty_delta
+        For duration: uses difficulty bucket to lookup avg_duration[bucket] + delta
         """
         for category_name in categories:
             cat_stats = (
@@ -408,18 +454,22 @@ class EnrichmentService:
                     return avg + delta
 
             elif field == "duration":
+                if difficulty is None:
+                    logger.warning("Duration lookup requires difficulty value")
+                    return None
+
+                bucket = self._calculate_bucket(difficulty)
                 duration_map = cat_stats.avg_duration or {}
                 duration_delta_map = cat_stats.avg_duration_delta or {}
 
-                for bucket, avg_val in duration_map.items():
+                if bucket in duration_map:
+                    avg_val = duration_map[bucket]
                     delta_val = duration_delta_map.get(bucket, 0)
-                    if avg_val is not None:
-                        return avg_val + delta_val
+                    return avg_val + delta_val
 
-                if duration_map:
-                    for bucket, avg_val in duration_map.items():
-                        delta_val = duration_delta_map.get(bucket, 0)
-                        return avg_val + delta_val
+                for b, avg_val in duration_map.items():
+                    delta_val = duration_delta_map.get(b, 0)
+                    return avg_val + delta_val
 
         return None
 
@@ -653,7 +703,7 @@ class EnrichmentService:
     def _parse_date_string(self, date_string: str) -> Optional[datetime]:
         """Parse a date string using dateparser."""
         try:
-            parsed = self.dateparser.parse(date_string)
+            parsed = dateparser.parse(date_string)
             if parsed:
                 return parsed
         except Exception as e:
