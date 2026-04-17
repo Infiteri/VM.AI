@@ -244,16 +244,41 @@ class EnrichmentService:
             2. category_statistics (loop through categories by priority)
             3. Keep predicted value
 
-        Returns:
-            overwrite_map: {field_name: {"source": str, "data": {...}}}
+        For duration:
+            - If difficulty is predicted=True: use stats difficulty for bucket
+            - If difficulty is predicted=False: use actual task_payload difficulty for bucket
         """
         overwrite_map = {}
-        status = match_result.get("association_status", "none")
         stats_id = match_result.get("associated_id")
         categories = self._extract_categories(nlp_payload)
 
-        logger.debug(f"Building overwrite map. Status: {status}, Stats ID: {stats_id}")
+        logger.debug(f"Building overwrite map. Stats ID: {stats_id}")
 
+        # First, determine difficulty values (for duration lookup)
+        difficulty_predicted = False
+        difficulty_from_stats = None
+        difficulty_actual = None
+
+        if "difficulty" in nlp_payload:
+            diff_value, diff_predicted = self._extract_field(nlp_payload["difficulty"])
+            difficulty_predicted = diff_predicted
+            difficulty_actual = diff_value
+
+            if diff_predicted:
+                # Get difficulty from stats (task or category)
+                if stats_id:
+                    task_stats = self._get_task_stats(db, stats_id)
+                    if task_stats:
+                        difficulty_from_stats = self._get_value_from_task_stats(
+                            task_stats, "difficulty"
+                        )
+
+                if difficulty_from_stats is None and categories:
+                    difficulty_from_stats = self._get_value_from_category_stats(
+                        db, categories, "difficulty"
+                    )
+
+        # Process each field
         fields_to_overwrite = ["difficulty", "duration", "importance", "location"]
 
         for field in fields_to_overwrite:
@@ -272,6 +297,7 @@ class EnrichmentService:
             overwrite_value = None
             overwrite_source = None
 
+            # === TASK STATISTICS ===
             if stats_id:
                 task_stats = self._get_task_stats(db, stats_id)
                 if task_stats:
@@ -282,32 +308,38 @@ class EnrichmentService:
                         if overwrite_value is not None:
                             overwrite_source = "task_statistics"
                             logger.info(
-                                f"    Overwriting '{field}' from task_statistics: "
-                                f"{value} -> {overwrite_value}"
+                                f"    Overwriting '{field}' from task_statistics: {value} -> {overwrite_value}"
                             )
+
                     elif field == "duration":
-                        difficulty_val = self._get_value_from_task_stats(
-                            task_stats, "difficulty"
-                        )
-                        overwrite_value = self._get_value_from_task_stats(
-                            task_stats, field, difficulty_val
-                        )
-                        if overwrite_value is not None:
-                            overwrite_source = "task_statistics"
-                            logger.info(
-                                f"    Overwriting '{field}' from task_statistics: "
-                                f"{value} -> {overwrite_value}"
+                        # Determine which difficulty to use for bucket
+                        if difficulty_predicted:
+                            # Use stats difficulty
+                            dur_difficulty = difficulty_from_stats
+                        else:
+                            # Use actual difficulty from task_payload
+                            dur_difficulty = difficulty_actual
+
+                        if dur_difficulty is not None:
+                            overwrite_value = self._get_value_from_task_stats(
+                                task_stats, field, dur_difficulty
                             )
+                            if overwrite_value is not None:
+                                overwrite_source = "task_statistics"
+                                logger.info(
+                                    f"    Overwriting '{field}' from task_statistics: {value} -> {overwrite_value}"
+                                )
+
                     elif field == "location":
                         location = self._get_location_from_task_stats(db, stats_id)
                         if location:
                             overwrite_value = location
                             overwrite_source = "task_statistics"
                             logger.info(
-                                f"    Overwriting '{field}' from task_statistics: "
-                                f"{value} -> {overwrite_value}"
+                                f"    Overwriting '{field}' from task_statistics: {value} -> {overwrite_value}"
                             )
 
+            # === CATEGORY STATISTICS (if no task stats) ===
             if overwrite_value is None and categories:
                 if field == "difficulty":
                     overwrite_value = self._get_value_from_category_stats(
@@ -316,27 +348,33 @@ class EnrichmentService:
                     if overwrite_value is not None:
                         overwrite_source = "category_statistics"
                         logger.info(
-                            f"    Overwriting '{field}' from category_statistics: "
-                            f"{value} -> {overwrite_value}"
+                            f"    Overwriting '{field}' from category_statistics: {value} -> {overwrite_value}"
                         )
+
                 elif field == "duration":
-                    difficulty_val = self._get_value_from_category_stats(
-                        db, categories, "difficulty"
-                    )
-                    if overwrite_value is not None:
-                        overwrite_source = "category_statistics"
-                        logger.info(
-                            f"    Overwriting '{field}' from category_statistics: "
-                            f"{value} -> {overwrite_value}"
+                    # Determine which difficulty to use for bucket
+                    if difficulty_predicted:
+                        dur_difficulty = difficulty_from_stats
+                    else:
+                        dur_difficulty = difficulty_actual
+
+                    if dur_difficulty is not None:
+                        overwrite_value = self._get_value_from_category_stats(
+                            db, categories, field, dur_difficulty
                         )
+                        if overwrite_value is not None:
+                            overwrite_source = "category_statistics"
+                            logger.info(
+                                f"    Overwriting '{field}' from category_statistics: {value} -> {overwrite_value}"
+                            )
+
                 elif field == "location":
                     location = self._get_location_from_category_stats(db, categories)
                     if location:
                         overwrite_value = location
                         overwrite_source = "category_statistics"
                         logger.info(
-                            f"    Overwriting '{field}' from category_statistics: "
-                            f"{value} -> {overwrite_value}"
+                            f"    Overwriting '{field}' from category_statistics: {value} -> {overwrite_value}"
                         )
 
             if overwrite_value is not None and overwrite_source:
