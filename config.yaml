@@ -36,11 +36,11 @@ modes:
 
   specific:
     num_train_epochs: 15
-    max_limit: 200
-    per_device_train_batch_size: 4
+    max_limit: 1000
+    per_device_train_batch_size: 8
     gradient_accumulation_steps: 16
-    learning_rate_fresh: 1e-5
-    learning_rate_resume: 1e-5
+    learning_rate_fresh: 5e-6
+    learning_rate_resume: 2e-6
 
   modify_only:
     num_train_epochs: 10

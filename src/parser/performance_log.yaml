@@ -1,0 +1,2663 @@
+- timestamp: '2026-04-14T16:04:52.142806'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.144621'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: work
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.145624'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: health
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.146624'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.147622'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: shopping
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.148625'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.149625'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.149625'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.150625'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.151625'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.152625'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: study
+    location: library
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.153626'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: home
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.153626'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.155624'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: study
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.156627'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.157627'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.904431'
+  mode: modify
+  input: push deadline to friday
+  raw_output: name=Friday[EXP]</s>
+  parsed:
+    name: Friday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:52.998445'
+  mode: modify
+  input: move deadline to next week
+  raw_output: name=next week[EXP]</s>
+  parsed:
+    name: next week[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.246710'
+  mode: modify
+  input: set it for 3pm
+  raw_output: name=help<extra_id_76> | difficulty=0.55[PRD] | duration=30[EXP]</s>
+  parsed:
+    name: help
+    difficulty: '0.55'
+    duration: 30[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.446928'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: name=help formularul formularul înscris | start=12:30[EXP]</s>
+  parsed:
+    name: help formularul formularul înscris
+    start: 12:30[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.684986'
+  mode: modify
+  input: cancel fixed time
+  raw_output: name=cancel fixed_time=false[EXP]</s>
+  parsed:
+    name: cancel fixed_time=false[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.745997'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: name=90[PRD]</s>
+  parsed:
+    name: 90[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.879706'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: name=make it 15 minutes[EXP]</s>
+  parsed:
+    name: make it 15 minutes[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:53.963714'
+  mode: modify
+  input: make it harder
+  raw_output: name=hardware[EXP]</s>
+  parsed:
+    name: hardware[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.048245'
+  mode: modify
+  input: make it easier
+  raw_output: name=easyeasy[EXP]</s>
+  parsed:
+    name: easyeasy[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.149270'
+  mode: modify
+  input: make it urgent
+  raw_output: name=make it urgent[EXP]</s>
+  parsed:
+    name: make it urgent[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.233308'
+  mode: modify
+  input: make it low priority
+  raw_output: name=low priority[EXP]</s>
+  parsed:
+    name: low priority[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.308316'
+  mode: modify
+  input: do it at home instead
+  raw_output: name=home[PRD]</s>
+  parsed:
+    name: home[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.400324'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: name=fitness[EXP]</s>
+  parsed:
+    name: fitness[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.495345'
+  mode: modify
+  input: change to work
+  raw_output: name=change to work[PRD]</s>
+  parsed:
+    name: change to work[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.642379'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: name=repeat every Monday[EXP]</s>
+  parsed:
+    name: repeat every Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.804415'
+  mode: modify
+  input: cancel recurrence
+  raw_output: name=cancel recurrence[EXP]</s>
+  parsed:
+    name: cancel recurrence[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:04:54.885446'
+  mode: modify
+  input: start on monday
+  raw_output: name=Monday[EXP]</s>
+  parsed:
+    name: Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.493460'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.495461'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: work
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.496453'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: health
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.496453'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.497451'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: shopping
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.498452'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.499460'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.500460'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.501452'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.502455'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.503456'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: study
+    location: library
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.505452'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: home
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.506453'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.507454'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: study
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.508454'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.509455'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.809521'
+  mode: modify
+  input: push deadline to friday
+  raw_output: name=Friday[EXP]</s>
+  parsed:
+    name: Friday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:03.917545'
+  mode: modify
+  input: move deadline to next week
+  raw_output: name=next week[EXP]</s>
+  parsed:
+    name: next week[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.188606'
+  mode: modify
+  input: set it for 3pm
+  raw_output: name=help<extra_id_76> | difficulty=0.55[PRD] | duration=30[EXP]</s>
+  parsed:
+    name: help
+    difficulty: '0.55'
+    duration: 30[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.397653'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: name=help formularul formularul înscris | start=12:30[EXP]</s>
+  parsed:
+    name: help formularul formularul înscris
+    start: 12:30[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.606701'
+  mode: modify
+  input: cancel fixed time
+  raw_output: name=cancel fixed_time=false[EXP]</s>
+  parsed:
+    name: cancel fixed_time=false[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.681720'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: name=90[PRD]</s>
+  parsed:
+    name: 90[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.822749'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: name=make it 15 minutes[EXP]</s>
+  parsed:
+    name: make it 15 minutes[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:04.907768'
+  mode: modify
+  input: make it harder
+  raw_output: name=hardware[EXP]</s>
+  parsed:
+    name: hardware[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.006791'
+  mode: modify
+  input: make it easier
+  raw_output: name=easyeasy[EXP]</s>
+  parsed:
+    name: easyeasy[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.130829'
+  mode: modify
+  input: make it urgent
+  raw_output: name=make it urgent[EXP]</s>
+  parsed:
+    name: make it urgent[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.223839'
+  mode: modify
+  input: make it low priority
+  raw_output: name=low priority[EXP]</s>
+  parsed:
+    name: low priority[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.311858'
+  mode: modify
+  input: do it at home instead
+  raw_output: name=home[PRD]</s>
+  parsed:
+    name: home[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.423883'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: name=fitness[EXP]</s>
+  parsed:
+    name: fitness[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.533910'
+  mode: modify
+  input: change to work
+  raw_output: name=change to work[PRD]</s>
+  parsed:
+    name: change to work[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.691955'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: name=repeat every Monday[EXP]</s>
+  parsed:
+    name: repeat every Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.894990'
+  mode: modify
+  input: cancel recurrence
+  raw_output: name=cancel recurrence[EXP]</s>
+  parsed:
+    name: cancel recurrence[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:11:05.988018'
+  mode: modify
+  input: start on monday
+  raw_output: name=Monday[EXP]</s>
+  parsed:
+    name: Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.015233'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.016247'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: work
+    location: null
+    importance: null
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.017247'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: health
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.018247'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.019247'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: shopping
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.020245'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.021248'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.021248'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.022248'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.023241'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: fitness
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.024241'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: study
+    location: library
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.025247'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: null
+    duration: null
+    category: null
+    location: home
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.026247'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '30'
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.027247'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: null
+    duration: '120'
+    category: study
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.028247'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: null
+    duration: null
+    category: finance
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.029247'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: null
+    duration: null
+    category: null
+    location: null
+    importance: null
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.383322'
+  mode: modify
+  input: push deadline to friday
+  raw_output: deadline=Friday[EXP]</s>
+  parsed:
+    deadline: Friday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.515350'
+  mode: modify
+  input: move deadline to next week
+  raw_output: deadline=next week[EXP]</s>
+  parsed:
+    deadline: next week[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:42.797413'
+  mode: modify
+  input: set it for 3pm
+  raw_output: fixed_time=true[EXP] | fixed_start=15:00[PRD]</s>
+  parsed:
+    fixed_time: true
+    fixed_start: 15:00[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.081495'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: fixed_time=true[EXP] | fixed_start=12:00[PRD]</s>
+  parsed:
+    fixed_time: true
+    fixed_start: 12:00[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.265539'
+  mode: modify
+  input: cancel fixed time
+  raw_output: fixed_time=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:15:43.385565'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: duration=90[PRD]</s>
+  parsed:
+    duration: 90[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.490587'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: duration=15[PRD]</s>
+  parsed:
+    duration: 15[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.636332'
+  mode: modify
+  input: make it harder
+  raw_output: difficulty=0.43[PRD]</s>
+  parsed:
+    difficulty: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.769361'
+  mode: modify
+  input: make it easier
+  raw_output: difficulty=0.43[PRD]</s>
+  parsed:
+    difficulty: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:43.894391'
+  mode: modify
+  input: make it urgent
+  raw_output: importance=0.43[PRD]</s>
+  parsed:
+    importance: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:44.009414'
+  mode: modify
+  input: make it low priority
+  raw_output: importance=0.43[PRD]</s>
+  parsed:
+    importance: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:44.129899'
+  mode: modify
+  input: do it at home instead
+  raw_output: location=home[PRD]</s>
+  parsed:
+    location: home[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:44.264930'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: category=fitness[EXP]</s>
+  parsed:
+    category: fitness[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:44.476978'
+  mode: modify
+  input: change to work
+  raw_output: fixed_time=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:15:44.912914'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: recurrent=true[EXP] | recurrence_days=Monday[PRD]</s>
+  parsed:
+    recurrent: true
+    recurrence_days: Monday[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:15:45.097954'
+  mode: modify
+  input: cancel recurrence
+  raw_output: recurrent=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:15:45.219982'
+  mode: modify
+  input: start on monday
+  raw_output: start=Monday[EXP]</s>
+  parsed:
+    start: Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.242553'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.244557'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: work
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.245555'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: health
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.246554'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.246554'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: shopping
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.247554'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.248548'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.249557'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.250555'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.250555'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.251555'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: study
+    location: library
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.252555'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: home
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.253547'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.254558'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '120'
+    category: study
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.254558'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.255549'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.566646'
+  mode: modify
+  input: push deadline to friday
+  raw_output: deadline=Friday[EXP]</s>
+  parsed:
+    deadline: Friday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.691745'
+  mode: modify
+  input: move deadline to next week
+  raw_output: deadline=next week[EXP]</s>
+  parsed:
+    deadline: next week[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:32.983817'
+  mode: modify
+  input: set it for 3pm
+  raw_output: fixed_time=true[EXP] | fixed_start=15:00[PRD]</s>
+  parsed:
+    fixed_time: true
+    fixed_start: 15:00[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.245874'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: fixed_time=true[EXP] | fixed_start=12:00[PRD]</s>
+  parsed:
+    fixed_time: true
+    fixed_start: 12:00[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.408914'
+  mode: modify
+  input: cancel fixed time
+  raw_output: fixed_time=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:20:33.498927'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: duration=90[PRD]</s>
+  parsed:
+    duration: 90[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.591964'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: duration=15[PRD]</s>
+  parsed:
+    duration: 15[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.718995'
+  mode: modify
+  input: make it harder
+  raw_output: difficulty=0.43[PRD]</s>
+  parsed:
+    difficulty: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.833013'
+  mode: modify
+  input: make it easier
+  raw_output: difficulty=0.43[PRD]</s>
+  parsed:
+    difficulty: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:33.954066'
+  mode: modify
+  input: make it urgent
+  raw_output: importance=0.43[PRD]</s>
+  parsed:
+    importance: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:34.066091'
+  mode: modify
+  input: make it low priority
+  raw_output: importance=0.43[PRD]</s>
+  parsed:
+    importance: 0.43[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:34.167114'
+  mode: modify
+  input: do it at home instead
+  raw_output: location=home[PRD]</s>
+  parsed:
+    location: home[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:34.283131'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: category=fitness[EXP]</s>
+  parsed:
+    category: fitness[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:34.441165'
+  mode: modify
+  input: change to work
+  raw_output: fixed_time=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:20:34.802916'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: recurrent=true[EXP] | recurrence_days=Monday[PRD]</s>
+  parsed:
+    recurrent: true
+    recurrence_days: Monday[PRD]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:20:34.976962'
+  mode: modify
+  input: cancel recurrence
+  raw_output: recurrent=false[EXP]</s>
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:20:35.091990'
+  mode: modify
+  input: start on monday
+  raw_output: start=Monday[EXP]</s>
+  parsed:
+    start: Monday[EXP]</s>
+  error: null
+
+- timestamp: '2026-04-14T16:24:04.298279'
+  mode: add
+  input: go home
+  raw_output: (rule-based)
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.638814'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.639814'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: work
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.640815'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: health
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.641815'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.642815'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: shopping
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.643815'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.643815'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.644815'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.645816'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.646819'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.647818'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: study
+    location: library
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.648817'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: home
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.649819'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.650817'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '120'
+    category: study
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.651817'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.651817'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:30:05.973899'
+  mode: modify
+  input: push deadline to friday
+  raw_output: deadline=Friday[EXP]
+  parsed:
+    deadline: Friday
+  error: null
+
+- timestamp: '2026-04-14T16:30:06.099937'
+  mode: modify
+  input: move deadline to next week
+  raw_output: deadline=next week[EXP]
+  parsed:
+    deadline: next week
+  error: null
+
+- timestamp: '2026-04-14T16:30:06.389042'
+  mode: modify
+  input: set it for 3pm
+  raw_output: fixed_time=true[EXP] | fixed_start=15:00[PRD]
+  parsed:
+    fixed_time: true
+    fixed_start: '15:00'
+  error: null
+
+- timestamp: '2026-04-14T16:30:06.709122'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: fixed_time=true[EXP] | fixed_start=12:00[PRD]
+  parsed:
+    fixed_time: true
+    fixed_start: '12:00'
+  error: null
+
+- timestamp: '2026-04-14T16:30:06.883153'
+  mode: modify
+  input: cancel fixed time
+  raw_output: fixed_time=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:30:06.977175'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: duration=90[PRD]
+  parsed:
+    duration: '90'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.072196'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: duration=15[PRD]
+  parsed:
+    duration: '15'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.191224'
+  mode: modify
+  input: make it harder
+  raw_output: difficulty=0.43[PRD]
+  parsed:
+    difficulty: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.298639'
+  mode: modify
+  input: make it easier
+  raw_output: difficulty=0.43[PRD]
+  parsed:
+    difficulty: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.447661'
+  mode: modify
+  input: make it urgent
+  raw_output: importance=0.43[PRD]
+  parsed:
+    importance: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.564690'
+  mode: modify
+  input: make it low priority
+  raw_output: importance=0.43[PRD]
+  parsed:
+    importance: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.686715'
+  mode: modify
+  input: do it at home instead
+  raw_output: location=home[PRD]
+  parsed:
+    location: home
+  error: null
+
+- timestamp: '2026-04-14T16:30:07.804750'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: category=fitness[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:30:07.988791'
+  mode: modify
+  input: change to work
+  raw_output: fixed_time=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:30:08.367869'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: recurrent=true[EXP] | recurrence_days=Monday[PRD]
+  parsed:
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:30:08.571914'
+  mode: modify
+  input: cancel recurrence
+  raw_output: recurrent=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:30:08.688132'
+  mode: modify
+  input: start on monday
+  raw_output: start=Monday[EXP]
+  parsed:
+    start: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.441951'
+  mode: add
+  input: gym at 6am
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.456953'
+  mode: add
+  input: meeting at 3pm
+  raw_output: (rule-based)
+  parsed:
+    name: meeting
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: work
+    location: null
+    importance: '0.5'
+    fixed_time: true
+    fixed_start: '15:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.457944'
+  mode: add
+  input: meditate
+  raw_output: (rule-based)
+  parsed:
+    name: meditate
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: health
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.458951'
+  mode: add
+  input: pay the rent
+  raw_output: (rule-based)
+  parsed:
+    name: pay the rent
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.459951'
+  mode: add
+  input: grocery shopping
+  raw_output: (rule-based)
+  parsed:
+    name: grocery shopping
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: shopping
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.460952'
+  mode: add
+  input: hard workout
+  raw_output: (rule-based)
+  parsed:
+    name: hard workout
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.461944'
+  mode: add
+  input: easy task
+  raw_output: (rule-based)
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.461944'
+  mode: add
+  input: urgent fix
+  raw_output: (rule-based)
+  parsed:
+    name: urgent fix
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.95'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.462945'
+  mode: add
+  input: low priority reading
+  raw_output: (rule-based)
+  parsed:
+    name: low priority reading
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.15'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.463948'
+  mode: add
+  input: gym every monday
+  raw_output: (rule-based)
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.464953'
+  mode: add
+  input: study at the library
+  raw_output: (rule-based)
+  parsed:
+    name: study
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: study
+    location: library
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.465953'
+  mode: add
+  input: work from home
+  raw_output: (rule-based)
+  parsed:
+    name: work
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: home
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.466953'
+  mode: add
+  input: 30 minute stretch
+  raw_output: (rule-based)
+  parsed:
+    name: 30 minute stretch
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.467954'
+  mode: add
+  input: 2 hour study session
+  raw_output: (rule-based)
+  parsed:
+    name: 2 hour study session
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '120'
+    category: study
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.468953'
+  mode: add
+  input: pay bill tomorrow
+  raw_output: (rule-based)
+  parsed:
+    name: pay bill tomorrow
+    start: null
+    deadline: tomorrow
+    difficulty: '0.5'
+    duration: '30'
+    category: finance
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.468953'
+  mode: add
+  input: finish report by friday
+  raw_output: (rule-based)
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: '0.5'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-04-14T16:48:02.871425'
+  mode: modify
+  input: push deadline to friday
+  raw_output: deadline=Friday[EXP]
+  parsed:
+    deadline: Friday
+  error: null
+
+- timestamp: '2026-04-14T16:48:03.011456'
+  mode: modify
+  input: move deadline to next week
+  raw_output: deadline=next week[EXP]
+  parsed:
+    deadline: next week
+  error: null
+
+- timestamp: '2026-04-14T16:48:03.406388'
+  mode: modify
+  input: set it for 3pm
+  raw_output: fixed_time=true[EXP] | fixed_start=15:00[PRD]
+  parsed:
+    fixed_time: true
+    fixed_start: '15:00'
+  error: null
+
+- timestamp: '2026-04-14T16:48:03.687460'
+  mode: modify
+  input: at 10:30am instead
+  raw_output: fixed_time=true[EXP] | fixed_start=12:00[PRD]
+  parsed:
+    fixed_time: true
+    fixed_start: '12:00'
+  error: null
+
+- timestamp: '2026-04-14T16:48:03.849488'
+  mode: modify
+  input: cancel fixed time
+  raw_output: fixed_time=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:48:03.942519'
+  mode: modify
+  input: make it 90 minutes
+  raw_output: duration=90[PRD]
+  parsed:
+    duration: '90'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.033539'
+  mode: modify
+  input: make it 15 minutes
+  raw_output: duration=15[PRD]
+  parsed:
+    duration: '15'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.156567'
+  mode: modify
+  input: make it harder
+  raw_output: difficulty=0.43[PRD]
+  parsed:
+    difficulty: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.276600'
+  mode: modify
+  input: make it easier
+  raw_output: difficulty=0.43[PRD]
+  parsed:
+    difficulty: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.390629'
+  mode: modify
+  input: make it urgent
+  raw_output: importance=0.43[PRD]
+  parsed:
+    importance: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.503662'
+  mode: modify
+  input: make it low priority
+  raw_output: importance=0.43[PRD]
+  parsed:
+    importance: '0.43'
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.606675'
+  mode: modify
+  input: do it at home instead
+  raw_output: location=home[PRD]
+  parsed:
+    location: home
+  error: null
+
+- timestamp: '2026-04-14T16:48:04.730703'
+  mode: modify
+  input: categorize it as fitness
+  raw_output: category=fitness[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:48:04.893745'
+  mode: modify
+  input: change to work
+  raw_output: fixed_time=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:48:05.284837'
+  mode: modify
+  input: make it repeat every monday
+  raw_output: recurrent=true[EXP] | recurrence_days=Monday[PRD]
+  parsed:
+    recurrent: true
+    recurrence_days: Monday
+  error: null
+
+- timestamp: '2026-04-14T16:48:05.447869'
+  mode: modify
+  input: cancel recurrence
+  raw_output: recurrent=false[EXP]
+  parsed: null
+  error: no_changes
+
+- timestamp: '2026-04-14T16:48:05.565897'
+  mode: modify
+  input: start on monday
+  raw_output: start=Monday[EXP]
+  parsed:
+    start: Monday
+  error: null
+

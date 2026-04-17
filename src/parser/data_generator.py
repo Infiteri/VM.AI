@@ -1,8 +1,8 @@
 """
-    VM-AI - Data Generator with EXP/PRD Tag Support
-    Generates training data in pipe format with explicit/predicted tags:
-    name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
-    Run: python src/parser/data_generator.py
+VM-AI - Data Generator with EXP/PRD Tag Support
+Generates training data in pipe format with explicit/predicted tags:
+name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
+Run: python src/parser/data_generator.py
 """
 
 import vars
@@ -13,48 +13,125 @@ import re
 import os
 from datasets import Dataset
 from schemas import (
-    schema_to_pipe, changed_to_pipe, normalize_duration, 
-    normalize_deadline, normalize_time, clamp_category,
-    detect_explicit_fields, DIFFICULTY_KEYWORDS, IMPORTANCE_KEYWORDS,
-    CATEGORY_KEYWORDS, DURATION_KEYWORDS, TIME_KEYWORDS, RECURRENCE_KEYWORDS
+    schema_to_pipe,
+    changed_to_pipe,
+    normalize_duration,
+    normalize_deadline,
+    normalize_time,
+    clamp_category,
+    detect_explicit_fields,
+    DIFFICULTY_KEYWORDS,
+    IMPORTANCE_KEYWORDS,
+    CATEGORY_KEYWORDS,
+    DURATION_KEYWORDS,
+    TIME_KEYWORDS,
+    RECURRENCE_KEYWORDS,
 )
 
 PREDICTED_FIELDS = vars.PREDICTED_FIELDS
-FIELD_MAP = vars.FIELD_MAP if hasattr(vars, 'FIELD_MAP') else {}
+FIELD_MAP = vars.FIELD_MAP if hasattr(vars, "FIELD_MAP") else {}
 DAYS = vars.DAYS
 DAYS_LOWER = {d.lower(): d for d in DAYS}
+
 
 # ── Random Generators ────────────────────────────────────────────────────────
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
 
+
 def _rand_deadline():
-    return random.choice(["Sunday", "next Monday", "Friday", "tomorrow", "next week", "this weekend", "Wednesday", "Thursday"])
+    return random.choice(
+        [
+            "Sunday",
+            "next Monday",
+            "Friday",
+            "tomorrow",
+            "next week",
+            "this weekend",
+            "Wednesday",
+            "Thursday",
+        ]
+    )
+
 
 def _rand_location():
-    return random.choice(["home", "office", "gym", "library", "online", "school", "the coffee shop", "the park"])
+    return random.choice(
+        [
+            "home",
+            "office",
+            "gym",
+            "library",
+            "online",
+            "school",
+            "the coffee shop",
+            "the park",
+        ]
+    )
+
 
 def _rand_difficulty():
     return str(round(random.uniform(0.1, 0.95), 2))
 
+
 def _rand_importance():
     return str(round(random.uniform(0.1, 0.99), 2))
+
 
 def _rand_category():
     return random.choice(list(vars.VALID_CATEGORIES))
 
+
 def _rand_name():
-    return random.choice(["finish the report", "review the document", "send the email", "prepare the presentation", "call the client", "fix the bug"])
+    return random.choice(
+        [
+            "finish the report",
+            "review the document",
+            "send the email",
+            "prepare the presentation",
+            "call the client",
+            "fix the bug",
+        ]
+    )
+
 
 def _rand_time():
-    return random.choice(["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"])
+    return random.choice(
+        [
+            "08:00",
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+            "16:00",
+            "17:00",
+            "18:00",
+            "19:00",
+        ]
+    )
+
 
 def _rand_start():
-    return random.choice(["tomorrow", "next week", "Monday", "Friday", "today", "next Monday", "Wednesday", "this weekend"])
+    return random.choice(
+        [
+            "tomorrow",
+            "next week",
+            "Monday",
+            "Friday",
+            "today",
+            "next Monday",
+            "Wednesday",
+            "this weekend",
+        ]
+    )
+
 
 def _rand_recurrence_days():
     count = random.randint(1, 3)
     return ",".join(random.sample(DAYS, k=count))
+
 
 # ── CHANGE_TEMPLATES ──────────────────────────────────────────────────────────
 # Format: (field_name, phrase_function, value_generator)
@@ -83,14 +160,27 @@ CHANGE_TEMPLATES = [
     ("location", lambda v: f"change location to {v}", _rand_location),
     ("location", lambda v: f"move it to {v}", _rand_location),
     ("location", lambda v: f"at {v} instead", _rand_location),
-    # ── Difficulty ────────────────────────────────────────────────────
-    ("difficulty", lambda v: f"mark it as {'hard' if float(v) > 0.5 else 'easy'}", _rand_difficulty),
-    ("difficulty", lambda v: f"make it {'harder' if float(v) > 0.5 else 'easier'}", _rand_difficulty),
-    ("difficulty", lambda v: f"{'more' if float(v) > 0.5 else 'less'} challenging", _rand_difficulty),
-    # ── Importance ────────────────────────────────────────────────────
-    ("importance", lambda v: f"mark it as {'high priority' if float(v) > 0.5 else 'low priority'}", _rand_importance),
-    ("importance", lambda v: f"make it {'urgent' if float(v) > 0.7 else 'optional'}", _rand_importance),
-    ("importance", lambda v: f"{'very' if float(v) > 0.5 else 'not very'} important", _rand_importance),
+    # ── Difficulty (EXPLICIT mappings for consistent training) ───────
+    ("difficulty", lambda v: f"make it hard", lambda: "0.85"),
+    ("difficulty", lambda v: f"make it harder", lambda: "0.85"),
+    ("difficulty", lambda v: f"make it easy", lambda: "0.15"),
+    ("difficulty", lambda v: f"make it easier", lambda: "0.15"),
+    ("difficulty", lambda v: f"make it more challenging", lambda: "0.8"),
+    ("difficulty", lambda v: f"make it very easy", lambda: "0.1"),
+    ("difficulty", lambda v: f"make it moderate", lambda: "0.45"),
+    ("difficulty", lambda v: f"mark it as hard", lambda: "0.85"),
+    ("difficulty", lambda v: f"mark it as easy", lambda: "0.15"),
+    # ── Importance (EXPLICIT mappings for consistent training) ───────
+    ("importance", lambda v: f"make it urgent", lambda: "0.95"),
+    ("importance", lambda v: f"make it critical", lambda: "0.98"),
+    ("importance", lambda v: f"make it optional", lambda: "0.15"),
+    ("importance", lambda v: f"make it high priority", lambda: "0.85"),
+    ("importance", lambda v: f"make it low priority", lambda: "0.15"),
+    ("importance", lambda v: f"make it very important", lambda: "0.9"),
+    ("importance", lambda v: f"mark it as urgent", lambda: "0.95"),
+    ("importance", lambda v: f"mark it as critical", lambda: "0.98"),
+    ("importance", lambda v: f"mark it as high priority", lambda: "0.85"),
+    ("importance", lambda v: f"mark it as low priority", lambda: "0.15"),
     # ── Category ──────────────────────────────────────────────────────
     ("category", lambda v: f"categorize it as {v}", _rand_category),
     ("category", lambda v: f"put it under {v}", _rand_category),
@@ -107,7 +197,11 @@ CHANGE_TEMPLATES = [
     ("cancel_fixed_time", lambda v: "remove the time", lambda: "false"),
     ("cancel_fixed_time", lambda v: "no specific time", lambda: "false"),
     # ── Recurrence ────────────────────────────────────────────────────
-    ("recurrent+recurrence_days", lambda v: f"make it repeat every {v}", _rand_recurrence_days),
+    (
+        "recurrent+recurrence_days",
+        lambda v: f"make it repeat every {v}",
+        _rand_recurrence_days,
+    ),
     ("recurrent+recurrence_days", lambda v: f"repeat on {v}", _rand_recurrence_days),
     ("cancel_recurrent", lambda v: "cancel recurrence", lambda: "false"),
     ("cancel_recurrent", lambda v: "make it one-time", lambda: "false"),
@@ -187,99 +281,236 @@ class DataGenerator:
     # ── Keyword-based Inference ───────────────────────────────────────────────
 
     _TASK_CATEGORY_MAP = {
-        "migration": "work", "deploy": "work", "refactor": "work", "optimize": "work",
-        "code": "work", "bug": "work", "crash": "work", "fix": "work",
-        "presentation": "work", "meeting": "work", "standup": "work",
-        "report": "work", "email": "work", "client": "work", "invoice": "work",
-        "exam": "study", "homework": "study", "lecture": "study",
-        "thesis": "study", "assignment": "study", "tutor": "study",
-        "study session": "study", "study": "study",
-        "gym": "fitness", "run": "fitness", "yoga": "fitness",
-        "workout": "fitness", "swim": "fitness", "cycle": "fitness",
-        "doctor": "health", "medication": "health", "dentist": "health",
-        "meditate": "health", "prescription": "health",
-        "rent": "finance", "bill": "finance", "tax": "finance", "taxes": "finance",
-        "bank": "finance", "payment": "finance",
-        "clean": "home", "laundry": "home", "cook": "home",
-        "dinner": "home", "lunch": "home", "breakfast": "home",
-        "call mom": "personal", "call dad": "personal",
-        "kids": "family", "children": "family",
-        "friend": "social", "party": "social", "movie": "social",
-        "flight": "travel", "hotel": "travel", "passport": "travel",
-        "guitar": "creative", "draw": "creative", "blog": "creative",
-        "spanish": "learning", "piano": "learning", "learn": "learning",
-        "groceries": "shopping", "gift": "shopping", "buy": "shopping",
-        "shopping": "shopping", "supermarket": "shopping",
-        "return": "errands", "package": "errands",
-        "password": "admin", "backup": "admin", "config": "admin",
+        "migration": "work",
+        "deploy": "work",
+        "refactor": "work",
+        "optimize": "work",
+        "code": "work",
+        "bug": "work",
+        "crash": "work",
+        "fix": "work",
+        "presentation": "work",
+        "meeting": "work",
+        "standup": "work",
+        "report": "work",
+        "email": "work",
+        "client": "work",
+        "invoice": "work",
+        "exam": "study",
+        "homework": "study",
+        "lecture": "study",
+        "thesis": "study",
+        "assignment": "study",
+        "tutor": "study",
+        "study session": "study",
+        "study": "study",
+        "gym": "fitness",
+        "run": "fitness",
+        "yoga": "fitness",
+        "workout": "fitness",
+        "swim": "fitness",
+        "cycle": "fitness",
+        "doctor": "health",
+        "medication": "health",
+        "dentist": "health",
+        "meditate": "health",
+        "prescription": "health",
+        "rent": "finance",
+        "bill": "finance",
+        "tax": "finance",
+        "taxes": "finance",
+        "bank": "finance",
+        "payment": "finance",
+        "clean": "home",
+        "laundry": "home",
+        "cook": "home",
+        "dinner": "home",
+        "lunch": "home",
+        "breakfast": "home",
+        "call mom": "personal",
+        "call dad": "personal",
+        "kids": "family",
+        "children": "family",
+        "friend": "social",
+        "party": "social",
+        "movie": "social",
+        "flight": "travel",
+        "hotel": "travel",
+        "passport": "travel",
+        "guitar": "creative",
+        "draw": "creative",
+        "blog": "creative",
+        "spanish": "learning",
+        "piano": "learning",
+        "learn": "learning",
+        "groceries": "shopping",
+        "gift": "shopping",
+        "buy": "shopping",
+        "shopping": "shopping",
+        "supermarket": "shopping",
+        "return": "errands",
+        "package": "errands",
+        "password": "admin",
+        "backup": "admin",
+        "config": "admin",
     }
 
     def _infer_category(self, sentence: str) -> str:
         s = sentence.lower()
         for keyword in sorted(self._TASK_CATEGORY_MAP.keys(), key=len, reverse=True):
-            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
+            if re.search(r"\b" + re.escape(keyword) + r"\b", s):
                 return self._TASK_CATEGORY_MAP[keyword]
         return random.choice(["work", "personal", "home", "errands"])
 
     def _infer_difficulty(self, sentence: str) -> str:
         s = sentence.lower()
         # Use local keywords since imported ones are sets
-        local_keywords = {"hard": 0.8, "difficult": 0.85, "challenging": 0.8, "complex": 0.75, "intense": 0.9, "heavy": 0.85, "tough": 0.75, "urgent": 0.75, "easy": 0.15, "simple": 0.2, "light": 0.25, "quick": 0.2, "moderate": 0.5, "medium": 0.5}
+        local_keywords = {
+            "hard": 0.8,
+            "difficult": 0.85,
+            "challenging": 0.8,
+            "complex": 0.75,
+            "intense": 0.9,
+            "heavy": 0.85,
+            "tough": 0.75,
+            "urgent": 0.75,
+            "easy": 0.15,
+            "simple": 0.2,
+            "light": 0.25,
+            "quick": 0.2,
+            "moderate": 0.5,
+            "medium": 0.5,
+        }
         for keyword, val in local_keywords.items():
-            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
+            if re.search(r"\b" + re.escape(keyword) + r"\b", s):
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix", "emergency", "critical", "taxes", "tax", "exam"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in [
+                "crash",
+                "bug",
+                "fix",
+                "emergency",
+                "critical",
+                "taxes",
+                "tax",
+                "exam",
+            ]
+        ):
             return str(round(random.uniform(0.6, 0.85), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["workout", "gym", "heavy", "hard"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["workout", "gym", "heavy", "hard"]
+        ):
             return str(round(random.uniform(0.6, 0.85), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation", "study"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["report", "presentation", "study"]
+        ):
             return str(round(random.uniform(0.5, 0.7), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["quick", "easy", "simple", "stretch"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["quick", "easy", "simple", "stretch"]
+        ):
             return str(round(random.uniform(0.1, 0.25), 2))
         return str(round(random.uniform(0.3, 0.6), 2))
 
     def _infer_importance(self, sentence: str) -> str:
         s = sentence.lower()
         # Use local keywords since imported ones are sets
-        local_keywords = {"urgent": 0.9, "critical": 0.95, "asap": 0.92, "emergency": 0.98, "important": 0.75, "high priority": 0.8, "must": 0.85, "low priority": 0.2, "not urgent": 0.2, "minor": 0.25, "can wait": 0.3, "whenever": 0.15, "optional": 0.15}
+        local_keywords = {
+            "urgent": 0.9,
+            "critical": 0.95,
+            "asap": 0.92,
+            "emergency": 0.98,
+            "important": 0.75,
+            "high priority": 0.8,
+            "must": 0.85,
+            "low priority": 0.2,
+            "not urgent": 0.2,
+            "minor": 0.25,
+            "can wait": 0.3,
+            "whenever": 0.15,
+            "optional": 0.15,
+        }
         for keyword, val in local_keywords.items():
-            if re.search(r'\b' + re.escape(keyword) + r'\b', s):
+            if re.search(r"\b" + re.escape(keyword) + r"\b", s):
                 return str(round(val + random.uniform(-0.05, 0.05), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "emergency", "critical", "urgent", "asap", "taxes", "rent", "bill", "pay", "exam"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in [
+                "crash",
+                "emergency",
+                "critical",
+                "urgent",
+                "asap",
+                "taxes",
+                "rent",
+                "bill",
+                "pay",
+                "exam",
+            ]
+        ):
             return str(round(random.uniform(0.8, 0.95), 2))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meeting", "presentation", "report"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["meeting", "presentation", "report"]
+        ):
             return str(round(random.uniform(0.5, 0.7), 2))
         return str(round(random.uniform(0.4, 0.6), 2))
 
     def _infer_duration(self, sentence: str) -> str:
         s = sentence.lower()
-        match = re.search(r'(\d+)\s*(?:minute|min|hour|hr)', s)
+        match = re.search(r"(\d+)\s*(?:minute|min|hour|hr)", s)
         if match:
             val = int(match.group(1))
             if "hour" in s or "hr" in s:
                 return str(val * 60)
             return str(val)
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["crash", "bug", "fix"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s) for w in ["crash", "bug", "fix"]
+        ):
             return str(random.choice([60, 90, 120]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["report", "presentation"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["report", "presentation"]
+        ):
             return str(random.choice([60, 90, 120]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["workout", "gym", "yoga"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["workout", "gym", "yoga"]
+        ):
             return str(random.choice([45, 60, 90]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meeting", "call"]):
+        if any(re.search(r"\b" + re.escape(w) + r"\b", s) for w in ["meeting", "call"]):
             return str(random.choice([15, 30, 45, 60]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["run", "jog", "stretch"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["run", "jog", "stretch"]
+        ):
             return str(random.choice([15, 30, 45]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["meditate", "meditation"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["meditate", "meditation"]
+        ):
             return str(random.choice([10, 15, 20]))
-        if any(re.search(r'\b' + re.escape(w) + r'\b', s) for w in ["pay", "bill", "rent", "tax"]):
+        if any(
+            re.search(r"\b" + re.escape(w) + r"\b", s)
+            for w in ["pay", "bill", "rent", "tax"]
+        ):
             return str(random.choice([5, 10, 15]))
         return str(random.choice([30, 45, 60]))
 
     def _infer_location(self, sentence: str) -> str | None:
         s = sentence.lower()
-        locs = {"at the library": "library", "at the gym": "gym", "at home": "home", 
-                "from home": "home", "at the coffee shop": "coffee shop", 
-                "at the office": "office", "at the supermarket": "supermarket"}
+        locs = {
+            "at the library": "library",
+            "at the gym": "gym",
+            "at home": "home",
+            "from home": "home",
+            "at the coffee shop": "coffee shop",
+            "at the office": "office",
+            "at the supermarket": "supermarket",
+        }
         for phrase, loc in sorted(locs.items(), key=len, reverse=True):
             if phrase in s:
                 return loc
@@ -288,20 +519,38 @@ class DataGenerator:
     def _build_schema(self, placeholder_map, sentence=""):
         s = sentence.lower()
         explicit_fields = detect_explicit_fields(sentence)
-        
+
         schema = {
             "name": {"value": None, "predicted": "name" not in explicit_fields},
             "start": {"value": None, "predicted": "start" not in explicit_fields},
             "deadline": {"value": None, "predicted": "deadline" not in explicit_fields},
-            "difficulty": {"value": None, "predicted": "difficulty" not in explicit_fields},
+            "difficulty": {
+                "value": None,
+                "predicted": "difficulty" not in explicit_fields,
+            },
             "duration": {"value": None, "predicted": "duration" not in explicit_fields},
             "category": {"value": None, "predicted": "category" not in explicit_fields},
             "location": {"value": None, "predicted": "location" not in explicit_fields},
-            "importance": {"value": None, "predicted": "importance" not in explicit_fields},
-            "fixed_time": {"value": False, "predicted": "fixed_time" not in explicit_fields},
-            "fixed_start": {"value": None, "predicted": "fixed_start" not in explicit_fields},
-            "recurrent": {"value": False, "predicted": "recurrent" not in explicit_fields},
-            "recurrence_days": {"value": None, "predicted": "recurrence_days" not in explicit_fields},
+            "importance": {
+                "value": None,
+                "predicted": "importance" not in explicit_fields,
+            },
+            "fixed_time": {
+                "value": False,
+                "predicted": "fixed_time" not in explicit_fields,
+            },
+            "fixed_start": {
+                "value": None,
+                "predicted": "fixed_start" not in explicit_fields,
+            },
+            "recurrent": {
+                "value": False,
+                "predicted": "recurrent" not in explicit_fields,
+            },
+            "recurrence_days": {
+                "value": None,
+                "predicted": "recurrence_days" not in explicit_fields,
+            },
         }
 
         for yaml_key, value in placeholder_map.items():
@@ -318,13 +567,13 @@ class DataGenerator:
         schema["difficulty"]["value"] = self._infer_difficulty(s)
         schema["importance"]["value"] = self._infer_importance(s)
         schema["duration"]["value"] = self._infer_duration(s)
-        
+
         loc = self._infer_location(s)
         if loc:
             schema["location"]["value"] = loc
 
         # Handle time/explicit time
-        time_match = re.search(r'(\d{1,2}(?::\d{2})?\s*(?:am|pm))', s)
+        time_match = re.search(r"(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
         if time_match:
             schema["fixed_time"]["value"] = True
             schema["fixed_start"]["value"] = normalize_time(time_match.group(0))
@@ -337,15 +586,32 @@ class DataGenerator:
             if "every day" in s or "daily" in s:
                 schema["recurrence_days"]["value"] = DAYS.copy()
             elif "weekday" in s:
-                schema["recurrence_days"]["value"] = ["Monday","Tuesday","Wednesday","Thursday","Friday"]
+                schema["recurrence_days"]["value"] = [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                ]
             else:
                 mentioned = [DAYS_LOWER[d] for d in DAYS_LOWER if d in s]
-                schema["recurrence_days"]["value"] = mentioned if mentioned else random.sample(DAYS, k=random.randint(1, 3))
+                schema["recurrence_days"]["value"] = (
+                    mentioned
+                    if mentioned
+                    else random.sample(DAYS, k=random.randint(1, 3))
+                )
 
         # Handle deadline/start keywords (only if not already set from placeholders)
-        deadline_keywords = ["by", "due", "before", "deadline", "until", "no later than"]
+        deadline_keywords = [
+            "by",
+            "due",
+            "before",
+            "deadline",
+            "until",
+            "no later than",
+        ]
         start_keywords = ["start", "begin", "from", "starting", "kick off", "commence"]
-        
+
         has_deadline_kw = any(kw in s for kw in deadline_keywords)
         has_start_kw = any(kw in s for kw in start_keywords)
 
@@ -356,7 +622,7 @@ class DataGenerator:
                 if d.lower() in s:
                     day_found = d
                     break
-            
+
             if day_found:
                 if has_start_kw:
                     schema["start"]["value"] = day_found
@@ -368,7 +634,7 @@ class DataGenerator:
                         schema["start"]["value"] = day_found
                     else:
                         schema["deadline"]["value"] = day_found
-        
+
         if not schema["deadline"]["value"] and not schema["start"]["value"]:
             if "tomorrow" in s:
                 if has_start_kw:
@@ -380,8 +646,12 @@ class DataGenerator:
                         schema["start"]["value"] = "tomorrow"
                     else:
                         schema["deadline"]["value"] = "tomorrow"
-            
-            if not schema["deadline"]["value"] and not schema["start"]["value"] and "next week" in s:
+
+            if (
+                not schema["deadline"]["value"]
+                and not schema["start"]["value"]
+                and "next week" in s
+            ):
                 if has_start_kw:
                     schema["start"]["value"] = "next week"
                 elif has_deadline_kw:
@@ -391,8 +661,12 @@ class DataGenerator:
                         schema["start"]["value"] = "next week"
                     else:
                         schema["deadline"]["value"] = "next week"
-            
-            if not schema["deadline"]["value"] and not schema["start"]["value"] and "today" in s:
+
+            if (
+                not schema["deadline"]["value"]
+                and not schema["start"]["value"]
+                and "today" in s
+            ):
                 if has_start_kw:
                     schema["start"]["value"] = "today"
                 elif has_deadline_kw:
@@ -404,10 +678,22 @@ class DataGenerator:
                         schema["deadline"]["value"] = "today"
 
         # Update predicted flags based on what was actually found
-        for field in ["fixed_time", "fixed_start", "recurrent", "recurrence_days", "deadline", "start"]:
-            if schema[field]["value"] is not None and schema[field]["value"] is not False:
+        for field in [
+            "fixed_time",
+            "fixed_start",
+            "recurrent",
+            "recurrence_days",
+            "deadline",
+            "start",
+        ]:
+            if (
+                schema[field]["value"] is not None
+                and schema[field]["value"] is not False
+            ):
                 schema[field]["predicted"] = False
-            elif field in ["fixed_time", "recurrent"] and schema[field]["value"] is False:
+            elif (
+                field in ["fixed_time", "recurrent"] and schema[field]["value"] is False
+            ):
                 schema[field]["predicted"] = False
 
         return schema
@@ -434,17 +720,30 @@ class DataGenerator:
             change_phrases.append(phrase_fn(new_value))
             if field_name == "fixed_time+fixed_start":
                 changed_fields["fixed_time"] = {"value": True, "predicted": False}
-                changed_fields["fixed_start"] = {"value": normalize_time(new_value), "predicted": False}
+                changed_fields["fixed_start"] = {
+                    "value": normalize_time(new_value),
+                    "predicted": False,
+                }
             elif field_name == "recurrent+recurrence_days":
                 changed_fields["recurrent"] = {"value": True, "predicted": False}
-                changed_fields["recurrence_days"] = {"value": new_value, "predicted": False}
+                changed_fields["recurrence_days"] = {
+                    "value": new_value,
+                    "predicted": False,
+                }
             elif field_name == "cancel_fixed_time":
                 changed_fields["fixed_time"] = {"value": False, "predicted": False}
                 changed_fields["fixed_start"] = {"value": None, "predicted": False}
             elif field_name == "cancel_recurrent":
                 changed_fields["recurrent"] = {"value": False, "predicted": False}
                 changed_fields["recurrence_days"] = {"value": None, "predicted": False}
-            elif field_name in ("deadline", "start", "duration", "location", "name", "recurrence_days"):
+            elif field_name in (
+                "deadline",
+                "start",
+                "duration",
+                "location",
+                "name",
+                "recurrence_days",
+            ):
                 # User stated a specific value — explicit
                 changed_fields[field_name] = {"value": new_value, "predicted": False}
             elif field_name in ("difficulty", "importance"):
@@ -472,17 +771,30 @@ class DataGenerator:
             change_phrases.append(phrase_fn(new_value))
             if field_name == "fixed_time+fixed_start":
                 changed_fields["fixed_time"] = {"value": True, "predicted": False}
-                changed_fields["fixed_start"] = {"value": normalize_time(new_value), "predicted": False}
+                changed_fields["fixed_start"] = {
+                    "value": normalize_time(new_value),
+                    "predicted": False,
+                }
             elif field_name == "recurrent+recurrence_days":
                 changed_fields["recurrent"] = {"value": True, "predicted": False}
-                changed_fields["recurrence_days"] = {"value": new_value, "predicted": False}
+                changed_fields["recurrence_days"] = {
+                    "value": new_value,
+                    "predicted": False,
+                }
             elif field_name == "cancel_fixed_time":
                 changed_fields["fixed_time"] = {"value": False, "predicted": False}
                 changed_fields["fixed_start"] = {"value": None, "predicted": False}
             elif field_name == "cancel_recurrent":
                 changed_fields["recurrent"] = {"value": False, "predicted": False}
                 changed_fields["recurrence_days"] = {"value": None, "predicted": False}
-            elif field_name in ("deadline", "start", "duration", "location", "name", "recurrence_days"):
+            elif field_name in (
+                "deadline",
+                "start",
+                "duration",
+                "location",
+                "name",
+                "recurrence_days",
+            ):
                 changed_fields[field_name] = {"value": new_value, "predicted": False}
             elif field_name in ("difficulty", "importance"):
                 changed_fields[field_name] = {"value": new_value, "predicted": True}
@@ -508,7 +820,7 @@ class DataGenerator:
 
         # Detect explicit fields from input
         explicit_fields = detect_explicit_fields(sentence)
-        
+
         difficulty = output.get("difficulty")
         if difficulty is None:
             difficulty = self._infer_difficulty(sentence)
@@ -550,18 +862,51 @@ class DataGenerator:
             fixed_start = normalize_time(fixed_start)
 
         schema = {
-            "name": {"value": output.get("name"), "predicted": "name" not in explicit_fields},
+            "name": {
+                "value": output.get("name"),
+                "predicted": "name" not in explicit_fields,
+            },
             "start": {"value": start, "predicted": "start" not in explicit_fields},
-            "deadline": {"value": deadline, "predicted": "deadline" not in explicit_fields},
-            "difficulty": {"value": difficulty, "predicted": "difficulty" not in explicit_fields},
-            "duration": {"value": duration, "predicted": "duration" not in explicit_fields},
-            "category": {"value": category, "predicted": "category" not in explicit_fields},
-            "location": {"value": output.get("location"), "predicted": "location" not in explicit_fields},
-            "importance": {"value": importance, "predicted": "importance" not in explicit_fields},
-            "fixed_time": {"value": output.get("fixed_time", False), "predicted": "fixed_time" not in explicit_fields},
-            "fixed_start": {"value": fixed_start, "predicted": "fixed_start" not in explicit_fields},
-            "recurrent": {"value": output.get("recurrent", False), "predicted": "recurrent" not in explicit_fields},
-            "recurrence_days": {"value": output.get("recurrence_days"), "predicted": "recurrence_days" not in explicit_fields},
+            "deadline": {
+                "value": deadline,
+                "predicted": "deadline" not in explicit_fields,
+            },
+            "difficulty": {
+                "value": difficulty,
+                "predicted": "difficulty" not in explicit_fields,
+            },
+            "duration": {
+                "value": duration,
+                "predicted": "duration" not in explicit_fields,
+            },
+            "category": {
+                "value": category,
+                "predicted": "category" not in explicit_fields,
+            },
+            "location": {
+                "value": output.get("location"),
+                "predicted": "location" not in explicit_fields,
+            },
+            "importance": {
+                "value": importance,
+                "predicted": "importance" not in explicit_fields,
+            },
+            "fixed_time": {
+                "value": output.get("fixed_time", False),
+                "predicted": "fixed_time" not in explicit_fields,
+            },
+            "fixed_start": {
+                "value": fixed_start,
+                "predicted": "fixed_start" not in explicit_fields,
+            },
+            "recurrent": {
+                "value": output.get("recurrent", False),
+                "predicted": "recurrent" not in explicit_fields,
+            },
+            "recurrence_days": {
+                "value": output.get("recurrence_days"),
+                "predicted": "recurrence_days" not in explicit_fields,
+            },
         }
 
         return f"add: {sentence.lower().strip()}", schema_to_pipe(schema)
@@ -603,7 +948,10 @@ class DataGenerator:
                 changed[field] = {"value": clamp_category(value), "predicted": True}
             elif field in ("difficulty", "importance"):
                 try:
-                    changed[field] = {"value": str(round(float(value), 2)), "predicted": True}
+                    changed[field] = {
+                        "value": str(round(float(value), 2)),
+                        "predicted": True,
+                    }
                 except (ValueError, TypeError):
                     changed[field] = {"value": str(value), "predicted": True}
             else:
@@ -618,12 +966,15 @@ class DataGenerator:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test data generator output")
-    parser.add_argument("--samples", type=int, default=10, help="Number of samples per mode")
+    parser.add_argument(
+        "--samples", type=int, default=10, help="Number of samples per mode"
+    )
     parser.add_argument("--mode", choices=["add", "modify", "both"], default="both")
     args = parser.parse_args()
 
     import os
     from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
+
     # Navigate to project root from src/parser/
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     data_dir = os.path.join(project_root, "data")
@@ -646,7 +997,7 @@ if __name__ == "__main__":
         print("=" * 70)
         for i in range(args.samples):
             inp, tgt = gen._generate_add()
-            print(f"[{i+1}] IN:  {inp}")
+            print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
             # Quick validation
             if "[EXP]" not in tgt and "[PRD]" not in tgt:
@@ -661,7 +1012,7 @@ if __name__ == "__main__":
         print("=" * 70)
         for i in range(args.samples):
             inp, tgt = gen._generate_modify()
-            print(f"[{i+1}] IN:  {inp}")
+            print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
             # Quick validation
             if "[EXP]" not in tgt and "[PRD]" not in tgt:

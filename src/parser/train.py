@@ -1,7 +1,7 @@
 """
-    VM-AI - Parser Training Script
-    Trains the parser model with EXP/PRD tag format.
-    Run: python src/parser/train.py
+VM-AI - Parser Training Script
+Trains the parser model with EXP/PRD tag format.
+Run: python src/parser/train.py
 """
 
 import os
@@ -38,12 +38,12 @@ def _parse_pipe_with_tags(text: str) -> dict:
             continue
         k, _, rest = part.partition("=")
         k = k.strip().lower()
-        
+
         if "[" in rest and rest.endswith("]"):
             v = rest[:-1].split("[", 1)[0].strip()
         else:
             v = rest.strip()
-            
+
         if v.lower() in ("null", ""):
             v = None
         result[k] = v
@@ -54,16 +54,16 @@ def compute_metrics(eval_preds: EvalPrediction, tokenizer):
     predictions, label_ids = eval_preds
 
     predictions = np.where(predictions < 0, tokenizer.pad_token_id, predictions)
-    label_ids   = np.where(label_ids   < 0, tokenizer.pad_token_id, label_ids)
+    label_ids = np.where(label_ids < 0, tokenizer.pad_token_id, label_ids)
 
-    decoded_preds  = tokenizer.batch_decode(predictions, skip_special_tokens=True)
-    decoded_labels = tokenizer.batch_decode(label_ids,   skip_special_tokens=True)
+    decoded_preds = tokenizer.batch_decode(predictions, skip_special_tokens=True)
+    decoded_labels = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
 
     correct = {f: 0 for f in TRACKED_FIELDS}
     present = {f: 0 for f in TRACKED_FIELDS}
 
     for pred_str, label_str in zip(decoded_preds, decoded_labels):
-        pred_dict  = _parse_pipe_with_tags(pred_str)
+        pred_dict = _parse_pipe_with_tags(pred_str)
         label_dict = _parse_pipe_with_tags(label_str)
         for field in TRACKED_FIELDS:
             if field not in label_dict:
@@ -83,7 +83,9 @@ def compute_metrics(eval_preds: EvalPrediction, tokenizer):
         total_correct += c
         total_present += n
 
-    metrics["acc_overall"] = round(total_correct / total_present, 4) if total_present > 0 else 0.0
+    metrics["acc_overall"] = (
+        round(total_correct / total_present, 4) if total_present > 0 else 0.0
+    )
     return metrics
 
 
@@ -152,11 +154,33 @@ def build_dataset(cfg, mode):
     gen = DataGenerator(training_data, real_examples, specific_examples)
 
     if mode == "modify_only":
-        dataset = gen.generate_modify_only(cfg.max_limit)
+        data = {"input_text": [], "target_text": []}
+        for _ in range(cfg.max_limit):
+            inp, tgt = gen._generate_modify()
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+        for example in real_examples + specific_examples:
+            if not isinstance(example.get("input"), str):
+                continue
+            if example["input"].startswith("modify:"):
+                inp, tgt = gen._convert_real_modify(example)
+                for _ in range(3):
+                    data["input_text"].append(inp)
+                    data["target_text"].append(tgt)
+        dataset = Dataset.from_dict(data)
     elif mode == "specific":
         data = {"input_text": [], "target_text": []}
+        # Include modify examples from specific data
         for example in specific_examples:
             inp, tgt = gen._convert_real(example)
+            data["input_text"].append(inp)
+            data["target_text"].append(tgt)
+        # Also include generated modify samples for better coverage
+        import random
+
+        random.seed(42)
+        for _ in range(min(500, cfg.max_limit)):
+            inp, tgt = gen._generate_modify()
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
         dataset = Dataset.from_dict(data)
@@ -177,30 +201,40 @@ def build_dataset(cfg, mode):
 
 def tokenize(train_ds, test_ds, tokenizer):
     def tokenize_fn(examples):
-        inputs  = tokenizer(
+        inputs = tokenizer(
             examples["input_text"],
-            truncation=True, padding="max_length", max_length=256,
+            truncation=True,
+            padding="max_length",
+            max_length=256,
         )
         targets = tokenizer(
             examples["target_text"],
-            truncation=True, padding="max_length", max_length=128,
+            truncation=True,
+            padding="max_length",
+            max_length=128,
         )
-        labels = np.array([
-            [(t if t != tokenizer.pad_token_id else -100) for t in label]
-            for label in targets["input_ids"]
-        ], dtype=np.int64)
+        labels = np.array(
+            [
+                [(t if t != tokenizer.pad_token_id else -100) for t in label]
+                for label in targets["input_ids"]
+            ],
+            dtype=np.int64,
+        )
         inputs["labels"] = labels
         return inputs
 
     cols = ["input_ids", "attention_mask", "labels"]
-    tok_train = train_ds.map(tokenize_fn, batched=True).with_format("torch", columns=cols)
-    tok_test  = test_ds.map(tokenize_fn,  batched=True).with_format("torch", columns=cols)
+    tok_train = train_ds.map(tokenize_fn, batched=True).with_format(
+        "torch", columns=cols
+    )
+    tok_test = test_ds.map(tokenize_fn, batched=True).with_format("torch", columns=cols)
     return tok_train, tok_test
 
 
 def find_latest_checkpoint(output_dir):
     """Finds the latest checkpoint folder and returns its path."""
     import re
+
     if not os.path.exists(output_dir):
         return None
 
@@ -220,41 +254,41 @@ def find_latest_checkpoint(output_dir):
 
 def train(model, tokenizer, cfg, tok_train, tok_test, lr, resume_from=None):
     args = Seq2SeqTrainingArguments(
-        output_dir=                  cfg.output_dir,
-        eval_strategy=               "epoch",
-        save_strategy=               "epoch",
-        learning_rate=               lr,
-        weight_decay=                0.01,
-        save_total_limit=            2,
-        predict_with_generate=       True,
-        generation_max_length=       128,
-        push_to_hub=                 False,
-        remove_unused_columns=       False,
-        optim=                       "adafactor",
-        num_train_epochs=            cfg.num_train_epochs,
-        per_device_train_batch_size= cfg.per_device_train_batch_size,
-        per_device_eval_batch_size=  cfg.per_device_eval_batch_size,
-        gradient_accumulation_steps= cfg.gradient_accumulation_steps,
-        fp16=                        cfg.fp16,
-        dataloader_num_workers=      cfg.dataloader_num_workers,
-        dataloader_pin_memory=       cfg.dataloader_pin_memory,
-        logging_steps=               cfg.logging_steps,
+        output_dir=cfg.output_dir,
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        learning_rate=lr,
+        weight_decay=0.01,
+        save_total_limit=2,
+        predict_with_generate=True,
+        generation_max_length=128,
+        push_to_hub=False,
+        remove_unused_columns=False,
+        optim="adafactor",
+        num_train_epochs=cfg.num_train_epochs,
+        per_device_train_batch_size=cfg.per_device_train_batch_size,
+        per_device_eval_batch_size=cfg.per_device_eval_batch_size,
+        gradient_accumulation_steps=cfg.gradient_accumulation_steps,
+        fp16=cfg.fp16,
+        dataloader_num_workers=cfg.dataloader_num_workers,
+        dataloader_pin_memory=cfg.dataloader_pin_memory,
+        logging_steps=cfg.logging_steps,
     )
 
     trainer = Seq2SeqTrainer(
-        model=           model,
-        args=            args,
-        train_dataset=   tok_train,
-        eval_dataset=    tok_test,
-        data_collator=   DataCollatorForSeq2Seq(tokenizer, model=model),
-        compute_metrics= lambda p: compute_metrics(p, tokenizer),
+        model=model,
+        args=args,
+        train_dataset=tok_train,
+        eval_dataset=tok_test,
+        data_collator=DataCollatorForSeq2Seq(tokenizer, model=model),
+        compute_metrics=lambda p: compute_metrics(p, tokenizer),
     )
 
     print("Starting training...")
     if resume_from:
-        print(f"  → Resuming from: {resume_from}")
+        print(f"  -> Resuming from: {resume_from}")
     else:
-        print("  → Starting fresh (no checkpoints found)")
+        print("  -> Starting fresh (no checkpoints found)")
 
     trainer.train(resume_from_checkpoint=resume_from)
 
@@ -271,10 +305,10 @@ def parse_args():
 
 
 def main():
-    start  = time.time()
-    args   = parse_args()
+    start = time.time()
+    args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    cfg    = Config(args.mode)
+    cfg = Config(args.mode)
 
     if args.mode == "modify_only":
         if not os.path.exists(cfg.output_dir) or not os.listdir(cfg.output_dir):
@@ -294,20 +328,25 @@ def main():
     download_base_model(cfg)
 
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_cache)
-    model     = load_model(cfg, device)
+    model = load_model(cfg, device)
     tokenizer, model = add_special_tokens(tokenizer, model)
 
-    train_ds, test_ds   = build_dataset(cfg, args.mode)
+    train_ds, test_ds = build_dataset(cfg, args.mode)
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
 
-    resume_path = find_latest_checkpoint(cfg.output_dir)
+    resume_path = None  # Force fresh start to avoid torch version issues
+
+    # Don't resume from checkpoint for specific mode — avoid torch.load version conflicts.
+    # The model weights are loaded from the saved safetensors files instead.
+    if args.mode == "specific":
+        resume_path = None
 
     train(model, tokenizer, cfg, tok_train, tok_test, lr, resume_from=resume_path)
     save_model(model, tokenizer, cfg)
 
     elapsed = int(time.time() - start)
-    h, rem  = divmod(elapsed, 3600)
-    m, s    = divmod(rem, 60)
+    h, rem = divmod(elapsed, 3600)
+    m, s = divmod(rem, 60)
     print(f"\nDone in {h:02d}h {m:02d}m {s:02d}s")
 
 
