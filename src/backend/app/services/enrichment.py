@@ -240,7 +240,7 @@ class EnrichmentService:
         Determine which fields to overwrite based on predicted flags and stats.
 
         Priority chain:
-            1. task_statistics (if exists, regardless of records count for data availability)
+            1. task_statistics (only if records >= 3)
             2. category_statistics (loop through categories by priority)
             3. Keep predicted value
 
@@ -268,7 +268,7 @@ class EnrichmentService:
                 # Get difficulty from stats (task or category)
                 if stats_id:
                     task_stats = self._get_task_stats(db, stats_id)
-                    if task_stats:
+                    if task_stats and task_stats.get("records", 0) >= 3:
                         difficulty_from_stats = self._get_value_from_task_stats(
                             task_stats, "difficulty"
                         )
@@ -277,6 +277,13 @@ class EnrichmentService:
                     difficulty_from_stats = self._get_value_from_category_stats(
                         db, categories, "difficulty"
                     )
+
+        # Get deadline for importance calculation
+        deadline = None
+        if "deadline" in nlp_payload:
+            deadline_value, _ = self._extract_field(nlp_payload["deadline"])
+            if isinstance(deadline_value, datetime):
+                deadline = deadline_value
 
         # Process each field
         fields_to_overwrite = ["difficulty", "duration", "importance", "location"]
@@ -297,10 +304,10 @@ class EnrichmentService:
             overwrite_value = None
             overwrite_source = None
 
-            # === TASK STATISTICS ===
+            # === TASK STATISTICS (only if records >= 3) ===
             if stats_id:
                 task_stats = self._get_task_stats(db, stats_id)
-                if task_stats:
+                if task_stats and task_stats.get("records", 0) >= 3:
                     if field == "difficulty":
                         overwrite_value = self._get_value_from_task_stats(
                             task_stats, field
@@ -314,10 +321,8 @@ class EnrichmentService:
                     elif field == "duration":
                         # Determine which difficulty to use for bucket
                         if difficulty_predicted:
-                            # Use stats difficulty
                             dur_difficulty = difficulty_from_stats
                         else:
-                            # Use actual difficulty from task_payload
                             dur_difficulty = difficulty_actual
 
                         if dur_difficulty is not None:
@@ -329,6 +334,17 @@ class EnrichmentService:
                                 logger.info(
                                     f"    Overwriting '{field}' from task_statistics: {value} -> {overwrite_value}"
                                 )
+
+                    elif field == "importance":
+                        base_importance = value
+                        overwrite_value = self._calculate_importance(
+                            db, base_importance, deadline, match_result
+                        )
+                        if overwrite_value is not None:
+                            overwrite_source = "task_statistics"
+                            logger.info(
+                                f"    Overwriting '{field}' from task_statistics: {value} -> {overwrite_value}"
+                            )
 
                     elif field == "location":
                         location = self._get_location_from_task_stats(db, stats_id)
@@ -367,6 +383,17 @@ class EnrichmentService:
                             logger.info(
                                 f"    Overwriting '{field}' from category_statistics: {value} -> {overwrite_value}"
                             )
+
+                elif field == "importance":
+                    base_importance = value
+                    overwrite_value = self._calculate_importance(
+                        db, base_importance, deadline, match_result
+                    )
+                    if overwrite_value is not None:
+                        overwrite_source = "category_statistics"
+                        logger.info(
+                            f"    Overwriting '{field}' from category_statistics: {value} -> {overwrite_value}"
+                        )
 
                 elif field == "location":
                     location = self._get_location_from_category_stats(db, categories)
@@ -455,9 +482,9 @@ class EnrichmentService:
                 )
                 return avg_val + delta_val
 
-            for b, avg_val in duration_map.items():
-                delta_val = duration_delta_map.get(b, 0) if duration_delta_map else 0
-                return avg_val + delta_val
+            # Bucket not found - return None to let caller try next source
+            logger.debug(f"Duration bucket '{bucket}' not found in task_stats")
+            return None
 
         return None
 
@@ -505,9 +532,11 @@ class EnrichmentService:
                     delta_val = duration_delta_map.get(bucket, 0)
                     return avg_val + delta_val
 
-                for b, avg_val in duration_map.items():
-                    delta_val = duration_delta_map.get(b, 0)
-                    return avg_val + delta_val
+                # Bucket not found in this category - continue to next category
+                logger.debug(
+                    f"Duration bucket '{bucket}' not found in category '{category_name}', trying next"
+                )
+                continue
 
         return None
 
@@ -789,11 +818,18 @@ class EnrichmentService:
         return draft_id
 
     def _draft_load(self, db: Session, draft_id: UUID) -> Optional[dict[str, Any]]:
-        """Load task from draft table."""
+        """Load task from draft table and delete it."""
         draft = db.query(TaskDraft).filter(TaskDraft.id == draft_id).first()
         if draft:
+            content = draft.content
             logger.debug(f"Draft loaded: {draft_id}")
-            return draft.content
+
+            # Delete draft after loading (memory efficiency)
+            db.delete(draft)
+            db.commit()
+            logger.info(f"Draft deleted: {draft_id}")
+
+            return content
         logger.warning(f"Draft not found: {draft_id}")
         return None
 
