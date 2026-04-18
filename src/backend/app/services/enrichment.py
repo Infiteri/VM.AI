@@ -493,11 +493,27 @@ class EnrichmentService:
                 return None
 
             if bucket in duration_map:
-                avg_val = duration_map[bucket]
-                delta_val = (
-                    duration_delta_map.get(bucket, 0) if duration_delta_map else 0
+                # Access nested structure: {"count": 5, "avg": 30}
+                # Also supports old format for backward compatibility
+                avg_bucket = duration_map[bucket]
+                if isinstance(avg_bucket, dict):
+                    avg_val = avg_bucket.get("avg")
+                else:
+                    # Old format: direct value
+                    avg_val = avg_bucket
+
+                # Duration delta: {"count": 3, "avg": 10}
+                delta_bucket = (
+                    duration_delta_map.get(bucket) if duration_delta_map else None
                 )
-                return avg_val + delta_val
+                if isinstance(delta_bucket, dict):
+                    delta_val = delta_bucket.get("avg", 0)
+                else:
+                    # Old format: direct value
+                    delta_val = delta_bucket if delta_bucket else 0
+
+                if avg_val is not None:
+                    return avg_val + delta_val
 
             # Bucket not found - return None to let caller try next source
             logger.debug(f"Duration bucket '{bucket}' not found in task_stats")
@@ -545,9 +561,27 @@ class EnrichmentService:
                 duration_delta_map = cat_stats.avg_duration_delta or {}
 
                 if bucket in duration_map:
-                    avg_val = duration_map[bucket]
-                    delta_val = duration_delta_map.get(bucket, 0)
-                    return avg_val + delta_val
+                    # Access nested structure: {"count": 5, "avg": 30}
+                    # Also supports old format for backward compatibility
+                    avg_bucket = duration_map[bucket]
+                    if isinstance(avg_bucket, dict):
+                        avg_val = avg_bucket.get("avg")
+                    else:
+                        # Old format: direct value
+                        avg_val = avg_bucket
+
+                    # Duration delta: {"count": 3, "avg": 10}
+                    delta_bucket = (
+                        duration_delta_map.get(bucket) if duration_delta_map else None
+                    )
+                    if isinstance(delta_bucket, dict):
+                        delta_val = delta_bucket.get("avg", 0)
+                    else:
+                        # Old format: direct value
+                        delta_val = delta_bucket if delta_bucket else 0
+
+                    if avg_val is not None:
+                        return avg_val + delta_val
 
                 # Bucket not found in this category - continue to next category
                 logger.debug(
