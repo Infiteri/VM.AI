@@ -161,7 +161,7 @@ def get_task(
 
     return TaskDetailResponse(
         task_id=id,
-        payload=TaskPayload(
+        task=TaskPayload(
             name="Stub Task for Display",
             start=datetime(2026, 4, 19, 9, 0),
             deadline=datetime(2026, 4, 20, 17, 0),

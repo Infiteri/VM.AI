@@ -112,7 +112,7 @@ class TaskDetailResponse(BaseModel):
     """Detailed task data returned when fetching a single task or in queues."""
 
     task_id: UUID
-    payload: TaskPayload
+    task: TaskPayload
     created_at: datetime
 
 
