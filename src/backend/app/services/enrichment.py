@@ -55,22 +55,39 @@ class EnrichmentService:
             - draft_id: UUID of saved draft
 
         Steps:
-            1. Determine overwrite map based on match status
-            2. Overwrite predicted fields with historical data
-            3. Parse date strings to datetime
+            1. Parse date strings to datetime (first, for importance calculation)
+            2. Determine overwrite map based on match status + datetime deadline
+            3. Overwrite predicted fields with historical data
             4. Save to draft table
         """
         logger.info(f"Enrichment: predict_nlp_add started")
         logger.debug(f"  Input NLP payload keys: {list(nlp_payload.keys())}")
         logger.debug(f"  Match status: {match_result.get('association_status')}")
 
-        overwrite_map = self._get_overwrite_map(db, match_result, nlp_payload)
+        # First parse dates (flat structure needed for _get_overwrite_map)
+        flat_payload = {}
+        for field, entry in nlp_payload.items():
+            value, _ = self._extract_field(entry)
+            flat_payload[field] = value
 
-        enriched_task = self._overwrite_fields(nlp_payload, overwrite_map)
+        parsed_task = self._date_parse(flat_payload)
 
-        parsed_task = self._date_parse(enriched_task)
+        # Rebuild nlp_payload with parsed datetime for importance calculation
+        nlp_payload_with_dates = nlp_payload.copy()
+        for field in ["start", "deadline", "fixed_start"]:
+            if field in parsed_task and parsed_task[field] is not None:
+                nlp_payload_with_dates[field] = {
+                    "value": parsed_task[field],
+                    "predicted": nlp_payload.get(field, {}).get("predicted", False),
+                }
 
-        draft_id = self._draft_save(db, parsed_task, match_result)
+        overwrite_map = self._get_overwrite_map(
+            db, match_result, nlp_payload_with_dates
+        )
+
+        enriched_task = self._overwrite_fields(parsed_task, overwrite_map)
+
+        draft_id = self._draft_save(db, enriched_task, match_result)
 
         logger.info(f"Enrichment: predict_nlp_add complete. Draft ID: {draft_id}")
         logger.debug(f"  Output task keys: {list(parsed_task.keys())}")
