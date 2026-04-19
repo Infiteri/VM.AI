@@ -11,6 +11,7 @@ from app.models.statistics import (
     TaskStatisticsLocation,
     CategoryStatisticsLocation,
 )
+from app.models.category import Category
 from app.services.task_matcher import task_matcher
 from app.core.logging_config import setup_logging
 
@@ -90,8 +91,8 @@ class EnrichmentService:
         draft_id = self._draft_save(db, enriched_task, match_result)
 
         logger.info(f"Enrichment: predict_nlp_add complete. Draft ID: {draft_id}")
-        logger.debug(f"  Output task keys: {list(parsed_task.keys())}")
-        return parsed_task, draft_id
+        logger.debug(f"  Output task keys: {list(enriched_task.keys())}")
+        return enriched_task, draft_id
 
     def commit_from_draft(
         self,
@@ -479,7 +480,7 @@ class EnrichmentService:
             delta = task_stats.get("avg_difficulty_delta")
             if avg is not None:
                 delta = delta if delta is not None else 0.0
-                return avg + delta
+                return round(avg + delta, 2)
         elif field == "duration":
             if difficulty is None:
                 logger.warning("Duration lookup requires difficulty value")
@@ -537,11 +538,15 @@ class EnrichmentService:
         for category_name in categories:
             cat_stats = (
                 db.query(CategoryStatistics)
-                .filter(CategoryStatistics.category_name == category_name)
+                .join(Category, Category.id == CategoryStatistics.category_id)
+                .filter(Category.name == category_name)
                 .first()
             )
 
             if not cat_stats:
+                logger.warning(
+                    f"CategoryStats lookup failed for '{category_name}': no matching category_statistics record"
+                )
                 continue
 
             if field == "difficulty":
@@ -549,7 +554,7 @@ class EnrichmentService:
                 delta = cat_stats.avg_difficulty_delta
                 if avg is not None:
                     delta = delta if delta is not None else 0.0
-                    return avg + delta
+                    return round(avg + delta, 2)
 
             elif field == "duration":
                 if difficulty is None:
@@ -623,11 +628,15 @@ class EnrichmentService:
         for category_name in categories:
             cat_stats = (
                 db.query(CategoryStatistics)
-                .filter(CategoryStatistics.category_name == category_name)
+                .join(Category, Category.id == CategoryStatistics.category_id)
+                .filter(Category.name == category_name)
                 .first()
             )
 
             if not cat_stats:
+                logger.warning(
+                    f"CategoryStats location lookup failed for '{category_name}': no matching record"
+                )
                 continue
 
             location_record = (
@@ -740,7 +749,7 @@ class EnrichmentService:
             f"final={final_importance}"
         )
 
-        return round(final_importance, 4)
+        return round(final_importance, 2)
 
     def _get_completion_rate(
         self,
@@ -983,7 +992,7 @@ class EnrichmentService:
             days_left = 0.001
 
         urgency = min(1.0, importance * (1 / days_left) * 3)
-        return round(max(0.0, urgency), 4)
+        return round(max(0.0, urgency), 2)
 
     @staticmethod
     def _calculate_value(
@@ -998,7 +1007,7 @@ class EnrichmentService:
         Formula: (importance * 0.4 + urgency * 0.4 + difficulty * 0.2) * completion_rate
         """
         raw_value = (importance * 0.4) + (urgency * 0.4) + (difficulty * 0.2)
-        return round(raw_value * completion_rate, 4)
+        return round(raw_value * completion_rate, 2)
 
 
 enrichment_service = EnrichmentService()
