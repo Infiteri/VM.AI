@@ -26,6 +26,7 @@ import sys
 import os
 import json
 import traceback
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -267,7 +268,6 @@ def test_commit_manual():
             result = enrichment_service.commit_manual(db, case["task"], case["match"])
 
             logger.write_json("OUTPUT result", result)
-            log_db_results(db, logger, "DB RESULTS")
 
             logger.write("\n    SUCCESS\n")
 
@@ -322,7 +322,7 @@ def test_predict_nlp_add():
         "location": {"value": "", "predicted": True},
         "importance": {"value": 0.5, "predicted": True},
         "fixed_time": {"value": True, "predicted": False},
-        "fixed_start": {"value": datetime(2026, 4, 20, 6, 0), "predicted": False},
+        "fixed_start": {"value": "Monday 06:00", "predicted": False},
     }
 
     test_cases = [
@@ -434,7 +434,6 @@ def test_predict_nlp_add():
 
             output_data = {"result": result, "draft_id": str(draft_id)}
             logger.write_json("OUTPUT result", output_data)
-            log_db_results(db, logger, "DB RESULTS")
 
             logger.write("\n    SUCCESS\n")
 
@@ -492,7 +491,6 @@ def test_commit_from_draft():
             result = enrichment_service.commit_from_draft(db, request_task, draft_id)
 
             logger.write_json("OUTPUT result", result)
-            log_db_results(db, logger, "DB RESULTS")
 
             logger.write("\n    SUCCESS\n")
 
@@ -639,7 +637,6 @@ def test_merge_nlp_modify():
             )
 
             logger.write_json("OUTPUT result", result)
-            log_db_results(db, logger, "DB RESULTS")
 
             logger.write("\n    SUCCESS\n")
 
@@ -712,7 +709,6 @@ def test_update_task():
             result = enrichment_service.update_task(db, case["task"])
 
             logger.write_json("OUTPUT result", result)
-            log_db_results(db, logger, "DB RESULTS")
 
             logger.write("\n    SUCCESS\n")
 
@@ -733,6 +729,7 @@ def test_update_task():
 def main():
     print("Running enrichment tests - see logs in logs/ directory")
 
+    start = time.time()
     test_commit_manual()
     test_predict_nlp_add()
     test_commit_from_draft()
@@ -740,6 +737,8 @@ def main():
     test_update_task()
 
     print("ALL TESTS COMPLETED - See logs in C:\\VM.AI\\src\\backend\\logs\\")
+    end = time.time()
+    print(f"Execution time: {end - start:.4f}")
 
 
 if __name__ == "__main__":

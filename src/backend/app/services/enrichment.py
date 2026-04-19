@@ -952,7 +952,12 @@ class EnrichmentService:
         deadline = result.get("deadline")
         difficulty = result.get("difficulty", 0.5)
 
-        urgency = self._calculate_urgency(importance, deadline)
+        if result.get("fixed_time") and result.get("fixed_start"):
+            urgency_reference = result["fixed_start"]
+        else:
+            urgency_reference = deadline
+
+        urgency = self._calculate_urgency(importance, urgency_reference)
         value = self._calculate_value(importance, urgency, difficulty)
 
         result["urgency"] = urgency

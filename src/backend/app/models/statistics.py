@@ -26,7 +26,6 @@ class TaskStatistics(BaseModel):
     avg_duration = Column(JSONB, nullable=True)
     avg_duration_delta = Column(JSONB, nullable=True)
 
-
     avg_difficulty = Column(Float, nullable=True)  # 0.0–1.0
     avg_difficulty_delta = Column(Float, nullable=True)
 
@@ -69,10 +68,13 @@ class CategoryStatistics(BaseModel):
 
     __tablename__ = "category_statistics"
 
-    # Override the inherited UUID id with Integer primary key
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    category_name = Column(Text, nullable=False, unique=True)
+    # Use BaseModel's UUID id (no override)
+    category_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("categories.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
 
     # Plan averages keyed by difficulty bucket (0.0, 0.5, 1.0)
     # Structure: {"0.0": {"count": 5, "avg": 30}, "0.5": {"count": 3, "avg": 45}, "1.0": {"count": 4, "avg": 45}}
@@ -94,12 +96,18 @@ class CategoryStatistics(BaseModel):
     category_time_scores = Column(JSONB, nullable=True)
 
     # Relationships
+    category = relationship("Category", back_populates="statistics", lazy="select")
     locations = relationship(
         "CategoryStatisticsLocation",
         back_populates="statistics",
         cascade="all, delete-orphan",
         lazy="select",
     )
+
+    @property
+    def name(self) -> str:
+        """Backward compatible property - returns category name."""
+        return self.category.name if self.category else None
 
 
 class TaskStatisticsLocation(Base):
@@ -146,7 +154,7 @@ class CategoryStatisticsLocation(Base):
     __tablename__ = "category_statistics_locations"
 
     statistics_id = Column(
-        Integer,
+        UUID(as_uuid=True),
         ForeignKey("category_statistics.id", ondelete="CASCADE"),
         primary_key=True,
     )

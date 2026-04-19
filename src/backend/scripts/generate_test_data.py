@@ -343,8 +343,13 @@ def generate_test_data():
 
         cat_stats_list = []
         for record in category_stats_records:
+            cat = (
+                db.query(Category)
+                .filter(Category.name == record["category_name"])
+                .first()
+            )
             stats = CategoryStatistics(
-                category_name=record["category_name"],
+                category_id=cat.id,
                 avg_duration=record.get("avg_duration"),
                 avg_duration_delta=record.get("avg_duration_delta"),
                 avg_difficulty=record.get("avg_difficulty"),
