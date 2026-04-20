@@ -12,14 +12,14 @@ All match_results have name_vector (never None).
 Fresh db session per test case - FULL JSON logging for:
 - INPUT: All task fields
 - OUTPUT: All computed fields
-- DB: tasks + tasks_statistics tables
+- DB: tasks + task_statistics tables
 - ERROR: Full stacktrace in JSON
 
-Logs saved to C:\VM.AI\src\backend\logs\enrichment_{test_type}_{YYYYMMDD}.log
+Logs saved to C:\\VM.AI\\src\\backend\\logs\\enrichment_{test_type}_{YYYYMMDD}.log
 
 Run from backend directory:
     cd src/backend
-    python scripts/test_enrichment.py
+    python tests/test_enrichment.py
 """
 
 import sys
@@ -435,6 +435,12 @@ def test_predict_nlp_add():
             output_data = {"result": result, "draft_id": str(draft_id)}
             logger.write_json("OUTPUT result", output_data)
 
+            # Query draft from DB to get full saved record
+            db.expire_all()
+            saved_draft = db.query(TaskDraft).filter(TaskDraft.id == draft_id).first()
+            if saved_draft:
+                logger.write_json("DRAFT_AFTER", saved_draft.content)
+
             logger.write("\n    SUCCESS\n")
 
         except Exception as e:
@@ -466,6 +472,7 @@ def test_commit_from_draft():
     db.close()
 
     for i, draft_id in enumerate(draft_ids[:5], 1):
+        logger.write(f"\n=== Processing test {i} of {len(draft_ids[:5])} ===\n")
         is_fixed = i in [3, 5]
         request_task = {
             "name": f"updated task {i}",
@@ -488,9 +495,24 @@ def test_commit_from_draft():
             logger.write_json("INPUT request_task", request_task)
             logger.write(f"    INPUT draft_id: {draft_id}\n")
 
+            # Log the original draft content before commit
+            draft_before = db.query(TaskDraft).filter(TaskDraft.id == draft_id).first()
+            if draft_before:
+                logger.write_json("DRAFT_BEFORE", draft_before.content)
+
             result = enrichment_service.commit_from_draft(db, request_task, draft_id)
 
             logger.write_json("OUTPUT result", result)
+
+            # Query draft again after commit for comparison
+            db.expire_all()  # Clear cache to get fresh data
+            draft_after = db.query(TaskDraft).filter(TaskDraft.id == draft_id).first()
+            if draft_after:
+                logger.write_json("DRAFT_AFTER", draft_after.content)
+            else:
+                logger.write(
+                    f"    DRAFT_AFTER: NOT FOUND (draft deleted after commit)\n"
+                )
 
             logger.write("\n    SUCCESS\n")
 

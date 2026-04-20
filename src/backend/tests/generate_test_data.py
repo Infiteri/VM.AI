@@ -8,7 +8,7 @@ Generates test data with various scenarios for testing enrichment:
 
 Run from backend directory:
     cd src/backend
-    python scripts/generate_test_data.py
+    python tests/generate_test_data.py
 """
 
 import sys
@@ -28,6 +28,7 @@ from app.models.statistics import (
     TaskStatisticsLocation,
     CategoryStatisticsLocation,
 )
+from app.services.task_matcher import TaskMatcher
 
 
 def clear_all_data():
@@ -228,11 +229,19 @@ def generate_test_data():
             },
         ]
 
+        print("   Loading TaskMatcher model for vector generation...")
+        matcher = TaskMatcher()
+
         task_stats_list = []
         for record in task_stats_records:
+            task_name = record["task_name"]
+            task_vector = matcher.model.encode(
+                task_name, normalize_embeddings=True
+            ).tolist()
+
             stats = TaskStatistics(
-                task_name=record["task_name"],
-                task_name_vector=None,  # Skip vector for testing
+                task_name=task_name,
+                task_name_vector=task_vector,
                 avg_duration=record.get("avg_duration"),
                 avg_duration_delta=record.get("avg_duration_delta"),
                 avg_difficulty=record.get("avg_difficulty"),

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Float, ForeignKey, Integer, Text
-from sqlalchemy.dialects.postgresql import FLOAT, UUID, JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, UUID, JSONB
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -14,10 +14,10 @@ class TaskStatistics(BaseModel):
     Rows are NEVER cascade-deleted when a task is deleted (persist for matching).
     """
 
-    __tablename__ = "tasks_statistics"
+    __tablename__ = "task_statistics"
 
     task_name = Column(Text, nullable=False, unique=True)
-    task_name_vector = Column(FLOAT, nullable=True)  # 384-dim MiniLM embedding
+    task_name_vector = Column(ARRAY(Float), nullable=True)  # 384-dim MiniLM embedding
 
     # Plan averages keyed by difficulty bucket (0.0, 0.5, 1.0)
     # Structure: {"0.0": {"count": 5, "avg": 30}, "0.5": {"count": 3, "avg": 45}, "1.0": {"count": 4, "avg": 45}}
@@ -121,7 +121,7 @@ class TaskStatisticsLocation(Base):
 
     statistics_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("tasks_statistics.id", ondelete="CASCADE"),
+        ForeignKey("task_statistics.id", ondelete="CASCADE"),
         primary_key=True,
     )
     location_id = Column(

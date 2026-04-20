@@ -1,4 +1,4 @@
-import dateparser
+import parsedatetime
 from datetime import datetime
 from typing import Optional, Any, Tuple
 from uuid import UUID, uuid4
@@ -303,6 +303,16 @@ class EnrichmentService:
             if isinstance(deadline_value, datetime):
                 deadline = deadline_value
 
+        # Get fixed_start for importance calculation (for fixed tasks)
+        fixed_start = None
+        if "fixed_start" in nlp_payload:
+            fixed_start_value, _ = self._extract_field(nlp_payload["fixed_start"])
+            if isinstance(fixed_start_value, datetime):
+                fixed_start = fixed_start_value
+
+        # Use fixed_start for fixed tasks, deadline otherwise
+        deadline_for_importance = fixed_start if fixed_start else deadline
+
         # Process each field
         fields_to_overwrite = ["difficulty", "duration", "importance", "location"]
 
@@ -356,7 +366,7 @@ class EnrichmentService:
                     elif field == "importance":
                         base_importance = value
                         overwrite_value = self._calculate_importance(
-                            db, base_importance, deadline, match_result
+                            db, base_importance, deadline_for_importance, match_result
                         )
                         if overwrite_value is not None:
                             overwrite_source = "task_statistics"
@@ -405,7 +415,7 @@ class EnrichmentService:
                 elif field == "importance":
                     base_importance = value
                     overwrite_value = self._calculate_importance(
-                        db, base_importance, deadline, match_result
+                        db, base_importance, deadline_for_importance, match_result
                     )
                     if overwrite_value is not None:
                         overwrite_source = "category_statistics"
@@ -828,11 +838,19 @@ class EnrichmentService:
         return result
 
     def _parse_date_string(self, date_string: str) -> Optional[datetime]:
-        """Parse a date string using dateparser."""
+        """Parse a date string using parsedatetime with future validation."""
         try:
-            parsed = dateparser.parse(date_string)
-            if parsed:
-                return parsed
+            cal = parsedatetime.Calendar()
+            parsed, flag = cal.parse(date_string)
+            if flag:
+                dt = datetime(*parsed[:6])
+                if dt >= datetime.now():
+                    return dt
+                else:
+                    logger.warning(
+                        f"Parsed date is in past: '{date_string}' -> {dt.isoformat()}"
+                    )
+                    return None
         except Exception as e:
             logger.error(f"Date parsing error: {e}")
         return None
@@ -840,6 +858,16 @@ class EnrichmentService:
     # ================================================================
     # HELPER: DRAFT OPERATIONS
     # ================================================================
+
+    def _serialize_datetime(self, obj):
+        """Serialize datetime objects to ISO strings for JSON storage."""
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if isinstance(obj, (dict, list)):
+            if isinstance(obj, dict):
+                return {k: self._serialize_datetime(v) for k, v in obj.items()}
+            return [self._serialize_datetime(item) for item in obj]
+        return obj
 
     def _draft_save(
         self,
@@ -860,7 +888,7 @@ class EnrichmentService:
         draft_id = uuid4()
 
         content = {
-            "task": task_payload,
+            "task": self._serialize_datetime(task_payload),
             "match_result": {
                 "associated_id": str(match_result.get("associated_id"))
                 if match_result.get("associated_id")
