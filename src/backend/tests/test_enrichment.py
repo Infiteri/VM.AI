@@ -36,6 +36,7 @@ from app.core.database import SessionLocal
 from app.models.draft import TaskDraft
 from app.models.statistics import TaskStatistics
 from app.models.task import Task
+from app.services.task_matcher import TaskMatcher
 
 
 mock_vector = [0.1, 0.2, 0.3, 0.4, 0.5]
@@ -144,9 +145,6 @@ def test_commit_manual():
     logger.write("TEST 1: commit_manual (5 test cases)\n")
     logger.write("=" * 70 + "\n")
 
-    stats = SessionLocal().query(TaskStatistics).limit(5).all()
-    stats_ids = [s.id for s in stats]
-
     test_cases = [
         {
             "name": "test_manual_1",
@@ -162,11 +160,6 @@ def test_commit_manual():
                 "importance": 0.6,
                 "fixed_time": False,
                 "fixed_start": None,
-            },
-            "match": {
-                "associated_id": None,
-                "association_status": "none",
-                "name_vector": mock_vector,
             },
         },
         {
@@ -184,11 +177,6 @@ def test_commit_manual():
                 "fixed_time": False,
                 "fixed_start": None,
             },
-            "match": {
-                "associated_id": stats_ids[0] if len(stats_ids) > 0 else None,
-                "association_status": "same",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_manual_3",
@@ -204,11 +192,6 @@ def test_commit_manual():
                 "importance": 0.8,
                 "fixed_time": True,
                 "fixed_start": datetime(2026, 4, 20, 6, 0),
-            },
-            "match": {
-                "associated_id": stats_ids[1] if len(stats_ids) > 1 else None,
-                "association_status": "same",
-                "name_vector": mock_vector,
             },
         },
         {
@@ -226,11 +209,6 @@ def test_commit_manual():
                 "fixed_time": False,
                 "fixed_start": None,
             },
-            "match": {
-                "associated_id": stats_ids[2] if len(stats_ids) > 2 else None,
-                "association_status": "similar",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_manual_5",
@@ -247,11 +225,6 @@ def test_commit_manual():
                 "fixed_time": True,
                 "fixed_start": datetime(2026, 4, 21, 9, 0),
             },
-            "match": {
-                "associated_id": stats_ids[3] if len(stats_ids) > 3 else None,
-                "association_status": "similar",
-                "name_vector": mock_vector,
-            },
         },
     ]
 
@@ -262,10 +235,14 @@ def test_commit_manual():
         db = SessionLocal()
 
         try:
-            logger.write_json("INPUT task_payload", case["task"])
-            logger.write_json("INPUT match_result", case["match"])
+            # Get real match from TaskMatcher
+            matcher = TaskMatcher()
+            real_match = matcher.find_match(db, case["task"]["name"])
 
-            result = enrichment_service.commit_manual(db, case["task"], case["match"])
+            logger.write_json("INPUT task_payload", case["task"])
+            logger.write_json("INPUT match_result", real_match)
+
+            result = enrichment_service.commit_manual(db, case["task"], real_match)
 
             logger.write_json("OUTPUT result", result)
 
@@ -293,11 +270,6 @@ def test_predict_nlp_add():
     logger.write("=" * 70 + "\n")
     logger.write("TEST 2: predict_nlp_add (5 test cases)\n")
     logger.write("=" * 70 + "\n")
-
-    db = SessionLocal()
-    stats = db.query(TaskStatistics).limit(5).all()
-    stats_ids = [s.id for s in stats]
-    db.close()
 
     nlp_payload_fixed = {
         "name": {"value": "test", "predicted": False},
@@ -328,6 +300,7 @@ def test_predict_nlp_add():
     test_cases = [
         {
             "name": "test_nlp_add_1",
+            "task_name": "chemistry homework",
             "nlp": {
                 **nlp_payload_fixed,
                 "name": {"value": "chemistry homework", "predicted": False},
@@ -339,14 +312,10 @@ def test_predict_nlp_add():
                 "location": {"value": "home", "predicted": True},
                 "importance": {"value": 0.6, "predicted": True},
             },
-            "match": {
-                "associated_id": None,
-                "association_status": "none",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_nlp_add_2",
+            "task_name": "math assignment",
             "nlp": {
                 **nlp_payload_fixed,
                 "name": {"value": "math assignment", "predicted": False},
@@ -358,14 +327,10 @@ def test_predict_nlp_add():
                 "location": {"value": "library", "predicted": True},
                 "importance": {"value": 0.7, "predicted": True},
             },
-            "match": {
-                "associated_id": stats_ids[0] if len(stats_ids) > 0 else None,
-                "association_status": "same",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_nlp_add_3",
+            "task_name": "gym workout",
             "nlp": {
                 **nlp_payload_fixed_true,
                 "name": {"value": "gym workout", "predicted": False},
@@ -375,14 +340,10 @@ def test_predict_nlp_add():
                 "location": {"value": "gym", "predicted": True},
                 "importance": {"value": 0.8, "predicted": True},
             },
-            "match": {
-                "associated_id": stats_ids[1] if len(stats_ids) > 1 else None,
-                "association_status": "same",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_nlp_add_4",
+            "task_name": "physics lab",
             "nlp": {
                 **nlp_payload_fixed,
                 "name": {"value": "physics lab", "predicted": False},
@@ -394,14 +355,10 @@ def test_predict_nlp_add():
                 "location": {"value": "university", "predicted": True},
                 "importance": {"value": 0.8, "predicted": True},
             },
-            "match": {
-                "associated_id": stats_ids[2] if len(stats_ids) > 2 else None,
-                "association_status": "similar",
-                "name_vector": mock_vector,
-            },
         },
         {
             "name": "test_nlp_add_5",
+            "task_name": "work meeting",
             "nlp": {
                 **nlp_payload_fixed_true,
                 "name": {"value": "work meeting", "predicted": False},
@@ -410,11 +367,6 @@ def test_predict_nlp_add():
                 "category": {"value": ["work"], "predicted": False},
                 "location": {"value": "office", "predicted": True},
                 "importance": {"value": 0.75, "predicted": True},
-            },
-            "match": {
-                "associated_id": stats_ids[3] if len(stats_ids) > 3 else None,
-                "association_status": "similar",
-                "name_vector": mock_vector,
             },
         },
     ]
@@ -425,11 +377,15 @@ def test_predict_nlp_add():
         db = SessionLocal()
 
         try:
+            # Get real match from TaskMatcher
+            matcher = TaskMatcher()
+            real_match = matcher.find_match(db, case["task_name"])
+
             logger.write_json("INPUT nlp_payload", case["nlp"])
-            logger.write_json("INPUT match_result", case["match"])
+            logger.write_json("INPUT match_result", real_match)
 
             result, draft_id = enrichment_service.predict_nlp_add(
-                db, case["nlp"], case["match"]
+                db, case["nlp"], real_match
             )
 
             output_data = {"result": result, "draft_id": str(draft_id)}

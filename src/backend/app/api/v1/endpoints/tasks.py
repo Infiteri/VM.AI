@@ -153,7 +153,7 @@ def get_task(
     id: UUID,
     db: Session = Depends(get_db),
 ):
-    """
+    """ 
     GET /tasks/{id}
     Fetches details of a specific task by ID.
     """
