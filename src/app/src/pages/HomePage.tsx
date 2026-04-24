@@ -1,22 +1,23 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import MainViewDates from "../components/MainViewDates";
 import Sidebar from "../components/Sidebar";
 import TaskView from "../components/TaskView";
 import Background from "../components/Background";
+import type { Task } from "../types/Task";
 
-const tasks = [
-    { id: 1, name: "Morning Gym", locationLabel: "Location", locationValue: "Gold's Gym", startTime: "06:00", endTime: "07:30" },
-    { id: 2, name: "Math Class", locationLabel: "Location", locationValue: "School", startTime: "08:00", endTime: "09:30" },
-    { id: 3, name: "Project Sync", locationLabel: "Location", locationValue: "Discord", startTime: "11:00", endTime: "12:00" },
-    { id: 4, name: "Grocery Run", locationLabel: "Store", locationValue: "Whole Foods", startTime: "17:00", endTime: "18:00" },
-    { id: 5, name: "Dinner Date", locationLabel: "Venue", locationValue: "Pasta Place", startTime: "19:30", endTime: "21:00" },
-    { id: 6, name: "Review Code", locationLabel: "Home", locationValue: "Office", startTime: "21:30", endTime: "22:30" },
-    { id: 7, name: "Meditation", locationLabel: "App", locationValue: "Headspace", startTime: "23:00", endTime: "23:30" }
+const tasks: Task[] = [
+    { name: "Morning Gym", location: "Gold's Gym", start: "06:00", deadline: null, duration: "90", difficulty: "0.7", importance: "0.8", fixed_time: true, fixed_start: "06:00", recurrent: false, recurrence_days: null, category: ["fitness"], created_at: "", updated_at: "" },
+    { name: "Math Class", location: "School", start: "08:00", deadline: null, duration: "90", difficulty: "0.6", importance: "0.7", fixed_time: true, fixed_start: "08:00", recurrent: false, recurrence_days: null, category: ["education"], created_at: "", updated_at: "" },
+    { name: "Project Sync", location: "Discord", start: "11:00", deadline: null, duration: "60", difficulty: "0.5", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["work"], created_at: "", updated_at: "" },
+    { name: "Grocery Run", location: "Whole Foods", start: "17:00", deadline: null, duration: "60", difficulty: "0.3", importance: "0.7", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["personal"], created_at: "", updated_at: "" },
+    { name: "Dinner Date", location: "Pasta Place", start: "19:30", deadline: null, duration: "90", difficulty: "0.4", importance: "0.9", fixed_time: true, fixed_start: "19:30", recurrent: false, recurrence_days: null, category: ["social"], created_at: "", updated_at: "" },
+    { name: "Review Code", location: "Office", start: "21:30", deadline: null, duration: "60", difficulty: "0.8", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["work"], created_at: "", updated_at: "" },
+    { name: "Meditation", location: "Headspace", start: "23:00", deadline: null, duration: "30", difficulty: "0.2", importance: "0.5", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["wellness"], created_at: "", updated_at: "" }
 ];
 
 function MainView() {
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [constraints, setConstraints] = useState({ left: 0, right: 0 });
 
     useEffect(() => {
@@ -40,8 +41,8 @@ function MainView() {
                     dragConstraints={constraints}
                     className="flex flex-row gap-6 py-4"
                 >
-                    {tasks.map((t) => (
-                        <div key={t.id} className="shrink-0">
+                    {tasks.map((t, i) => (
+                        <div key={i} className="shrink-0">
                             <TaskView task={t} />
                         </div>
                     ))}
@@ -55,7 +56,7 @@ export default function HomePage() {
     return (
         <div className="w-screen h-screen flex overflow-hidden">
             <Background />
-            <Sidebar firstIcon={true} />
+            <Sidebar />
             <MainView />
         </div>
     );

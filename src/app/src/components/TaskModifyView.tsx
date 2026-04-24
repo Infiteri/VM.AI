@@ -68,7 +68,6 @@ function toISODateTime(dateStr: string, timeStr: string): string | null {
 
 export default function TaskModifyView({ task }: TaskModifyProps) {
   const defaultTask: Task = {
-    id: "",
     name: "",
     start: null,
     deadline: null,
@@ -80,7 +79,7 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
     fixed_start: null,
     recurrent: false,
     recurrence_days: null,
-    category: null,
+    category: [],
     created_at: "",
     updated_at: "",
   };
@@ -93,6 +92,7 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
   const [fixedTime, setFixedTime] = useState(
     formData.fixed_start ? formData.fixed_start.split("T")[1]?.slice(0, 5) : ""
   );
+  const [categoryInput, setCategoryInput] = useState("");
 
   const handleFixedToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isFixed = e.target.checked;
@@ -142,6 +142,23 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleCategoryAdd = () => {
+    if (categoryInput.trim()) {
+      setFormData((prev) => ({
+        ...prev,
+        category: [...prev.category, categoryInput.trim()],
+      }));
+      setCategoryInput("");
+    }
+  };
+
+  const handleCategoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleCategoryAdd();
+    }
   };
 
   return (
@@ -253,13 +270,50 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
         className="w-full bg-sec/40 border border-main-font/20 rounded-xl px-4 py-3 text-main-font placeholder:text-main-font/20 outline-none focus:border-main-font/40 transition-all"
       />
 
-      <input
-        name="category"
-        value={formData.category ?? ""}
-        onChange={handleChange}
-        placeholder="Category"
-        className="w-full bg-sec/40 border border-main-font/20 rounded-xl px-4 py-3 text-main-font placeholder:text-main-font/20 outline-none focus:border-main-font/40 transition-all"
-      />
+
+
+      <div className="flex gap-2">
+        <input
+          name="category"
+          value={categoryInput}
+          onChange={(e) => setCategoryInput(e.target.value)}
+          onKeyDown={handleCategoryKeyDown}
+          placeholder="Category"
+          className="flex-1 bg-sec/40 border border-main-font/20 rounded-xl px-4 py-3 text-main-font placeholder:text-main-font/20 outline-none focus:border-main-font/40 transition-all"
+        />
+        <button
+          type="button"
+          onClick={handleCategoryAdd}
+          className="w-12 bg-sec/40 border border-main-font/20 rounded-xl text-main-font text-xl font-light hover:bg-main-font/10 transition-all"
+        >
+          +
+        </button>
+      </div>
+
+      {formData.category.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {formData.category.map((cat, i) => (
+            <span
+              key={i}
+              className="px-3 py-1.5 bg-sec/40 border border-main-font/20 rounded-lg text-main-font text-sm flex items-center gap-2"
+            >
+              {cat}
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    category: prev.category.filter((_, idx) => idx !== i),
+                  }))
+                }
+                className="text-main-font/60 hover:text-main-font"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
 
       <button
         onClick={() => console.log(formData)}

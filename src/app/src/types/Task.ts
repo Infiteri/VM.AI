@@ -1,5 +1,4 @@
 export interface Task {
-  id: string;
   name: string;
   start: string | null;
   deadline: string | null;
@@ -11,14 +10,13 @@ export interface Task {
   fixed_start: string | null;
   recurrent: boolean;
   recurrence_days: string[] | null;
-  category: string | null;
+  category: string[];
   created_at: string;
   updated_at: string;
 }
 
 export function createDefaultTask(): Task {
   return {
-    id: crypto.randomUUID(),
     name: "",
     start: null,
     deadline: null,
@@ -30,7 +28,7 @@ export function createDefaultTask(): Task {
     fixed_start: null,
     recurrent: false,
     recurrence_days: null,
-    category: null,
+    category: [],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };

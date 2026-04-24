@@ -39,7 +39,7 @@ export default function NLPView({ mode }: NLPViewProps) {
             </div>
 
             <button className="w-full bg-main-font text-background font-bold py-5 rounded-[20px] text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-widest">
-                Submit task
+                Submit request
             </button>
         </div>
     );

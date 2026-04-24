@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { CheckCircle2, CircleOff, MessageSquareText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Task } from '../types/Task';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskViewProps {
-  task: Task;
+    task: Task;
 }
 
 export default function TaskView({ task }: TaskViewProps) {
     const [isNoteOpen, setIsNoteOpen] = useState(false);
+    const navigate = useNavigate()
 
     const [taskData, setTaskData] = useState<{
         duration: string;
@@ -28,6 +30,24 @@ export default function TaskView({ task }: TaskViewProps) {
 
     const handleSave = () => {
         console.log("Saving Task Data:", { name, ...taskData });
+    };
+
+    const handleModifyClick = () => {
+        const plainTask = {
+            name: task.name,
+            start: task.start,
+            deadline: task.deadline,
+            duration: task.duration,
+            difficulty: task.difficulty,
+            location: task.location,
+            importance: task.importance,
+            fixed_time: task.fixed_time,
+            fixed_start: task.fixed_start,
+            recurrent: task.recurrent,
+            recurrence_days: task.recurrence_days,
+            category: task.category,
+        };
+        navigate("/task", { state: { task: plainTask, openMode: "modify" } });
     };
 
     return (
@@ -59,7 +79,7 @@ export default function TaskView({ task }: TaskViewProps) {
                 </div>
 
                 <div className="flex justify-between mt-1 px-1 text-[9px] font-medium uppercase tracking-tighter">
-                    <button className="text-second hover:text-main transition-colors">Modify</button>
+                    <button onClick={() => { handleModifyClick() }} className="text-second hover:text-main transition-colors">Modify</button>
                     <button className="text-second hover:text-del transition-colors">Delete</button>
                 </div>
             </div>
