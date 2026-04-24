@@ -49,7 +49,7 @@ export default function Sidebar() {
     const fields = [
         { id: 1, name: "Schedule", icon: "schedule", path: "/" },
         { id: 2, name: "Add a task", icon: "task", path: "/task" },
-        { id: 3, name: "Statistics", icon: "stats", path: "/stats" },
+        { id: 3, name: "Pending changes", icon: "stats", path: "/pending" },
     ];
 
     return (

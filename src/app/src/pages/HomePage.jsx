@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import MainViewDates from "../components/MainViewDates";
 import Sidebar from "../components/Sidebar";
 import TaskView from "../components/TaskView";
+import Background from "../components/Background";
 
 const tasks = [
     { id: 1, name: "Morning Gym", locationLabel: "Location", locationValue: "Gold's Gym", startTime: "06:00", endTime: "07:30" },
@@ -52,7 +53,8 @@ function MainView() {
 
 export default function HomePage() {
     return (
-        <div className="w-screen h-screen bg-main flex overflow-hidden">
+        <div className="w-screen h-screen flex overflow-hidden">
+            <Background />
             <Sidebar firstIcon={true} />
             <MainView />
         </div>

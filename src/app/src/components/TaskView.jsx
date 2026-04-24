@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { CheckCircle2, CircleOff, MessageSquareText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// TODO: change to fit the actual task model, make a task class and add all fields
+
 export default function TaskView({ task }) {
     const [isNoteOpen, setIsNoteOpen] = useState(false);
 
