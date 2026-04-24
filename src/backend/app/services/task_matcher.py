@@ -12,8 +12,8 @@ logger = setup_logging()
 MODEL_NAME = "paraphrase-MiniLM-L6-v2"
 
 # Thresholds for classification
-EXACT_THRESHOLD = 0.92
-SIMILAR_THRESHOLD = 0.65
+EXACT_THRESHOLD = 0.90
+SIMILAR_THRESHOLD = 0.60
 
 
 class TaskMatcher:
@@ -55,7 +55,7 @@ class TaskMatcher:
     def find_match(self, db: Session, task_name: str) -> dict:
         """
         Compares a new task name against existing tasks in the database.
-        
+
         Returns a dictionary with:
         - associated_id: UUID of the matched task (or None)
         - association_status: "same", "similar", or "none"
@@ -69,22 +69,24 @@ class TaskMatcher:
         # We look for a name that matches exactly (case-insensitive).
         # We use .ilike() for case-insensitive SQL comparison.
         # We strip whitespace to be safe.
-        exact_match = db.query(TaskStatistics).filter(
-            TaskStatistics.task_name.ilike(task_name.strip())
-        ).first()
+        exact_match = (
+            db.query(TaskStatistics)
+            .filter(TaskStatistics.task_name.ilike(task_name.strip()))
+            .first()
+        )
 
         if exact_match:
             logger.info("Found Exact Match!")
             return {
                 "associated_id": exact_match.id,
                 "association_status": "same",
-                "name_vector": exact_match.task_name_vector  # Reuse existing vector
+                "name_vector": exact_match.task_name_vector,  # Reuse existing vector
             }
 
         # ---------------------------------------------------------
         # 2. Semantic Similarity (The AI Path)
         # ---------------------------------------------------------
-        
+
         # Get all historical task names and vectors from DB
         history = db.query(TaskStatistics.id, TaskStatistics.task_name_vector).all()
 
@@ -92,17 +94,19 @@ class TaskMatcher:
         if not history:
             logger.info("No history found. Status: none")
             # Encode the new name anyway so we can save it later
-            new_vector = self.model.encode(task_name, normalize_embeddings=True).tolist()
+            new_vector = self.model.encode(
+                task_name, normalize_embeddings=True
+            ).tolist()
             return {
                 "associated_id": None,
                 "association_status": "none",
-                "name_vector": new_vector
+                "name_vector": new_vector,
             }
 
         # Encode the NEW task name into a vector (384 dimensions)
         # normalize_embeddings=True makes the vector length 1.0, simplifying cosine similarity
         new_vector = self.model.encode(task_name, normalize_embeddings=True)
-        
+
         best_score = -1.0
         best_id = None
 
@@ -133,9 +137,9 @@ class TaskMatcher:
         logger.info(f"Final Status: {status}")
 
         return {
-            "associated_id": best_id,
+            "associated_id": best_id if status != "none" else None,
             "association_status": status,
-            "name_vector": new_vector.tolist()  # Convert numpy array to list for DB storage
+            "name_vector": new_vector.tolist(),  # Convert numpy array to list for DB storage
         }
 
 

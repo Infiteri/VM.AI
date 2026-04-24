@@ -24,6 +24,7 @@ router = APIRouter()
 # 1. NLP Parsing Endpoints
 # ---------------------------------------------------------
 
+
 @router.post("/parse/add", response_model=ParseAddResponse)
 def parse_add_task(
     body: ParseAddRequest,
@@ -34,7 +35,7 @@ def parse_add_task(
     Parses natural language input to extract task fields.
     """
     # TODO: Call NLP Parser Service
-    
+
     return ParseAddResponse(
         draft_id=UUID("00000000-0000-0000-0000-000000000000"),  # Stub UUID
         task=TaskPayload(
@@ -48,7 +49,7 @@ def parse_add_task(
             importance=0.5,
             fixed_time=False,
             fixed_start=None,
-        )
+        ),
     )
 
 
@@ -62,9 +63,8 @@ def parse_modify_task(
     Parses modification prompts.
     """
     # TODO: Call NLP Parser Service
-    
+
     return ParseModifyResponse(
-        task_id=body.task_id,
         task=TaskPayload(
             name="Modified Task",
             start=datetime(2026, 4, 19, 9, 0),
@@ -83,6 +83,7 @@ def parse_modify_task(
 # ---------------------------------------------------------
 # 2. Task CRUD Endpoints
 # ---------------------------------------------------------
+
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=TaskResponse)
 def create_task(
@@ -146,20 +147,21 @@ def delete_task(
 # 3. Task Fetching Endpoint
 # ---------------------------------------------------------
 
+
 @router.get("/{id}", response_model=TaskDetailResponse)
 def get_task(
     id: UUID,
     db: Session = Depends(get_db),
 ):
-    """
+    """ 
     GET /tasks/{id}
     Fetches details of a specific task by ID.
     """
     # TODO: Implement DB query
-    
+
     return TaskDetailResponse(
         task_id=id,
-        payload=TaskPayload(
+        task=TaskPayload(
             name="Stub Task for Display",
             start=datetime(2026, 4, 19, 9, 0),
             deadline=datetime(2026, 4, 20, 17, 0),
@@ -178,6 +180,7 @@ def get_task(
 # ---------------------------------------------------------
 # 4. Queue Endpoint
 # ---------------------------------------------------------
+
 
 @router.get("/unscheduled", response_model=UnscheduledResponse)
 def get_unscheduled(

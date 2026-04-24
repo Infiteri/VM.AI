@@ -8,31 +8,36 @@ from app.models.base import BaseModel
 class Task(BaseModel):
     """
     Primary task storage table.
-    
+
     Source of truth for all task definitions.
     State is derived from presence in workflow tables:
     - In unscheduled_tasks → awaiting scheduling
     - In provisional_schedule → staged for commit
     - In scheduled_slots → committed to main schedule
     """
+
     __tablename__ = "tasks"
 
     # Foreign keys to statistics tables
     task_statistics_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("tasks_statistics.id", ondelete="NO ACTION"),
+        ForeignKey("task_statistics.id", ondelete="NO ACTION"),
         nullable=False,
     )
     associated_task_statistics_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("tasks_statistics.id", ondelete="NO ACTION"),
+        ForeignKey("task_statistics.id", ondelete="NO ACTION"),
         nullable=True,  # Only set when matched to a similar task
     )
 
     # Core task fields
     name = Column(Text, nullable=False)
-    start = Column(DateTime(timezone=True), nullable=True)  # ISO timestamp string (resolved by Enrichment)
-    deadline = Column(DateTime(timezone=True), nullable=True)  # ISO timestamp string (resolved by Enrichment)
+    start = Column(
+        DateTime(timezone=True), nullable=True
+    )  # ISO timestamp string (resolved by Enrichment)
+    deadline = Column(
+        DateTime(timezone=True), nullable=True
+    )  # ISO timestamp string (resolved by Enrichment)
     difficulty = Column(Float, nullable=True)  # 0.0–1.0
     duration = Column(Integer, nullable=True)  # Minutes
 
@@ -50,7 +55,9 @@ class Task(BaseModel):
 
     # Fixed-time task flags
     fixed_time = Column(Boolean, default=False, nullable=False)
-    fixed_start = Column(DateTime(timezone=True), nullable=True)  # Raw time string (e.g., "Monday 09:00")
+    fixed_start = Column(
+        DateTime(timezone=True), nullable=True
+    )  # Raw time string (e.g., "Monday 09:00")
 
     # User rating tracking
     rated = Column(Boolean, default=False, nullable=False)

@@ -14,7 +14,7 @@ def rate_task(
     body: RateRequest,
     db: Session = Depends(get_db),
 ):
-    
+
     # === TEMPORARY STUB ===
     # Future logic:
     # Fetch task: task = db.query(Task).filter(Task.id == id).first()
@@ -25,7 +25,7 @@ def rate_task(
 
     return RateResponse(
         success=True,
-        task_id=str(id),
+        task_id=id,
         stats_updated=True,
         message="Task rated successfully (stub)",
     )

@@ -1,11 +1,13 @@
-# Task Matching Model — Technical Documentation
-VM.AI Project · ONIA 2026
-Version 2.4 (Stable Pipeline Integration)
-Last Updated: April 13, 2026
+# Task Matching Module — Technical Documentation
+**Version:** 1.0 (Final)
+**Last Updated:** April 18, 2026
+**Competition:** ONIA 2026
+
+---
 
 ## 1. Overview
 
-The Task Matching Model is the second stage in the VM.AI pipeline. Its job is to compare the task name parsed by the NLP module against every task name stored in the user's `tasks_statistics` table and determine whether the new task is the **same** as an existing one, **similar**, or **entirely new**.
+The Task Matching module is the second stage in the VM.AI pipeline. Its job is to compare the task name parsed by the NLP module against every task name stored in the user's `tasks_statistics` table and determine whether the new task is the **same** as an existing one, **similar**, or **entirely new**.
 
 This distinction is critical because the Enrichment module uses the match result to decide:
 - Which `associated_task_statistics_id` to store in the `tasks` table
@@ -24,25 +26,27 @@ This distinction is critical because the Enrichment module uses the match result
 - Make scheduling, enrichment, or stats-recording decisions
 - Require fine-tuning or training — used entirely off-the-shelf
 
+---
+
 ## 2. Position in Pipeline
 
-```text
+```
 User Input
-↓
+    ↓
 NLP Parser → TaskPayload
-↓
+    ↓
 Task Matching Model → { name_vector, associated_id, association_status }
-↓
-Boundary Validation (Pydantic schema enforcement)
-↓
+    ↓
 Enrichment Module → reads tasks_statistics or category_statistics
-↓
+    ↓
 Enrichment → creates tasks_statistics row (if needed)
-↓
+    ↓
 Enrichment → creates tasks row with both ID fields
-↓
+    ↓
 Enrichment → inserts task_id into unscheduled_tasks
 ```
+
+---
 
 ## 3. Model Details
 
@@ -55,6 +59,8 @@ Enrichment → inserts task_id into unscheduled_tasks
 | Disk Size | ~90MB |
 | Training Required | No — used off-the-shelf |
 | ONIA Compliance | Yes — fully open-source, documented, CPU-only |
+
+---
 
 ## 4. Matching Algorithm
 
@@ -71,65 +77,69 @@ If no exact match:
 2. Compute cosine similarity against every stored `task_name_vector` in `tasks_statistics`
 3. Identify highest similarity score (`best_score`)
 4. Classify using fixed thresholds:
-   - `best_score >= 0.92` → `"same"`
-   - `0.65 <= best_score < 0.92` → `"similar"`
-   - `best_score < 0.65` → `"none"`
+
+| Threshold | Result |
+|-----------|--------|
+| `>= 0.92` | `"same"` |
+| `0.65 - 0.91` | `"similar"` |
+| `< 0.65` | `"none"` |
 
 ```python
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-8)
 ```
 
-> 💡 **Single-User Scale Note:** Cosine similarity against all rows is `O(N)` where `N` = number of tasks. For a personal productivity tool, `N` rarely exceeds 500–1000. Vectorized NumPy computation completes in `<2ms`.
+---
 
 ## 5. Output Schema
 
-The model always returns exactly three fields. This is the **only** payload passed to Enrichment.
+The model always returns exactly three fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name_vector` | `float[384]` | Encoded vector of the parsed task name. Stored in `tasks_statistics.task_name_vector`. |
-| `associated_id` | `UUID \| null` | `tasks_statistics.id` of the best matching task. `null` when `association_status = "none"`. |
-| `association_status` | `"same" \| "similar" \| "none"` | Classification result based on thresholds. |
+| `name_vector` | `float[384]` | Encoded vector of parsed task name |
+| `associated_id` | `UUID | null` | `tasks_statistics.id` of best matching task |
+| `association_status` | `"same" \| "similar" \| "none"` | Classification result |
 
 ```json
 {
-  "name_vector": [0.23, -0.11, 0.45, 0.89, ...],
-  "associated_id": "550e8400-e29b-41d4-a716-446655440000",
-  "association_status": "same"
+    "name_vector": [0.23, -0.11, 0.45, 0.89, ...],
+    "associated_id": "550e8400-e29b-41d4-a716-446655440000",
+    "association_status": "same"
 }
 ```
 
+---
+
 ## 6. Match Cases & Enrichment Handoff
 
-The Enrichment module consumes this output to determine database writes and data source priority.
-
-| `association_status` | New `tasks_statistics` row? | `task_statistics_id` | `associated_task_statistics_id` | Enrichment Data Source |
+| `association_status` | New `tasks_statistics` row? | `task_statistics_id` | `associated_task_statistics_id` | Data Source |
 |----------------------|-----------------------------|----------------------|----------------------------------|------------------------|
 | `"same"` | **No** | `= associated_id` | `= associated_id` | Matched task's row (if `records >= 3`) |
 | `"similar"` | **Yes** | New UUID | `= associated_id` | Matched task's row (if `records >= 3`) |
 | `"none"` | **Yes** | New UUID | `null` | Category-level statistics |
 
-> ⚠️ **Critical Invariant:** `associated_id` is always a `tasks_statistics.id`, never a `tasks.id`. This points directly to the statistics row, enabling clean separation between task instances and behavioral history.
+> **Critical Invariant:** `associated_id` is always a `tasks_statistics.id`, never a `tasks.id`.
+
+---
 
 ## 7. Threshold Configuration
 
-Thresholds are hardcoded as constants but should be exposed via environment variables for easy tuning during demo preparation.
-
 | Constant | Default Value | Meaning |
 |----------|---------------|---------|
-| `EXACT_THRESHOLD` | `0.92` | `≥ 0.92` → `"same"` |
+| `EXACT_THRESHOLD` | `0.92` | `>= 0.92` → `"same"` |
 | `SIMILAR_THRESHOLD` | `0.65` | `0.65–0.91` → `"similar"` |
 | Fallback | `< 0.65` | `"none"` |
 
 **Tuning Guidance:**
 - Too high → fails to recognize paraphrases (`"chem hw"` vs `"chemistry homework"`)
 - Too low → incorrectly merges unrelated tasks (`"gym workout"` vs `"buy groceries"`)
-- Adjust during Week 3 using real user logs before demo day.
+
+---
 
 ## 8. Database Reference
 
-The Task Matching Model only **reads** from `tasks_statistics`. It does not write.
+The Task Matching module only **reads** from `tasks_statistics`.
 
 | Table | Field | Purpose |
 |-------|-------|---------|
@@ -137,53 +147,61 @@ The Task Matching Model only **reads** from `tasks_statistics`. It does not writ
 | `tasks_statistics` | `task_name` | Used for exact string pre-filter |
 | `tasks_statistics` | `task_name_vector` | 384-dim embedding for cosine similarity |
 
-> ℹ The `tasks_statistics` table also contains statistical fields (`avg_duration`, `records`, etc.), but the matcher **ignores them completely**. Separation of concerns is strict.
+> The `tasks_statistics` table also contains statistical fields (`avg_duration`, `records`, etc.), but the matcher **ignores them completely**.
 
-## 9. Vector Storage Lifecycle
+---
 
-While the matcher computes `name_vector`, storage happens during the database commit phase (handled by Enrichment/backend):
-
-1. NLP parses task → passes name to matcher
-2. Matcher returns `{ name_vector, associated_id, association_status }`
-3. Enrichment uses result to determine DB writes
-4. Backend inserts `name_vector` into `tasks_statistics.task_name_vector` during task creation
-5. Vector is never recomputed or updated unless the task name is modified (handled via separate pipeline path)
-
-## 10. Cold Start Behavior
+## 9. Cold Start Behavior
 
 When a new user has zero task history:
-- `tasks_statistics` table is empty (except pre-seeded categories)
+- `tasks_statistics` table is empty
 - Exact match loop returns no results
 - Cosine similarity list is empty → `best_score = 0.0`
 - Returns: `association_status: "none"`, `associated_id: null`, `name_vector: [computed]`
 - Enrichment falls back to category-level statistics immediately
 - System works from first input. No warmup period required.
 
-## 11. Implementation Recommendations & Proposals
+---
 
-The following proposals are strongly recommended to ensure reliability, prevent silent mismatches, and maximize demo-day performance:
+## 10. Implementation Notes
 
-| Area | Proposal | Impact |
-|------|----------|--------|
-| **Environment Thresholds** | Load `EXACT_THRESHOLD` and `SIMILAR_THRESHOLD` from `.env` | Enables quick tuning during demo without code changes |
-| **Batch Similarity Optimization** | Use `sentence-transformers.util.cos_sim` for vectorized comparison | Reduces Python loop overhead, keeps `<5ms` even at 500+ tasks |
-| **Pydantic Output Validation** | Wrap matcher return in strict schema before passing to Enrichment | Catches type/format mismatches early, prevents pipeline crashes |
-| **Name Normalization** | Strip punctuation, collapse multiple spaces, lowercase before exact match | Prevents false negatives on `"Math HW!"` vs `"math hw"` |
-| **Fallback on Model Load Failure** | If `sentence-transformers` fails to initialize, return `association_status: "none"` with logged warning | Guarantees pipeline never blocks on dependency issues |
+### Environment Thresholds
+Load thresholds from environment variables for easy tuning:
+```python
+import os
+EXACT_THRESHOLD = float(os.getenv("EXACT_THRESHOLD", "0.92"))
+SIMILAR_THRESHOLD = float(os.getenv("SIMILAR_THRESHOLD", "0.65"))
+```
 
-## 12. Summary
+### Batch Similarity Optimization
+Use `sentence-transformers.util.cos_sim` for vectorized comparison:
+```python
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+embeddings = model.encode(task_names)
+cosine_scores = util.cos_sim(input_embedding, embeddings)
+```
+
+### Fallback on Model Load Failure
+If `sentence-transformers` fails to initialize, return `association_status: "none"` with logged warning to guarantee pipeline never blocks.
+
+---
+
+## 11. Summary
 
 | Aspect | Description |
 |--------|-------------|
 | **Purpose** | Classify new task name against existing history |
 | **Model** | `paraphrase-MiniLM-L6-v2` (384-dim, off-the-shelf) |
-| **Matching Order** | Exact string → Cosine similarity → Threshold classification |
-| **Thresholds** | `≥ 0.92` = same, `0.65–0.91` = similar, `< 0.65` = none |
+| **Matching Order** | Exact string → Cosine similarity → Threshold |
+| **Thresholds** | `>= 0.92` = same, `0.65-0.91` = similar, `< 0.65` = none |
 | **Output** | `{ name_vector, associated_id, association_status }` |
 | `associated_id` Type | `tasks_statistics.id` (never `tasks.id`) |
-| **DB Interaction** | Read-only on `tasks_statistics` (id, task_name, task_name_vector) |
-| **Cold Start** | Returns `"none"` immediately. Works from first input. |
-| **Vector Storage** | Handled during backend commit, not inside matcher |
-| **AI Content** | Semantic embedding only. No fine-tuning, no training loops. |
-| **Execution** | Synchronous, lightweight (`<10ms` end-to-end) |
-| **Next Stage** | Enrichment Module (uses payload to select historical data source) |
+| **DB Interaction** | Read-only on `tasks_statistics` |
+| **Cold Start** | Works from first input |
+| **Execution** | Synchronous, lightweight (`<10ms`) |
+| **Next Stage** | Enrichment Module |
+
+---
+
+*Document prepared for ONIA 2026.*
