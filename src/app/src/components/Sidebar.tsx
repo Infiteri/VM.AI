@@ -1,9 +1,20 @@
-import { Calendar, Calendar1, BarChart } from "lucide-react";
+import { Calendar, Calendar1, BarChart, LucideIcon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-function Field({ data, isSelected, onTap }) {
-    const iconMap = {
+interface FieldProps {
+  data: {
+    id: number;
+    name: string;
+    icon: "schedule" | "task" | "stats";
+    path: string;
+  };
+  isSelected: boolean;
+  onTap: () => void;
+}
+
+function Field({ data, isSelected, onTap }: FieldProps) {
+    const iconMap: Record<string, LucideIcon> = {
         schedule: Calendar,
         task: Calendar1,
         stats: BarChart,
@@ -46,7 +57,7 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const fields = [
+    const fields: { id: number; name: string; icon: "schedule" | "task" | "stats"; path: string; }[] = [
         { id: 1, name: "Schedule", icon: "schedule", path: "/" },
         { id: 2, name: "Add a task", icon: "task", path: "/task" },
         { id: 3, name: "Pending changes", icon: "stats", path: "/pending" },

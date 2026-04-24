@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
-export default function NLPView({ mode }) {
+interface NLPViewProps {
+  mode: "add" | "modify";
+}
+
+export default function NLPView({ mode }: NLPViewProps) {
     const [modeText, setModeText] = useState("Add");
 
     useEffect(() => {

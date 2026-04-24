@@ -1,17 +1,23 @@
 import { useState } from "react";
 import { MapPin, Clock, Calendar, Dumbbell, BookOpen, MessageSquare, ShoppingCart, Utensils, Code, Moon, MoreHorizontal } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import Background from "../components/Background";
 import TaskView from "../components/TaskView";
+import type { Task } from "../types/Task";
 
-const tasks = [
-    { id: 1, name: "Morning Gym", locationLabel: "Location", locationValue: "Gold's Gym", startTime: "06:00", endTime: "07:30", icon: Dumbbell },
-    { id: 2, name: "Math Class", locationLabel: "Location", locationValue: "School", startTime: "08:00", endTime: "09:30", icon: BookOpen },
-    { id: 3, name: "Project Sync", locationLabel: "Location", locationValue: "Discord", startTime: "11:00", endTime: "12:00", icon: MessageSquare },
-    { id: 4, name: "Grocery Run", locationLabel: "Store", locationValue: "Whole Foods", startTime: "17:00", endTime: "18:00", icon: ShoppingCart },
-    { id: 5, name: "Dinner Date", locationLabel: "Venue", locationValue: "Pasta Place", startTime: "19:30", endTime: "21:00", icon: Utensils },
-    { id: 6, name: "Review Code", locationLabel: "Home", locationValue: "Office", startTime: "21:30", endTime: "22:30", icon: Code },
-    { id: 7, name: "Meditation", locationLabel: "App", locationValue: "Headspace", startTime: "23:00", endTime: "23:30", icon: Moon }
+interface TaskWithIcon extends Task {
+  icon?: LucideIcon;
+}
+
+const tasks: TaskWithIcon[] = [
+    { id: "1", name: "Morning Gym", location: "Gold's Gym", start: "06:00", duration: "90", difficulty: "0.7", importance: "0.8", fixed_time: true, fixed_start: null, recurrent: false, recurrence_days: null, category: "fitness", deadline: null, created_at: "", updated_at: "", icon: Dumbbell },
+    { id: "2", name: "Math Class", location: "School", start: "08:00", duration: "90", difficulty: "0.6", importance: "0.7", fixed_time: true, fixed_start: null, recurrent: false, recurrence_days: null, category: "education", deadline: null, created_at: "", updated_at: "", icon: BookOpen },
+    { id: "3", name: "Project Sync", location: "Discord", start: "11:00", duration: "60", difficulty: "0.5", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: "work", deadline: null, created_at: "", updated_at: "", icon: MessageSquare },
+    { id: "4", name: "Grocery Run", location: "Whole Foods", start: "17:00", duration: "60", difficulty: "0.3", importance: "0.7", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: "personal", deadline: null, created_at: "", updated_at: "", icon: ShoppingCart },
+    { id: "5", name: "Dinner Date", location: "Pasta Place", start: "19:30", duration: "90", difficulty: "0.4", importance: "0.9", fixed_time: true, fixed_start: null, recurrent: false, recurrence_days: null, category: "social", deadline: null, created_at: "", updated_at: "", icon: Utensils },
+    { id: "6", name: "Review Code", location: "Office", start: "21:30", duration: "60", difficulty: "0.8", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: "work", deadline: null, created_at: "", updated_at: "", icon: Code },
+    { id: "7", name: "Meditation", location: "Headspace", start: "23:00", duration: "30", difficulty: "0.2", importance: "0.5", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: "wellness", deadline: null, created_at: "", updated_at: "", icon: Moon }
 ];
 
 function ScheduleChangesView() {
@@ -24,18 +30,16 @@ function ScheduleChangesView() {
     );
 }
 
-function UnscheduledTaskView({ task }) {
+function UnscheduledTaskView({ task }: { task: TaskWithIcon }) {
     const Icon = task.icon;
 
-    const tags = [
-        { icon: MapPin, value: task.locationValue }
-    ];
+    const tags = task.location ? [{ icon: MapPin, value: task.location }] : [];
 
     return (
         <div className="flex flex-col gap-3 p-4 border border-white/20 rounded-lg bg-white/5">
             <div className="flex flex-row items-center justify-between">
                 <span className="text-lg text-main-font font-medium">{task.name}</span>
-                <span className="text-sm text-second-font">{task.startTime} - {task.endTime}</span>
+                <span className="text-sm text-second-font">{task.start}</span>
             </div>
             <div className="flex flex-row gap-2">
                 {tags.map((tag, i) => {
@@ -71,7 +75,7 @@ export default function PendingTasksPage() {
             <Sidebar />
 
             <div className="flex-1 flex items-center justify-center p-12">
-                <div className="w-[1100px] h-[700px] rounded-[40px] border border-white/5 bg-sec/30 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden">
+                <div className="w-275 h-175 rounded-[40px] border border-white/5 bg-sec/30 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden">
                     <div className="p-6 border-b border-white/5">
                         <div className="flex flex-row items-center justify-between">
                             <div className="flex flex-row gap-3">
