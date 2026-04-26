@@ -1,6 +1,6 @@
 # VM.AI — Full Project Overview
 **Competition:** ONIA 2026
-**Status:** Architecture Complete, Core Pipeline Implemented
+**Status:** Architecture Complete, Full Pipeline Implemented
 
 ---
 
@@ -47,22 +47,24 @@ The system learns from user's task completion patterns to make intelligent predi
   - Keep predicted value (cold start defaults to 0.5)
 - **Output:** Full task data ready for DB insertion
 
-### Stage 4: Scheduler
+### Stage 4: Scheduler (Complete - v4.0)
 - **Algorithm:** Stable Incremental Algorithm
+- **Implementation:** ScheduleEngine class
 - **Process:**
-  1. Fetch unscheduled tasks (FIFO order)
-  2. Constraint solver
-  3. Top-15 pruning
-  4. Stable scoring
-  5. 1-layer displacement max
+  1. Fetch tasks (hybrid: queue or task_ids list)
+  2. Build free slot inventory
+  3. Constraint solver
+  4. **ALL slots scored** (not just top-15)
+  5. Stable scoring with displacement handling
 - **Scoring Formula:**
   ```
-  score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference
+  score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference + urgency_boost
   ```
-- **Guards:**
-  - 12s hard timeout
-  - Early termination if score < 0.35
-  - 25% value threshold for displacement
+- **Key Parameters:**
+  - TOP_N_CANDIDATES=400 (score all candidate slots)
+  - FREE_SLOT_BOOST=0.5 (free slots bubble to top)
+  - MAX_LAYER=1 (1-layer displacement max)
+  - VALUE_THRESHOLD=0.25 (25% value threshold)
 - **Output:** Writes to `provisional_schedule` + `schedule_changes`
 
 ### Stage 5: Stats Recorder
@@ -80,7 +82,15 @@ The system learns from user's task completion patterns to make intelligent predi
 
 ## 3. Key Features
 
-### 3.1 Draft System
+### 3.1 Class-Based Service Architecture
+All core services follow a class-based pattern:
+- **EnrichmentService** - Field enrichment, priority chain, importance recomputation
+- **ScheduleEngine** - Scheduling with ALL slots scoring, displacement handling
+- **TaskMatchingService** - Embedding-based task association
+- **StatsRecorderService** - Two-denominator statistics updates
+- **Hybrid schedule_batch** - Accepts optional task_ids or uses unscheduled queue
+
+### 3.2 Draft System
 - **Purpose:** Safe task creation via Chat/AI without polluting the main database
 - **Flow:**
   1. User enters NLP prompt
@@ -90,25 +100,25 @@ The system learns from user's task completion patterns to make intelligent predi
   5. On commit: draft loaded → merged → saved to `tasks`
 - **Safety:** If user abandons, background cleanup deletes drafts after 24 hours
 
-### 3.2 Strict Validation
+### 3.3 Strict Validation
 - All API schemas use Pydantic `Field` with constraints
 - Automatic datetime ISO validation
 - Model validators for `fixed_time` logic
 - Catches 80% of errors at the boundary
 
-### 3.3 Behavior-Aware Predictions
+### 3.4 Behavior-Aware Predictions
 - Task-level statistics (from matched tasks)
 - Category-level aggregates (fallback)
 - Importance recalculation with deadline proximity
 - Location preferences
 
-### 3.4 Stable Scheduling
+### 3.5 Stable Scheduling
 - Incremental updates (not full reschedule)
 - 1-layer displacement maximum
 - 25% value threshold
-- 12s timeout
+- **ALL slots scored** (not top-15) - ensures low-value tasks find free slots
 
-### 3.5 Atomic Commits
+### 3.6 Atomic Commits
 - Single PostgreSQL transaction for schedule commit
 - Prevents blank calendar on network drop
 
@@ -121,7 +131,7 @@ The system learns from user's task completion patterns to make intelligent predi
 1. User fills all fields in frontend form
 2. Frontend calls POST /tasks with TaskPayload
 3. Backend calls Task Matching
-4. Backend computes urgency/value
+4. Backend computes urgency/value (EnrichmentService)
 5. Backend creates task + statistics + categories
 6. Backend adds to unscheduled queue
 7. Return task_id + status
@@ -151,6 +161,22 @@ The system learns from user's task completion patterns to make intelligent predi
 7. Frontend shows modified task
 ```
 
+### 4.4 Schedule Batch (Hybrid Queue/Task IDs)
+```
+1. Frontend calls POST /schedule/batch (optional: task_ids list)
+2. If task_ids provided: fetch specific tasks
+3. If no task_ids: fetch from unscheduled_queue
+4. ScheduleEngine.process_batch():
+   a. Build free slot inventory
+   b. For each task:
+      - Get candidate slots (start_time window)
+      - Score ALL slots (TOP_N_CANDIDATES=400)
+      - Place in highest-scoring slot
+      - Handle displacement if needed (MAX_LAYER=1)
+5. Save to provisional_schedule
+6. Record schedule_changes
+```
+
 ---
 
 ## 5. API Endpoints Summary
@@ -168,7 +194,7 @@ The system learns from user's task completion patterns to make intelligent predi
 | Method | Endpoint | Body | Response |
 |--------|----------|------|----------|
 | GET | `/schedule` | - | `ScheduleResponse` |
-| POST | `/schedule/batch` | - | `BatchScheduleResponse` |
+| POST | `/schedule/batch` | `BatchScheduleRequest` (optional: task_ids) | `BatchScheduleResponse` |
 
 ### Provisional
 | Method | Endpoint | Body | Response |
@@ -218,9 +244,41 @@ The system learns from user's task completion patterns to make intelligent predi
 | Database Models | Complete |
 | Task Matching | Complete |
 | NLP Parser | Complete |
-| Enrichment | Complete |
-| Scheduler | Not Started |
-| Stats Recorder | Not Started |
+| Enrichment | Complete (EnrichmentService class) |
+| Scheduler | Complete (ScheduleEngine, ALL slots scored) |
+| Stats Recorder | Complete (StatsRecorderService class) |
+
+---
+
+## 9. Key Implementation Details
+
+### 9.1 ScheduleEngine Scoring
+```
+score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference + urgency_boost
+```
+
+Where:
+- **base_value** = task.importance × urgency (normalized)
+- **free_boost** = FREE_SLOT_BOOST (0.5) if slot is free
+- **stability_penalty** = 0.15 × layer_displaced (1-layer max)
+- **location_boost** = 0.3 × location_match (preferred location)
+- **overlap_penalty** = -999 if overlaps (impossible)
+- **time_preference** = 0.1 × time_match (preferred time blocks)
+- **urgency_boost** = (1 - position_ratio) × 0.2 (near deadline)
+
+### 9.2 Displacement Handling
+- Only if displaced task importance × (1 - VALUE_THRESHOLD) >= new task importance
+- MAX_LAYER=1 prevents cascade rescheduling
+- Displaced tasks return to unscheduled_queue
+
+### 9.3 Hybrid Batch Schedule
+```python
+def process_batch(self, db: Session, task_ids: list[str] | None = None) -> BatchScheduleResponse:
+    if task_ids:
+        tasks = self._fetch_specific_tasks(db, task_ids)
+    else:
+        tasks = self._fetch_queue_tasks(db)
+```
 
 ---
 
