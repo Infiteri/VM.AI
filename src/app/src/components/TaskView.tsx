@@ -1,25 +1,53 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CheckCircle2, CircleOff, MessageSquareText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Task } from '../types/Task';
+import { useNavigate } from 'react-router-dom';
 
-export default function TaskView({ task }) {
+interface TaskViewProps {
+    task: Task;
+}
+
+export default function TaskView({ task }: TaskViewProps) {
     const [isNoteOpen, setIsNoteOpen] = useState(false);
+    const navigate = useNavigate()
 
-    const [taskData, setTaskData] = useState({
-        realization: task?.realization ?? null, // null = untouched, true = done, false = skipped
-        duration: task?.time || 0,
-        difficulty: task?.difficulty || 50
+    const [taskData, setTaskData] = useState<{
+        duration: string;
+        difficulty: string;
+        realization: boolean | null;
+    }>({
+        duration: task?.duration ?? "30",
+        difficulty: task?.difficulty ?? "0.5",
+        realization: null
     });
 
     const {
-        name = "Task name",
-        locationValue = "School",
-        startTime = "07:00",
-        endTime = "08:00",
+        name = task.name ?? "Task name",
+        location = task.location ?? "School",
+        fixed_start = task.fixed_start ?? "07:00"
     } = task || {};
 
     const handleSave = () => {
         console.log("Saving Task Data:", { name, ...taskData });
+    };
+
+    const handleModifyClick = () => {
+        const plainTask = {
+            name: task.name,
+            start: task.start,
+            deadline: task.deadline,
+            duration: task.duration,
+            difficulty: task.difficulty,
+            location: task.location,
+            importance: task.importance,
+            fixed_time: task.fixed_time,
+            fixed_start: task.fixed_start,
+            recurrent: task.recurrent,
+            recurrence_days: task.recurrence_days,
+            category: task.category,
+        };
+        navigate("/task", { state: { task: plainTask, openMode: "modify" } });
     };
 
     return (
@@ -35,7 +63,7 @@ export default function TaskView({ task }) {
                     <div className="bg-sec border border-main/20 px-2 py-1 rounded flex gap-1.5 items-center text-xs">
                         <span className="text-main/60">Location</span>
                         <span className="text-main/30">|</span>
-                        <span className="text-main/80 truncate max-w-15">{locationValue}</span>
+                        <span className="text-main/80 truncate max-w-15">{location}</span>
                     </div>
 
                     <button
@@ -47,11 +75,11 @@ export default function TaskView({ task }) {
                 </div>
 
                 <div className="bg-main-font text-background py-1.5 rounded-lg font-bold text-sm text-center">
-                    {startTime} - {endTime}
+                    {fixed_start}
                 </div>
 
                 <div className="flex justify-between mt-1 px-1 text-[9px] font-medium uppercase tracking-tighter">
-                    <button className="text-second hover:text-main transition-colors">Modify</button>
+                    <button onClick={() => { handleModifyClick() }} className="text-second hover:text-main transition-colors">Modify</button>
                     <button className="text-second hover:text-del transition-colors">Delete</button>
                 </div>
             </div>
