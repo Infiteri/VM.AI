@@ -188,11 +188,13 @@ def _schedule_fixed_task(task: Task, db: Session) -> SchedulingResult:
         )
     
     fixed_start = _round_down_to_interval(task.fixed_start, SLOT_INTERVAL_MINUTES)
-    fixed_end = _calculate_end(fixed_start, task.duration)
+    fixed_end = _calculate_fixed_task_end(task.fixed_start, task.duration)
     
     logger.debug(f"Fixed task at {fixed_start} - {fixed_end}")
     
     overlapping = _get_overlapping_tasks(fixed_start, fixed_end, db)
+    
+    displaced_ids: List[UUID] = []
     
     for existing in overlapping:
         if existing.fixed:
@@ -204,8 +206,9 @@ def _schedule_fixed_task(task: Task, db: Session) -> SchedulingResult:
                 displaced_tasks=[],
                 message=f"Slot occupied by fixed task {existing.task_id}",
             )
-        existing_fixed_task = db.query(Task).filter(Task.id == existing.task_id).first()
-        if existing_fixed_task and existing_fixed_task.fixed_time:
+        
+        existing_task = db.query(Task).filter(Task.id == existing.task_id).first()
+        if existing_task and existing_task.fixed_time:
             return SchedulingResult(
                 success=False,
                 task_id=task.id,
@@ -216,17 +219,39 @@ def _schedule_fixed_task(task: Task, db: Session) -> SchedulingResult:
             )
         
         displaced_id = existing.task_id
+        
+        old_start = existing.start
+        old_end = existing.end
+        
         db.delete(existing)
         
-        change = ScheduleChange(
-            task_id=displaced_id,
-            change_type="move",
-            old_slot_start=existing.start,
-            old_slot_end=existing.end,
-            new_slot_start=fixed_start,
-            new_slot_end=fixed_end,
-        )
-        db.add(change)
+        existing_task_for_displacement = db.query(Task).filter(Task.id == displaced_id).first()
+        if existing_task_for_displacement:
+            reschedule_result = _try_reschedule_task(existing_task_for_displacement, db, layer=1)
+            
+            if not reschedule_result.success:
+                db.rollback()
+                return SchedulingResult(
+                    success=False,
+                    task_id=task.id,
+                    slot_start=fixed_start,
+                    slot_end=fixed_end,
+                    displaced_tasks=[],
+                    message=f"Cannot displace {displaced_id}: cannot be rescheduled",
+                )
+            
+            new_change = ScheduleChange(
+                task_id=displaced_id,
+                change_type="move",
+                old_slot_start=old_start,
+                old_slot_end=old_end,
+                new_slot_start=reschedule_result.slot_start,
+                new_slot_end=reschedule_result.slot_end,
+            )
+            db.add(new_change)
+            displaced_ids.append(displaced_id)
+        else:
+            logger.warning(f"Task {displaced_id} not found for displacement")
     
     slot = ProvisionalSlot(
         task_id=task.id,
@@ -249,14 +274,12 @@ def _schedule_fixed_task(task: Task, db: Session) -> SchedulingResult:
     
     logger.info(f"Fixed task scheduled at {fixed_start}")
     
-    displaced = [t.task_id for t in overlapping]
-    
     return SchedulingResult(
         success=True,
         task_id=task.id,
         slot_start=fixed_start,
         slot_end=fixed_end,
-        displaced_tasks=displaced,
+        displaced_tasks=displaced_ids,
         message="Task scheduled at fixed time",
     )
 
@@ -280,7 +303,8 @@ def _schedule_flexible_task(task: Task, db: Session) -> SchedulingResult:
             message="No viable time windows",
         )
     
-    slots = _generate_slots(windows)
+    duration = task.duration or 30
+    slots = _generate_slots(windows, duration)
     if not slots:
         return SchedulingResult(
             success=False,
@@ -438,9 +462,15 @@ def _subtract_dead_zones(
 # ============================================================================
 
 def _generate_slots(
-    windows: Dict[str, List[TimeWindow]]
+    windows: Dict[str, List[TimeWindow]],
+    duration_minutes: int,
 ) -> List[datetime]:
-    """Split windows into 15-min slot start times."""
+    """
+    Split windows into 15-min slot start times.
+    
+    IMPORTANT: Accounts for task duration.
+    Last valid slot start = window_end - duration (task must complete within window)
+    """
     slots: List[datetime] = []
     
     for date_str, ws in windows.items():
@@ -448,11 +478,17 @@ def _generate_slots(
             start_minutes = _parse_time(window.start_time)
             end_minutes = _parse_time(window.end_time)
             
+            window_end_total_minutes = end_minutes[0] * 60 + end_minutes[1]
+            duration_total_minutes = _round_up_to_interval(duration_minutes)
+            valid_end_minutes = window_end_total_minutes - duration_total_minutes
+            
+            if valid_end_minutes <= 0:
+                continue
+            
             current_hour = start_minutes[0]
             current_minute = start_minutes[1]
             
-            while (current_hour < end_minutes[0] or 
-                   (current_hour == end_minutes[0] and current_minute < end_minutes[1])):
+            while (current_hour * 60 + current_minute) <= valid_end_minutes:
                 slot_dt = datetime.strptime(f"{date_str} {current_hour:02d}:{current_minute:02d}", "%Y-%m-%d %H:%M")
                 slots.append(slot_dt)
                 
@@ -478,10 +514,10 @@ def _score_slot(
     """Calculate total score for a slot."""
     score = BASE_SLOT_SCORE
     
-    score += _get_location_boost(slot_start, task, db)
+    score += _get_location_boost(slot_start, slot_end, task, db)
     score += _get_free_slot_boost(slot_start, slot_end, db)
     score += _get_time_score_boost(slot_start, task, db)
-    score += _get_urgency_boost(slot_start, slot_end, task, db)
+    score += _get_urgency_boost(slot_start, task)
     score += _get_continuity_boost(slot_start, db)
     score -= _get_overlap_penalty(slot_start, slot_end, db)
     
@@ -490,6 +526,7 @@ def _score_slot(
 
 def _get_location_boost(
     slot_start: datetime,
+    slot_end: datetime,
     task: Task,
     db: Session,
 ) -> float:
@@ -505,8 +542,8 @@ def _get_location_boost(
     ).order_by(ProvisionalSlot.end.desc()).first()
     
     after = db.query(ProvisionalSlot).filter(
-        ProvisionalSlot.start >= slot_start,
-        ProvisionalSlot.start < slot_start + timedelta(hours=2),
+        ProvisionalSlot.start >= slot_end,
+        ProvisionalSlot.start < slot_end + timedelta(hours=2),
     ).order_by(ProvisionalSlot.start).first()
     
     continuity_count = 0
@@ -582,28 +619,37 @@ def _get_time_score_boost(
 
 def _get_urgency_boost(
     slot_start: datetime,
-    slot_end: datetime,
     task: Task,
-    db: Session,
 ) -> float:
-    """Calculate urgency boost (earlier slots get higher boost)."""
-    total_minutes = HORIZON_DAYS * 24 * 60
-    slot_minutes = (slot_start - datetime.utcnow().replace(hour=0, minute=0)).total_seconds() / 60
+    """Calculate urgency boost (earlier slots get higher boost).
     
-    quarter = slot_minutes / total_minutes
+    Formula: boost = URGENCY_AMPLIFIER * urgency_value * (1 - position_ratio)
+    Earlier slots (low position_ratio) → higher boost
+    Later slots (high position_ratio) → lower boost
+    
+    Args:
+        slot_start: When the slot begins
+        task: Task with urgency and importance values
+    """
+    total_minutes = HORIZON_DAYS * 24 * 60
+    
+    # Calculate minutes from now to slot_start (includes days automatically)
+    now = datetime.utcnow()
+    
+    # Slot cannot be in the past - return negative score
+    if slot_start <= now:
+        logger.warning(f"Slot {slot_start} is in the past (now: {now})")
+        return -1.0
+    
+    slot_minutes = (slot_start - now).total_seconds() / 60
+    
+    # Position ratio: 0.0 = start of horizon, 1.0 = end of horizon
+    position_ratio = slot_minutes / total_minutes
     
     urgency_value = (task.urgency or 0.5) * 0.5 + (task.importance or 0.5) * 0.5
     
-    if quarter < 0.25:
-        modifier = 1.0
-    elif quarter < 0.50:
-        modifier = 0.7
-    elif quarter < 0.75:
-        modifier = 0.4
-    else:
-        modifier = 0.0
-    
-    return URGENCY_AMPLIFIER * urgency_value * modifier
+    # Linear formula: higher boost for earlier slots
+    return URGENCY_AMPLIFIER * urgency_value * (1 - position_ratio)
 
 
 def _get_continuity_boost(
@@ -652,11 +698,34 @@ def _get_overlap_penalty(
 # DISPLACEMENT HANDLER
 # ============================================================================
 
+def _try_reschedule_task(task: Task, db: Session, layer: int = 1) -> SchedulingResult:
+    """
+    Try to reschedule a displaced task.
+    
+    Uses full scheduling pipeline but with layer limit.
+    """
+    if layer > MAX_DISPLACEMENT_LAYERS:
+        return SchedulingResult(
+            success=False,
+            task_id=task.id,
+            slot_start=None,
+            slot_end=None,
+            displaced_tasks=[],
+            message=f"Max displacement layers ({MAX_DISPLACEMENT_LAYERS}) exceeded",
+        )
+    
+    if task.fixed_time:
+        return _schedule_fixed_task(task, db)
+    else:
+        return _schedule_flexible_task(task, db)
+
+
 def _handle_displacement(
     task: Task,
     slot_start: datetime,
     slot_end: datetime,
     db: Session,
+    layer: int = 1,
 ) -> SchedulingResult:
     """Try to place task in slot, displacing if needed."""
     overlapping = _get_overlapping_tasks(slot_start, slot_end, db)
@@ -689,18 +758,39 @@ def _handle_displacement(
                 message=f"Cannot displace {existing.task_id}: value threshold not met",
             )
         
-        displaced_ids.append(existing.task_id)
+        displaced_task = db.query(Task).filter(Task.id == existing.task_id).first()
+        if not displaced_task:
+            logger.warning(f"Task {existing.task_id} not found for displacement")
+            continue
+        
+        old_start = existing.start
+        old_end = existing.end
+        
         db.delete(existing)
         
-        change = ScheduleChange(
+        reschedule_result = _try_reschedule_task(displaced_task, db, layer=layer + 1)
+        
+        if not reschedule_result.success:
+            db.rollback()
+            return SchedulingResult(
+                success=False,
+                task_id=task.id,
+                slot_start=slot_start,
+                slot_end=slot_end,
+                displaced_tasks=displaced_ids,
+                message=f"Cannot displace {existing.task_id}: cannot be rescheduled",
+            )
+        
+        new_change = ScheduleChange(
             task_id=existing.task_id,
             change_type="move",
-            old_slot_start=existing.start,
-            old_slot_end=existing.end,
-            new_slot_start=slot_start,
-            new_slot_end=slot_end,
+            old_slot_start=old_start,
+            old_slot_end=old_end,
+            new_slot_start=reschedule_result.slot_start,
+            new_slot_end=reschedule_result.slot_end,
         )
-        db.add(change)
+        db.add(new_change)
+        displaced_ids.append(existing.task_id)
     
     return _place_task(task, slot_start, slot_end, db, displaced_ids)
 
@@ -721,6 +811,17 @@ def _place_task(
     displaced_ids: List[UUID],
 ) -> SchedulingResult:
     """Place task in provisional schedule."""
+    # Check if task already exists in provisional_schedule
+    existing = db.query(ProvisionalSlot).filter(
+        ProvisionalSlot.task_id == task.id
+    ).first()
+    
+    change_type = "move" if existing else "insert"
+    
+    # Remove old slot if exists (task was rescheduled)
+    if existing:
+        db.delete(existing)
+    
     slot = ProvisionalSlot(
         task_id=task.id,
         start=slot_start,
@@ -733,7 +834,9 @@ def _place_task(
     
     change = ScheduleChange(
         task_id=task.id,
-        change_type="insert" if not displaced_ids else "move",
+        change_type=change_type,
+        old_slot_start=existing.start if existing else None,
+        old_slot_end=existing.end if existing else None,
         new_slot_start=slot_start,
         new_slot_end=slot_end,
     )
@@ -753,6 +856,31 @@ def _place_task(
 # ============================================================================
 # UTILITIES
 # ============================================================================
+
+def _calculate_fixed_task_end(fixed_start: datetime, duration_minutes: int) -> datetime:
+    """
+    Calculate end time for fixed task.
+    
+    Unlike regular tasks, fixed tasks calculate end from ORIGINAL start time,
+    then normalize both start and end to slot boundaries.
+    
+    Example:
+        fixed_start = 13:40, duration = 30 min
+        Raw end = 13:40 + 30 = 14:10
+        Normalize end: 14:10 → 14:15 (round up to interval)
+        Result: 14:15
+    """
+    raw_end = fixed_start + timedelta(minutes=duration_minutes)
+    return _round_up_to_interval_dt(raw_end)
+
+
+def _round_up_to_interval_dt(dt: datetime) -> datetime:
+    """Round datetime UP to nearest interval."""
+    total_minutes = dt.hour * 60 + dt.minute
+    rounded = ((total_minutes + SLOT_INTERVAL_MINUTES - 1) // SLOT_INTERVAL_MINUTES) * SLOT_INTERVAL_MINUTES
+    if rounded >= 24 * 60:
+        return dt.replace(hour=23, minute=59, second=59, microsecond=0)
+    return dt.replace(hour=rounded // 60, minute=rounded % 60, second=0, microsecond=0)
 
 def _get_overlapping_tasks(
     slot_start: datetime,
