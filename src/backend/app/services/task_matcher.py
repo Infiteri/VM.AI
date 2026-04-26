@@ -3,6 +3,7 @@ from sentence_transformers import SentenceTransformer
 from sqlalchemy.orm import Session
 
 from app.models.statistics import TaskStatistics
+from app.schemas.task_matcher import MatchResult
 from app.core.logging_config import setup_logging
 
 logger = setup_logging()
@@ -52,14 +53,15 @@ class TaskMatcher:
             self._load_model()
         return self._model
 
-    def find_match(self, db: Session, task_name: str) -> dict:
+    def find_match(self, db: Session, task_name: str) -> MatchResult:
         """
         Compares a new task name against existing tasks in the database.
 
-        Returns a dictionary with:
-        - associated_id: UUID of the matched task (or None)
-        - association_status: "same", "similar", or "none"
-        - name_vector: The 384-dim vector of the new name (for storage)
+        Returns:
+            MatchResult with:
+            - associated_id: UUID of the matched task (or None)
+            - association_status: "same", "similar", or "none"
+            - name_vector: The 384-dim vector of the new name (for storage)
         """
         logger.info(f"Starting match for: '{task_name}'")
 
@@ -77,11 +79,11 @@ class TaskMatcher:
 
         if exact_match:
             logger.info("Found Exact Match!")
-            return {
-                "associated_id": exact_match.id,
-                "association_status": "same",
-                "name_vector": exact_match.task_name_vector,  # Reuse existing vector
-            }
+            return MatchResult(
+                associated_id=exact_match.id,
+                association_status="same",
+                name_vector=exact_match.task_name_vector,  # Reuse existing vector
+            )
 
         # ---------------------------------------------------------
         # 2. Semantic Similarity (The AI Path)
@@ -97,11 +99,11 @@ class TaskMatcher:
             new_vector = self.model.encode(
                 task_name, normalize_embeddings=True
             ).tolist()
-            return {
-                "associated_id": None,
-                "association_status": "none",
-                "name_vector": new_vector,
-            }
+            return MatchResult(
+                associated_id=None,
+                association_status="none",
+                name_vector=new_vector,
+            )
 
         # Encode the NEW task name into a vector (384 dimensions)
         # normalize_embeddings=True makes the vector length 1.0, simplifying cosine similarity
@@ -136,11 +138,11 @@ class TaskMatcher:
 
         logger.info(f"Final Status: {status}")
 
-        return {
-            "associated_id": best_id if status != "none" else None,
-            "association_status": status,
-            "name_vector": new_vector.tolist(),  # Convert numpy array to list for DB storage
-        }
+        return MatchResult(
+            associated_id=best_id if status != "none" else None,
+            association_status=status,
+            name_vector=new_vector.tolist(),  # Convert numpy array to list for DB storage
+        )
 
 
 # Create the single instance that the rest of the app will use

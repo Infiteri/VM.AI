@@ -15,6 +15,20 @@ from app.models.category import Category
 from app.services.task_matcher import task_matcher
 from app.core.logging_config import setup_logging
 
+# ============================================================================
+# SCHEMAS - Pydantic schemas for validation gates
+# ============================================================================
+from app.schemas.enrichment import (
+    TaskPayloadComputed,
+    TaskPayloadComputedWithRefs,
+)
+from app.schemas.nlp import (
+    NlpAddPayload,
+    NlpPayloadField,
+)
+from app.schemas.task_matcher import MatchResult
+from app.schemas.task import TaskPayload
+
 logger = setup_logging()
 
 
@@ -34,23 +48,36 @@ class EnrichmentService:
     """
 
     # ================================================================
-    # MAIN PUBLIC METHODS
+    # MAIN PUBLIC METHODS (with Validation Gates)
     # ================================================================
+    #
+    # Integration approach (Option B):
+    # - Input: Accept both Pydantic schemas (recommended) and dicts (legacy)
+    # - Internal: Convert to dict for existing logic
+    # - Output: Return dicts (not schemas - to not break callers)
+    #
+    # The schemas are imported for documentation and optional type hints:
+    # - NlpAddPayload: Input for predict_nlp_add()
+    # - MatchResult: Input for predict_nlp_add(), commit_manual()
+    # - TaskPayload: Input for commit_from_draft(), commit_manual(), merge_nlp_modify(), update_task()
+    # - TaskPayloadComputed: Output for update_task()
+    # - TaskPayloadComputedWithRefs: Output for commit_from_draft(), commit_manual()
+    # ============================================================================
 
     def predict_nlp_add(
         self,
         db: Session,
-        nlp_payload: dict[str, dict[str, Any]],
-        match_result: dict[str, Any],
+        nlp_payload: NlpAddPayload | dict[str, dict[str, Any]],
+        match_result: MatchResult | dict[str, Any],
     ) -> Tuple[dict[str, Any], UUID]:
         """
         NLP add flow (Phase 1 only).
 
-        Input:
-            nlp_payload: Task fields with {value, predicted} structure
-            match_result: Result from task_matcher.find_match()
+        Input (Validation Gate):
+            nlp_payload: NlpAddPayload or dict with {value, predicted} structure
+            match_result: MatchResult or dict from task_matcher.find_match()
 
-        Returns:
+        Returns (internal dict - not schema):
             (clean_task_payload, draft_id)
             - clean_task_payload: TaskPayload with resolved dates, overwritten fields
             - draft_id: UUID of saved draft
@@ -60,9 +87,33 @@ class EnrichmentService:
             2. Determine overwrite map based on match status + datetime deadline
             3. Overwrite predicted fields with historical data
             4. Save to draft table
+
+        Integration Notes:
+            - Accept NlpAddPayload schema or legacy dict
+            - Accept MatchResult schema or legacy dict
+            - Returns dict for backward compatibility with callers
         """
         logger.info(f"Enrichment: predict_nlp_add started")
-        logger.debug(f"  Input NLP payload keys: {list(nlp_payload.keys())}")
+
+        # ============================================================================
+        # CONVERSION: Schema to dict (Validation Gate)
+        # ============================================================================
+        # Convert schemas to dicts for internal processing
+        if hasattr(nlp_payload, 'model_dump'):
+            # It's a NlpAddPayload schema - convert to dict
+            nlp_payload_dict = {}
+            for field, field_obj in nlp_payload.model_dump().items():
+                if isinstance(field_obj, NlpPayloadField):
+                    nlp_payload_dict[field] = field_obj.model_dump()
+                else:
+                    nlp_payload_dict[field] = {"value": field_obj, "predicted": True}
+            nlp_payload = nlp_payload_dict
+
+        if hasattr(match_result, 'model_dump'):
+            # It's a MatchResult schema - convert to dict
+            match_result = match_result.model_dump()
+
+        logger.debug(f"  Input NLP payload keys: {list(nlp_payload.keys())}") 
         logger.debug(f"  Match status: {match_result.get('association_status')}")
 
         # First parse dates (flat structure needed for _get_overwrite_map)
@@ -92,31 +143,45 @@ class EnrichmentService:
 
         logger.info(f"Enrichment: predict_nlp_add complete. Draft ID: {draft_id}")
         logger.debug(f"  Output task keys: {list(enriched_task.keys())}")
-        return enriched_task, draft_id
+
+        # Convert output to schema (TaskPayload - no computed, no refs)
+        output_schema = self._convert_output(enriched_task, with_computed=False, with_refs=False)
+        return output_schema, draft_id
 
     def commit_from_draft(
         self,
         db: Session,
-        request_task: dict[str, Any],
+        request_task: TaskPayloadComputedWithRefs | dict[str, Any],
         draft_id: UUID,
     ) -> dict[str, Any]:
         """
         Draft commit flow (Phase 2 only).
 
-        Input:
-            request_task: Task data from frontend request (source of truth)
+        Input (Validation Gate):
+            request_task: TaskPayloadComputedWithRefs or dict from frontend
             draft_id: UUID of saved draft
 
-        Returns:
+        Returns (internal dict):
             full_task_data: Complete task data with internal refs, ready for DB
+            - Base fields + computed (urgency, value) + internal refs
 
         Steps:
             1. Load draft (including match_result) from DB
             2. Merge request with draft (request priority)
             3. Compute urgency/value
             4. Add internal refs (loaded from draft)
+
+        Integration Notes:
+            - Accept TaskPayloadComputedWithRefs schema or legacy dict
+            - Returns dict for backward compatibility
         """
         logger.info(f"Enrichment: commit_from_draft started for draft '{draft_id}'")
+
+        # ============================================================================
+        # CONVERSION: Schema to dict (Validation Gate)
+        # ============================================================================
+        if hasattr(request_task, 'model_dump'):
+            request_task = request_task.model_dump()
 
         draft_data = self._draft_load(db, draft_id)
         if not draft_data:
@@ -137,31 +202,48 @@ class EnrichmentService:
             f"Status: {match_result.get('association_status')}"
         )
         logger.debug(f"  full_task_data keys: {list(full_task_data.keys())}")
-        return full_task_data
+
+        # Convert output to schema (TaskPayloadComputedWithRefs - with computed + refs)
+        output_schema = self._convert_output(full_task_data, with_computed=True, with_refs=True)
+        return output_schema
 
     def commit_manual(
         self,
         db: Session,
-        task_payload: dict[str, Any],
-        match_result: dict[str, Any],
+        task_payload: TaskPayload | dict[str, Any],
+        match_result: MatchResult | dict[str, Any],
     ) -> dict[str, Any]:
         """
         Manual creation flow (Phase 1 + 2 combined).
 
-        Input:
-            task_payload: User-filled task data (TaskPayload, all explicit)
-            match_result: Result from task_matcher.find_match()
+        Input (Validation Gate):
+            task_payload: TaskPayload or dict (all explicit fields)
+            match_result: MatchResult or dict from task_matcher.find_match()
 
-        Returns:
+        Returns (internal dict):
             full_task_data: Complete task data with internal refs, ready for DB
+            - Base fields + computed (urgency, value) + internal refs
 
         Steps:
             1. Compute urgency/value (no overwrite - all fields explicit)
             2. Add internal refs
+
+        Integration Notes:
+            - Accept TaskPayload/MatchResult schemas or legacy dicts
+            - Returns dict for backward compatibility
         """
         logger.info(
             f"Enrichment: commit_manual started for '{task_payload.get('name')}'"
         )
+
+        # ============================================================================
+        # CONVERSION: Schema to dict (Validation Gate)
+        # ============================================================================
+        if hasattr(task_payload, 'model_dump'):
+            task_payload = task_payload.model_dump()
+
+        if hasattr(match_result, 'model_dump'):
+            match_result = match_result.model_dump()
 
         full_task_data = self._compute(task_payload)
 
@@ -172,59 +254,89 @@ class EnrichmentService:
             f"Value: {full_task_data.get('value')}, "
             f"Status: {match_result.get('association_status')}"
         )
-        return full_task_data
+
+        # Convert output to schema (TaskPayloadComputedWithRefs - with computed + refs)
+        output_schema = self._convert_output(full_task_data, with_computed=True, with_refs=True)
+        return output_schema
 
     def merge_nlp_modify(
         self,
         db: Session,
-        existing_task: dict[str, Any],
-        changed_fields: dict[str, Any],
+        existing_task: TaskPayload | dict[str, Any],
+        changed_fields: dict[str, Any],  # Keep as dict per user request
     ) -> dict[str, Any]:
         """
         NLP modify flow.
 
-        Input:
-            existing_task: Current task data from DB
-            changed_fields: Fields changed by NLP (from parse/modify)
+        Input (Validation Gate):
+            existing_task: TaskPayload or dict (current task from DB)
+            changed_fields: dict (fields changed by NLP parse/modify)
 
-        Returns:
+        Returns (internal dict):
             merged_task: Task with merged changes and resolved dates
 
         Steps:
             1. Merge changed fields with existing task
             2. Parse date strings
+
+        Integration Notes:
+            - Accept TaskPayload schema or legacy dict
+            - changed_fields stays as dict (dynamic/partial)
+            - Returns dict for backward compatibility
         """
         logger.info(f"Enrichment: merge_nlp_modify started")
+
+        # ============================================================================
+        # CONVERSION: Schema to dict (Validation Gate)
+        # ============================================================================
+        if hasattr(existing_task, 'model_dump'):
+            existing_task = existing_task.model_dump()
 
         merged_task = self._change_merge(existing_task, changed_fields)
 
         parsed_task = self._date_parse(merged_task)
 
         logger.info(f"Enrichment: merge_nlp_modify complete")
-        return parsed_task
+
+        # Convert output to schema (TaskPayload - no computed, no refs)
+        output_schema = self._convert_output(parsed_task, with_computed=False, with_refs=False)
+        return output_schema
 
     def update_task(
         self,
         db: Session,
-        task_payload: dict[str, Any],
+        task_payload: TaskPayload | dict[str, Any],
     ) -> dict[str, Any]:
         """
         Update task flow - recalculates computed fields.
 
-        Input:
-            task_payload: Updated task data
+        Input (Validation Gate):
+            task_payload: TaskPayload or dict (updated task data)
 
-        Returns:
+        Returns (internal dict):
             task_with_computed: Task with recalculated urgency/value
+
+        Integration Notes:
+            - Accept TaskPayload schema or legacy dict
+            - Returns dict for backward compatibility
         """
         logger.info(f"Enrichment: update_task started for '{task_payload.get('name')}'")
+
+        # ============================================================================
+        # CONVERSION: Schema to dict (Validation Gate)
+        # ============================================================================
+        if hasattr(task_payload, 'model_dump'):
+            task_payload = task_payload.model_dump()
 
         task_with_computed = self._compute(task_payload)
 
         logger.info(
             f"Enrichment: update_task complete. Value: {task_with_computed.get('value')}"
         )
-        return task_with_computed
+
+        # Convert output to schema (TaskPayloadComputed - with computed, no refs)
+        output_schema = self._convert_output(task_with_computed, with_computed=True, with_refs=False)
+        return output_schema
 
     # ================================================================
     # HELPER: EXTRACT FIELD
@@ -1036,6 +1148,34 @@ class EnrichmentService:
         """
         raw_value = (importance * 0.4) + (urgency * 0.4) + (difficulty * 0.2)
         return round(raw_value * completion_rate, 2)
+
+    # ============================================================================
+    # OUTPUT CONVERSION - Schema output for all public methods
+    # ============================================================================
+
+    def _convert_output(
+        self,
+        task_dict: dict[str, Any],
+        with_computed: bool = False,
+        with_refs: bool = False,
+    ) -> TaskPayload | TaskPayloadComputed | TaskPayloadComputedWithRefs:
+        """
+        Convert internal dict output to Pydantic schema.
+
+        Args:
+            task_dict: Internal task dict
+            with_computed: If True, include urgency and value fields
+            with_refs: If True, include internal refs (task_statistics_id, name_vector, association_status)
+
+        Returns:
+            TaskPayload, TaskPayloadComputed, or TaskPayloadComputedWithRefs
+        """
+        if with_refs:
+            return TaskPayloadComputedWithRefs(**task_dict)
+        elif with_computed:
+            return TaskPayloadComputed(**task_dict)
+        else:
+            return TaskPayload(**task_dict)
 
 
 enrichment_service = EnrichmentService()
