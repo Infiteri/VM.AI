@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 
 from app.core.database import get_db
+from app.core.logging_config import setup_logging
 from app.schemas.task import (
     TaskCreateRequest,
     TaskUpdateRequest,
@@ -16,8 +17,12 @@ from app.schemas.task import (
     ParseModifyResponse,
     UnscheduledResponse,
 )
+from app.services.task_matcher import task_matcher
+from app.services.enrichment import enrichment_service
+from app.utils.task_saver import save_commited_task
 
 router = APIRouter()
+logger = setup_logging()
 
 
 # ---------------------------------------------------------
@@ -93,21 +98,36 @@ def create_task(
     """
     POST /tasks
     Creates a new task in the database.
+
+    Flow:
+        If draft_id is present:
+            1. Fetch draft from DB.
+            2. Update draft data with body.task edits.
+            3. Save to main DB, delete draft.
+        Else (Manual Creation):
+            1. Run Task Matching & Enrichment pipeline on body.task.
+            2. Save to main DB (TODO: implement later).
     """
-    # TODO: Logic Fork
-    # If body.draft_id is present:
-    #   1. Fetch draft from DB.
-    #   2. Update draft data with body.task edits.
-    #   3. Save to main DB, delete draft.
-    # Else (Manual Creation):
-    #   1. Run Task Matching & Enrichment pipeline on body.task.
-    #   2. Save to main DB.
+    if body.draft_id:
+        # TODO: Handle draft commit later
+        pass
+    else:
+        match_result = task_matcher.find_match(db, body.task.name)
+        enriched = enrichment_service.commit_manual(db, body.task, match_result)
+
+    saved = save_commited_task(db, enriched)
+
+    if not saved:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to save task to database"
+        )
 
     return TaskResponse(
         success=True,
-        task_id=UUID("550e8400-e29b-41d4-a716-446655440001"),
+        task_id=saved.id,
         status="unscheduled",
-        message="Task created successfully (stub)",
+        message="Task enrichment complete - saved to DB",
     )
 
 

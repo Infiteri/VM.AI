@@ -69,7 +69,7 @@ class EnrichmentService:
         db: Session,
         nlp_payload: NlpAddPayload | dict[str, dict[str, Any]],
         match_result: MatchResult | dict[str, Any],
-    ) -> Tuple[dict[str, Any], UUID]:
+    ) -> Tuple[TaskPayload, UUID]:
         """
         NLP add flow (Phase 1 only).
 
@@ -77,7 +77,7 @@ class EnrichmentService:
             nlp_payload: NlpAddPayload or dict with {value, predicted} structure
             match_result: MatchResult or dict from task_matcher.find_match()
 
-        Returns (internal dict - not schema):
+        Returns:
             (clean_task_payload, draft_id)
             - clean_task_payload: TaskPayload with resolved dates, overwritten fields
             - draft_id: UUID of saved draft
@@ -153,7 +153,7 @@ class EnrichmentService:
         db: Session,
         request_task: TaskPayloadComputedWithRefs | dict[str, Any],
         draft_id: UUID,
-    ) -> dict[str, Any]:
+    ) -> TaskPayloadComputedWithRefs:
         """
         Draft commit flow (Phase 2 only).
 
@@ -161,7 +161,7 @@ class EnrichmentService:
             request_task: TaskPayloadComputedWithRefs or dict from frontend
             draft_id: UUID of saved draft
 
-        Returns (internal dict):
+        Returns:
             full_task_data: Complete task data with internal refs, ready for DB
             - Base fields + computed (urgency, value) + internal refs
 
@@ -212,7 +212,7 @@ class EnrichmentService:
         db: Session,
         task_payload: TaskPayload | dict[str, Any],
         match_result: MatchResult | dict[str, Any],
-    ) -> dict[str, Any]:
+    ) -> TaskPayloadComputedWithRefs:
         """
         Manual creation flow (Phase 1 + 2 combined).
 
@@ -220,7 +220,7 @@ class EnrichmentService:
             task_payload: TaskPayload or dict (all explicit fields)
             match_result: MatchResult or dict from task_matcher.find_match()
 
-        Returns (internal dict):
+        Returns:
             full_task_data: Complete task data with internal refs, ready for DB
             - Base fields + computed (urgency, value) + internal refs
 
@@ -232,18 +232,18 @@ class EnrichmentService:
             - Accept TaskPayload/MatchResult schemas or legacy dicts
             - Returns dict for backward compatibility
         """
-        logger.info(
-            f"Enrichment: commit_manual started for '{task_payload.get('name')}'"
-        )
-
         # ============================================================================
-        # CONVERSION: Schema to dict (Validation Gate)
+        # CONVERSION: Schema to dict (Validation Gate) - MUST be first!
         # ============================================================================
         if hasattr(task_payload, 'model_dump'):
             task_payload = task_payload.model_dump()
 
         if hasattr(match_result, 'model_dump'):
             match_result = match_result.model_dump()
+
+        logger.info(
+            f"Enrichment: commit_manual started for '{task_payload.get('name')}'"
+        )
 
         full_task_data = self._compute(task_payload)
 
@@ -264,7 +264,7 @@ class EnrichmentService:
         db: Session,
         existing_task: TaskPayload | dict[str, Any],
         changed_fields: dict[str, Any],  # Keep as dict per user request
-    ) -> dict[str, Any]:
+    ) -> TaskPayload:
         """
         NLP modify flow.
 
@@ -272,7 +272,7 @@ class EnrichmentService:
             existing_task: TaskPayload or dict (current task from DB)
             changed_fields: dict (fields changed by NLP parse/modify)
 
-        Returns (internal dict):
+        Returns:
             merged_task: Task with merged changes and resolved dates
 
         Steps:
@@ -306,27 +306,26 @@ class EnrichmentService:
         self,
         db: Session,
         task_payload: TaskPayload | dict[str, Any],
-    ) -> dict[str, Any]:
+    ) -> TaskPayloadComputed:
         """
         Update task flow - recalculates computed fields.
 
         Input (Validation Gate):
             task_payload: TaskPayload or dict (updated task data)
 
-        Returns (internal dict):
+        Returns:
             task_with_computed: Task with recalculated urgency/value
 
         Integration Notes:
             - Accept TaskPayload schema or legacy dict
-            - Returns dict for backward compatibility
         """
-        logger.info(f"Enrichment: update_task started for '{task_payload.get('name')}'")
-
         # ============================================================================
-        # CONVERSION: Schema to dict (Validation Gate)
+        # CONVERSION: Schema to dict (Validation Gate) - MUST be first!
         # ============================================================================
         if hasattr(task_payload, 'model_dump'):
             task_payload = task_payload.model_dump()
+
+        logger.info(f"Enrichment: update_task started for '{task_payload.get('name')}'")
 
         task_with_computed = self._compute(task_payload)
 
