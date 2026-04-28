@@ -38,25 +38,3 @@ class NlpAddPayload(BaseModel):
     importance: NlpPayloadField
     fixed_time: NlpPayloadField
     fixed_start: NlpPayloadField
-
-
-# ================================================================================
-# NlpChangedFields - For merge_nlp_modify() input
-# ================================================================================
-
-class NlpChangedFields(BaseModel):
-    """
-    Changed fields for NLP modify flow.
-    Similar structure to NlpAddPayload but all fields are optional.
-    """
-
-    name: Optional[NlpPayloadField] = None
-    start: Optional[NlpPayloadField] = None
-    deadline: Optional[NlpPayloadField] = None
-    difficulty: Optional[NlpPayloadField] = None
-    duration: Optional[NlpPayloadField] = None
-    category: Optional[NlpPayloadField] = None
-    location: Optional[NlpPayloadField] = None
-    importance: Optional[NlpPayloadField] = None
-    fixed_time: Optional[NlpPayloadField] = None
-    fixed_start: Optional[NlpPayloadField] = None
