@@ -1,5 +1,5 @@
 import parsedatetime
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Any, Tuple
 from uuid import UUID, uuid4
 from sqlalchemy.orm import Session
@@ -108,6 +108,11 @@ class EnrichmentService:
                 else:
                     nlp_payload_dict[field] = {"value": field_obj, "predicted": True}
             nlp_payload = nlp_payload_dict
+
+        # ============================================================================
+        # VALIDATION: Validate and set defaults for NLP payload
+        # ============================================================================
+        nlp_payload = self._validate_nlp_add_dict(nlp_payload)
 
         if hasattr(match_result, 'model_dump'):
             # It's a MatchResult schema - convert to dict
@@ -916,6 +921,127 @@ class EnrichmentService:
         result["task_statistics_id"] = match_result.get("associated_id")
         result["name_vector"] = match_result.get("name_vector")
         result["association_status"] = match_result.get("association_status")
+        return result
+
+    # ================================================================
+    # HELPER: VALIDATION FOR NLP ADD PAYLOAD
+    # ================================================================
+
+    def _validate_nlp_add_dict(self, nlp_payload: dict) -> dict:
+        """
+        Validate and set defaults for NLP add payload.
+
+        Rules:
+            1. name=None -> "task"
+            2. start=None and not fixed_time -> current time
+            3. deadline=None and not fixed_time -> 23:59 calculation
+            4. difficulty=None -> 0.5
+            5. duration=None -> 30
+            6. category=None or [] -> []
+            7. location=None -> "home"
+            8. importance=None -> 0.5
+            9. fixed_time=None -> False
+            10. fixed_start=None but fixed_time=True -> fixed_time=False
+
+        Input:
+            nlp_payload: dict with {value, predicted} structure
+
+        Returns:
+            nlp_payload: same structure with validated values
+        """
+        result = nlp_payload.copy()
+        now = datetime.now()
+
+        # Rule 1: name=None -> "task"
+        name_entry = result.get("name", {})
+        name_value = name_entry.get("value") if name_entry else None
+        if name_value is None or name_value == "":
+            result["name"] = {"value": "task", "predicted": True}
+            logger.warning("Validation: name set to 'task' (was None)")
+
+        # Get fixed_time value
+        fixed_time_entry = result.get("fixed_time", {})
+        fixed_time_value = fixed_time_entry.get("value") if fixed_time_entry else False
+        if fixed_time_value is None:
+            fixed_time_value = False
+            result["fixed_time"] = {"value": False, "predicted": True}
+            logger.warning("Validation: fixed_time set to False (was None)")
+
+        # Rule 9: fixed_time=None -> False (already handled above)
+        # Rule 10: fixed_start=None but fixed_time=True -> fixed_time=False
+        if fixed_time_value is True:
+            fixed_start_entry = result.get("fixed_start", {})
+            fixed_start_value = fixed_start_entry.get("value") if fixed_start_entry else None
+            if fixed_start_value is None:
+                result["fixed_time"] = {"value": False, "predicted": True}
+                logger.warning("Validation: fixed_time set to False (fixed_start was None)")
+
+        # Apply rules for non-fixed_time tasks
+        if not fixed_time_value:
+            # Rule 2: start=None -> current time
+            start_entry = result.get("start", {})
+            start_value = start_entry.get("value") if start_entry else None
+            if start_value is None:
+                current_start = now.replace(second=0, microsecond=0)
+                result["start"] = {"value": current_start, "predicted": True}
+                logger.warning("Validation: start set to current time (was None)")
+
+            # Rule 3: deadline=None -> calculate
+            start_for_deadline = result.get("start", {}).get("value") or now
+            if isinstance(start_for_deadline, datetime):
+                start_time = start_for_deadline
+            else:
+                start_time = now
+
+            deadline_entry = result.get("deadline", {})
+            deadline_value = deadline_entry.get("value") if deadline_entry else None
+
+            if deadline_value is None:
+                # If 23:59 - start >= 7 hours, use today's 23:59
+                # Otherwise use tomorrow's 23:59
+                hours_diff = (datetime(2026, 1, 1, 23, 59) - datetime(2026, 1, 1, 9, 0)).seconds / 3600
+                if hours_diff >= 7:
+                    deadline = start_time.replace(hour=23, minute=59, second=0, microsecond=0)
+                else:
+                    deadline = (start_time + timedelta(days=1)).replace(hour=23, minute=59, second=0, microsecond=0)
+                result["deadline"] = {"value": deadline, "predicted": True}
+                logger.warning("Validation: deadline set based on start time (was None)")
+
+        # Rule 4: difficulty=None -> 0.5
+        difficulty_entry = result.get("difficulty", {})
+        difficulty_value = difficulty_entry.get("value") if difficulty_entry else None
+        if difficulty_value is None:
+            result["difficulty"] = {"value": 0.5, "predicted": True}
+            logger.warning("Validation: difficulty set to 0.5 (was None)")
+
+        # Rule 5: duration=None -> 30
+        duration_entry = result.get("duration", {})
+        duration_value = duration_entry.get("value") if duration_entry else None
+        if duration_value is None:
+            result["duration"] = {"value": 30, "predicted": True}
+            logger.warning("Validation: duration set to 30 (was None)")
+
+        # Rule 6: category=None or [] -> []
+        category_entry = result.get("category", {})
+        category_value = category_entry.get("value") if category_entry else None
+        if category_value is None or (isinstance(category_value, list) and len(category_value) == 0):
+            result["category"] = {"value": [], "predicted": True}
+            logger.warning("Validation: category set to [] (was None or empty)")
+
+        # Rule 7: location=None -> "home"
+        location_entry = result.get("location", {})
+        location_value = location_entry.get("value") if location_entry else None
+        if location_value is None or location_value == "":
+            result["location"] = {"value": "home", "predicted": True}
+            logger.warning("Validation: location set to 'home' (was None)")
+
+        # Rule 8: importance=None -> 0.5
+        importance_entry = result.get("importance", {})
+        importance_value = importance_entry.get("value") if importance_entry else None
+        if importance_value is None:
+            result["importance"] = {"value": 0.5, "predicted": True}
+            logger.warning("Validation: importance set to 0.5 (was None)")
+
         return result
 
     # ================================================================

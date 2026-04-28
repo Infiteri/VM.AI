@@ -38,25 +38,41 @@ def _convert_value_to_type(field: str, value: Any) -> Any:
     if value is None:
         return None
 
+    # difficulty: string 0.0-1.0 -> float
     if field == "difficulty" and isinstance(value, str):
         try:
             return float(value)
         except (ValueError, TypeError):
             return 0.5
 
+    # importance: string 0.0-1.0 -> float
     if field == "importance" and isinstance(value, str):
         try:
             return float(value)
         except (ValueError, TypeError):
             return 0.5
 
+    # duration: string minutes -> int
     if field == "duration" and isinstance(value, str):
         try:
             return int(value)
         except (ValueError, TypeError):
             return 30
 
-    if field in ("fixed_time",):
+    # category: string -> list of strings
+    if field == "category":
+        if isinstance(value, list):
+            return value if value else []
+        if isinstance(value, str):
+            return [value] if value else []
+        return []
+
+    # location: keep as string (or None)
+    if field == "location":
+        return value if value else None
+
+    # fixed_time: already bool
+    if field == "fixed_time":
         return bool(value) if value is not None else False
 
     return value if value is not None else None
