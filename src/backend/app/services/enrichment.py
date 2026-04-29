@@ -267,7 +267,7 @@ class EnrichmentService:
         db: Session,
         existing_task: TaskPayload | dict[str, Any],
         changed_fields: dict[str, Any],  # Keep as dict per user request
-    ) -> TaskPayload:
+    ) -> TaskPayload | None:
         """
         NLP modify flow.
 
@@ -1235,7 +1235,6 @@ class EnrichmentService:
             if value is not None:
                 merged[key] = value
 
-        logger.debug("Merged NLP changes with existing task")
         return merged
 
     # ================================================================

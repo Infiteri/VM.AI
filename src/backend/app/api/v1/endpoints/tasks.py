@@ -82,22 +82,27 @@ def parse_modify_task(
     POST /tasks/parse/modify
     Parses modification prompts.
     """
-    # TODO: Call NLP Parser Service
+    logger.info(f"Parse modify started: '{body.prompt}'")
 
-    return ParseModifyResponse(
-        task=TaskPayload(
-            name="Modified Task",
-            start=datetime(2026, 4, 19, 9, 0),
-            deadline=datetime(2026, 4, 20, 17, 0),
-            difficulty=0.5,
-            duration=60,
-            category=["study"],
-            location="Home",
-            importance=0.5,
-            fixed_time=False,
-            fixed_start=None,
-        ),
-    )
+    # Step 1: Parse modification
+    changed_fields = parser_service.parse_modify(body.task, body.prompt)
+    if not changed_fields:
+        logger.error("Parser returned None")
+        raise HTTPException(status_code=500, detail="Parser failed to modify task")
+
+    logger.info(f"Parser output: {changed_fields}")
+
+    # Step 2: Merge with existing task
+    merged_task = enrichment_service.merge_nlp_modify(db, body.task, changed_fields)
+    if not merged_task:
+        logger.error("Merge returned None")
+        raise HTTPException(status_code=500, detail="Merge failed")
+
+    logger.debug(f"Merged task: {merged_task.model_dump()}")
+
+    logger.info("Parse modify complete")
+
+    return ParseModifyResponse(task=merged_task)
 
 
 # ---------------------------------------------------------
