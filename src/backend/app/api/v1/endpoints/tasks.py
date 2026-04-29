@@ -20,6 +20,7 @@ from app.schemas.task import (
 from app.services.task_matcher import task_matcher
 from app.services.enrichment import enrichment_service
 from app.utils.task_saver import save_commited_task
+from app.services.parser import parser_service
 
 router = APIRouter()
 logger = setup_logging()
@@ -39,23 +40,37 @@ def parse_add_task(
     POST /tasks/parse/add
     Parses natural language input to extract task fields.
     """
-    # TODO: Call NLP Parser Service
 
-    return ParseAddResponse(
-        draft_id=UUID("00000000-0000-0000-0000-000000000000"),  # Stub UUID
-        task=TaskPayload(
-            name="Example Task",
-            start=datetime(2026, 4, 14, 9, 0),
-            deadline=datetime(2026, 4, 15, 17, 0),
-            difficulty=0.5,
-            duration=60,
-            category=["study"],
-            location="Home",
-            importance=0.5,
-            fixed_time=False,
-            fixed_start=None,
-        ),
-    )
+    logger.info(f"Parse add started: '{body.prompt}'")
+
+    # Step 1: Parse prompt
+    nlp_payload = parser_service.parse_add(body.prompt)
+    if not nlp_payload:
+        logger.error("Parser returned None")
+        raise HTTPException(status_code=500, detail="Parser failed to parse prompt")
+
+    logger.debug(f"Parser output: {nlp_payload.model_dump()}")
+
+    # Step 2: Find match
+    match_result = task_matcher.find_match(db, nlp_payload.name.value)
+    if not match_result:
+        logger.error("Task matcher returned None")
+        raise HTTPException(status_code=500, detail="Task matcher failed")
+
+    logger.debug(f"Match result: {match_result.model_dump()}")
+
+    # Step 3: Enrichment
+    task_payload, draft_id = enrichment_service.predict_nlp_add(db, nlp_payload, match_result)
+
+    if not task_payload or not draft_id:
+        logger.error("Enrichment returned None")
+        raise HTTPException(status_code=500, detail="Enrichment failed")
+
+    logger.debug(f"Enrichment output: {task_payload.model_dump()}")
+
+    logger.info(f"Parse add complete. Draft ID: {draft_id}")
+
+    return ParseAddResponse(task=task_payload, draft_id=draft_id)
 
 
 @router.post("/parse/modify", response_model=ParseModifyResponse)

@@ -102,11 +102,9 @@ class EnrichmentService:
         if hasattr(nlp_payload, 'model_dump'):
             # It's a NlpAddPayload schema - convert to dict
             nlp_payload_dict = {}
-            for field, field_obj in nlp_payload.model_dump().items():
-                if isinstance(field_obj, NlpPayloadField):
-                    nlp_payload_dict[field] = field_obj.model_dump()
-                else:
-                    nlp_payload_dict[field] = {"value": field_obj, "predicted": True}
+            for field_name in NlpAddPayload.model_fields:
+                field_obj = getattr(nlp_payload, field_name)
+                nlp_payload_dict[field_name] = {"value": field_obj.value, "predicted": field_obj.predicted}
             nlp_payload = nlp_payload_dict
 
         # ============================================================================
@@ -958,6 +956,13 @@ class EnrichmentService:
         if name_value is None or name_value == "":
             result["name"] = {"value": "task", "predicted": True}
             logger.warning("Validation: name set to 'task' (was None)")
+        else:
+            # Normalize: capitalize first letter only
+            name_value = str(name_value).strip()
+            if name_value:
+                name_value = name_value[0].upper() + name_value[1:]
+            result["name"] = {"value": name_value, "predicted": name_entry.get("predicted", True)}
+            logger.debug(f"Validation: name normalized to '{name_value}'")
 
         # Get fixed_time value
         fixed_time_entry = result.get("fixed_time", {})
@@ -1027,6 +1032,12 @@ class EnrichmentService:
         if category_value is None or (isinstance(category_value, list) and len(category_value) == 0):
             result["category"] = {"value": [], "predicted": True}
             logger.warning("Validation: category set to [] (was None or empty)")
+        else:
+            # Normalize: lowercase each category
+            if isinstance(category_value, list):
+                category_value = [str(cat).lower().strip() for cat in category_value if cat]
+            result["category"] = {"value": category_value, "predicted": category_entry.get("predicted", True)}
+            logger.debug(f"Validation: category normalized to {category_value}")
 
         # Rule 7: location=None -> "home"
         location_entry = result.get("location", {})
@@ -1034,6 +1045,11 @@ class EnrichmentService:
         if location_value is None or location_value == "":
             result["location"] = {"value": "home", "predicted": True}
             logger.warning("Validation: location set to 'home' (was None)")
+        else:
+            # Normalize: lowercase
+            location_value = str(location_value).lower().strip()
+            result["location"] = {"value": location_value, "predicted": location_entry.get("predicted", True)}
+            logger.debug(f"Validation: location normalized to '{location_value}'")
 
         # Rule 8: importance=None -> 0.5
         importance_entry = result.get("importance", {})
@@ -1064,8 +1080,17 @@ class EnrichmentService:
         for field in date_fields:
             value = result.get(field)
             if isinstance(value, str) and value:
-                parsed = self._parse_date_string(value)
+                parsed, flag = self._parse_date_string(value)
                 if parsed:
+                    # Apply default hours if no time was specified (flag == 1)
+                    # flag = 1: date only (no time)
+                    # flag >= 2: date + time
+                    if flag == 1:
+                        if field == "start":
+                            parsed = parsed.replace(hour=6, minute=0, second=0, microsecond=0)
+                        elif field == "deadline":
+                            parsed = parsed.replace(hour=23, minute=59, second=0, microsecond=0)
+                        logger.debug(f"Applied default time for {field}: {parsed}")
                     result[field] = parsed
                     logger.debug(f"Parsed {field}: '{value}' -> {parsed}")
                 else:
@@ -1074,23 +1099,30 @@ class EnrichmentService:
 
         return result
 
-    def _parse_date_string(self, date_string: str) -> Optional[datetime]:
-        """Parse a date string using parsedatetime with future validation."""
+    def _parse_date_string(self, date_string: str) -> Tuple[Optional[datetime], int]:
+        """
+        Parse a date string using parsedatetime with future validation.
+
+        Returns:
+            (datetime, flag): datetime object and parsedatetime flag
+            - flag = 1: date only (no time specified)
+            - flag >= 2: date AND time specified
+        """
         try:
             cal = parsedatetime.Calendar()
             parsed, flag = cal.parse(date_string)
             if flag:
                 dt = datetime(*parsed[:6])
                 if dt >= datetime.now():
-                    return dt
+                    return dt, flag
                 else:
                     logger.warning(
                         f"Parsed date is in past: '{date_string}' -> {dt.isoformat()}"
                     )
-                    return None
+                    return None, flag
         except Exception as e:
             logger.error(f"Date parsing error: {e}")
-        return None
+        return None, 0
 
     # ================================================================
     # HELPER: DRAFT OPERATIONS
