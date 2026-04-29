@@ -5,6 +5,7 @@ from datetime import datetime
 
 from app.core.database import get_db
 from app.core.logging_config import setup_logging
+from app.models.draft import TaskDraft
 from app.schemas.task import (
     TaskCreateRequest,
     TaskUpdateRequest,
@@ -128,12 +129,65 @@ def create_task(
             1. Run Task Matching & Enrichment pipeline on body.task.
             2. Save to main DB (TODO: implement later).
     """
-    if body.draft_id:
-        # TODO: Handle draft commit later
-        pass
+    logger.info("Starting task commit...")
+    logger.info(f"Request body: {body.model_dump()}")
+    
+    # Normalize incoming TaskPayload
+    body.task.name = str(body.task.name).strip()
+    if body.task.name:
+        body.task.name = body.task.name[0].upper() + body.task.name[1:]
+    
+    body.task.location = str(body.task.location).lower().strip() if body.task.location else "home"
+    
+    if body.task.category:
+        body.task.category = [str(c).lower().strip() for c in body.task.category if c]
     else:
+        body.task.category = []
+    
+    logger.debug(f"Normalized task: {body.task.model_dump()}")
+    
+    enriched = None
+
+    if body.draft_id:
+        logger.info(f"Request body have draft_id: {body.draft_id}")
+        
+        # Check if draft exists in DB
+        draft = db.query(TaskDraft).filter(TaskDraft.id == body.draft_id).first()
+        if not draft:
+            logger.warning(f"Draft not found: {body.draft_id}")
+            raise HTTPException(
+                status_code=404,
+                detail=f"Draft with id {body.draft_id} not found"
+            )
+        
+        enriched = enrichment_service.commit_from_draft(db, body.task, body.draft_id)
+        if not enriched:
+            logger.warning("No output from enrichment")
+            raise HTTPException(
+                status_code=500,
+                detail="The enrichment failded for commit_from_draft"
+            )
+        logger.info(f"Output from commit_from_draft(): {enriched.model_dump()}")  
+    else:
+        logger.info("Request body don't have draft_id")
         match_result = task_matcher.find_match(db, body.task.name)
+        if not match_result:
+            logger.warning("No output from task_matcher")
+            raise HTTPException(
+                status_code=500,
+                detail="The task matching failded"
+            )
+        logger.info(f"Output from find_match(): {match_result.model_dump()}")
         enriched = enrichment_service.commit_manual(db, body.task, match_result)
+        if not enriched:
+            logger.warning("No output from enrichment")
+            raise HTTPException(
+                status_code=500,
+                detail="The enrichment failded for commit_manual"
+            )
+        logger.info(f"Output from commit_manual(): {enriched.model_dump()}")
+
+
 
     saved = save_commited_task(db, enriched)
 

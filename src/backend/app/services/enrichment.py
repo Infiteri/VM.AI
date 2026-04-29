@@ -154,9 +154,9 @@ class EnrichmentService:
     def commit_from_draft(
         self,
         db: Session,
-        request_task: TaskPayloadComputedWithRefs | dict[str, Any],
+        request_task: TaskPayload | dict[str, Any],
         draft_id: UUID,
-    ) -> TaskPayloadComputedWithRefs:
+    ) -> TaskPayloadComputedWithRefs | None:
         """
         Draft commit flow (Phase 2 only).
 
@@ -188,8 +188,8 @@ class EnrichmentService:
 
         draft_data = self._draft_load(db, draft_id)
         if not draft_data:
-            logger.warning(f"Draft {draft_id} not found, using request only")
-            draft_data = {}
+            logger.warning(f"Draft {draft_id} not found, returning none")
+            return None
 
         match_result = draft_data.get("match_result", {})
 
