@@ -54,6 +54,34 @@ class TaskPayload(BaseModel):
                 )
             if self.fixed_start is not None:
                 raise ValueError("If fixed_time is false, fixed_start must be null.")
+        
+        return self
+    
+    @model_validator(mode="after")
+    def check_datetime_validity(self):
+        """
+        Validates that dates are in the future and start < deadline.
+        """
+        now = datetime.now()
+        
+        # Rule: start < deadline
+        if self.start is not None and self.deadline is not None:
+            if self.start >= self.deadline:
+                raise ValueError("start must be before deadline")
+        
+        # Rule: start > now
+        if self.start is not None and self.start <= now:
+            raise ValueError("start must be in the future")
+        
+        # Rule: deadline > now
+        if self.deadline is not None and self.deadline <= now:
+            raise ValueError("deadline must be in the future")
+        
+        # Rule: fixed_start > now (only if fixed_time is true)
+        if self.fixed_time and self.fixed_start is not None:
+            if self.fixed_start <= now:
+                raise ValueError("fixed_start must be in the future")
+        
         return self
 
 
