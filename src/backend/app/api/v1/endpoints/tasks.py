@@ -22,6 +22,7 @@ from app.services.task_matcher import task_matcher
 from app.services.enrichment import enrichment_service
 from app.utils.task_saver import save_commited_task
 from app.services.parser import parser_service
+from app.services.stats_recorder import stats_recorder
 
 router = APIRouter()
 logger = setup_logging()
@@ -41,37 +42,45 @@ def parse_add_task(
     POST /tasks/parse/add
     Parses natural language input to extract task fields.
     """
+    try:
+        logger.info(f"Parse add started: '{body.prompt}'")
 
-    logger.info(f"Parse add started: '{body.prompt}'")
+        # Step 1: Parse prompt
+        nlp_payload = parser_service.parse_add(body.prompt)
+        if not nlp_payload:
+            logger.error("Parser returned None")
+            raise HTTPException(status_code=500, detail="Parser failed to parse prompt")
 
-    # Step 1: Parse prompt
-    nlp_payload = parser_service.parse_add(body.prompt)
-    if not nlp_payload:
-        logger.error("Parser returned None")
-        raise HTTPException(status_code=500, detail="Parser failed to parse prompt")
+        logger.debug(f"Parser output: {nlp_payload.model_dump()}")
 
-    logger.debug(f"Parser output: {nlp_payload.model_dump()}")
+        # Step 2: Find match
+        match_result = task_matcher.find_match(db, nlp_payload.name.value)
+        if not match_result:
+            logger.error("Task matcher returned None")
+            raise HTTPException(status_code=500, detail="Task matcher failed")
 
-    # Step 2: Find match
-    match_result = task_matcher.find_match(db, nlp_payload.name.value)
-    if not match_result:
-        logger.error("Task matcher returned None")
-        raise HTTPException(status_code=500, detail="Task matcher failed")
+        logger.debug(f"Match result: {match_result.model_dump()}")
 
-    logger.debug(f"Match result: {match_result.model_dump()}")
+        # Step 3: Enrichment
+        task_payload, draft_id = enrichment_service.predict_nlp_add(db, nlp_payload, match_result)
 
-    # Step 3: Enrichment
-    task_payload, draft_id = enrichment_service.predict_nlp_add(db, nlp_payload, match_result)
+        if not task_payload or not draft_id:
+            logger.error("Enrichment returned None")
+            raise HTTPException(status_code=500, detail="Enrichment failed")
 
-    if not task_payload or not draft_id:
-        logger.error("Enrichment returned None")
-        raise HTTPException(status_code=500, detail="Enrichment failed")
+        logger.debug(f"Enrichment output: {task_payload.model_dump()}")
 
-    logger.debug(f"Enrichment output: {task_payload.model_dump()}")
+        logger.info(f"Parse add complete. Draft ID: {draft_id}")
 
-    logger.info(f"Parse add complete. Draft ID: {draft_id}")
-
-    return ParseAddResponse(task=task_payload, draft_id=draft_id)
+        return ParseAddResponse(task=task_payload, draft_id=draft_id)
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Parse add failed: {e}")
+        raise HTTPException(status_code=500, detail="Parse add failed")
 
 
 @router.post("/parse/modify", response_model=ParseModifyResponse)
@@ -83,27 +92,36 @@ def parse_modify_task(
     POST /tasks/parse/modify
     Parses modification prompts.
     """
-    logger.info(f"Parse modify started: '{body.prompt}'")
+    try:
+        logger.info(f"Parse modify started: '{body.prompt}'")
 
-    # Step 1: Parse modification
-    changed_fields = parser_service.parse_modify(body.task, body.prompt)
-    if not changed_fields:
-        logger.error("Parser returned None")
-        raise HTTPException(status_code=500, detail="Parser failed to modify task")
+        # Step 1: Parse modification
+        changed_fields = parser_service.parse_modify(body.task, body.prompt)
+        if not changed_fields:
+            logger.error("Parser returned None")
+            raise HTTPException(status_code=500, detail="Parser failed to modify task")
 
-    logger.info(f"Parser output: {changed_fields}")
+        logger.info(f"Parser output: {changed_fields}")
 
-    # Step 2: Merge with existing task
-    merged_task = enrichment_service.merge_nlp_modify(db, body.task, changed_fields)
-    if not merged_task:
-        logger.error("Merge returned None")
-        raise HTTPException(status_code=500, detail="Merge failed")
+        # Step 2: Merge with existing task
+        merged_task = enrichment_service.merge_nlp_modify(db, body.task, changed_fields)
+        if not merged_task:
+            logger.error("Merge returned None")
+            raise HTTPException(status_code=500, detail="Merge failed")
 
-    logger.debug(f"Merged task: {merged_task.model_dump()}")
+        logger.debug(f"Merged task: {merged_task.model_dump()}")
 
-    logger.info("Parse modify complete")
+        logger.info("Parse modify complete")
 
-    return ParseModifyResponse(task=merged_task)
+        return ParseModifyResponse(task=merged_task)
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Parse modify failed: {e}")
+        raise HTTPException(status_code=500, detail="Parse modify failed")
 
 
 # ---------------------------------------------------------
@@ -127,82 +145,103 @@ def create_task(
             3. Save to main DB, delete draft.
         Else (Manual Creation):
             1. Run Task Matching & Enrichment pipeline on body.task.
-            2. Save to main DB (TODO: implement later).
+            2. Save to main DB.
     """
-    logger.info("Starting task commit...")
-    logger.info(f"Request body: {body.model_dump()}")
-    
-    # Normalize incoming TaskPayload
-    body.task.name = str(body.task.name).strip()
-    if body.task.name:
-        body.task.name = body.task.name[0].upper() + body.task.name[1:]
-    
-    body.task.location = str(body.task.location).lower().strip() if body.task.location else "home"
-    
-    if body.task.category:
-        body.task.category = [str(c).lower().strip() for c in body.task.category if c]
-    else:
-        body.task.category = []
-    
-    logger.debug(f"Normalized task: {body.task.model_dump()}")
-    
-    enriched = None
-
-    if body.draft_id:
-        logger.info(f"Request body have draft_id: {body.draft_id}")
+    try:
+        logger.info("Starting task commit...")
+        logger.info(f"Request body: {body.model_dump()}")
         
-        # Check if draft exists in DB
-        draft = db.query(TaskDraft).filter(TaskDraft.id == body.draft_id).first()
-        if not draft:
-            logger.warning(f"Draft not found: {body.draft_id}")
+        # Normalize incoming TaskPayload
+        body.task.name = str(body.task.name).strip()
+        if body.task.name:
+            body.task.name = body.task.name[0].upper() + body.task.name[1:]
+        
+        body.task.location = str(body.task.location).lower().strip() if body.task.location else "home"
+        
+        if body.task.category:
+            body.task.category = [str(c).lower().strip() for c in body.task.category if c]
+        else:
+            body.task.category = []
+        
+        logger.debug(f"Normalized task: {body.task.model_dump()}")
+        
+        enriched = None
+
+        if body.draft_id:
+            logger.info(f"Request body have draft_id: {body.draft_id}")
+            
+            # Check if draft exists in DB
+            draft = db.query(TaskDraft).filter(TaskDraft.id == body.draft_id).first()
+            if not draft:
+                logger.warning(f"Draft not found: {body.draft_id}")
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Draft with id {body.draft_id} not found"
+                )
+            
+            enriched = enrichment_service.commit_from_draft(db, body.task, body.draft_id)
+            if not enriched:
+                logger.warning("No output from enrichment")
+                raise HTTPException(
+                    status_code=500,
+                    detail="The enrichment failed for commit_from_draft"
+                )
+            logger.info(f"Output from commit_from_draft(): {enriched.model_dump()}")
+        else:
+            logger.info("Request body don't have draft_id")
+            match_result = task_matcher.find_match(db, body.task.name)
+            if not match_result:
+                logger.warning("No output from task_matcher")
+                raise HTTPException(
+                    status_code=500,
+                    detail="The task matching failed"
+                )
+            logger.info(f"Output from find_match(): {match_result.model_dump()}")
+            enriched = enrichment_service.commit_manual(db, body.task, match_result)
+            if not enriched:
+                logger.warning("No output from enrichment")
+                raise HTTPException(
+                    status_code=500,
+                    detail="The enrichment failed for commit_manual"
+                )
+            logger.info(f"Output from commit_manual(): {enriched.model_dump()}")
+
+        saved = save_commited_task(db, enriched)
+
+        if not saved:
+            logger.error("Failed to save task to database")
             raise HTTPException(
-                status_code=404,
-                detail=f"Draft with id {body.draft_id} not found"
+                status_code=500,
+                detail="Failed to save task to database"
             )
         
-        enriched = enrichment_service.commit_from_draft(db, body.task, body.draft_id)
-        if not enriched:
-            logger.warning("No output from enrichment")
+        stats_updated = stats_recorder.update_stats_after_commit(db, saved.id)
+
+        if not stats_updated:
+            logger.error("Failed to update stats")
             raise HTTPException(
                 status_code=500,
-                detail="The enrichment failded for commit_from_draft"
+                detail="Failed to update task statistics"
             )
-        logger.info(f"Output from commit_from_draft(): {enriched.model_dump()}")  
-    else:
-        logger.info("Request body don't have draft_id")
-        match_result = task_matcher.find_match(db, body.task.name)
-        if not match_result:
-            logger.warning("No output from task_matcher")
-            raise HTTPException(
-                status_code=500,
-                detail="The task matching failded"
-            )
-        logger.info(f"Output from find_match(): {match_result.model_dump()}")
-        enriched = enrichment_service.commit_manual(db, body.task, match_result)
-        if not enriched:
-            logger.warning("No output from enrichment")
-            raise HTTPException(
-                status_code=500,
-                detail="The enrichment failded for commit_manual"
-            )
-        logger.info(f"Output from commit_manual(): {enriched.model_dump()}")
 
-
-
-    saved = save_commited_task(db, enriched)
-
-    if not saved:
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to save task to database"
+        db.commit()
+        
+        logger.info(f"Task committed successfully: {saved.id}")
+        
+        return TaskResponse(
+            success=True,
+            task_id=saved.id,
+            status="unscheduled",
+            message="Task enrichment complete - saved to DB",
         )
-
-    return TaskResponse(
-        success=True,
-        task_id=saved.id,
-        status="unscheduled",
-        message="Task enrichment complete - saved to DB",
-    )
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Task commit failed: {e}")
+        raise HTTPException(status_code=500, detail="Task commit failed")
 
 
 @router.post("/{id}/update", response_model=TaskResponse)
