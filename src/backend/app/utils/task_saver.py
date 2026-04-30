@@ -4,7 +4,8 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.models import Task, Location, Category, TaskCategory, TaskStatistics
+from app.models import Task, Location, Category, TaskCategory, TaskStatistics, CategoryStatistics
+from app.models.workflow import UnscheduledTask
 from app.schemas.enrichment import TaskPayloadComputedWithRefs
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,10 @@ def save_commited_task(db: Session, enriched_task: TaskPayloadComputedWithRefs) 
         db.add(task)
         db.flush()
         
+        # Also add to unscheduled_tasks queue
+        unscheduled = UnscheduledTask(task_id=task.id)
+        db.add(unscheduled)
+        
         for priority, cat_name in enumerate(enriched_task.category):
             category = _ensure_category(db, cat_name)
             db.add(TaskCategory(
@@ -47,6 +52,8 @@ def save_commited_task(db: Session, enriched_task: TaskPayloadComputedWithRefs) 
                 category_id=category.id,
                 priority=priority
             ))
+            # Ensure category statistics exists
+            _ensure_category_statistics(db, cat_name)
         
         db.commit()
         logger.info(f"Task saved successfully: {enriched_task.name}")
@@ -137,4 +144,45 @@ def _create_task_statistics(
     db.add(stats)
     db.flush()
     logger.info(f"Created new task_statistics: {task_name}")
+    return stats
+
+
+def _ensure_category_statistics(
+    db: Session,
+    category_name: str,
+) -> Optional[CategoryStatistics]:
+    """
+    Ensure category statistics exists in DB, create if needed.
+    Returns CategoryStatistics object or None if category not found.
+    """
+    # Get category by name
+    category = db.query(Category).filter(Category.name == category_name).first()
+    
+    if not category:
+        logger.warning(f"Category not found: {category_name}")
+        return None
+    
+    # Check if statistics already exists
+    stats = db.query(CategoryStatistics).filter(
+        CategoryStatistics.category_id == category.id
+    ).first()
+    
+    if stats:
+        return stats
+    
+    # Create new CategoryStatistics
+    stats = CategoryStatistics(
+        category_id=category.id,
+        avg_duration={},
+        avg_duration_delta={},
+        avg_difficulty=0.0,
+        avg_difficulty_delta=0.0,
+        completed_count=0,
+        uncompleted_count=0,
+        records=0,
+        category_time_scores={},
+    )
+    db.add(stats)
+    db.flush()
+    logger.info(f"Created new category_statistics: {category_name}")
     return stats
