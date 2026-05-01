@@ -6,6 +6,7 @@ from datetime import datetime
 from app.core.database import get_db
 from app.core.logging_config import setup_logging
 from app.models.draft import TaskDraft
+from app.utils import normalize_task_payload
 from app.schemas.task import (
     TaskCreateRequest,
     TaskUpdateRequest,
@@ -151,17 +152,7 @@ def create_task(
         logger.info("Starting task commit...")
         logger.info(f"Request body: {body.model_dump()}")
         
-        # Normalize incoming TaskPayload
-        body.task.name = str(body.task.name).strip()
-        if body.task.name:
-            body.task.name = body.task.name[0].upper() + body.task.name[1:]
-        
-        body.task.location = str(body.task.location).lower().strip() if body.task.location else "home"
-        
-        if body.task.category:
-            body.task.category = [str(c).lower().strip() for c in body.task.category if c]
-        else:
-            body.task.category = []
+        normalize_task_payload(body.task)
         
         logger.debug(f"Normalized task: {body.task.model_dump()}")
         
