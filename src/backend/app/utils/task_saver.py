@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Task, Location, Category, TaskCategory, TaskStatistics, CategoryStatistics
 from app.models.workflow import UnscheduledTask
-from app.schemas.enrichment import TaskPayloadComputedWithRefs
+from app.schemas.enrichment import TaskPayloadComputedWithRefs, TaskPayloadComputed
 from app.core.logging_config import setup_logging
 
 logger = setup_logging()
@@ -187,3 +187,63 @@ def _ensure_category_statistics(
     db.flush()
     logger.info(f"Created new category_statistics: {category_name}")
     return stats
+
+
+def update_commited_task(db: Session, task_id: UUID, updated_task: TaskPayloadComputed) -> Task | None:
+    """
+    Update an existing task in DB.
+    
+    Args:
+        db: Database session
+        task_id: UUID of the task to update
+        updated_task: TaskPayloadComputed with updated field values
+        
+    Returns:
+        Updated Task ORM object, or None on failure
+    """
+    try:
+        task = db.query(Task).filter(Task.id == task_id).first()
+        if not task:
+            logger.error(f"Task not found: {task_id}")
+            return None
+        
+        logger.info(f"Starting task update: {task_id}")
+        
+        location = _ensure_location(db, updated_task.location)
+        
+        task.name = updated_task.name
+        task.start = updated_task.start
+        task.deadline = updated_task.deadline
+        task.difficulty = updated_task.difficulty
+        task.duration = updated_task.duration
+        task.location_id = location.id
+        task.importance = updated_task.importance
+        task.urgency = updated_task.urgency
+        task.value = updated_task.value
+        task.fixed_time = updated_task.fixed_time
+        task.fixed_start = updated_task.fixed_start
+        
+        logger.info(f"Updated task fields for: {task.name}")
+        
+        db.query(TaskCategory).filter(TaskCategory.task_id == task_id).delete()
+        logger.debug(f"Deleted old TaskCategory records for task: {task_id}")
+        
+        for priority, cat_name in enumerate(updated_task.category):
+            category = _ensure_category(db, cat_name)
+            db.add(TaskCategory(
+                task_id=task.id,
+                category_id=category.id,
+                priority=priority
+            ))
+            _ensure_category_statistics(db, cat_name)
+        
+        logger.info(f"Added new TaskCategory records for task: {task_id}")
+        
+        db.commit()
+        logger.info(f"Task updated successfully: {task_id}")
+        return task
+        
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to update task '{task_id}': {e}")
+        return None

@@ -21,7 +21,8 @@ from app.schemas.task import (
 )
 from app.services.task_matcher import task_matcher
 from app.services.enrichment import enrichment_service
-from app.utils.task_saver import save_commited_task
+from app.utils.task_saver import save_commited_task, update_commited_task
+from app.models.workflow import UnscheduledTask
 from app.services.parser import parser_service
 from app.services.stats_recorder import stats_recorder
 
@@ -246,12 +247,53 @@ def update_task(
     POST /tasks/{id}/update
     Updates an existing task based on its source.
     """
-    return TaskResponse(
-        success=True,
-        task_id=id,
-        status="unscheduled",
-        message="Task updated successfully (stub)",
-    )
+    try:
+        logger.info(f"Starting task update: {id}")
+        
+        normalize_task_payload(body.task)
+        
+        computed_task = enrichment_service.update_task(db, body.task)
+        
+        updated = update_commited_task(db, id, computed_task)
+        
+        if not updated:
+            logger.error(f"Failed to update task in DB: {id}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to update task in database"
+            )
+        
+        stats_updated = stats_recorder.update_stats_after_commit(db, id)
+        
+        if not stats_updated:
+            logger.error(f"Failed to update stats for task: {id}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to update task statistics"
+            )
+        
+        db.query(UnscheduledTask).filter(UnscheduledTask.task_id == id).delete()
+        unscheduled = UnscheduledTask(task_id=id)
+        db.add(unscheduled)
+        
+        db.commit()
+        
+        logger.info(f"Task updated successfully: {id}")
+        
+        return TaskResponse(
+            success=True,
+            task_id=id,
+            status="unscheduled",
+            message="Task updated successfully",
+        )
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Task update failed: {e}")
+        raise HTTPException(status_code=500, detail="Task update failed")
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -302,3 +302,101 @@ Test 20: Create hobby task manually
     "fixed_start": null
   }
 }
+
+
+================================================================================
+POST /tasks/{id}/update (5 tests)
+================================================================================
+
+Note: Replace {id} with actual task UUID from previous commit response.
+All tests use source=unscheduled.
+
+Test 21: Update task - increase importance
+---
+POST /tasks/{id}/update?source=unscheduled
+{
+  "task": {
+    "name": "Gym session",
+    "start": "2026-04-30T06:00:00",
+    "deadline": "2026-04-30T23:59:00",
+    "difficulty": 0.5,
+    "duration": 60,
+    "category": ["fitness"],
+    "location": "gym",
+    "importance": 0.9,
+    "fixed_time": false,
+    "fixed_start": null
+  }
+}
+
+Test 22: Update task - change duration and difficulty
+---
+POST /tasks/{id}/update?source=unscheduled
+{
+  "task": {
+    "name": "Study session",
+    "start": "2026-05-01T18:00:00",
+    "deadline": "2026-05-01T20:00:00",
+    "difficulty": 0.8,
+    "duration": 180,
+    "category": ["study"],
+    "location": "library",
+    "importance": 0.7,
+    "fixed_time": false,
+    "fixed_start": null
+  }
+}
+
+Test 23: Update task - change location
+---
+POST /tasks/{id}/update?source=unscheduled
+{
+  "task": {
+    "name": "Project presentation",
+    "start": "2026-05-02T09:00:00",
+    "deadline": "2026-05-02T17:00:00",
+    "difficulty": 0.8,
+    "duration": 480,
+    "category": ["work"],
+    "location": "home",
+    "importance": 0.85,
+    "fixed_time": false,
+    "fixed_start": null
+  }
+}
+
+Test 24: Update task - change category
+---
+POST /tasks/{id}/update?source=unscheduled
+{
+  "task": {
+    "name": "Read book",
+    "start": "2026-05-03T20:00:00",
+    "deadline": "2026-05-03T22:00:00",
+    "difficulty": 0.3,
+    "duration": 120,
+    "category": ["personal"],
+    "location": "home",
+    "importance": 0.4,
+    "fixed_time": false,
+    "fixed_start": null
+  }
+}
+
+Test 25: Update task - extend deadline
+---
+POST /tasks/{id}/update?source=unscheduled
+{
+  "task": {
+    "name": "Call doctor",
+    "start": "2026-05-04T10:00:00",
+    "deadline": "2026-05-05T10:30:00",
+    "difficulty": 0.2,
+    "duration": 30,
+    "category": ["personal"],
+    "location": "home",
+    "importance": 0.6,
+    "fixed_time": false,
+    "fixed_start": null
+  }
+}
