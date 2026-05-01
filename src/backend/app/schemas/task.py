@@ -1,7 +1,7 @@
 from pydantic import BaseModel, model_validator, Field
 from typing import Optional, List
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 from app.schemas.shared import SuccessResponse
 
 
@@ -62,20 +62,22 @@ class TaskPayload(BaseModel):
         """
         Validates that deadline is in the future and start < deadline.
         """
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         
-        # Rule: start < deadline
         if self.start is not None and self.deadline is not None:
-            if self.start >= self.deadline:
+            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start
+            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
+            if start >= deadline:
                 raise ValueError("start must be before deadline")
         
-        # Rule: deadline > now
-        if self.deadline is not None and self.deadline <= now:
-            raise ValueError("deadline must be in the future")
+        if self.deadline is not None:
+            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
+            if deadline <= now:
+                raise ValueError("deadline must be in the future")
         
-        # Rule: fixed_start > now (only if fixed_time is true)
         if self.fixed_time and self.fixed_start is not None:
-            if self.fixed_start <= now:
+            fixed = self.fixed_start.astimezone(timezone.utc) if self.fixed_start.tzinfo else self.fixed_start
+            if fixed <= now:
                 raise ValueError("fixed_start must be in the future")
         
         return self

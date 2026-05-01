@@ -381,27 +381,36 @@ def get_task(
     id: UUID,
     db: Session = Depends(get_db),
 ):
-    """ 
+    """
     GET /tasks/{id}
     Fetches details of a specific task by ID.
     """
-    # TODO: Implement DB query
+    logger.info(f"Fetching task: {id}")
+
+    task = db.query(Task).filter(Task.id == id).first()
+    if not task:
+        logger.info(f"Task not found: {id}")
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    category_names = [tc.category.name for tc in task.task_categories]
+
+    logger.info(f"Task fetched successfully: {id}")
 
     return TaskDetailResponse(
-        task_id=id,
+        task_id=task.id,
         task=TaskPayload(
-            name="Stub Task for Display",
-            start=datetime(2026, 4, 19, 9, 0),
-            deadline=datetime(2026, 4, 20, 17, 0),
-            difficulty=0.5,
-            duration=60,
-            category=["study"],
-            location="Home",
-            importance=0.5,
-            fixed_time=False,
-            fixed_start=None,
+            name=task.name,
+            start=task.start,
+            deadline=task.deadline,
+            difficulty=task.difficulty,
+            duration=task.duration,
+            category=category_names,
+            location=task.location.name,
+            importance=task.importance,
+            fixed_time=task.fixed_time,
+            fixed_start=task.fixed_start,
         ),
-        created_at=datetime(2026, 4, 10, 12, 0),
+        created_at=task.created_at,
     )
 
 
