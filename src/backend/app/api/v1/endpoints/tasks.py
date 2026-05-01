@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query, status, Path, HTTPException
 from sqlalchemy.orm import Session
+from typing import Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -15,6 +16,7 @@ from app.schemas.task import (
     TaskResponse,
     TaskDetailResponse,
     TaskPayload,
+    InternalTaskPayload,
     ParseAddRequest,
     ParseModifyRequest,
     ParseAddResponse,
@@ -129,7 +131,60 @@ def parse_modify_task(
 
 
 # ---------------------------------------------------------
-# 2. Task CRUD Endpoints
+# 2. Queue Endpoint
+# ---------------------------------------------------------
+
+
+@router.get("/unscheduled", response_model=UnscheduledResponse)
+def get_unscheduled(
+    limit: Optional[int] = Query(None, description="Max number of tasks to return"),
+    db: Session = Depends(get_db),
+):
+    """
+    GET /tasks/unscheduled
+    Fetches tasks waiting for scheduling (FIFO order).
+    """
+    logger.info("Fetching unscheduled tasks")
+
+    query = db.query(UnscheduledTask).order_by(UnscheduledTask.created_at)
+    
+    if limit is not None:
+        query = query.limit(limit)
+    
+    unscheduled = query.all()
+
+    tasks = []
+    for entry in unscheduled:
+        task = entry.task
+        category_names = [tc.category.name for tc in task.task_categories]
+
+        tasks.append(TaskDetailResponse(
+            task_id=task.id,
+            task=InternalTaskPayload(
+                name=task.name,
+                start=task.start,
+                deadline=task.deadline,
+                difficulty=task.difficulty,
+                duration=task.duration,
+                category=category_names,
+                location=task.location.name,
+                importance=task.importance,
+                fixed_time=task.fixed_time,
+                fixed_start=task.fixed_start,
+            ),
+            created_at=task.created_at,
+        ))
+
+    logger.info(f"Returning {len(tasks)} unscheduled tasks")
+
+    return UnscheduledResponse(
+        tasks=tasks,
+        total_count=len(tasks),
+    )
+
+
+# ---------------------------------------------------------
+# 3. Task CRUD Endpoints
 # ---------------------------------------------------------
 
 
@@ -372,7 +427,7 @@ def delete_task(
 
 
 # ---------------------------------------------------------
-# 3. Task Fetching Endpoint
+# 4. Task Fetching Endpoint
 # ---------------------------------------------------------
 
 
@@ -398,7 +453,7 @@ def get_task(
 
     return TaskDetailResponse(
         task_id=task.id,
-        task=TaskPayload(
+        task=InternalTaskPayload(
             name=task.name,
             start=task.start,
             deadline=task.deadline,
@@ -413,22 +468,3 @@ def get_task(
         created_at=task.created_at,
     )
 
-
-# ---------------------------------------------------------
-# 4. Queue Endpoint
-# ---------------------------------------------------------
-
-
-@router.get("/unscheduled", response_model=UnscheduledResponse)
-def get_unscheduled(
-    limit: int = Query(50, description="Max number of tasks to return"),
-    db: Session = Depends(get_db),
-):
-    """
-    GET /tasks/unscheduled
-    Fetches the queue of tasks waiting for scheduling.
-    """
-    return UnscheduledResponse(
-        tasks=[],
-        total_count=0,
-    )

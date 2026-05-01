@@ -83,6 +83,51 @@ class TaskPayload(BaseModel):
         return self
 
 
+class InternalTaskPayload(BaseModel):
+    """
+    Task payload for internal responses.
+    
+    Same as TaskPayload but without deadline/fixed_start future validation.
+    Used for reading tasks that may have past deadlines.
+    """
+
+    name: str = Field(..., min_length=1)
+    start: Optional[datetime] = None
+    deadline: Optional[datetime] = None
+    difficulty: float = Field(..., gt=0.0, le=1.0)
+    duration: int = Field(..., gt=0, lt=1440)
+    category: List[str] = Field(..., min_length=1)
+    location: str
+    importance: float = Field(..., gt=0.0, le=1.0)
+    fixed_time: bool = False
+    fixed_start: Optional[datetime] = None
+
+    @model_validator(mode="after")
+    def check_fixed_logic(self):
+        """Same fixed_time validation as TaskPayload."""
+        if self.fixed_time:
+            if self.start is not None or self.deadline is not None:
+                raise ValueError("If fixed_time is true, start and deadline must be null.")
+            if self.fixed_start is None:
+                raise ValueError("If fixed_time is true, fixed_start is required.")
+        else:
+            if self.start is None or self.deadline is None:
+                raise ValueError("If fixed_time is false, start and deadline are required.")
+            if self.fixed_start is not None:
+                raise ValueError("If fixed_time is false, fixed_start must be null.")
+        return self
+
+    @model_validator(mode="after")
+    def check_datetime_validity(self):
+        """Only validates start < deadline (NOT deadline > now or fixed_start > now)."""
+        if self.start is not None and self.deadline is not None:
+            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start
+            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
+            if start >= deadline:
+                raise ValueError("start must be before deadline")
+        return self
+
+
 # 2. Request Wrappers
 class TaskCreateRequest(BaseModel):
     """Input for POST /tasks (Commit Phase)"""
@@ -138,7 +183,7 @@ class TaskDetailResponse(BaseModel):
     """Detailed task data returned when fetching a single task or in queues."""
 
     task_id: UUID
-    task: TaskPayload
+    task: InternalTaskPayload
     created_at: datetime
 
 
