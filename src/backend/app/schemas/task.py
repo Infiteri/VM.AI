@@ -60,7 +60,7 @@ class TaskPayload(BaseModel):
     @model_validator(mode="after")
     def check_datetime_validity(self):
         """
-        Validates that dates are in the future and start < deadline.
+        Validates that deadline is in the future and start < deadline.
         """
         now = datetime.now()
         
@@ -68,10 +68,6 @@ class TaskPayload(BaseModel):
         if self.start is not None and self.deadline is not None:
             if self.start >= self.deadline:
                 raise ValueError("start must be before deadline")
-        
-        # Rule: start > now
-        if self.start is not None and self.start <= now:
-            raise ValueError("start must be in the future")
         
         # Rule: deadline > now
         if self.deadline is not None and self.deadline <= now:

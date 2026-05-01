@@ -1,4 +1,4 @@
-import logging
+import copy
 from typing import Optional
 from uuid import UUID
 
@@ -10,8 +10,9 @@ from app.models.statistics import (
     CategoryStatisticsLocation,
 )
 from app.models import Location
+from app.core.logging_config import setup_logging
 
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 RECORDS_NR_TRACK = 30
 
@@ -91,7 +92,7 @@ class StatsRecorder:
 
         # Update duration bucket
         bucket = self._get_duration_bucket(task.difficulty)
-        avg_duration = stats.avg_duration or {}
+        avg_duration = copy.deepcopy(stats.avg_duration) if stats.avg_duration else {}
 
         if bucket not in avg_duration:
             avg_duration[bucket] = {"count": 0, "avg": 0}
@@ -120,7 +121,7 @@ class StatsRecorder:
         # Increment records
         stats.records = current_records + 1
 
-        logger.debug(f"Updated TaskStatistics: {task.name}, records={stats.records}")
+        logger.info(f"[STATS] Final: {stats}")
 
     def _update_task_statistics_location(self, db: Session, task: Task) -> None:
         """Update TaskStatisticsLocation count for task's location."""
@@ -147,7 +148,7 @@ class StatsRecorder:
             )
             db.add(loc_record)
 
-        logger.debug(f"Updated TaskStatisticsLocation for: {task.name}")
+        logger.info(f"Updated TaskStatisticsLocation for: {task.name}")
 
     def _update_category_statistics(self, db: Session, task: Task) -> None:
         """Update CategoryStatistics for each category of the task."""
@@ -181,7 +182,7 @@ class StatsRecorder:
 
             # Update duration bucket
             bucket = self._get_duration_bucket(task.difficulty)
-            avg_duration = cat_stats.avg_duration or {}
+            avg_duration = copy.deepcopy(cat_stats.avg_duration) if cat_stats.avg_duration else {}
 
             if bucket not in avg_duration:
                 avg_duration[bucket] = {"count": 0, "avg": 0}
@@ -202,7 +203,7 @@ class StatsRecorder:
             # Increment records
             cat_stats.records = current_records + 1
 
-            logger.debug(f"Updated CategoryStatistics for category_id: {tc.category_id}")
+            logger.info(f"[CAT_STATS] Final: {cat_stats}")
 
     def _update_category_statistics_location(self, db: Session, task: Task) -> None:
         """Update CategoryStatisticsLocation for each category of the task."""
@@ -237,7 +238,7 @@ class StatsRecorder:
                 )
                 db.add(loc_record)
 
-        logger.debug(f"Updated CategoryStatisticsLocation for task: {task.name}")
+        logger.info(f"Updated CategoryStatisticsLocation for task: {task.name}")
 
     def _get_duration_bucket(self, difficulty: float) -> str:
         """Calculate duration bucket: round(difficulty * 2) / 2"""

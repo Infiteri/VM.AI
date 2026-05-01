@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 from app.models import Task, Location, Category, TaskCategory, TaskStatistics, CategoryStatistics
 from app.models.workflow import UnscheduledTask
 from app.schemas.enrichment import TaskPayloadComputedWithRefs
+from app.core.logging_config import setup_logging
 
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
 
 def save_commited_task(db: Session, enriched_task: TaskPayloadComputedWithRefs) -> Task | None:

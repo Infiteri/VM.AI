@@ -22,7 +22,7 @@ def sweep_drafts(db: Session):
             db.commit()
             logger.info(f"Cleanup: Deleted {count} old drafts.")
         else:
-            logger.debug("Cleanup: No old drafts found.")
+            logger.info("Cleanup: No old drafts found.")
             
     except Exception as e:
         logger.error(f"Cleanup sweep failed: {e}")
