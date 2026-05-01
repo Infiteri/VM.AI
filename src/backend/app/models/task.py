@@ -102,9 +102,3 @@ class Task(BaseModel):
         uselist=False,  # One-to-one
         lazy="select",
     )
-    schedule_changes = relationship(
-        "ScheduleChange",
-        back_populates="task",
-        cascade="all, delete-orphan",
-        lazy="select",
-    )

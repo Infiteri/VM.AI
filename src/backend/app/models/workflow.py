@@ -40,15 +40,15 @@ class UnscheduledTask(Base):
 class ScheduleChange(BaseModel):
     """
     Change log — records only 'insert' and 'move' operations.
-    
+
     Tracks what changed when transforming Main → Provisional schedule.
     Cleared on atomic commit.
     """
     __tablename__ = "schedule_changes"
 
-    task_id = Column(
+    provisional_schedule_slot_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("tasks.id", ondelete="CASCADE"),
+        ForeignKey("provisional_schedule.id", ondelete="CASCADE"),
         nullable=False,
     )
     change_type = Column(Text, nullable=False)  # 'insert' or 'move'
@@ -58,8 +58,8 @@ class ScheduleChange(BaseModel):
     new_slot_end = Column(DateTime(timezone=True), nullable=False)
 
     # Relationships
-    task = relationship(
-        "Task",
+    slot = relationship(
+        "ProvisionalSlot",
         back_populates="schedule_changes",
         lazy="select",
     )

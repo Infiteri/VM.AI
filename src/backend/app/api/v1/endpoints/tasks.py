@@ -6,6 +6,8 @@ from datetime import datetime
 from app.core.database import get_db
 from app.core.logging_config import setup_logging
 from app.models.draft import TaskDraft
+from app.models.schedule import MainScheduleSlot, ProvisionalSlot
+from app.models.task import Task
 from app.utils import normalize_task_payload
 from app.schemas.task import (
     TaskCreateRequest,
@@ -306,7 +308,67 @@ def delete_task(
     DELETE /tasks/{id}
     Deletes a task based on its source context.
     """
-    pass
+    try:
+        logger.info(f"Starting task delete: {id}, source: {source}")
+        
+        if source == "main_schedule":
+            task = db.query(Task).filter(Task.id == id).first()
+            if not task:
+                logger.info(f"Task not found in main_schedule: {id}")
+                raise HTTPException(status_code=404, detail="Task not found")
+            db.query(Task).filter(Task.id == id).delete()
+            logger.info(f"Deleted task from tasks table: {id}")
+            
+        elif source == "unscheduled":
+            in_provisional = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
+            in_main = db.query(MainScheduleSlot).filter(MainScheduleSlot.task_id == id).first()
+            
+            if in_provisional or in_main:
+                record = db.query(UnscheduledTask).filter(UnscheduledTask.task_id == id).first()
+                if not record:
+                    logger.info(f"Task not found in unscheduled_tasks: {id}")
+                    raise HTTPException(status_code=404, detail="Task not found in unscheduled queue")
+                db.query(UnscheduledTask).filter(UnscheduledTask.task_id == id).delete()
+                logger.info(f"Deleted task from unscheduled_tasks: {id}")
+            else:
+                task = db.query(Task).filter(Task.id == id).first()
+                if not task:
+                    logger.info(f"Task not found: {id}")
+                    raise HTTPException(status_code=404, detail="Task not found")
+                db.query(Task).filter(Task.id == id).delete()
+                logger.info(f"Deleted task from tasks table: {id}")
+                
+        elif source == "provisional":
+            in_unscheduled = db.query(UnscheduledTask).filter(UnscheduledTask.task_id == id).first()
+            in_main = db.query(MainScheduleSlot).filter(MainScheduleSlot.task_id == id).first()
+            
+            if in_unscheduled or in_main:
+                slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
+                if not slot:
+                    logger.info(f"Task not found in provisional_schedule: {id}")
+                    raise HTTPException(status_code=404, detail="Task not found in provisional schedule")
+                db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).delete()
+                logger.info(f"Deleted task from provisional_schedule: {id}")
+            else:
+                task = db.query(Task).filter(Task.id == id).first()
+                if not task:
+                    logger.info(f"Task not found: {id}")
+                    raise HTTPException(status_code=404, detail="Task not found")
+                db.query(Task).filter(Task.id == id).delete()
+                logger.info(f"Deleted task from tasks table: {id}")
+        else:
+            raise HTTPException(status_code=400, detail="Invalid source parameter")
+        
+        db.commit()
+        logger.info(f"Task delete completed: {id}")
+        
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Task delete failed: {e}")
+        raise HTTPException(status_code=500, detail="Task delete failed")
 
 
 # ---------------------------------------------------------

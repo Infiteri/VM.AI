@@ -62,3 +62,9 @@ class ProvisionalSlot(BaseModel):
         back_populates="provisional_slots",
         lazy="select",
     )
+    schedule_changes = relationship(
+        "ScheduleChange",
+        back_populates="slot",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
