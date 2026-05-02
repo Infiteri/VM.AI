@@ -49,7 +49,6 @@ BASE_SLOT_SCORE = 1.0
 
 DEAD_ZONES = [
     ("23:00", "06:00"),
-    ("13:00", "15:00"),
 ]
 
 
@@ -78,6 +77,7 @@ class SchedulingResult:
     """Result of scheduling a single task."""
     success: bool
     task_id: Optional[UUID]
+    slot_id: Optional[UUID]
     slot_start: Optional[datetime]
     slot_end: Optional[datetime]
     displaced_tasks: List[UUID]
@@ -289,7 +289,7 @@ class ScheduleEngine:
                     )
                 
                 new_change = ScheduleChange(
-                    task_id=displaced_id,
+                    provisional_schedule_slot_id=reschedule_result.slot_id,
                     change_type="move",
                     old_slot_start=old_start,
                     old_slot_end=old_end,
@@ -300,7 +300,7 @@ class ScheduleEngine:
                 displaced_ids.append(displaced_id)
             else:
                 logger.warning(f"Task {displaced_id} not found for displacement")
-        
+
         slot = ProvisionalSlot(
             task_id=task.id,
             start=fixed_start,
@@ -310,21 +310,23 @@ class ScheduleEngine:
             location=task.location.name if task.location else None,
         )
         db.add(slot)
-        
+        db.flush()
+
         change = ScheduleChange(
-            task_id=task.id,
+            provisional_schedule_slot_id=slot.id,
             change_type="insert",
             new_slot_start=fixed_start,
             new_slot_end=fixed_end,
         )
         db.add(change)
         db.commit()
-        
+
         logger.info(f"Fixed task scheduled at {fixed_start}")
-        
+
         return SchedulingResult(
             success=True,
             task_id=task.id,
+            slot_id=slot.id,
             slot_start=fixed_start,
             slot_end=fixed_end,
             displaced_tasks=displaced_ids,
@@ -829,7 +831,7 @@ class ScheduleEngine:
                 )
             
             new_change = ScheduleChange(
-                task_id=existing.task_id,
+                provisional_schedule_slot_id=reschedule_result.slot_id,
                 change_type="move",
                 old_slot_start=old_start,
                 old_slot_end=old_end,
@@ -877,9 +879,10 @@ class ScheduleEngine:
             location=task.location.name if task.location else None,
         )
         db.add(slot)
-        
+        db.flush()
+
         change = ScheduleChange(
-            task_id=task.id,
+            provisional_schedule_slot_id=slot.id,
             change_type=change_type,
             old_slot_start=existing.start if existing else None,
             old_slot_end=existing.end if existing else None,
@@ -888,10 +891,11 @@ class ScheduleEngine:
         )
         db.add(change)
         db.commit()
-        
+
         return SchedulingResult(
             success=True,
             task_id=task.id,
+            slot_id=slot.id,
             slot_start=slot_start,
             slot_end=slot_end,
             displaced_tasks=displaced_ids,
