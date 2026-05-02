@@ -37,6 +37,7 @@ from app.models import (
     UnscheduledTask,
     TaskDraft,
 )
+from app.utils.task_saver import generate_default_time_scores, DEFAULT_TIME_ANCHORS
 
 
 def _future_datetime(days_from_now: int = 0, hour: int = 6, minute: int = 0) -> datetime:
@@ -181,7 +182,7 @@ def seed_data(db, reset: bool = False):
             completed_count=data["completed_count"],
             uncompleted_count=data["uncompleted_count"],
             records=data["records"],
-            task_time_scores={},
+            task_time_scores=generate_default_time_scores(DEFAULT_TIME_ANCHORS),
         )
         db.add(stats)
         db.flush()
@@ -208,7 +209,7 @@ def seed_data(db, reset: bool = False):
             completed_count=data["completed"],
             uncompleted_count=data["uncompleted"],
             records=data["records"],
-            category_time_scores={},
+            category_time_scores=generate_default_time_scores(DEFAULT_TIME_ANCHORS),
         )
         db.add(stats)
         db.flush()

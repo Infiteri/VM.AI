@@ -11,6 +11,110 @@ from app.core.logging_config import setup_logging
 
 logger = setup_logging()
 
+DEFAULT_TIME_ANCHORS: dict[str, float] = {
+    "00:00": -1.5,
+    "02:00": -2,
+    "06:00": -1,
+    "09:00": 0.5,
+    "12:00": 1.5,
+    "14:00": 2,
+    "16:00": 1.25,
+    "18:00": 1.0,
+    "20:00": 0.5,
+    "22:00": 0.0,
+    "23:00": -1.0,
+}
+
+
+def generate_default_time_scores(
+    anchors: dict[str, float],
+    step: float = 0.25
+) -> dict[str, float]:
+    """
+    Generate time scores using linear interpolation between anchor points.
+    
+    Args:
+        anchors: Dict of time strings to values, e.g. {"09:00": 0.0, "15:00": 1.5}
+        step: Interval step in hours (default 0.25 = 15 minutes)
+    
+    Returns:
+        Dict of time strings to interpolated float values, e.g. {"09:00": 0.0, "09:15": 0.375, ...}
+    """
+    if not anchors:
+        return {}
+    
+    def time_to_minutes(t: str) -> int:
+        parts = t.split(":")
+        return int(parts[0]) * 60 + int(parts[1])
+    
+    def minutes_to_time(m: int) -> str:
+        hours = (m // 60) % 24
+        mins = m % 60
+        return f"{hours:02d}:{mins:02d}"
+    
+    sorted_anchors = sorted(anchors.items(), key=lambda x: time_to_minutes(x[0]))
+    anchor_minutes = [(time_to_minutes(t), v) for t, v in sorted_anchors]
+    
+    if len(anchor_minutes) < 2:
+        return {}
+    
+    first_min = anchor_minutes[0][0]
+    last_min = anchor_minutes[-1][0]
+    
+    time_scores: dict[str, float] = {}
+    
+    if last_min > first_min:
+        start = first_min
+        end = last_min + int(step * 60)
+        while start <= end:
+            time_str = minutes_to_time(start)
+            value = _interpolate_value(start, anchor_minutes)
+            rounded_value = round(value / step) * step
+            time_scores[time_str] = rounded_value
+            start += int(step * 60)
+    else:
+        for m in range(0, 24 * 60, int(step * 60)):
+            time_str = minutes_to_time(m)
+            value = _interpolate_circular(m, anchor_minutes)
+            rounded_value = round(value / step) * step
+            time_scores[time_str] = rounded_value
+    
+    return time_scores
+
+
+def _interpolate_value(current_min: int, anchors: list[tuple[int, float]]) -> float:
+    """Linear interpolation between two anchor points."""
+    for i in range(len(anchors) - 1):
+        t1, v1 = anchors[i]
+        t2, v2 = anchors[i + 1]
+        if t1 <= current_min <= t2:
+            if t2 == t1:
+                return v1
+            ratio = (current_min - t1) / (t2 - t1)
+            return v1 + (v2 - v1) * ratio
+    return anchors[-1][1]
+
+
+def _interpolate_circular(current_min: int, anchors: list[tuple[int, float]]) -> float:
+    """Circular interpolation for times that span midnight."""
+    first_min = anchors[0][0]
+    last_min = anchors[-1][0]
+    
+    if first_min <= current_min <= last_min:
+        return _interpolate_value(current_min, anchors)
+    
+    if current_min < first_min:
+        t1, v1 = anchors[-1]
+        t2, v2 = anchors[0]
+        span = (24 * 60 - t1) + t2
+        if span == 0:
+            return v1
+        ratio = ((24 * 60 - current_min) - (24 * 60 - t1)) / span
+        ratio = 1 - ratio
+        return v1 + (v2 - v1) * ratio
+    
+    return anchors[0][1]
+
 
 def save_commited_task(db: Session, enriched_task: TaskPayloadComputedWithRefs) -> Task | None:
     """
@@ -140,7 +244,7 @@ def _create_task_statistics(
         completed_count=0,
         uncompleted_count=0,
         records=0,
-        task_time_scores={},
+        task_time_scores=generate_default_time_scores(DEFAULT_TIME_ANCHORS),
     )
     db.add(stats)
     db.flush()
@@ -181,7 +285,7 @@ def _ensure_category_statistics(
         completed_count=0,
         uncompleted_count=0,
         records=0,
-        category_time_scores={},
+        category_time_scores=generate_default_time_scores(DEFAULT_TIME_ANCHORS),
     )
     db.add(stats)
     db.flush()

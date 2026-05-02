@@ -696,7 +696,7 @@ class ScheduleEngine:
             stats = db.query(TaskStatistics).filter(
                 TaskStatistics.id == task.task_statistics_id
             ).first()
-            if stats and stats.task_time_scores:
+            if stats and stats.task_time_scores and stats.records > 3:
                 if time_key in stats.task_time_scores:
                     score = stats.task_time_scores[time_key]
                     return TIME_SCORE_AMPLIFIER * (score / 10)
@@ -705,7 +705,7 @@ class ScheduleEngine:
             stats = db.query(TaskStatistics).filter(
                 TaskStatistics.id == task.associated_task_statistics_id
             ).first()
-            if stats and stats.task_time_scores:
+            if stats and stats.task_time_scores and stats.records > 3:
                 if time_key in stats.task_time_scores:
                     score = stats.task_time_scores[time_key]
                     return TIME_SCORE_AMPLIFIER * (score / 10)
