@@ -113,13 +113,10 @@ class ScheduleEngine:
         logger.info(f"Scheduling task: {task.name} (ID: {task.id})")
 
         try:
-            with db.begin_nested() as savepoint:
-                if task.fixed_time:
-                    result = self._schedule_fixed_task(task, db)
-                else:
-                    result = self._schedule_flexible_task(task, db)
-                savepoint.commit()
-                return result
+            if task.fixed_time:
+                return self._schedule_fixed_task(task, db)
+            else:
+                return self._schedule_flexible_task(task, db)
         except Exception as e:
             db.rollback()
             logger.error(f"Scheduling failed for task {task.id}: {e}")
@@ -524,32 +521,52 @@ class ScheduleEngine:
         windows: Dict[str, List[TimeWindow]],
     ) -> Dict[str, List[TimeWindow]]:
         """Subtract dead zones from time windows."""
-        for zone_start, zone_end in DEAD_ZONES:
+        for zone_start_str, zone_end_str in DEAD_ZONES:
+            zs = self._parse_time(zone_start_str)
+            ze = self._parse_time(zone_end_str)
+
             for date_str in windows:
                 new_windows = []
                 for window in windows[date_str]:
                     ws = self._parse_time(window.start_time)
                     we = self._parse_time(window.end_time)
-                    zs = self._parse_time(zone_start)
-                    ze = self._parse_time(zone_end)
-                    
-                    if we <= zs or ws >= ze:
-                        new_windows.append(window)
+
+                    # Check if dead zone spans midnight (e.g., 23:00-06:00)
+                    if ze < zs:  # Zone spans midnight
+                        # Valid time is ONLY: zone_end (06:00) to zone_start (23:00)
+                        # Skip morning dead zone: if window starts before ze, start at ze
+                        if ws < ze:
+                            ws = ze
+                        # Skip evening dead zone: if window ends after zs, end at zs
+                        if we > zs:
+                            we = zs
+
+                        # Only add window if valid range exists
+                        if ws < we:
+                            new_windows.append(TimeWindow(
+                                date=date_str,
+                                start_time=self._format_time(ws),
+                                end_time=self._format_time(we),
+                            ))
                     else:
-                        if ws < zs:
-                            new_windows.append(TimeWindow(
-                                date=date_str,
-                                start_time=window.start_time,
-                                end_time=zone_start,
-                            ))
-                        if we > ze:
-                            new_windows.append(TimeWindow(
-                                date=date_str,
-                                start_time=zone_end,
-                                end_time=window.end_time,
-                            ))
+                        # Normal case: dead zone doesn't span midnight (e.g., 09:00-11:00)
+                        if we <= zs or ws >= ze:
+                            new_windows.append(window)
+                        else:
+                            if ws < zs:
+                                new_windows.append(TimeWindow(
+                                    date=date_str,
+                                    start_time=window.start_time,
+                                    end_time=zone_start_str,
+                                ))
+                            if we > ze:
+                                new_windows.append(TimeWindow(
+                                    date=date_str,
+                                    start_time=zone_end_str,
+                                    end_time=window.end_time,
+                                ))
                 windows[date_str] = new_windows
-        
+
         return windows
     
     
@@ -582,6 +599,7 @@ class ScheduleEngine:
                 
                 while (current_hour * 60 + current_minute) <= valid_end_minutes:
                     slot_dt = datetime.strptime(f"{date_str} {current_hour:02d}:{current_minute:02d}", "%Y-%m-%d %H:%M")
+                    slot_dt = slot_dt.replace(tzinfo=timezone.utc)
                     slots.append(slot_dt)
                     
                     current_minute += SLOT_INTERVAL_MINUTES
@@ -743,6 +761,9 @@ class ScheduleEngine:
         db: Session,
     ) -> float:
         """Calculate proximity boost to previous task."""
+        if slot_start.tzinfo is None:
+            slot_start = slot_start.replace(tzinfo=timezone.utc)
+        
         prev_task = db.query(ProvisionalSlot).filter(
             ProvisionalSlot.end <= slot_start,
         ).order_by(ProvisionalSlot.end.desc()).first()
@@ -944,6 +965,8 @@ class ScheduleEngine:
     
     def _round_down_to_interval(self, dt: datetime, interval: int) -> datetime:
         """Round datetime down to nearest interval."""
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
         total_minutes = dt.hour * 60 + dt.minute
         rounded = (total_minutes // interval) * interval
         return dt.replace(hour=rounded // 60, minute=rounded % 60, second=0, microsecond=0)
@@ -963,6 +986,8 @@ class ScheduleEngine:
     
     def _round_up_to_interval_dt(self, dt: datetime) -> datetime:
         """Round datetime UP to nearest interval."""
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
         total_minutes = dt.hour * 60 + dt.minute
         rounded = ((total_minutes + SLOT_INTERVAL_MINUTES - 1) // SLOT_INTERVAL_MINUTES) * SLOT_INTERVAL_MINUTES
         if rounded >= 24 * 60:
@@ -974,6 +999,12 @@ class ScheduleEngine:
         """Parse HH:MM string to (hour, minute) tuple."""
         parts = time_str.split(":")
         return int(parts[0]), int(parts[1])
+    
+    
+    def _format_time(self, minutes: Tuple[int, int]) -> str:
+        """Format (hours, minutes) tuple to HH:MM string."""
+        hours, mins = minutes
+        return f"{hours:02d}:{mins:02d}"
 
 
 # ============================================================================
