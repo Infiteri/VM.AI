@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 from datetime import datetime, date
 
 from app.core.database import get_db
+from app.core.logging_config import setup_logging
 from app.schemas.schedule import ScheduleResponse, BatchScheduleResponse
+from app.services.schedule_engine import schedule_engine
 
+logger = setup_logging()
 router = APIRouter()
 
 
@@ -31,12 +34,19 @@ def schedule_batch(
     """
     POST /schedule/batch
     """
-    # Stub Response
-    return BatchScheduleResponse(
-        success=True,
-        scheduled_count=0,
-        unscheduled_remaining=[],  # List of TaskDetailResponse
-        message="All tasks scheduled successfully (stub)",
-        provisional_changes=[],
-        execution_time_ms=0,
-    )
+    try:
+        result = schedule_engine.schedule_batch(db)
+        return BatchScheduleResponse(
+            success=result.scheduled_count > 0,
+            scheduled_count=result.scheduled_count,
+            failed_count=result.failed_count,
+            unscheduled_remaining=result.unscheduled_remaining,
+            results=result.results,
+            execution_time_ms=result.execution_time_ms,
+        )
+    except Exception as e:
+        logger.error(f"Batch scheduling failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Batch scheduling failed"
+        )

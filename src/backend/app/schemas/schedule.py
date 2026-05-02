@@ -6,6 +6,36 @@ from app.schemas.shared import SuccessResponse
 from app.schemas.task import TaskDetailResponse
 
 
+class SchedulingResult(BaseModel):
+    """Result of scheduling a single task."""
+    success: bool
+    task_id: Optional[UUID] = None
+    slot_id: Optional[UUID] = None
+    slot_start: Optional[datetime] = None
+    slot_end: Optional[datetime] = None
+    displaced_tasks: List[UUID] = []
+    message: str = ""
+
+
+class BatchSchedulingResult(BaseModel):
+    """Internal result of batch scheduling (service layer)."""
+    scheduled_count: int
+    failed_count: int
+    unscheduled_remaining: List[UUID] = []
+    results: List[SchedulingResult] = []
+    execution_time_ms: int = 0
+
+
+class BatchScheduleResponse(BaseModel):
+    """Response for POST /schedule/batch"""
+    success: bool
+    scheduled_count: int
+    failed_count: int
+    unscheduled_remaining: List[UUID]
+    results: List[SchedulingResult]
+    execution_time_ms: int
+
+
 class ScheduleTask(BaseModel):
     """A single task shown on the calendar for a specific day."""
     task_id: UUID
@@ -20,16 +50,6 @@ class ScheduleResponse(BaseModel):
     """Response for GET /schedule"""
     date: date  # Strict date type
     tasks: List[ScheduleTask]
-
-
-class BatchScheduleResponse(BaseModel):
-    """Response for POST /schedule/batch"""
-    success: bool
-    scheduled_count: int
-    unscheduled_remaining: List[TaskDetailResponse]  # Changed to TaskDetailResponse
-    message: str
-    provisional_changes: List[dict]
-    execution_time_ms: int
 
 
 # ---------------------------------------------------------

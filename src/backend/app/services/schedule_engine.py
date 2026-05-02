@@ -14,7 +14,7 @@ Version: 2.0 (Class-based)
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Tuple, Any
 from uuid import UUID
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from sqlalchemy.orm import Session
 
 from app.models.task import Task
@@ -23,6 +23,7 @@ from app.models.workflow import UnscheduledTask, ScheduleChange
 from app.models.statistics import TaskStatistics, CategoryStatistics
 from app.models.task_category import TaskCategory
 from app.models.category import Category
+from app.schemas.schedule import SchedulingResult, BatchSchedulingResult
 from app.core.logging_config import setup_logging
 
 logger = setup_logging()
@@ -72,27 +73,6 @@ class CandidateSlot:
     score: float
 
 
-@dataclass
-class SchedulingResult:
-    """Result of scheduling a single task."""
-    success: bool
-    task_id: Optional[UUID]
-    slot_id: Optional[UUID]
-    slot_start: Optional[datetime]
-    slot_end: Optional[datetime]
-    displaced_tasks: List[UUID]
-    message: str
-
-
-@dataclass
-class BatchSchedulingResult:
-    """Result of batch scheduling."""
-    scheduled_count: int
-    failed_count: int
-    results: List[SchedulingResult]
-    execution_time_ms: int
-
-
 # ============================================================================
 # SCHEDULE ENGINE CLASS
 # ============================================================================
@@ -117,20 +97,38 @@ class ScheduleEngine:
     ) -> SchedulingResult:
         """
         Schedule a single task into the provisional schedule.
-        
+
+        Uses savepoint to ensure provisional slot is restored on failure.
+        If a task already exists in provisional_schedule, it is deleted
+        before scheduling. On failure, the savepoint rollback restores
+        the deleted slot.
+
         Args:
             task: Task to schedule
             db: Database session
-        
+
         Returns:
             SchedulingResult with success status and slot info.
         """
         logger.info(f"Scheduling task: {task.name} (ID: {task.id})")
-        
-        if task.fixed_time:
-            return self._schedule_fixed_task(task, db)
-        else:
-            return self._schedule_flexible_task(task, db)
+
+        with db.nested():
+            try:
+                if task.fixed_time:
+                    return self._schedule_fixed_task(task, db)
+                else:
+                    return self._schedule_flexible_task(task, db)
+            except Exception as e:
+                logger.error(f"Scheduling failed for task {task.id}: {e}")
+                return SchedulingResult(
+                    success=False,
+                    task_id=task.id,
+                    slot_id=None,
+                    slot_start=None,
+                    slot_end=None,
+                    displaced_tasks=[],
+                    message="Scheduling failed",
+                )
     
     
     def schedule_batch(
@@ -141,17 +139,17 @@ class ScheduleEngine:
     ) -> BatchSchedulingResult:
         """
         Schedule tasks from unscheduled_tasks queue or from provided list.
-        
+
         If task_ids is None: query unscheduled_tasks queue
         If task_ids provided: use provided list
-        
+
         Args:
             db: Database session
             timeout: Maximum execution time in seconds
             task_ids: Optional list of task IDs to schedule
-        
+
         Returns:
-            BatchSchedulingResult with count and details.
+            BatchSchedulingResult with scheduling results.
         """
         start_time = datetime.utcnow()
         logger.info("Starting batch scheduling")
@@ -169,24 +167,26 @@ class ScheduleEngine:
             )
             logger.info(f"Scheduling {len(entries)} tasks from queue")
         
-        results: List[SchedulingResult] = []
+        results: List[Any] = []
         scheduled_count = 0
         failed_count = 0
-        
+        unscheduled_remaining: List[UUID] = []
+
         for entry in entries:
             if isinstance(entry, Task):
                 task = entry
             else:
                 task = entry.task
-            
+
             if not task:
                 logger.warning(f"Task not found")
                 failed_count += 1
+                unscheduled_remaining.append(entry.task_id if hasattr(entry, 'task_id') else None)
                 continue
-            
+
             result = self.schedule_single(task, db)
             results.append(result)
-            
+
             if result.success:
                 scheduled_count += 1
                 if task_ids is None and hasattr(entry, 'task_id'):
@@ -194,22 +194,24 @@ class ScheduleEngine:
                 db.commit()
             else:
                 failed_count += 1
-            
+                unscheduled_remaining.append(task.id)
+
             elapsed = (datetime.utcnow() - start_time).total_seconds()
             if elapsed > timeout:
                 logger.warning(f"Timeout reached after {elapsed:.1f}s")
                 break
-        
+
         execution_time_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
-        
+
         logger.info(
             f"Batch complete: {scheduled_count} scheduled, {failed_count} failed, "
             f"{execution_time_ms}ms"
         )
-        
+
         return BatchSchedulingResult(
             scheduled_count=scheduled_count,
             failed_count=failed_count,
+            unscheduled_remaining=[uid for uid in unscheduled_remaining if uid is not None],
             results=results,
             execution_time_ms=execution_time_ms,
         )

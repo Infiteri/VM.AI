@@ -346,12 +346,24 @@ class TaskPayload(BaseModel):
 {
     "success": true,
     "scheduled_count": 5,
+    "failed_count": 0,
     "unscheduled_remaining": [],
-    "message": "All tasks scheduled successfully",
-    "provisional_changes": [],
+    "results": [
+        {
+            "success": true,
+            "task_id": "550e8400-e29b-41d4-a716-446655440000",
+            "slot_id": "660e8400-e29b-41d4-a716-446655440001",
+            "slot_start": "2026-04-20T09:00:00",
+            "slot_end": "2026-04-20T10:00:00",
+            "displaced_tasks": [],
+            "message": "Task scheduled successfully"
+        }
+    ],
     "execution_time_ms": 3500
 }
 ```
+
+**Note:** Service layer returns `BatchSchedulingResult`, endpoint converts to `BatchScheduleResponse`.
 
 **Schema:** `BatchScheduleResponse`
 
