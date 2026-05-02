@@ -11,7 +11,7 @@ Handles:
 Version: 2.0 (Class-based)
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Dict, Tuple, Any
 from uuid import UUID
 from dataclasses import dataclass, field
@@ -112,23 +112,26 @@ class ScheduleEngine:
         """
         logger.info(f"Scheduling task: {task.name} (ID: {task.id})")
 
-        with db.nested():
-            try:
+        try:
+            with db.begin_nested() as savepoint:
                 if task.fixed_time:
-                    return self._schedule_fixed_task(task, db)
+                    result = self._schedule_fixed_task(task, db)
                 else:
-                    return self._schedule_flexible_task(task, db)
-            except Exception as e:
-                logger.error(f"Scheduling failed for task {task.id}: {e}")
-                return SchedulingResult(
-                    success=False,
-                    task_id=task.id,
-                    slot_id=None,
-                    slot_start=None,
-                    slot_end=None,
-                    displaced_tasks=[],
-                    message="Scheduling failed",
-                )
+                    result = self._schedule_flexible_task(task, db)
+                savepoint.commit()
+                return result
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Scheduling failed for task {task.id}: {e}")
+            return SchedulingResult(
+                success=False,
+                task_id=task.id,
+                slot_id=None,
+                slot_start=None,
+                slot_end=None,
+                displaced_tasks=[],
+                message="Scheduling failed",
+            )
     
     
     def schedule_batch(
@@ -151,7 +154,7 @@ class ScheduleEngine:
         Returns:
             BatchSchedulingResult with scheduling results.
         """
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         logger.info("Starting batch scheduling")
         
         if task_ids is not None:
@@ -196,12 +199,12 @@ class ScheduleEngine:
                 failed_count += 1
                 unscheduled_remaining.append(task.id)
 
-            elapsed = (datetime.utcnow() - start_time).total_seconds()
+            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             if elapsed > timeout:
                 logger.warning(f"Timeout reached after {elapsed:.1f}s")
                 break
 
-        execution_time_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
+        execution_time_ms = int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
 
         logger.info(
             f"Batch complete: {scheduled_count} scheduled, {failed_count} failed, "
@@ -445,10 +448,19 @@ class ScheduleEngine:
         """Build viable time windows for task."""
         windows: Dict[str, List[TimeWindow]] = {}
         
-        task_start = task.start or datetime.utcnow()
-        task_deadline = task.deadline or (task_start + timedelta(days=7))
+        now = datetime.now(timezone.utc)
         
-        horizon_end = datetime.utcnow() + timedelta(days=HORIZON_DAYS)
+        if task.start:
+            task_start = task.start.astimezone(timezone.utc) if task.start.tzinfo else task.start.replace(tzinfo=timezone.utc)
+        else:
+            task_start = now
+        
+        if task.deadline:
+            task_deadline = task.deadline.astimezone(timezone.utc) if task.deadline.tzinfo else task.deadline.replace(tzinfo=timezone.utc)
+        else:
+            task_deadline = task_start + timedelta(days=7)
+        
+        horizon_end = now + timedelta(days=HORIZON_DAYS)
         if task_deadline > horizon_end:
             task_deadline = horizon_end
         
@@ -707,7 +719,10 @@ class ScheduleEngine:
         """Calculate urgency boost (earlier slots get higher boost)."""
         total_minutes = HORIZON_DAYS * 24 * 60
         
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
+        
+        if slot_start.tzinfo is None:
+            slot_start = slot_start.replace(tzinfo=timezone.utc)
         
         if slot_start <= now:
             logger.warning(f"Slot {slot_start} is in the past (now: {now})")
