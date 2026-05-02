@@ -62,14 +62,19 @@ def generate_default_time_scores(
     last_min = anchor_minutes[-1][0]
     
     time_scores: dict[str, float] = {}
+    MAX_DAY_END = 23 * 60 + 45  # 1425 minutes = 23:45
     
     if last_min > first_min:
         start = first_min
-        end = last_min + int(step * 60)
+        last_anchor_value = anchor_minutes[-1][1]
+        end = MAX_DAY_END  # Always extend to 23:45
         while start <= end:
             time_str = minutes_to_time(start)
-            value = _interpolate_value(start, anchor_minutes)
-            rounded_value = round(value / step) * step
+            if start > last_min:
+                rounded_value = round(last_anchor_value / step) * step
+            else:
+                value = _interpolate_value(start, anchor_minutes)
+                rounded_value = round(value / step) * step
             time_scores[time_str] = rounded_value
             start += int(step * 60)
     else:

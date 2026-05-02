@@ -1,20 +1,23 @@
 import copy
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from app.models import Task, TaskStatistics, CategoryStatistics
+from app.models import Task, TaskStatistics, CategoryStatistics, TaskCategory
 from app.models.statistics import (
     TaskStatisticsLocation,
     CategoryStatisticsLocation,
 )
-from app.models import Location
 from app.core.logging_config import setup_logging
 
 logger = setup_logging()
 
 RECORDS_NR_TRACK = 30
+
+TIME_SCORE_CLAMP = (-10.0, 10.0)
+TIME_SCORE_STEP = 0.25
 
 
 class StatsRecorder:
@@ -239,6 +242,132 @@ class StatsRecorder:
                 db.add(loc_record)
 
         logger.info(f"Updated CategoryStatisticsLocation for task: {task.name}")
+
+    def update_time_score(
+        self,
+        db: Session,
+        task_uuid: UUID,
+        slot_start: datetime,
+        boost: float,
+    ) -> bool:
+        """
+        Update time scores with radial boost around a slot.
+        
+        Args:
+            db: Database session
+            task_uuid: UUID of the task
+            slot_start: Datetime of the slot to boost
+            boost: Boost value to apply (positive or negative)
+        
+        Returns:
+            bool: True if successful, False on error
+        """
+        try:
+            task = db.query(Task).filter(Task.id == task_uuid).first()
+            if not task:
+                logger.error(f"Task not found: {task_uuid}")
+                return False
+
+            if slot_start.tzinfo is not None:
+                slot_start = slot_start.replace(tzinfo=None)
+
+            target_hour = slot_start.hour
+            target_minute = slot_start.minute
+            target_minutes = target_hour * 60 + target_minute
+
+            if task.task_statistics_id:
+                self._update_statistics_time_scores(
+                    db,
+                    task.task_statistics_id,
+                    target_minutes,
+                    boost,
+                    is_category=False,
+                )
+
+            task_categories = db.query(TaskCategory).filter(
+                TaskCategory.task_id == task_uuid
+            ).all()
+
+            for tc in task_categories:
+                cat_stats = db.query(CategoryStatistics).filter(
+                    CategoryStatistics.category_id == tc.category_id
+                ).first()
+                if cat_stats:
+                    self._update_statistics_time_scores(
+                        db,
+                        cat_stats.id,
+                        target_minutes,
+                        boost,
+                        is_category=True,
+                    )
+
+            db.commit()
+            logger.info(f"Time scores updated for task: {task.name}")
+            return True
+
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to update time scores for task {task_uuid}: {e}")
+            return False
+
+    def _update_statistics_time_scores(
+        self,
+        db: Session,
+        statistics_id: UUID,
+        target_minutes: int,
+        boost: float,
+        is_category: bool,
+    ) -> None:
+        """Update time_scores for a statistics record with radial boost."""
+        if is_category:
+            stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.id == statistics_id
+            ).first()
+            time_scores_key = "category_time_scores"
+        else:
+            stats = db.query(TaskStatistics).filter(
+                TaskStatistics.id == statistics_id
+            ).first()
+            time_scores_key = "task_time_scores"
+
+        if not stats:
+            return
+
+        time_scores = copy.deepcopy(getattr(stats, time_scores_key)) if getattr(stats, time_scores_key) else {}
+
+        offset = 0
+        current_boost = boost
+
+        while current_boost > 0:
+            if offset == 0:
+                # Target slot: apply once
+                slot_minutes = target_minutes
+                hours = slot_minutes // 60
+                minutes = slot_minutes % 60
+                slot_key = f"{hours:02d}:{minutes:02d}"
+
+                current_value = time_scores.get(slot_key, 0.0)
+                new_value = current_value + current_boost
+                new_value = max(TIME_SCORE_CLAMP[0], min(TIME_SCORE_CLAMP[1], new_value))
+                time_scores[slot_key] = round(new_value, 2)
+            else:
+                # Adjacent slots: apply to both directions
+                for sign in [-1, 1]:
+                    slot_minutes = (target_minutes + sign * offset * 15) % (24 * 60)
+
+                    hours = slot_minutes // 60
+                    minutes = slot_minutes % 60
+                    slot_key = f"{hours:02d}:{minutes:02d}"
+
+                    current_value = time_scores.get(slot_key, 0.0)
+                    new_value = current_value + current_boost
+                    new_value = max(TIME_SCORE_CLAMP[0], min(TIME_SCORE_CLAMP[1], new_value))
+                    time_scores[slot_key] = round(new_value, 2)
+
+            offset += 1
+            current_boost = boost - (offset * TIME_SCORE_STEP)
+
+        setattr(stats, time_scores_key, time_scores)
 
     def _get_duration_bucket(self, difficulty: float) -> str:
         """Calculate duration bucket: round(difficulty * 2) / 2"""
