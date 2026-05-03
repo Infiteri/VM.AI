@@ -20,15 +20,16 @@ function formatDate(date) {
     return `${day}.${month}`;
 }
 
-export default function MainViewDates() {
-    const [today] = useState(() => {
-        const d = new Date();
-        d.setHours(0, 0, 0, 0);
-        return d;
-    });
+interface MainViewDatesProps {
+    selectedDate: Date;
+    onDateSelect: (date: Date) => void;
+}
+
+export default function MainViewDates({ selectedDate, onDateSelect }: MainViewDatesProps) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     const [visibleBack, setVisibleBack] = useState(0);
-    const [selectedDate, setSelectedDate] = useState(today);
 
     const dates = generateDates(today, visibleBack);
 
@@ -72,7 +73,7 @@ export default function MainViewDates() {
                     return (
                         <button
                             key={dateStr}
-                            onClick={() => setSelectedDate(date)}
+                            onClick={() => onDateSelect(date)}
                             style={{
                                 backgroundColor: isSel ? "var(--main-font)" : "var(--bg3)",
                                 color: isSel ? "var(--background)" : (isTdy ? "var(--main-font)" : "var(--second-font)"),

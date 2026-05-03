@@ -4,21 +4,23 @@ import MainViewDates from "../components/MainViewDates";
 import Sidebar from "../components/Sidebar";
 import TaskView from "../components/TaskView";
 import Background from "../components/Background";
-import type { Task } from "../types/Task";
+import { api } from "../services/api";
+import type { ScheduleTask } from "../types/Task";
 
-const tasks: Task[] = [
-    { name: "Morning Gym", location: "Gold's Gym", start: "06:00", deadline: null, duration: "90", difficulty: "0.7", importance: "0.8", fixed_time: true, fixed_start: "06:00", recurrent: false, recurrence_days: null, category: ["fitness"], created_at: "", updated_at: "" },
-    { name: "Math Class", location: "School", start: "08:00", deadline: null, duration: "90", difficulty: "0.6", importance: "0.7", fixed_time: true, fixed_start: "08:00", recurrent: false, recurrence_days: null, category: ["education"], created_at: "", updated_at: "" },
-    { name: "Project Sync", location: "Discord", start: "11:00", deadline: null, duration: "60", difficulty: "0.5", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["work"], created_at: "", updated_at: "" },
-    { name: "Grocery Run", location: "Whole Foods", start: "17:00", deadline: null, duration: "60", difficulty: "0.3", importance: "0.7", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["personal"], created_at: "", updated_at: "" },
-    { name: "Dinner Date", location: "Pasta Place", start: "19:30", deadline: null, duration: "90", difficulty: "0.4", importance: "0.9", fixed_time: true, fixed_start: "19:30", recurrent: false, recurrence_days: null, category: ["social"], created_at: "", updated_at: "" },
-    { name: "Review Code", location: "Office", start: "21:30", deadline: null, duration: "60", difficulty: "0.8", importance: "0.6", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["work"], created_at: "", updated_at: "" },
-    { name: "Meditation", location: "Headspace", start: "23:00", deadline: null, duration: "30", difficulty: "0.2", importance: "0.5", fixed_time: false, fixed_start: null, recurrent: false, recurrence_days: null, category: ["wellness"], created_at: "", updated_at: "" }
-];
+function formatDateForAPI(date: Date): string {
+    return date.toISOString().split("T")[0];
+}
 
-function MainView() {
+function extractTime(datetime: string): string {
+    if (!datetime) return "";
+    return datetime.split("T")[1]?.substring(0, 5) || "";
+}
+
+function MainView({ selectedDate, onDateSelect }: { selectedDate: Date; onDateSelect: (date: Date) => void }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [constraints, setConstraints] = useState({ left: 0, right: 0 });
+    const [tasks, setTasks] = useState<ScheduleTask[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (containerRef.current) {
@@ -28,36 +30,79 @@ function MainView() {
         }
     }, []);
 
+    useEffect(() => {
+        const fetchSchedule = async () => {
+            setLoading(true);
+            try {
+                const dateStr = formatDateForAPI(selectedDate);
+                const response = await api.getSchedule(dateStr);
+                setTasks(response.tasks);
+            } catch (error) {
+                console.error("Failed to fetch schedule:", error);
+                setTasks([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSchedule();
+    }, [selectedDate]);
+
     return (
         <div className="flex flex-col gap-15 items-center flex-1 text-main py-18 overflow-hidden">
             <h1 className="font-bold text-[48px] mb-8">YOUR SCHEDULE</h1>
-            <MainViewDates />
-
+            <MainViewDates selectedDate={selectedDate} onDateSelect={onDateSelect} />
 
             <div className="w-full max-w-6xl mx-auto mt-4 rounded-3xl border-2 border-white/5 bg-sec/30 shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing px-8 backdrop-blur-4xl">
-                <motion.div
-                    ref={containerRef}
-                    drag="x"
-                    dragConstraints={constraints}
-                    className="flex flex-row gap-6 py-4"
-                >
-                    {tasks.map((t, i) => (
-                        <div key={i} className="shrink-0">
-                            <TaskView task={t} />
-                        </div>
-                    ))}
-                </motion.div>
+                {loading ? (
+                    <div className="flex items-center justify-center py-12 text-second-font">Loading...</div>
+                ) : tasks.length === 0 ? (
+                    <div className="flex items-center justify-center py-12 text-second-font">No tasks scheduled</div>
+                ) : (
+                    <motion.div
+                        ref={containerRef}
+                        drag="x"
+                        dragConstraints={constraints}
+                        className="flex flex-row gap-6 py-4"
+                    >
+                        {tasks.map((t, i) => (
+                            <div key={t.task_id || i} className="shrink-0">
+                                <TaskView 
+                                    task={{
+                                        name: t.name,
+                                        start: t.start,
+                                        deadline: null,
+                                        duration: 60,
+                                        difficulty: 0.5,
+                                        location: t.location,
+                                        importance: 0.5,
+                                        fixed_time: false,
+                                        fixed_start: null,
+                                        category: []
+                                    }}
+                                    taskId={t.task_id}
+                                    onDelete={(id) => setTasks(prev => prev.filter(t => t.task_id !== id))}
+                                />
+                            </div>
+                        ))}
+                    </motion.div>
+                )}
             </div>
         </div>
     );
 }
 
 export default function HomePage() {
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        return d;
+    });
+
     return (
         <div className="w-screen h-screen flex overflow-hidden">
             <Background />
             <Sidebar />
-            <MainView />
+            <MainView selectedDate={selectedDate} onDateSelect={setSelectedDate} />
         </div>
     );
 }

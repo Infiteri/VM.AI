@@ -2,17 +2,13 @@ export interface Task {
   name: string;
   start: string | null;
   deadline: string | null;
-  duration: string;
-  difficulty: string;
-  location: string | null;
-  importance: string;
+  duration: number;
+  difficulty: number;
+  location: string;
+  importance: number;
   fixed_time: boolean;
   fixed_start: string | null;
-  recurrent: boolean;
-  recurrence_days: string[] | null;
   category: string[];
-  created_at: string;
-  updated_at: string;
 }
 
 export function createDefaultTask(): Task {
@@ -20,16 +16,39 @@ export function createDefaultTask(): Task {
     name: "",
     start: null,
     deadline: null,
-    duration: "30",
-    difficulty: "0.5",
-    location: null,
-    importance: "0.5",
+    duration: 30,
+    difficulty: 0.5,
+    location: "",
+    importance: 0.5,
     fixed_time: false,
     fixed_start: null,
-    recurrent: false,
-    recurrence_days: null,
     category: [],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
   };
+}
+
+export interface TaskResponse {
+  success: boolean;
+  task_id: string;
+  status: string;
+  message?: string;
+}
+
+export interface ScheduleTask {
+  task_id: string;
+  name: string;
+  start: string;
+  end: string;
+  location: string;
+  rated: boolean;
+}
+
+export interface ScheduleResponse {
+  date: string;
+  tasks: ScheduleTask[];
+}
+
+export interface UnscheduledTask {
+  task_id: string;
+  task: Task;
+  created_at: string;
 }
