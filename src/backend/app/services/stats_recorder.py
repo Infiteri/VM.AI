@@ -338,7 +338,7 @@ class StatsRecorder:
         offset = 0
         current_boost = boost
 
-        while current_boost > 0:
+        while abs(current_boost) >= TIME_SCORE_STEP:
             if offset == 0:
                 # Target slot: apply once
                 slot_minutes = target_minutes
@@ -365,7 +365,10 @@ class StatsRecorder:
                     time_scores[slot_key] = round(new_value, 2)
 
             offset += 1
-            current_boost = boost - (offset * TIME_SCORE_STEP)
+            if boost >= 0:
+                current_boost = boost - (offset * TIME_SCORE_STEP)
+            else:
+                current_boost = boost + (offset * TIME_SCORE_STEP)
 
         setattr(stats, time_scores_key, time_scores)
 
