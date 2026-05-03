@@ -13,12 +13,12 @@ export default function TaskView({ task }: TaskViewProps) {
     const navigate = useNavigate()
 
     const [taskData, setTaskData] = useState<{
-        duration: string;
-        difficulty: string;
+        duration: number;
+        difficulty: number;
         realization: boolean | null;
     }>({
-        duration: task?.duration ?? "30",
-        difficulty: task?.difficulty ?? "0.5",
+        duration: typeof task?.duration === 'number' ? task.duration : 30,
+        difficulty: typeof task?.difficulty === 'number' ? task.difficulty * 100 : 50,
         realization: null
     });
 
@@ -43,8 +43,6 @@ export default function TaskView({ task }: TaskViewProps) {
             importance: task.importance,
             fixed_time: task.fixed_time,
             fixed_start: task.fixed_start,
-            recurrent: task.recurrent,
-            recurrence_days: task.recurrence_days,
             category: task.category,
         };
         navigate("/task", { state: { task: plainTask, openMode: "modify" } });
@@ -130,7 +128,7 @@ export default function TaskView({ task }: TaskViewProps) {
                                     <input
                                         type="number"
                                         value={taskData.duration}
-                                        onChange={(e) => setTaskData({ ...taskData, duration: e.target.value })}
+                                        onChange={(e) => setTaskData({ ...taskData, duration: parseInt(e.target.value) || 0 })}
                                         style={{ backgroundColor: 'transparent', width: '100%', fontSize: '12px', color: 'white', outline: 'none', textAlign: 'right' }}
                                         placeholder="0"
                                     />
@@ -149,7 +147,7 @@ export default function TaskView({ task }: TaskViewProps) {
                                     min="0"
                                     max="100"
                                     value={taskData.difficulty}
-                                    onChange={(e) => setTaskData({ ...taskData, difficulty: e.target.value })}
+                                    onChange={(e) => setTaskData({ ...taskData, difficulty: parseInt(e.target.value) })}
                                     style={{ width: '100%', height: '4px', borderRadius: '8px', cursor: 'pointer', accentColor: 'var(--main-font)' }}
                                 />
                             </div>

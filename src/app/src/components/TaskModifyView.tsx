@@ -1,5 +1,7 @@
 import type { Task } from "../types/Task";
 import React, { useState } from "react";
+import { api } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 interface ToggleProps {
   name: string;
@@ -53,35 +55,57 @@ interface TaskModifyProps {
   task?: Task;
 }
 
-function toISODate(dateStr: string): string {
-  if (!dateStr) return "";
-  if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) return dateStr;
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "";
-  return date.toISOString().split("T")[0];
+function formatDateForInput(isoDate: string | null): string {
+  if (!isoDate) return "";
+  return isoDate.split("T")[0];
+}
+
+function formatTimeForInput(isoDate: string | null): string {
+  if (!isoDate) return "";
+  return isoDate.split("T")[1]?.substring(0, 5) || "";
 }
 
 function toISODateTime(dateStr: string, timeStr: string): string | null {
   if (!dateStr || !timeStr) return null;
-  return new Date(`${dateStr}T${timeStr}`).toISOString();
+  const d = new Date(`${dateStr}T${timeStr}:00`);
+  return d.toISOString();
+}
+
+function toFullDateTime(dateStr: string, defaultHour: number = 0): string | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  d.setHours(defaultHour, 0, 0, 0);
+  const iso = d.toISOString();
+  return iso.substring(0, 19) + "+00:00";
+}
+
+function toBackendDateTime(isoDate: string | null): string | null {
+  if (!isoDate) return null;
+  const d = new Date(isoDate);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = String(d.getHours()).padStart(2, "0");
+  const mins = String(d.getMinutes()).padStart(2, "0");
+  const secs = String(d.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${mins}:${secs}`;
 }
 
 export default function TaskModifyView({ task }: TaskModifyProps) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   const defaultTask: Task = {
     name: "",
     start: null,
     deadline: null,
-    duration: "30",
-    difficulty: "0.5",
-    location: null,
-    importance: "0.5",
+    duration: 30,
+    difficulty: 0.5,
+    location: "",
+    importance: 0.5,
     fixed_time: false,
     fixed_start: null,
-    recurrent: false,
-    recurrence_days: null,
     category: [],
-    created_at: "",
-    updated_at: "",
   };
 
   const [formData, setFormData] = useState<Task>(task ?? defaultTask);
@@ -138,10 +162,17 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "duration" || name === "difficulty" || name === "importance") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: parseFloat(value) || 0,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleCategoryAdd = () => {
@@ -179,7 +210,7 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
           <input
             name="duration"
             type="number"
-            value={formData.duration}
+            value={String(formData.duration)}
             onChange={handleChange}
             className="w-full bg-sec/40 border border-main-font/20 rounded-xl px-4 py-3 text-main-font placeholder:text-main-font/20 outline-none focus:border-main-font/40 transition-all no-spinner pr-12 text-right"
           />
@@ -219,11 +250,11 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
               </span>
               <input
                 type="date"
-                value={formData.start ?? ""}
+                value={formatDateForInput(formData.start)}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    start: toISODate(e.target.value),
+                    start: toFullDateTime(e.target.value, 9),
                   }))
                 }
                 className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
@@ -235,11 +266,11 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
               </span>
               <input
                 type="date"
-                value={formData.deadline ?? ""}
+                value={formatDateForInput(formData.deadline)}
                 onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    deadline: toISODate(e.target.value),
+                    deadline: toFullDateTime(e.target.value, 23),
                   }))
                 }
                 className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
@@ -252,13 +283,13 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
       <RangeSlider
         label="Difficulty"
         name="difficulty"
-        value={formData.difficulty}
+        value={String(formData.difficulty)}
         onChange={handleChange}
       />
       <RangeSlider
         label="Importance"
         name="importance"
-        value={formData.importance}
+        value={String(formData.importance)}
         onChange={handleChange}
       />
 
@@ -316,10 +347,58 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
       )}
 
       <button
-        onClick={() => console.log(formData)}
+        onClick={async () => {
+          if (!formData.name) {
+            alert("Please enter a task name");
+            return;
+          }
+          if (formData.category.length === 0) {
+            alert("Please add at least one category");
+            return;
+          }
+          if (!formData.location) {
+            alert("Please enter a location");
+            return;
+          }
+          
+          setLoading(true);
+          try {
+            let finalFixedStart = formData.fixed_start;
+            if (formData.fixed_time && !finalFixedStart) {
+              const now = new Date();
+              now.setHours(12, 0, 0, 0);
+              finalFixedStart = now.toISOString();
+            }
+            
+            const taskToSend = {
+              name: formData.name,
+              duration: formData.duration,
+              difficulty: formData.difficulty,
+              importance: formData.importance,
+              category: formData.category,
+              location: formData.location,
+              fixed_time: formData.fixed_time,
+              start: formData.fixed_time ? null : toBackendDateTime(formData.start),
+              deadline: formData.fixed_time ? null : toBackendDateTime(formData.deadline),
+              fixed_start: formData.fixed_time ? toBackendDateTime(finalFixedStart) : null,
+            };
+            console.log("Sending task:", JSON.stringify(taskToSend));
+            console.log("Calling API...");
+            await api.createTask(taskToSend);
+            console.log("API call done");
+            navigate("/pending");
+          } catch (err: any) {
+            console.error("Failed to create task:", err);
+            const errorMsg = err instanceof Error ? err.message : JSON.stringify(err);
+            alert("Failed to create task: " + errorMsg);
+          } finally {
+            setLoading(false);
+          }
+        }}
+        disabled={loading}
         className="w-full bg-main-font text-background font-bold py-4 rounded-2xl text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-[0.2em] mt-2"
       >
-        Submit task
+        {loading ? "Creating..." : "Submit task"}
       </button>
     </div>
   );
