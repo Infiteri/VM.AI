@@ -448,12 +448,12 @@ class ScheduleEngine:
         now = datetime.now()
         
         if task.start:
-            task_start = task.start
+            task_start = task.start.replace(tzinfo=None) if task.start.tzinfo else task.start
         else:
             task_start = now
         
         if task.deadline:
-            task_deadline = task.deadline
+            task_deadline = task.deadline.replace(tzinfo=None) if task.deadline.tzinfo else task.deadline
         else:
             task_deadline = task_start + timedelta(days=7)
         
@@ -589,7 +589,9 @@ class ScheduleEngine:
                 
                 window_end_total_minutes = end_minutes[0] * 60 + end_minutes[1]
                 duration_total_minutes = self._round_up_to_interval(duration_minutes)
-                valid_end_minutes = window_end_total_minutes - duration_total_minutes
+                
+                deadzone_start_minutes = 23 * 60
+                valid_end_minutes = min(window_end_total_minutes - duration_total_minutes, deadzone_start_minutes - duration_total_minutes)
                 
                 if valid_end_minutes <= 0:
                     continue
@@ -738,6 +740,9 @@ class ScheduleEngine:
         
         now = datetime.now()
         
+        if slot_start.tzinfo:
+            slot_start = slot_start.replace(tzinfo=None)
+        
         if slot_start <= now:
             logger.warning(f"Slot {slot_start} is in the past (now: {now})")
             return -1.0
@@ -757,6 +762,9 @@ class ScheduleEngine:
         db: Session,
     ) -> float:
         """Calculate proximity boost to previous task."""
+        if slot_start.tzinfo:
+            slot_start = slot_start.replace(tzinfo=None)
+        
         prev_task = db.query(ProvisionalSlot).filter(
             ProvisionalSlot.end <= slot_start,
         ).order_by(ProvisionalSlot.end.desc()).first()
@@ -764,7 +772,8 @@ class ScheduleEngine:
         if not prev_task:
             return 0.0
         
-        minutes_diff = (slot_start - prev_task.end).total_seconds() / 60
+        prev_end = prev_task.end.replace(tzinfo=None) if prev_task.end.tzinfo else prev_task.end
+        minutes_diff = (slot_start - prev_end).total_seconds() / 60
         
         slots_diff = round(minutes_diff / SLOT_INTERVAL_MINUTES)
         
