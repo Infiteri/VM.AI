@@ -58,14 +58,13 @@ class ScheduleResponse(BaseModel):
 
 class ProvisionalChange(BaseModel):
     """A single pending change in the schedule."""
+    provisional_schedule_slot_id: UUID
     task_id: UUID
     task_name: str
-    change_type: Optional[str] = None
+    change_type: str
     new_slot_start: datetime
     new_slot_end: datetime
-    location: str  # Not optional
-
-    # Removed: id, value, fixed (as requested)
+    location: str
 
 
 class ProvisionalChangesResponse(BaseModel):

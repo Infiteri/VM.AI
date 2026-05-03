@@ -378,6 +378,7 @@ class TaskPayload(BaseModel):
 {
     "changes": [
         {
+            "provisional_schedule_slot_id": "660e8400-e29b-41d4-a716-446655440001",
             "task_id": "550e8400-e29b-41d4-a716-446655440000",
             "task_name": "Math homework",
             "change_type": "insert",
@@ -450,8 +451,7 @@ class TaskPayload(BaseModel):
 ```json
 {
     "success": true,
-    "task_id": "550e8400-e29b-41d4-a716-446655440000",
-    "stats_updated": true,
+    "slot_id": "550e8400-e29b-41d4-a716-446655440000",
     "message": "Task rated successfully"
 }
 ```

@@ -307,6 +307,17 @@ def update_task(
     try:
         logger.info(f"Starting task update: {id}")
         
+        if source == "provisional":
+            slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
+            if not slot:
+                raise HTTPException(status_code=400, detail="Task not in provisional schedule")
+            stats_recorder.update_time_score(db, id, slot.start, boost=-2.0)
+        elif source == "main_schedule":
+            slot = db.query(MainScheduleSlot).filter(MainScheduleSlot.task_id == id).first()
+            if not slot:
+                raise HTTPException(status_code=400, detail="Task not in main schedule")
+            stats_recorder.update_time_score(db, id, slot.start, boost=-1.0)
+        
         normalize_task_payload(body.task)
         
         computed_task = enrichment_service.update_task(db, body.task)

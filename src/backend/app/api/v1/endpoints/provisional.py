@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+import time
 
 from app.core.database import get_db
+from app.models.schedule import ProvisionalSlot, MainScheduleSlot
+from app.models.task import Task
+from app.models.workflow import ScheduleChange
 from app.schemas.schedule import (
     ProvisionalChangesResponse,
     ProvisionalResetResponse,
@@ -19,14 +23,32 @@ def get_provisional_changes(
     GET /provisional/changes
 
     Fetches all pending inserts/moves in the working schedule.
-
-    TODO: Query provisional_schedule + schedule_changes
-    For now, returns empty stub.
     """
-    # === TEMPORARY STUB ===
+    slots = db.query(ProvisionalSlot).join(Task).all()
+
+    changes = []
+    for slot in slots:
+        task = slot.task
+
+        change = db.query(ScheduleChange).filter(
+            ScheduleChange.provisional_schedule_slot_id == slot.id
+        ).first()
+
+        location_name = task.location.name if task.location else ""
+
+        changes.append({
+            "provisional_schedule_slot_id": slot.id,
+            "task_id": task.id,
+            "task_name": task.name,
+            "change_type": change.change_type,
+            "new_slot_start": slot.start,
+            "new_slot_end": slot.end,
+            "location": location_name,
+        })
+
     return ProvisionalChangesResponse(
-        changes=[],
-        total_count=0,
+        changes=changes,
+        total_count=len(changes),
     )
 
 
@@ -36,19 +58,32 @@ def reset_provisional(
 ):
     """
     POST /provisional/reset
-    
-    Discards all provisional changes and resets working copy 
+
+    Discards all provisional changes and resets working copy
     to match committed schedule.
-    
-    TODO: Truncate provisional_schedule and schedule_changes, 
-    then copy from main_schedule.
-    For now, returns success stub.
     """
-    # === TEMPORARY STUB ===
+    changes_discarded = db.query(ScheduleChange).count()
+
+    db.query(ProvisionalSlot).delete(synchronize_session=False)
+
+    main_slots = db.query(MainScheduleSlot).all()
+    for slot in main_slots:
+        new_slot = ProvisionalSlot(
+            task_id=slot.task_id,
+            start=slot.start,
+            end=slot.end,
+            value=slot.value,
+            fixed=slot.fixed,
+            location=slot.location,
+        )
+        db.add(new_slot)
+
+    db.commit()
+
     return ProvisionalResetResponse(
         success=True,
-        message="Provisional schedule reset to main schedule (stub)",
-        changes_discarded=0,
+        message="Provisional schedule reset to main schedule",
+        changes_discarded=changes_discarded,
     )
 
 
@@ -58,20 +93,37 @@ def commit_provisional(
 ):
     """
     POST /provisional/commit
-    
-    Atomically copies provisional_schedule to main_schedule 
+
+    Atomically copies provisional_schedule to main_schedule
     and clears change logs.
-    
-    TODO: Wrap in a single PostgreSQL transaction:
-          1. DELETE FROM main_schedule
-          2. INSERT INTO main_schedule SELECT * FROM provisional_schedule
-          3. TRUNCATE schedule_changes
-    For now, returns success stub.
     """
-    # === TEMPORARY STUB ===
+    start = time.time()
+    
+    committed_count = db.query(ScheduleChange).count()
+    
+    db.query(MainScheduleSlot).delete(synchronize_session=False)
+    
+    provisional_slots = db.query(ProvisionalSlot).all()
+    for slot in provisional_slots:
+        new_slot = MainScheduleSlot(
+            task_id=slot.task_id,
+            start=slot.start,
+            end=slot.end,
+            value=slot.value,
+            fixed=slot.fixed,
+            location=slot.location,
+        )
+        db.add(new_slot)
+    
+    db.query(ScheduleChange).delete(synchronize_session=False)
+    
+    db.commit()
+    
+    transaction_time_ms = int((time.time() - start) * 1000)
+    
     return ProvisionalCommitResponse(
         success=True,
-        committed_count=0,
-        message="Schedule committed successfully (stub)",
-        transaction_time_ms=0,
+        committed_count=committed_count,
+        transaction_time_ms=transaction_time_ms,
+        message="Schedule committed successfully",
     )
