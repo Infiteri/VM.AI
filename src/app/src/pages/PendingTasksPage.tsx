@@ -7,13 +7,49 @@ import TaskView from "../components/TaskView";
 import type { Task, UnscheduledTask } from "../types/Task";
 import { api } from "../services/api";
 
-function ScheduleChangesView({ loading }: { loading: boolean }) {
+interface ProvisionalChange {
+    task_id: string;
+    task_name: string;
+    change_type: string;
+    new_slot_start: string;
+    new_slot_end: string;
+    location: string;
+}
+
+function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[]; loading: boolean }) {
     if (loading) {
         return <div className="text-second-font">Loading...</div>;
     }
+    if (changes.length === 0) {
+        return (
+            <div className="w-full grid grid-cols-4 auto-rows-fr gap-4">
+                <div className="text-second-font p-4">No pending schedule changes</div>
+            </div>
+        );
+    }
     return (
         <div className="w-full grid grid-cols-4 auto-rows-fr gap-4">
-            <div className="text-second-font p-4">No pending schedule changes</div>
+            {changes.map((change) => {
+                const startTime = change.new_slot_start ? change.new_slot_start.split("T")[1]?.substring(0, 5) : "";
+                const endTime = change.new_slot_end ? change.new_slot_end.split("T")[1]?.substring(0, 5) : "";
+                return (
+                    <div key={change.task_id} className="flex flex-col gap-3 p-4 border border-white/20 rounded-lg bg-white/5">
+                        <div className="flex flex-row items-center justify-between">
+                            <span className="text-lg text-main-font font-medium">{change.task_name}</span>
+                            <span className="text-sm text-second-font">{startTime} - {endTime}</span>
+                        </div>
+                        <div className="flex flex-row gap-2">
+                            <div className="flex flex-row items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/10">
+                                <MapPin className="w-3.5 h-3.5 text-second-font" />
+                                <span className="text-xs text-second-font">{change.location}</span>
+                            </div>
+                            <div className="px-2 py-1 rounded-md bg-white/5 border border-white/10">
+                                <span className="text-xs text-second-font">{change.change_type}</span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
         </div>
     );
 }
@@ -76,6 +112,7 @@ function UnscheduledChangesView({ tasks, loading, onDelete }: { tasks: Unschedul
 export default function PendingTasksPage() {
     const [activeView, setActiveView] = useState("unscheduled");
     const [unscheduledTasks, setUnscheduledTasks] = useState<UnscheduledTask[]>([]);
+    const [provisionalChanges, setProvisionalChanges] = useState<ProvisionalChange[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -93,9 +130,27 @@ export default function PendingTasksPage() {
         }
     };
 
+    const fetchProvisionalChanges = async () => {
+        setLoading(true);
+        try {
+            const response = await api.getProvisionalChanges();
+            setProvisionalChanges(response.changes);
+            setError("");
+        } catch (err) {
+            setError("Failed to fetch changes");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetchUnscheduled();
-    }, []);
+        if (activeView === "unscheduled") {
+            fetchUnscheduled();
+        } else {
+            fetchProvisionalChanges();
+        }
+    }, [activeView]);
 
     const handleDelete = async (taskId: string) => {
         try {
@@ -121,6 +176,7 @@ export default function PendingTasksPage() {
     const handleReset = async () => {
         try {
             await api.resetProvisional();
+            fetchProvisionalChanges();
         } catch (err) {
             console.error("Failed to reset:", err);
         }
@@ -129,6 +185,8 @@ export default function PendingTasksPage() {
     const handleCommit = async () => {
         try {
             await api.commitProvisional();
+            setActiveView("unscheduled");
+            fetchUnscheduled();
         } catch (err) {
             console.error("Failed to commit:", err);
         }
@@ -195,7 +253,7 @@ export default function PendingTasksPage() {
                     <div className="flex-1 p-8">
                         {error && <div className="text-red-500 mb-4">{error}</div>}
                         {activeView === "schedule" ? (
-                            <ScheduleChangesView loading={loading} />
+                            <ScheduleChangesView changes={provisionalChanges} loading={loading} />
                         ) : (
                             <UnscheduledChangesView tasks={unscheduledTasks} loading={loading} onDelete={handleDelete} />
                         )}

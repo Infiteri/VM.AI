@@ -66,18 +66,22 @@ function MainView({ selectedDate, onDateSelect }: { selectedDate: Date; onDateSe
                     >
                         {tasks.map((t, i) => (
                             <div key={t.task_id || i} className="shrink-0">
-                                <TaskView task={{
-                                    name: t.name,
-                                    start: extractTime(t.start),
-                                    deadline: null,
-                                    duration: 60,
-                                    difficulty: 0.5,
-                                    location: t.location,
-                                    importance: 0.5,
-                                    fixed_time: false,
-                                    fixed_start: extractTime(t.start),
-                                    category: []
-                                }} />
+                                <TaskView 
+                                    task={{
+                                        name: t.name,
+                                        start: t.start,
+                                        deadline: null,
+                                        duration: 60,
+                                        difficulty: 0.5,
+                                        location: t.location,
+                                        importance: 0.5,
+                                        fixed_time: false,
+                                        fixed_start: null,
+                                        category: []
+                                    }}
+                                    taskId={t.task_id}
+                                    onDelete={(id) => setTasks(prev => prev.filter(t => t.task_id !== id))}
+                                />
                             </div>
                         ))}
                     </motion.div>

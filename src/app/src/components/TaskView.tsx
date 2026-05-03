@@ -3,12 +3,15 @@ import { CheckCircle2, CircleOff, MessageSquareText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Task } from '../types/Task';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 interface TaskViewProps {
     task: Task;
+    taskId?: string;
+    onDelete?: (taskId: string) => void;
 }
 
-export default function TaskView({ task }: TaskViewProps) {
+export default function TaskView({ task, taskId, onDelete }: TaskViewProps) {
     const [isNoteOpen, setIsNoteOpen] = useState(false);
     const navigate = useNavigate()
 
@@ -22,10 +25,18 @@ export default function TaskView({ task }: TaskViewProps) {
         realization: null
     });
 
+    function formatTimeDisplay(dateStr: string | null): string {
+        if (!dateStr) return "07:00";
+        if (dateStr.includes("T")) {
+            return dateStr.split("T")[1]?.substring(0, 5) || "07:00";
+        }
+        return dateStr;
+    }
+
     const {
         name = task.name ?? "Task name",
         location = task.location ?? "School",
-        fixed_start = task.fixed_start ?? "07:00"
+        fixed_start = formatTimeDisplay(task.fixed_start)
     } = task || {};
 
     const handleSave = () => {
@@ -33,6 +44,7 @@ export default function TaskView({ task }: TaskViewProps) {
     };
 
     const handleModifyClick = () => {
+        console.log("Modify clicked - current task state:", task);
         const plainTask = {
             name: task.name,
             start: task.start,
@@ -45,6 +57,7 @@ export default function TaskView({ task }: TaskViewProps) {
             fixed_start: task.fixed_start,
             category: task.category,
         };
+        console.log("Navigating with:", { task: plainTask, openMode: "modify" });
         navigate("/task", { state: { task: plainTask, openMode: "modify" } });
     };
 
@@ -78,7 +91,19 @@ export default function TaskView({ task }: TaskViewProps) {
 
                 <div className="flex justify-between mt-1 px-1 text-[9px] font-medium uppercase tracking-tighter">
                     <button onClick={() => { handleModifyClick() }} className="text-second hover:text-main transition-colors">Modify</button>
-                    <button className="text-second hover:text-del transition-colors">Delete</button>
+                    <button 
+                        onClick={async () => {
+                            if (taskId && onDelete) {
+                                try {
+                                    await api.deleteTask(taskId, "main_schedule");
+                                    onDelete(taskId);
+                                } catch (err) {
+                                    console.error("Failed to delete:", err);
+                                }
+                            }
+                        }} 
+                        className="text-second hover:text-del transition-colors"
+                    >Delete</button>
                 </div>
             </div>
 

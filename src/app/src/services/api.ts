@@ -109,17 +109,17 @@ export const api = {
     }>;
     total_count: number;
   }> => {
-    return fetchAPI("/provisional/changes/");
+    return fetchAPI("/provisional/changes");
   },
 
   resetProvisional: async (): Promise<{ success: boolean; message: string; changes_discarded: number }> => {
-    return fetchAPI("/provisional/reset/", {
+    return fetchAPI("/provisional/reset", {
       method: "POST",
     });
   },
 
   commitProvisional: async (): Promise<{ success: boolean; committed_count: number; message: string; transaction_time_ms: number }> => {
-    return fetchAPI("/provisional/commit/", {
+    return fetchAPI("/provisional/commit", {
       method: "POST",
     });
   },

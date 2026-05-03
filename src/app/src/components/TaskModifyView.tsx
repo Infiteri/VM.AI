@@ -1,5 +1,5 @@
 import type { Task } from "../types/Task";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
@@ -53,6 +53,7 @@ const RangeSlider = ({ label, name, value, onChange }: RangeSliderProps) => (
 
 interface TaskModifyProps {
   task?: Task;
+  onUpdate?: (task: Task) => void;
 }
 
 function formatDateForInput(isoDate: string | null): string {
@@ -91,7 +92,7 @@ function toBackendDateTime(isoDate: string | null): string | null {
   return `${year}-${month}-${day}T${hours}:${mins}:${secs}`;
 }
 
-export default function TaskModifyView({ task }: TaskModifyProps) {
+export default function TaskModifyView({ task, onUpdate }: TaskModifyProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -109,6 +110,12 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
   };
 
   const [formData, setFormData] = useState<Task>(task ?? defaultTask);
+
+  useEffect(() => {
+    if (task) {
+      setFormData(task);
+    }
+  }, [task]);
 
   const [fixedDate, setFixedDate] = useState(
     formData.fixed_start ? formData.fixed_start.split("T")[0] : ""
@@ -359,6 +366,13 @@ export default function TaskModifyView({ task }: TaskModifyProps) {
           if (!formData.location) {
             alert("Please enter a location");
             return;
+          }
+          
+          if (!formData.fixed_time && formData.start && formData.deadline) {
+            if (new Date(formData.start) >= new Date(formData.deadline)) {
+              alert("Start time must be before deadline");
+              return;
+            }
           }
           
           setLoading(true);
