@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from uuid import UUID
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from app.core.database import get_db
 from app.core.logging_config import setup_logging
-from app.schemas.schedule import ScheduleResponse, BatchScheduleResponse
+from app.models.schedule import MainScheduleSlot
+from app.models.task import Task
+from app.schemas.schedule import ScheduleResponse, BatchScheduleResponse, ScheduleTask
 from app.services.schedule_engine import schedule_engine
 from app.services.stats_recorder import stats_recorder
 from app.models.workflow import UnscheduledTask
@@ -21,11 +23,31 @@ def get_schedule(
 ):
     """
     GET /schedule?date=YYYY-MM-DD
+    
+    Returns all tasks from main_schedule that start on the specified date.
     """
-    # Stub Response
+    day_start = datetime.combine(date, datetime.min.time())
+    day_end = day_start + timedelta(days=1)
+    
+    slots = db.query(MainScheduleSlot).filter(
+        MainScheduleSlot.start >= day_start,
+        MainScheduleSlot.start < day_end,
+    ).join(Task).order_by(MainScheduleSlot.start).all()
+    
+    tasks = []
+    for slot in slots:
+        tasks.append(ScheduleTask(
+            task_id=slot.task_id,
+            name=slot.task.name,
+            start=slot.start,
+            end=slot.end,
+            location=slot.location or "",
+            rated=slot.task.rated,
+        ))
+    
     return ScheduleResponse(
         date=date,
-        tasks=[],
+        tasks=tasks,
     )
 
 
