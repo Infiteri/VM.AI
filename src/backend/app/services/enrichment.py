@@ -116,7 +116,6 @@ class EnrichmentService:
             # It's a MatchResult schema - convert to dict
             match_result = match_result.model_dump()
 
-        logger.debug(f"  Input NLP payload keys: {list(nlp_payload.keys())}") 
         logger.debug(f"  Match status: {match_result.get('association_status')}")
 
         # First parse dates (flat structure needed for _get_overwrite_map)
@@ -145,7 +144,6 @@ class EnrichmentService:
         draft_id = self._draft_save(db, enriched_task, match_result)
 
         logger.info(f"Enrichment: predict_nlp_add complete. Draft ID: {draft_id}")
-        logger.debug(f"  Output task keys: {list(enriched_task.keys())}")
 
         # Convert output to schema (TaskPayload - no computed, no refs)
         output_schema = self._convert_output(enriched_task, with_computed=False, with_refs=False)
@@ -384,7 +382,7 @@ class EnrichmentService:
         stats_id = match_result.get("associated_id")
         categories = self._extract_categories(nlp_payload)
 
-        logger.debug(f"Building overwrite map. Stats ID: {stats_id}")
+        logger.info(f"Building overwrite map. Stats ID: {stats_id}")
 
         # First, determine difficulty values (for duration lookup)
         difficulty_predicted = False
@@ -957,14 +955,14 @@ class EnrichmentService:
         name_value = name_entry.get("value") if name_entry else None
         if name_value is None or name_value == "":
             result["name"] = {"value": "task", "predicted": True}
-            logger.warning("Validation: name set to 'task' (was None)")
+            logger.info("Validation: name set to 'task' (was None)")
         else:
             # Normalize: capitalize first letter only
             name_value = str(name_value).strip()
             if name_value:
                 name_value = name_value[0].upper() + name_value[1:]
             result["name"] = {"value": name_value, "predicted": name_entry.get("predicted", True)}
-            logger.debug(f"Validation: name normalized to '{name_value}'")
+            logger.info(f"Validation: name normalized to '{name_value}'")
 
         # Get fixed_time value
         fixed_time_entry = result.get("fixed_time", {})
@@ -972,7 +970,7 @@ class EnrichmentService:
         if fixed_time_value is None:
             fixed_time_value = False
             result["fixed_time"] = {"value": False, "predicted": True}
-            logger.warning("Validation: fixed_time set to False (was None)")
+            logger.info("Validation: fixed_time set to False (was None)")
 
         # Rule 9: fixed_time=None -> False (already handled above)
         # Rule 10: fixed_start=None but fixed_time=True -> fixed_time=False
@@ -981,7 +979,7 @@ class EnrichmentService:
             fixed_start_value = fixed_start_entry.get("value") if fixed_start_entry else None
             if fixed_start_value is None:
                 result["fixed_time"] = {"value": False, "predicted": True}
-                logger.warning("Validation: fixed_time set to False (fixed_start was None)")
+                logger.debug("Validation: fixed_time set to False (fixed_start was None)")
 
         # Apply rules for non-fixed_time tasks
         if not fixed_time_value:
@@ -991,7 +989,7 @@ class EnrichmentService:
             if start_value is None:
                 current_start = now.replace(second=0, microsecond=0)
                 result["start"] = {"value": current_start, "predicted": True}
-                logger.warning("Validation: start set to current time (was None)")
+                logger.debug("Validation: start set to current time (was None)")
 
             # Rule 3: deadline=None -> calculate
             start_for_deadline = result.get("start", {}).get("value") or now
@@ -1039,7 +1037,7 @@ class EnrichmentService:
             if isinstance(category_value, list):
                 category_value = [str(cat).lower().strip() for cat in category_value if cat]
             result["category"] = {"value": category_value, "predicted": category_entry.get("predicted", True)}
-            logger.debug(f"Validation: category normalized to {category_value}")
+            logger.info(f"Validation: category normalized to {category_value}")
 
         # Rule 7: location=None -> "home"
         location_entry = result.get("location", {})
@@ -1051,7 +1049,7 @@ class EnrichmentService:
             # Normalize: lowercase
             location_value = str(location_value).lower().strip()
             result["location"] = {"value": location_value, "predicted": location_entry.get("predicted", True)}
-            logger.debug(f"Validation: location normalized to '{location_value}'")
+            logger.info(f"Validation: location normalized to '{location_value}'")
 
         # Rule 8: importance=None -> 0.5
         importance_entry = result.get("importance", {})
