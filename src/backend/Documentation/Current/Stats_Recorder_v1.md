@@ -171,8 +171,7 @@ Applied when:
 ```json
 {
     "success": true,
-    "task_id": "uuid",
-    "stats_updated": true
+    "slot_id": "uuid"
 }
 ```
 

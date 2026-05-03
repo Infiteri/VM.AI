@@ -25,7 +25,6 @@ def rate_task(
 
     return RateResponse(
         success=True,
-        task_id=id,
-        stats_updated=True,
+        slot_id=id,
         message="Task rated successfully (stub)",
     )

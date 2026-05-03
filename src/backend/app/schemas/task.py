@@ -65,18 +65,18 @@ class TaskPayload(BaseModel):
         now = datetime.now(timezone.utc)
         
         if self.start is not None and self.deadline is not None:
-            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start
-            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
+            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start.replace(tzinfo=timezone.utc)
+            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline.replace(tzinfo=timezone.utc)
             if start >= deadline:
                 raise ValueError("start must be before deadline")
         
         if self.deadline is not None:
-            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
+            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline.replace(tzinfo=timezone.utc)
             if deadline <= now:
                 raise ValueError("deadline must be in the future")
         
         if self.fixed_time and self.fixed_start is not None:
-            fixed = self.fixed_start.astimezone(timezone.utc) if self.fixed_start.tzinfo else self.fixed_start
+            fixed = self.fixed_start.astimezone(timezone.utc) if self.fixed_start.tzinfo else self.fixed_start.replace(tzinfo=timezone.utc)
             if fixed <= now:
                 raise ValueError("fixed_start must be in the future")
         
