@@ -1,20 +1,37 @@
-from pydantic import BaseModel, model_validator, Field
-from typing import Optional, List
+from pydantic import BaseModel, model_validator, Field, ConfigDict
+from typing import Optional, List, Any
 from uuid import UUID
-from datetime import datetime, timezone
+from datetime import datetime
 from app.schemas.shared import SuccessResponse
+
+
+def naive_datetime_serializer(dt: datetime) -> str:
+    """Serialize datetime as naive ISO string (no timezone)."""
+    return dt.strftime("%Y-%m-%dT%H:%M:%S")
 
 
 # 1. The input structure for creating/updating tasks
 class TaskPayload(BaseModel):
     """
     Clean task data with strict validation constraints.
+    
+    All datetime fields use naive format (no timezone).
     """
+    
+    model_config = ConfigDict(
+        json_encoders={datetime: naive_datetime_serializer}
+    )
 
     name: str = Field(..., min_length=1, description="Task name cannot be empty")
 
-    start: Optional[datetime] = None
-    deadline: Optional[datetime] = None
+    start: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-09T09:30:00"}
+    )
+    deadline: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-14T17:00:00"}
+    )
 
     difficulty: float = Field(
         ..., gt=0.0, le=1.0, description="Must be between 0.0 and 1.0"
@@ -33,7 +50,10 @@ class TaskPayload(BaseModel):
     )
 
     fixed_time: bool = False
-    fixed_start: Optional[datetime] = None
+    fixed_start: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-09T09:30:00"}
+    )
 
     @model_validator(mode="after")
     def check_fixed_logic(self):
@@ -61,23 +81,20 @@ class TaskPayload(BaseModel):
     def check_datetime_validity(self):
         """
         Validates that deadline is in the future and start < deadline.
+        Uses naive datetime (no timezone conversion).
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         
         if self.start is not None and self.deadline is not None:
-            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start.replace(tzinfo=timezone.utc)
-            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline.replace(tzinfo=timezone.utc)
-            if start >= deadline:
+            if self.start >= self.deadline:
                 raise ValueError("start must be before deadline")
         
         if self.deadline is not None:
-            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline.replace(tzinfo=timezone.utc)
-            if deadline <= now:
+            if self.deadline <= now:
                 raise ValueError("deadline must be in the future")
         
         if self.fixed_time and self.fixed_start is not None:
-            fixed = self.fixed_start.astimezone(timezone.utc) if self.fixed_start.tzinfo else self.fixed_start.replace(tzinfo=timezone.utc)
-            if fixed <= now:
+            if self.fixed_start <= now:
                 raise ValueError("fixed_start must be in the future")
         
         return self
@@ -89,18 +106,32 @@ class InternalTaskPayload(BaseModel):
     
     Same as TaskPayload but without deadline/fixed_start future validation.
     Used for reading tasks that may have past deadlines.
+    Uses naive datetime format (no timezone).
     """
+    
+    model_config = ConfigDict(
+        json_encoders={datetime: naive_datetime_serializer}
+    )
 
     name: str = Field(..., min_length=1)
-    start: Optional[datetime] = None
-    deadline: Optional[datetime] = None
+    start: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-09T09:30:00"}
+    )
+    deadline: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-14T17:00:00"}
+    )
     difficulty: float = Field(..., gt=0.0, le=1.0)
     duration: int = Field(..., gt=0, lt=1440)
     category: List[str] = Field(..., min_length=1)
     location: str
     importance: float = Field(..., gt=0.0, le=1.0)
     fixed_time: bool = False
-    fixed_start: Optional[datetime] = None
+    fixed_start: Optional[datetime] = Field(
+        None,
+        json_schema_extra={"example": "2026-05-09T09:30:00"}
+    )
 
     @model_validator(mode="after")
     def check_fixed_logic(self):
@@ -119,11 +150,11 @@ class InternalTaskPayload(BaseModel):
 
     @model_validator(mode="after")
     def check_datetime_validity(self):
-        """Only validates start < deadline (NOT deadline > now or fixed_start > now)."""
+        """Only validates start < deadline (NOT deadline > now or fixed_start > now).
+        Uses naive datetime (no timezone conversion).
+        """
         if self.start is not None and self.deadline is not None:
-            start = self.start.astimezone(timezone.utc) if self.start.tzinfo else self.start
-            deadline = self.deadline.astimezone(timezone.utc) if self.deadline.tzinfo else self.deadline
-            if start >= deadline:
+            if self.start >= self.deadline:
                 raise ValueError("start must be before deadline")
         return self
 
@@ -181,15 +212,21 @@ class ParseModifyResponse(BaseModel):
 # 4. Task Detail (Read Model)
 class TaskDetailResponse(BaseModel):
     """Detailed task data returned when fetching a single task or in queues."""
+    
+    model_config = ConfigDict(
+        json_encoders={datetime: naive_datetime_serializer}
+    )
 
     task_id: UUID
     task: InternalTaskPayload
-    created_at: datetime
+    created_at: datetime = Field(
+        json_schema_extra={"example": "2026-05-03T12:00:00"}
+    )
 
 
 # 5. Unscheduled Queue Schema
 class UnscheduledResponse(BaseModel):
     """Response for GET /tasks/unscheduled"""
-
+    
     tasks: List[TaskDetailResponse]
     total_count: int

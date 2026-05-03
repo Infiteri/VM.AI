@@ -10,7 +10,7 @@ Run from src/backend directory:
 import sys
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 # Add src/backend directory to path (same structure as test_enrichment.py)
@@ -74,10 +74,13 @@ def serialize_for_json(obj):
 
 def create_test_task() -> TaskPayload:
     """Create a valid TaskPayload for modify tests."""
+    now = datetime.now()
+    future_start = now + timedelta(days=7)
+    future_deadline = now + timedelta(days=14)
     return TaskPayload(
         name="gym session",
-        start=datetime(2026, 4, 20, 9, 0),
-        deadline=datetime(2026, 4, 25, 17, 0),
+        start=future_start,
+        deadline=future_deadline,
         difficulty=0.5,
         duration=60,
         category=["fitness"],

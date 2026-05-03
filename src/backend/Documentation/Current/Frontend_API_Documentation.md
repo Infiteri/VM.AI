@@ -1,6 +1,6 @@
 # VM.AI — Frontend API Documentation
-**Version:** 3.0 (Final - Corrected)
-**Last Updated:** April 18, 2026
+**Version:** 3.1 (Current)
+**Last Updated:** May 3, 2026
 **Competition:** ONIA 2026
 
 ---
@@ -11,6 +11,13 @@
 ```
 http://localhost:8000/api/v1
 ```
+
+### DateTime Format (Important)
+All datetime values use **naive ISO 8601 format** (no timezone info):
+```
+"2026-05-09T09:30:00"
+```
+**Do NOT include** `Z`, `+03:00`, or any timezone suffix.
 
 ### All Endpoints (13 Total)
 
@@ -77,8 +84,8 @@ class TaskPayload(BaseModel):
     "draft_id": "550e8400-e29b-41d4-a716-446655440000",
     "task": {
         "name": "Chemistry homework",
-        "start": "2026-04-20T09:00:00",
-        "deadline": "2026-04-24T17:00:00",
+        "start": "2026-05-09T09:00:00",
+        "deadline": "2026-05-13T17:00:00",
         "difficulty": 0.7,
         "duration": 60,
         "category": ["study"],
@@ -103,8 +110,8 @@ class TaskPayload(BaseModel):
 {
     "task": {
         "name": "Math homework",
-        "start": "2026-04-20T09:00:00",
-        "deadline": "2026-04-25T17:00:00",
+        "start": "2026-05-09T09:00:00",
+        "deadline": "2026-05-14T17:00:00",
         "difficulty": 0.7,
         "duration": 60,
         "category": ["study"],
@@ -122,8 +129,8 @@ class TaskPayload(BaseModel):
 {
     "task": {
         "name": "Math homework",
-        "start": "2026-04-20T09:00:00",
-        "deadline": "2026-05-01T17:00:00",
+        "start": "2026-05-09T09:00:00",
+        "deadline": "2026-05-14T17:00:00",
         "difficulty": 0.7,
         "duration": 60,
         "category": ["study"],
@@ -148,8 +155,8 @@ class TaskPayload(BaseModel):
 {
     "task": {
         "name": "Math homework",
-        "start": "2026-04-20T09:00:00",
-        "deadline": "2026-04-25T17:00:00",
+        "start": "2026-05-09T09:00:00",
+        "deadline": "2026-05-14T17:00:00",
         "difficulty": 0.7,
         "duration": 60,
         "category": ["study"],
@@ -192,8 +199,8 @@ class TaskPayload(BaseModel):
 {
     "task": {
         "name": "Updated Math homework",
-        "start": "2026-04-21T09:00:00",
-        "deadline": "2026-04-26T17:00:00",
+        "start": "2026-05-10T10:00:00",
+        "deadline": "2026-05-15T17:00:00",
         "difficulty": 0.8,
         "duration": 90,
         "category": ["study"],
@@ -249,8 +256,8 @@ class TaskPayload(BaseModel):
     "task_id": "550e8400-e29b-41d4-a716-446655440000",
     "task": {
         "name": "Math homework",
-        "start": "2026-04-20T09:00:00",
-        "deadline": "2026-04-25T17:00:00",
+        "start": "2026-05-09T09:00:00",
+        "deadline": "2026-05-14T17:00:00",
         "difficulty": 0.7,
         "duration": 60,
         "category": ["study"],
@@ -259,7 +266,7 @@ class TaskPayload(BaseModel):
         "fixed_time": false,
         "fixed_start": null
     },
-    "created_at": "2026-04-18T10:30:00"
+    "created_at": "2026-05-15T10:30:00"
 }
 ```
 
@@ -286,8 +293,8 @@ class TaskPayload(BaseModel):
             "task_id": "550e8400-e29b-41d4-a716-446655440000",
             "task": {
                 "name": "Math homework",
-                "start": "2026-04-20T09:00:00",
-                "deadline": "2026-04-25T17:00:00",
+                "start": "2026-05-09T09:00:00",
+                "deadline": "2026-05-14T17:00:00",
                 "difficulty": 0.7,
                 "duration": 60,
                 "category": ["study"],
@@ -296,7 +303,7 @@ class TaskPayload(BaseModel):
                 "fixed_time": false,
                 "fixed_start": null
             },
-            "created_at": "2026-04-18T10:30:00"
+            "created_at": "2026-05-15T10:30:00"
         }
     ],
     "total_count": 1
@@ -319,13 +326,13 @@ class TaskPayload(BaseModel):
 **Response (ScheduleResponse):**
 ```json
 {
-    "date": "2026-04-20",
+    "date": "2026-05-20",
     "tasks": [
         {
             "task_id": "550e8400-e29b-41d4-a716-446655440000",
             "name": "Math homework",
-            "start": "2026-04-20T09:00:00",
-            "end": "2026-04-20T10:00:00",
+            "start": "2026-05-20T09:00:00",
+            "end": "2026-05-20T10:30:00",
             "location": "Library",
             "rated": false
         }
@@ -353,8 +360,8 @@ class TaskPayload(BaseModel):
             "success": true,
             "task_id": "550e8400-e29b-41d4-a716-446655440000",
             "slot_id": "660e8400-e29b-41d4-a716-446655440001",
-            "slot_start": "2026-04-20T09:00:00",
-            "slot_end": "2026-04-20T10:00:00",
+            "slot_start": "2026-05-20T09:00:00",
+            "slot_end": "2026-05-20T10:30:00",
             "displaced_tasks": [],
             "message": "Task scheduled successfully"
         }
@@ -382,8 +389,8 @@ class TaskPayload(BaseModel):
             "task_id": "550e8400-e29b-41d4-a716-446655440000",
             "task_name": "Math homework",
             "change_type": "insert",
-            "new_slot_start": "2026-04-20T09:00:00",
-            "new_slot_end": "2026-04-20T10:00:00",
+            "new_slot_start": "2026-05-20T09:00:00",
+            "new_slot_end": "2026-05-20T10:30:00",
             "location": "Library"
         }
     ],

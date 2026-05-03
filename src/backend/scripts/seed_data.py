@@ -19,7 +19,7 @@ Insert Order (respecting FK dependencies):
 import sys
 import os
 import argparse
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -41,8 +41,8 @@ from app.utils.task_saver import generate_default_time_scores, DEFAULT_TIME_ANCH
 
 
 def _future_datetime(days_from_now: int = 0, hour: int = 6, minute: int = 0) -> datetime:
-    """Generate a future datetime relative to now."""
-    now = datetime.now(timezone.utc)
+    """Generate a future datetime relative to now (naive format)."""
+    now = datetime.now()
     future = now + timedelta(days=days_from_now)
     return future.replace(hour=hour, minute=minute, second=0, microsecond=0)
 

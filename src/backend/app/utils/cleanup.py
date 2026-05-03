@@ -1,6 +1,6 @@
 import asyncio
 import copy
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
 from app.models.draft import TaskDraft
@@ -18,11 +18,11 @@ TIME_SCORE_MIN_THRESHOLD = 0.1
 def _get_schedule_cutoff() -> datetime:
     """
     Get the cutoff datetime for schedule cleanup.
-    Returns midnight (00:00) at the start of 3 days ago (UTC).
+    Returns midnight (00:00) at the start of 3 days ago (local time).
     """
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     three_days_ago = now.date() - timedelta(days=3)
-    return datetime.combine(three_days_ago, datetime.min.time()).replace(tzinfo=timezone.utc)
+    return datetime.combine(three_days_ago, datetime.min.time())
 
 
 def sweep_drafts(db: Session):

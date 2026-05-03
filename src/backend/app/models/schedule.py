@@ -22,8 +22,8 @@ class MainScheduleSlot(BaseModel):
         ForeignKey("tasks.id", ondelete="CASCADE"),
         nullable=False,
     )
-    start = Column(DateTime(timezone=True), nullable=False)  # Slot start time
-    end = Column(DateTime(timezone=True), nullable=False)  # Slot end time
+    start = Column(DateTime(timezone=False), nullable=False)  # Slot start time
+    end = Column(DateTime(timezone=False), nullable=False)  # Slot end time
     value = Column(Float, nullable=True)  # Task value at scheduling time
     fixed = Column(Boolean, default=False, nullable=False)  # Cannot be displaced
     location = Column(Text, nullable=True)  # For location continuity
@@ -50,8 +50,8 @@ class ProvisionalSlot(BaseModel):
         ForeignKey("tasks.id", ondelete="CASCADE"),
         nullable=False,
     )
-    start = Column(DateTime(timezone=True), nullable=False)  # Slot start time
-    end = Column(DateTime(timezone=True), nullable=False)  # Slot end time
+    start = Column(DateTime(timezone=False), nullable=False)  # Slot start time
+    end = Column(DateTime(timezone=False), nullable=False)  # Slot end time
     value = Column(Float, nullable=True)  # Task value
     fixed = Column(Boolean, default=False, nullable=False)  # Cannot be displaced
     location = Column(Text, nullable=True)  # For location continuity

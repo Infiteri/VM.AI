@@ -15,7 +15,7 @@ class TaskDraft(Base):
     content = Column(JSONB, nullable=False)
 
     created_at = Column(
-        DateTime(timezone=True),
+        DateTime(timezone=False),
         server_default=func.now(),
         nullable=False
     )

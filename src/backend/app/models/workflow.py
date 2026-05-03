@@ -24,7 +24,7 @@ class UnscheduledTask(Base):
         primary_key=True,
     )
     created_at = Column(
-        DateTime(timezone=True),
+        DateTime(timezone=False),
         server_default=func.now(),
         nullable=False,
     )
@@ -52,10 +52,10 @@ class ScheduleChange(BaseModel):
         nullable=False,
     )
     change_type = Column(Text, nullable=False)  # 'insert' or 'move'
-    old_slot_start = Column(DateTime(timezone=True), nullable=True)  # For 'move' operations
-    old_slot_end = Column(DateTime(timezone=True), nullable=True)  # For 'move' operations
-    new_slot_start = Column(DateTime(timezone=True), nullable=False)
-    new_slot_end = Column(DateTime(timezone=True), nullable=False)
+    old_slot_start = Column(DateTime(timezone=False), nullable=True)  # For 'move' operations
+    old_slot_end = Column(DateTime(timezone=False), nullable=True)  # For 'move' operations
+    new_slot_start = Column(DateTime(timezone=False), nullable=False)
+    new_slot_end = Column(DateTime(timezone=False), nullable=False)
 
     # Relationships
     slot = relationship(

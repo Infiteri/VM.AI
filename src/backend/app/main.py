@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,10 +10,17 @@ from app.utils.cleanup import run_cleanup_loop
 # Initialize logging immediately
 logger = setup_logging()
 
+
+def naive_datetime_filter(value):
+    """Format datetime as naive ISO string for OpenAPI schema."""
+    return value.strftime("%Y-%m-%dT%H:%M:%S")
+
+
 app = FastAPI(
     title="VM.AI Backend",
     description="AI-driven personal scheduling system for ONIA 2026",
     version="0.1.0",
+    json_encoders={datetime: naive_datetime_filter},
 )
 
 app.add_middleware(

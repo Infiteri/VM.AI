@@ -1,6 +1,6 @@
 # VM.AI Backend — Technical Summary
-**Version:** 4.0 (Current)
-**Last Updated:** April 26, 2026
+**Version:** 4.1 (Current)
+**Last Updated:** May 3, 2026
 **Competition:** ONIA 2026
 
 ---
@@ -110,6 +110,14 @@ Services receive `db` session per-method, not in `__init__`.
 ### 3.6 Background Cleanup
 - Async task runs every 24 hours
 - Deletes old drafts: `DELETE FROM task_drafts WHERE created_at < NOW() - INTERVAL '24 hours'`
+
+### 3.7 Naive Datetime Format
+- **Format:** All datetime values use naive ISO 8601 format (no timezone info)
+- **Example:** `"2026-05-09T09:30:00"` (NOT `"2026-05-09T09:30:00+03:00"` or `"2026-05-09T09:30:00Z"`)
+- **Database:** All `DateTime` columns use `timezone=False`
+- **Validation:** Uses `datetime.now()` without timezone
+- **Rationale:** All users in +03:00 timezone, no cross-timezone collaboration needed
+- **Storage:** What frontend sends, backend stores, frontend receives - no conversion
 
 ---
 

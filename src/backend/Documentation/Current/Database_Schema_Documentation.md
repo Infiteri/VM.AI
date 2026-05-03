@@ -1,6 +1,6 @@
 # VM.AI — Database Schema Documentation
-**Version:** 3.0 (Final with Bucket Counts)
-**Last Updated:** April 18, 2026
+**Version:** 3.1 (Current)
+**Last Updated:** May 3, 2026
 **Competition:** ONIA 2026
 
 ---
@@ -15,6 +15,7 @@ The VM.AI database consists of five logical groups: **Core Tables** (task storag
 - **Draft Pattern** — Uses `task_drafts` table to store "pending" tasks from NLP before commit
 - **Statistics persistence** — `tasks_statistics` rows are NEVER cascade-deleted when a task is deleted
 - **10-day rolling storage window** — scheduled tasks are kept for 3 past days, current day, and 6 future days
+- **Naive datetime format** — All datetime columns use `DateTime(timezone=False)` for consistency with frontend
 
 ---
 
@@ -28,6 +29,7 @@ The VM.AI database consists of five logical groups: **Core Tables** (task storag
 | **Atomic workflow operations** | Schedule commit, task creation, and stats updates run inside explicit transactions. |
 | **Immutable executed tasks** | Tasks with `end < NOW()` or outside the 10-day window cannot be modified or rescheduled. |
 | **Draft Cleanup** | Background async task runs every 24 hours to delete old drafts from `task_drafts` table. |
+| **Naive Datetime** | All datetime fields use `TIMESTAMP WITHOUT TIME ZONE` - no timezone conversion. |
 
 ---
 

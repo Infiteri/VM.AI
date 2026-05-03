@@ -11,7 +11,7 @@ Handles:
 Version: 2.0 (Class-based)
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Tuple, Any
 from uuid import UUID
 from dataclasses import dataclass, field
@@ -151,7 +151,7 @@ class ScheduleEngine:
         Returns:
             BatchSchedulingResult with scheduling results.
         """
-        start_time = datetime.now(timezone.utc)
+        start_time = datetime.now()
         logger.info("Starting batch scheduling")
         
         if task_ids is not None:
@@ -196,12 +196,12 @@ class ScheduleEngine:
                 failed_count += 1
                 unscheduled_remaining.append(task.id)
 
-            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
+            elapsed = (datetime.now() - start_time).total_seconds()
             if elapsed > timeout:
                 logger.warning(f"Timeout reached after {elapsed:.1f}s")
                 break
 
-        execution_time_ms = int((datetime.now(timezone.utc) - start_time).total_seconds() * 1000)
+        execution_time_ms = int((datetime.now() - start_time).total_seconds() * 1000)
 
         logger.info(
             f"Batch complete: {scheduled_count} scheduled, {failed_count} failed, "
@@ -445,15 +445,15 @@ class ScheduleEngine:
         """Build viable time windows for task."""
         windows: Dict[str, List[TimeWindow]] = {}
         
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         
         if task.start:
-            task_start = task.start.astimezone(timezone.utc) if task.start.tzinfo else task.start.replace(tzinfo=timezone.utc)
+            task_start = task.start
         else:
             task_start = now
         
         if task.deadline:
-            task_deadline = task.deadline.astimezone(timezone.utc) if task.deadline.tzinfo else task.deadline.replace(tzinfo=timezone.utc)
+            task_deadline = task.deadline
         else:
             task_deadline = task_start + timedelta(days=7)
         
@@ -599,7 +599,6 @@ class ScheduleEngine:
                 
                 while (current_hour * 60 + current_minute) <= valid_end_minutes:
                     slot_dt = datetime.strptime(f"{date_str} {current_hour:02d}:{current_minute:02d}", "%Y-%m-%d %H:%M")
-                    slot_dt = slot_dt.replace(tzinfo=timezone.utc)
                     slots.append(slot_dt)
                     
                     current_minute += SLOT_INTERVAL_MINUTES
@@ -737,10 +736,7 @@ class ScheduleEngine:
         """Calculate urgency boost (earlier slots get higher boost)."""
         total_minutes = HORIZON_DAYS * 24 * 60
         
-        now = datetime.now(timezone.utc)
-        
-        if slot_start.tzinfo is None:
-            slot_start = slot_start.replace(tzinfo=timezone.utc)
+        now = datetime.now()
         
         if slot_start <= now:
             logger.warning(f"Slot {slot_start} is in the past (now: {now})")
@@ -761,9 +757,6 @@ class ScheduleEngine:
         db: Session,
     ) -> float:
         """Calculate proximity boost to previous task."""
-        if slot_start.tzinfo is None:
-            slot_start = slot_start.replace(tzinfo=timezone.utc)
-        
         prev_task = db.query(ProvisionalSlot).filter(
             ProvisionalSlot.end <= slot_start,
         ).order_by(ProvisionalSlot.end.desc()).first()
@@ -965,8 +958,6 @@ class ScheduleEngine:
     
     def _round_down_to_interval(self, dt: datetime, interval: int) -> datetime:
         """Round datetime down to nearest interval."""
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
         total_minutes = dt.hour * 60 + dt.minute
         rounded = (total_minutes // interval) * interval
         return dt.replace(hour=rounded // 60, minute=rounded % 60, second=0, microsecond=0)
@@ -986,8 +977,6 @@ class ScheduleEngine:
     
     def _round_up_to_interval_dt(self, dt: datetime) -> datetime:
         """Round datetime UP to nearest interval."""
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
         total_minutes = dt.hour * 60 + dt.minute
         rounded = ((total_minutes + SLOT_INTERVAL_MINUTES - 1) // SLOT_INTERVAL_MINUTES) * SLOT_INTERVAL_MINUTES
         if rounded >= 24 * 60:

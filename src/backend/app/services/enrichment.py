@@ -1,5 +1,5 @@
 import parsedatetime
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Optional, Any, Tuple
 from uuid import UUID, uuid4
 from sqlalchemy.orm import Session
@@ -850,9 +850,7 @@ class EnrichmentService:
             logger.debug("Importance: no deadline, using base")
             return base_importance
 
-        now = datetime.now(timezone.utc)
-        if deadline.tzinfo is None:
-            deadline = deadline.replace(tzinfo=timezone.utc)
+        now = datetime.now()
         days_left = (deadline - now).total_seconds() / 86400
 
         if days_left <= 1:
@@ -1465,9 +1463,7 @@ class EnrichmentService:
         if not deadline:
             return 0.0
 
-        now = datetime.now(timezone.utc)
-        if deadline.tzinfo is None:
-            deadline = deadline.replace(tzinfo=timezone.utc)
+        now = datetime.now()
         days_left = (deadline - now).total_seconds() / 86400
 
         if days_left <= 0:
