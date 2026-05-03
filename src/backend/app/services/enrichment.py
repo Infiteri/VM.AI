@@ -295,12 +295,16 @@ class EnrichmentService:
 
         merged_task = self._change_merge(existing_task, changed_fields)
 
+        merged_task = self._enforce_fixed_time_consistency(merged_task, changed_fields)
+
         parsed_task = self._date_parse(merged_task)
+
+        validated_task = self._validate_nlp_modify(parsed_task)
 
         logger.info(f"Enrichment: merge_nlp_modify complete")
 
         # Convert output to schema (TaskPayload - no computed, no refs)
-        output_schema = self._convert_output(parsed_task, with_computed=False, with_refs=False)
+        output_schema = self._convert_output(validated_task, with_computed=False, with_refs=False)
         return output_schema
 
     def update_task(
@@ -1060,6 +1064,157 @@ class EnrichmentService:
 
         return result
 
+    def _validate_nlp_modify(self, task: dict[str, Any]) -> dict[str, Any]:
+        """
+        Validate and set defaults for NLP modify payload.
+
+        Rules (same as _validate_nlp_add_dict):
+            1. name=None -> "task"
+            2. start=None and not fixed_time -> current time
+            3. deadline=None and not fixed_time -> 23:59 calculation
+            4. difficulty=None -> 0.5
+            5. duration=None -> 30
+            6. category=None or [] -> []
+            7. location=None -> "home"
+            8. importance=None -> 0.5
+            9. fixed_time=None -> False
+            10. fixed_start=None but fixed_time=True -> fixed_time=False
+
+        Input:
+            task: dict with plain values (already parsed)
+
+        Returns:
+            task: dict with validated values
+        """
+        result = task.copy()
+        now = datetime.now()
+
+        # Rule 1: name=None -> "task"
+        name_value = result.get("name")
+        if name_value is None or name_value == "":
+            result["name"] = "task"
+            logger.info("Validation: name set to 'task' (was None)")
+        else:
+            name_value = str(name_value).strip()
+            if name_value:
+                name_value = name_value[0].upper() + name_value[1:]
+            result["name"] = name_value
+            logger.info(f"Validation: name normalized to '{name_value}'")
+
+        # Rule 9: fixed_time=None -> False
+        fixed_time_value = result.get("fixed_time")
+        if fixed_time_value is None:
+            fixed_time_value = False
+            result["fixed_time"] = False
+            logger.info("Validation: fixed_time set to False (was None)")
+
+        # Rule 10: fixed_start=None but fixed_time=True -> fixed_time=False
+        if fixed_time_value is True and result.get("fixed_start") is None:
+            result["fixed_time"] = False
+            logger.info("Validation: fixed_time set to False (fixed_start was None)")
+
+        # Apply rules for non-fixed_time tasks
+        if not fixed_time_value:
+            # Rule 2: start=None -> current time
+            if result.get("start") is None:
+                result["start"] = now.replace(second=0, microsecond=0)
+                logger.debug("Validation: start set to current time (was None)")
+
+            # Rule 3: deadline=None -> calculate
+            start_time = result.get("start") or now
+            if isinstance(start_time, datetime):
+                start_for_deadline = start_time
+            else:
+                start_for_deadline = now
+
+            if result.get("deadline") is None:
+                hours_diff = (datetime(2026, 1, 1, 23, 59) - datetime(2026, 1, 1, 9, 0)).seconds / 3600
+                if hours_diff >= 7:
+                    deadline = start_for_deadline.replace(hour=23, minute=59, second=0, microsecond=0)
+                else:
+                    deadline = (start_for_deadline + timedelta(days=1)).replace(hour=23, minute=59, second=0, microsecond=0)
+                result["deadline"] = deadline
+                logger.warning("Validation: deadline set based on start time (was None)")
+
+        # Rule 4: difficulty=None -> 0.5
+        if result.get("difficulty") is None:
+            result["difficulty"] = 0.5
+            logger.warning("Validation: difficulty set to 0.5 (was None)")
+
+        # Rule 5: duration=None -> 30
+        if result.get("duration") is None:
+            result["duration"] = 30
+            logger.warning("Validation: duration set to 30 (was None)")
+
+        # Rule 6: category=None or [] -> []
+        category_value = result.get("category")
+        if category_value is None or (isinstance(category_value, list) and len(category_value) == 0):
+            result["category"] = []
+            logger.warning("Validation: category set to [] (was None or empty)")
+        else:
+            if isinstance(category_value, list):
+                category_value = [str(cat).lower().strip() for cat in category_value if cat]
+            result["category"] = category_value
+            logger.info(f"Validation: category normalized to {category_value}")
+
+        # Rule 7: location=None -> "home"
+        location_value = result.get("location")
+        if location_value is None or location_value == "":
+            result["location"] = "home"
+            logger.warning("Validation: location set to 'home' (was None)")
+        else:
+            location_value = str(location_value).lower().strip()
+            result["location"] = location_value
+            logger.info(f"Validation: location normalized to '{location_value}'")
+
+        # Rule 8: importance=None -> 0.5
+        if result.get("importance") is None:
+            result["importance"] = 0.5
+            logger.warning("Validation: importance set to 0.5 (was None)")
+
+        return result
+
+    def _enforce_fixed_time_consistency(
+        self,
+        merged_task: dict[str, Any],
+        changed_fields: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Enforce mutual exclusivity between fixed_time and start/deadline.
+
+        Rules:
+            1. If changed_fields contains fixed_time=True -> set start=None, deadline=None
+            2. If changed_fields contains start or deadline -> set fixed_time=False, fixed_start=None
+
+        Input:
+            merged_task: dict (task after _change_merge)
+            changed_fields: dict (original changed fields for detection)
+
+        Returns:
+            dict: task with enforced consistency
+        """
+        result = merged_task.copy()
+        result_changed = {}
+
+        if changed_fields.get("fixed_time") is True:
+            result["start"] = None
+            result["deadline"] = None
+            result_changed["start"] = None
+            result_changed["deadline"] = None
+            logger.info("Fixed time consistency: set start=None, deadline=None (fixed_time=True)")
+
+        if changed_fields.get("start") is not None or changed_fields.get("deadline") is not None:
+            result["fixed_time"] = False
+            result["fixed_start"] = None
+            result_changed["fixed_time"] = False
+            result_changed["fixed_start"] = None
+            logger.info("Fixed time consistency: set fixed_time=False, fixed_start=None (start/deadline provided)")
+
+        if result_changed:
+            logger.debug(f"Fixed time consistency changes: {result_changed}")
+
+        return result
+
     # ================================================================
     # HELPER: DATE PARSING
     # ================================================================
@@ -1082,9 +1237,6 @@ class EnrichmentService:
             if isinstance(value, str) and value:
                 parsed, flag = self._parse_date_string(value)
                 if parsed:
-                    # Apply default hours if no time was specified (flag == 1)
-                    # flag = 1: date only (no time)
-                    # flag >= 2: date + time
                     if flag == 1:
                         if field == "start":
                             parsed = parsed.replace(hour=6, minute=0, second=0, microsecond=0)
@@ -1094,10 +1246,42 @@ class EnrichmentService:
                     result[field] = parsed
                     logger.debug(f"Parsed {field}: '{value}' -> {parsed}")
                 else:
-                    logger.warning(f"Failed to parse {field}: '{value}'")
-                    result[field] = None
+                    if flag >= 2:
+                        parsed_tomorrow = self._parse_time_only_as_tomorrow(value)
+                        if parsed_tomorrow:
+                            result[field] = parsed_tomorrow
+                            logger.info(f"Parsed {field} (tomorrow): '{value}' -> {parsed_tomorrow}")
+                        else:
+                            logger.warning(f"Failed to parse {field}: '{value}'")
+                            result[field] = None
+                    else:
+                        logger.warning(f"Failed to parse {field}: '{value}'")
+                        result[field] = None
 
         return result
+
+    def _parse_time_only_as_tomorrow(self, time_string: str) -> Optional[datetime]:
+        """
+        Parse a time-only string as tomorrow's date.
+
+        Input:
+            time_string: String like "09:00" or "3pm"
+
+        Returns:
+            datetime: Tomorrow's date with the parsed time, or None if parsing fails
+        """
+        try:
+            cal = parsedatetime.Calendar()
+            parsed, flag = cal.parse(time_string)
+            if flag >= 2:
+                dt = datetime(*parsed[:6])
+                tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+                result = tomorrow.replace(hour=dt.hour, minute=dt.minute, second=0, microsecond=0)
+                logger.debug(f"Time-only '{time_string}' parsed as tomorrow: {result}")
+                return result
+        except Exception as e:
+            logger.error(f"Time-only parsing error: {e}")
+        return None
 
     def _parse_date_string(self, date_string: str) -> Tuple[Optional[datetime], int]:
         """
