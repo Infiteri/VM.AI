@@ -354,7 +354,47 @@ class TaskPayload(BaseModel):
 
 ---
 
-### 3.9 POST /schedule/batch — Run Scheduler
+### 3.9 POST /tasks/{id}/rate — Rate Task
+
+**Purpose:** Rate a completed or uncompleted task.
+
+**Request Body (RateRequest):**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| completed | bool | Yes | Whether the task was completed |
+| actual_duration | int | If completed | Actual duration in minutes (0-1440) |
+| actual_difficulty | float | If completed | Actual difficulty (0.0-1.0) |
+
+**Example:**
+```json
+{
+    "completed": true,
+    "actual_duration": 45,
+    "actual_difficulty": 0.5
+}
+```
+
+**Response (RateResponse):**
+```json
+{
+    "success": true,
+    "task_id": "550e8400-e29b-41d4-a716-446655440000",
+    "message": "Task rated successfully"
+}
+```
+
+**Validation Rules:**
+| Check | HTTP | Error |
+|-------|------|-------|
+| Task in main_schedule | 400 | "Task not in main schedule" |
+| Task.rated == True | 400 | "Task already rated" |
+| slot.end < now | 400 | "Cannot rate task that ended in the past" |
+
+**Schema:** `RateResponse`
+
+---
+
+### 3.10 POST /schedule/batch — Run Scheduler
 
 **Purpose:** Run the scheduling algorithm on unscheduled tasks.
 

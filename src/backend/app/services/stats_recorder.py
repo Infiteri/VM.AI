@@ -372,6 +372,167 @@ class StatsRecorder:
 
         setattr(stats, time_scores_key, time_scores)
 
+    def rate_task(
+        self,
+        db: Session,
+        task_id: UUID,
+        slot_start: datetime,
+        completed: bool,
+        actual_duration: Optional[int] = None,
+        actual_difficulty: Optional[float] = None,
+    ) -> bool:
+        """
+        Rate a task as completed or uncompleted.
+        """
+        try:
+            task = db.query(Task).filter(Task.id == task_id).first()
+            if not task:
+                logger.error(f"Task not found: {task_id}")
+                return False
+
+            if slot_start.tzinfo is not None:
+                slot_start = slot_start.replace(tzinfo=None)
+
+            if completed:
+                self._rate_completed(
+                    db, task, slot_start, actual_duration, actual_difficulty
+                )
+                self.update_time_score(db, task_id, slot_start, boost=0.5)
+            else:
+                self._rate_uncompleted(db, task)
+                self.update_time_score(db, task_id, slot_start, boost=-0.5)
+
+            task.rated = True
+            db.commit()
+            logger.info(f"Task rated successfully: {task.name}, completed={completed}")
+            return True
+
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Failed to rate task {task_id}: {e}")
+            return False
+
+    def _rate_completed(
+        self,
+        db: Session,
+        task: Task,
+        slot_start: datetime,
+        actual_duration: Optional[int],
+        actual_difficulty: Optional[float],
+    ) -> None:
+        """Handle completed task rating."""
+        difficulty_delta = task.difficulty - actual_difficulty
+        duration_delta = task.duration - actual_duration
+        bucket = self._get_duration_bucket(actual_difficulty)
+
+        self._update_difficulty_delta(db, task.task_statistics_id, difficulty_delta, is_category=False)
+        self._update_duration_delta(db, task.task_statistics_id, bucket, duration_delta, is_category=False)
+        self._increment_completed_count(db, task.task_statistics_id, is_category=False)
+
+        task_categories = db.query(TaskCategory).filter(
+            TaskCategory.task_id == task.id
+        ).all()
+        for tc in task_categories:
+            cat_stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.category_id == tc.category_id
+            ).first()
+            if cat_stats:
+                self._update_difficulty_delta(db, cat_stats.id, difficulty_delta, is_category=True)
+                self._update_duration_delta(db, cat_stats.id, bucket, duration_delta, is_category=True)
+                self._increment_completed_count(db, cat_stats.id, is_category=True)
+
+    def _rate_uncompleted(self, db: Session, task: Task) -> None:
+        """Handle uncompleted task rating."""
+        if task.task_statistics_id:
+            stats = db.query(TaskStatistics).filter(
+                TaskStatistics.id == task.task_statistics_id
+            ).first()
+            if stats:
+                stats.uncompleted_count = (stats.uncompleted_count or 0) + 1
+
+        task_categories = db.query(TaskCategory).filter(
+            TaskCategory.task_id == task.id
+        ).all()
+        for tc in task_categories:
+            cat_stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.category_id == tc.category_id
+            ).first()
+            if cat_stats:
+                cat_stats.uncompleted_count = (cat_stats.uncompleted_count or 0) + 1
+
+    def _update_difficulty_delta(
+        self, db: Session, stats_id: UUID, difficulty_delta: float, is_category: bool
+    ) -> None:
+        """Update avg_difficulty_delta for stats record."""
+        if is_category:
+            stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.id == stats_id
+            ).first()
+        else:
+            stats = db.query(TaskStatistics).filter(
+                TaskStatistics.id == stats_id
+            ).first()
+
+        if not stats:
+            return
+
+        current_avg_delta = stats.avg_difficulty_delta or 0.0
+        current_completed = stats.completed_count or 0
+
+        new_avg_delta = round(
+            (current_avg_delta * current_completed + difficulty_delta) / (current_completed + 1),
+            2
+        )
+        stats.avg_difficulty_delta = new_avg_delta
+
+    def _update_duration_delta(
+        self, db: Session, stats_id: UUID, bucket: str, duration_delta: int, is_category: bool
+    ) -> None:
+        """Update avg_duration_delta for stats record."""
+        if is_category:
+            stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.id == stats_id
+            ).first()
+        else:
+            stats = db.query(TaskStatistics).filter(
+                TaskStatistics.id == stats_id
+            ).first()
+
+        if not stats:
+            return
+
+        avg_delta = copy.deepcopy(stats.avg_duration_delta) if stats.avg_duration_delta else {}
+
+        if bucket not in avg_delta:
+            avg_delta[bucket] = {"count": 0, "avg": 0}
+
+        current_count = avg_delta[bucket].get("count", 0)
+        current_avg = avg_delta[bucket].get("avg", 0)
+
+        new_avg_delta = round(
+            (current_avg * current_count + duration_delta) / (current_count + 1),
+            2
+        )
+        avg_delta[bucket] = {
+            "count": current_count + 1,
+            "avg": int(new_avg_delta)
+        }
+        stats.avg_duration_delta = avg_delta
+
+    def _increment_completed_count(self, db: Session, stats_id: UUID, is_category: bool) -> None:
+        """Increment completed_count for stats record."""
+        if is_category:
+            stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.id == stats_id
+            ).first()
+        else:
+            stats = db.query(TaskStatistics).filter(
+                TaskStatistics.id == stats_id
+            ).first()
+
+        if stats:
+            stats.completed_count = (stats.completed_count or 0) + 1
+
     def _get_duration_bucket(self, difficulty: float) -> str:
         """Calculate duration bucket: round(difficulty * 2) / 2"""
         return str(round(difficulty * 2) / 2)

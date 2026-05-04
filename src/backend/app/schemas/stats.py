@@ -24,4 +24,4 @@ class RateRequest(BaseModel):
 
 
 class RateResponse(SuccessResponse):
-    slot_id: UUID
+    task_id: UUID
