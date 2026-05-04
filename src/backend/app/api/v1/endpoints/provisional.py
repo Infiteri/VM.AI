@@ -11,6 +11,7 @@ from app.schemas.schedule import (
     ProvisionalResetResponse,
     ProvisionalCommitResponse
 )
+from app.services.stats_recorder import stats_recorder
 
 router = APIRouter()
 
@@ -96,10 +97,14 @@ def commit_provisional(
 
     Atomically copies provisional_schedule to main_schedule
     and clears change logs.
+    
+    Also updates time scores for scheduled tasks with boost +2.0.
     """
     start = time.time()
     
     committed_count = db.query(ScheduleChange).count()
+    
+    scheduled_task_ids = db.query(ScheduleChange.task_id).distinct().all()
     
     db.query(MainScheduleSlot).delete(synchronize_session=False)
     
@@ -116,6 +121,11 @@ def commit_provisional(
         db.add(new_slot)
     
     db.query(ScheduleChange).delete(synchronize_session=False)
+    
+    for (task_id,) in scheduled_task_ids:
+        slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == task_id).first()
+        if slot:
+            stats_recorder.update_time_score(db, task_id, slot.start, boost=2.0)
     
     db.commit()
     
