@@ -48,18 +48,14 @@ def main():
     print("=" * 60)
     print()
     
-    # Get token from command line or prompt
-    if len(sys.argv) > 1:
-        token = sys.argv[1].strip()
-    else:
-        print("Enter your Hugging Face token:")
-        print("Get one at: https://huggingface.co/settings/tokens")
-        token = input("Token: ").strip()
+    # Get token from command line (optional for public repos)
+    token = sys.argv[1].strip() if len(sys.argv) > 1 else None
     
-    if not token:
-        print("Error: No token provided")
-        print("Usage: python pull_from_hf.py [your_token]")
-        return
+    if token:
+        print("Using provided token")
+    else:
+        print("No token provided - will attempt public repo download")
+    print()
     
     # Always backup first
     backup_existing_model()
@@ -76,11 +72,11 @@ def main():
     # Download
     print("Downloading model...")
     try:
-        snapshot_download(
-            repo_id=repo_id,
-            local_dir=MODEL_PATH,
-            token=token
-        )
+        download_kwargs = {"repo_id": repo_id, "local_dir": MODEL_PATH}
+        if token:
+            download_kwargs["token"] = token
+        
+        snapshot_download(**download_kwargs)
         
         # Verify download
         files = os.listdir(MODEL_PATH)

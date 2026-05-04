@@ -22,7 +22,7 @@ export default function AddTaskPage() {
             <Sidebar />
 
             <div className="flex-1 flex items-center justify-center p-6">
-                <TaskModifyView task={task} onUpdate={setTask} openMode={openMode} taskId={location.state?.task_id} />
+                <TaskModifyView task={task} onUpdate={setTask} openMode={openMode} taskId={location.state?.task_id} source={location.state?.source} />
             </div>
 
             <main className="flex justify-end">

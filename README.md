@@ -1,126 +1,260 @@
-# VM.AI
-VM.AI is the project for ONIA built by
+# VM.AI - Natural Language Task Parser
+
+VM.AI is an AI-driven personal scheduling system that transforms natural language task descriptions into structured, actionable task data. The system uses a combination of rule-based parsing and machine learning to extract task attributes such as category, difficulty, importance, duration, deadline, location, and recurrence patterns.
+
+## Problem Description
+
+The project addresses the challenge of converting free-form natural language input into structured task schemas. Users can describe tasks in plain language (e.g., "gym every Monday at 6am", "finish report by Friday"), and the system parses this input into organized data that can be used for scheduling and task management.
+
+This aligns with ONIA competition requirements by providing a practical solution that uses AI to solve a real-world problem in task planning and time management.
+
+## Team
+
 - Golban Ion
-- Furculiță Maxim
+- Furculita Maxim
 
-The project, as of writing README.md, features the basic UI + parser training module
+## Project Structure
 
-## Training
 ```
-git clone https://github.com/Infiteri/VM.AI --depth 1
+VM.AI/
+├── src/
+│   ├── parser/           # NLP parser module (training + inference)
+│   ├── backend/          # FastAPI backend (see src/backend/README.md)
+│   └── frontend/         # React frontend (npm run dev)
+├── models/
+│   └── finetuned_parser/ # Trained T5 model (after training)
+├── data/                 # Training datasets
+├── tests/                # Test suite (documented in this README)
+├── scripts/              # Visualization and utility scripts
+├── docs/                 # Detailed documentation
+├── assets/               # Generated charts and visualizations
+└── package.json          # Frontend dependencies
+```
+
+## Setup
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- PostgreSQL 15+ (for backend)
+- uv (Python package manager)
+
+### Installation Steps
+
+**Step 1: Pull the trained model from HuggingFace**
+
+```bash
 cd VM.AI
-uv venv .venv
-.venv/Scripts/activate
-(.venv) python src/parser/train.py --mode [MODE]
+python src/parser/pull_from_hf.py
 ```
 
-Where '[MODE]' is the training mode, each training mode is configured in
-config.yaml, however the data builder can only extract from a few mods (i.e. both, specific, real)
+This downloads the latest trained model to `models/finetuned_parser/`.
+
+**Step 2: Set up the backend**
+
+Follow the instructions in `src/backend/README.md`:
+
+```bash
+cd src/backend
+
+# Create virtual environment
+uv venv
+.venv/Scripts/activate  # Windows
+# source .venv/bin/activate  # Linux/Mac
+
+# Install dependencies
+uv sync
+
+# Create .env file with database credentials
+# DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/dbname
+
+# Run migrations
+uv run alembic upgrade head
+
+# Start server
+uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+**Step 3: Run the frontend**
+
+```bash
+cd VM.AI
+npm run dev
+```
+
+The application will be available at the URL shown in the terminal (typically http://localhost:5173).
+
+## Datasets
+
+The model is trained on two datasets:
+
+### 1. Synthetic Dataset (VMAI_SYNTHETIC_Data.yaml)
+
+- Auto-generated training samples
+- Created using template-based data generation
+- Contains varied task descriptions with full schema coverage
+
+### 2. Real Dataset (VMAI_REAL_Data.yaml)
+
+- Human-written examples
+- More natural language variations
+- Includes both "add" and "modify" task patterns
+
+Both datasets are human-written (no public datasets used). All data follows the pipe-format schema with EXP/PRD tags:
+
+- `[EXP]` - Explicit field (user stated the value directly)
+- `[PRD]` - Predicted field (model inferred the value)
+
+## Training Pipeline
+
+To retrain the model:
+
+```bash
+# From project root
+python src/parser/train.py --mode [MODE]
+```
+
+Available modes:
+- `both` - Mix of add and modify samples (recommended)
+- `synthetic` - Only synthetic data
+- `real` - Only real human examples
+- `specific` - Targeted improvements
+- `modify_only` - Modify pattern only (requires existing checkpoint)
+
+Training produces metrics per field (category, difficulty, importance, duration, deadline, location, recurrence).
+
+## Running the Chat Interface
+
+For direct testing without the web interface:
+
+```bash
+python src/parser/chat.py
+```
+
+Commands:
+- `add: <task description>` - Parse a new task
+- `modify` - Modify the last added task
+- `end` - Exit
 
 ## Testing
 
-The test suite validates every layer of the parser — from low-level pipe-format parsing to end-to-end chat interactions.
+Run the test suite to validate parser functionality:
 
-### Full Suite
+```bash
+# Individual test suites
+python tests/test_core.py       # Pipe-format parsing
+python tests/test_generator.py  # Data generation
+python tests/test_add.py         # Add mode parsing
+python tests/test_modify.py      # Modify mode parsing
 
-```
-(.venv) python tests/test_llm_full.py
-```
-
-Runs all 4 core test suites (`test_core`, `test_generator`, `test_add`, `test_modify`) sequentially and prints a pass/fail summary.
-
-### Component Tests
-
-**Core Parser** — validates pipe-format string parsing, field prediction flags (`[EXP]` vs `[PRD]`), and change-detection logic between old/new schemas.
-```
-(.venv) python tests/test_core.py
+# Regression testing
+python tests/test_chat_suite.py  # Before/after comparison
 ```
 
-**Data Generator** — validates the synthetic data generator's keyword-based inference for category, difficulty, importance, duration, and location.
-```
-(.venv) python tests/test_generator.py
+## Visualization
+
+Generate charts and graphs for data analysis:
+
+```bash
+# Dataset overview
+python scripts/visualize_dataset.py data/VMAI_REAL_Data.yaml
+
+# Category comparison
+python scripts/plot_categories.py
+
+# Real data visualization
+python scripts/plot_real.py
+
+# Training metrics
+python scripts/plot_training.py
 ```
 
-**Add Mode** — tests the `TaskPlannerPredictor` on natural-language task creation, verifying field extraction (category, difficulty, importance, duration, fixed_time, recurrent, location).
-```
-(.venv) python tests/test_add.py
-```
+Generated visualizations are saved to `scripts/output/` and can be copied to `assets/` for documentation.
 
-**Modify Mode** — tests task modification: rescheduling, duration changes, priority shifts, category reassignment, and deadline updates.
-```
-(.venv) python tests/test_modify.py
-```
+### Dataset Overview
 
-### Regression & Sanitization
+![Dataset Visualization](assets/dataset_visualization.png)
 
-**Chat Suite** — runs a before/after regression by feeding a fixed set of add and modify prompts through `chat.py`, capturing outputs to `test_results_before.json` for comparison after model changes.
-```
-(.venv) python tests/test_chat_suite.py
-```
+### Combined Analysis (2x2 Grid)
 
-**Sanitization** — comprehensive pre-training check that validates schema tag generation (`[EXP]`/`[PRD]`), data generator output format, validation logic, keyword detection, normalization functions, and real data integrity across 10 test sections.
-```
-(.venv) python tests/test_sanitize.py
-```
+![Combined Analysis](assets/combined_grid.png)
 
-### Interactive Chat
+### Real Data Overview
 
-```
-(.venv) python src/parser/chat.py
-```
-
-Launches the interactive chat loop for manual add/modify testing.
-
-## Visualization Scripts
-
-All scripts render dark-themed PNGs into `scripts/output/`. They require `matplotlib`, `seaborn`, and `pandas`.
-
-### Dataset Analysis
-
-**Full dataset overview** — generates a multi-panel figure: category pie chart, difficulty vs importance scatter (colored by category), duration histogram, add/modify split bar chart, and a stats summary table.
-```
-(.venv) python scripts/visualize_dataset.py <path_to_yaml>
-```
-
-**Combined categories** — loads both synthetic and real datasets, plots category distributions, difficulty, importance, and duration histograms side by side.
-```
-(.venv) python scripts/plot_categories.py
-```
-
-**Real data overview** — visualizes only `VMAI_REAL_Data.yaml` with a scatter plot, box plot (duration by category), and category pie chart.
-```
-(.venv) python scripts/plot_real.py
-```
-
-**Specific fixes** — visualizes `VMAI_SPECIFIC_Data.yaml` to verify targeted dataset improvements (importance gap fill, difficulty/importance scatter).
-```
-(.venv) python scripts/plot_specific.py
-```
-
-**Scatter — difficulty vs importance** — standalone scatter plot of real data points colored by category, with per-category point counts.
-```
-(.venv) python scripts/plot_scatter.py
-```
-
-### Training Monitoring
-
-**Training loss** — reads `models/finetuned_parser/trainer_log.jsonl` and plots train/eval loss curves over training steps. Requires a completed training run.
-```
-(.venv) python scripts/plot_training.py
-```
+![Real Overview](assets/real_overview.png)
 
 ## Documentation
 
+Detailed documentation is available in the `docs/` folder:
+
 | Document | Description |
 |---|---|
-| [Project Overview](docs/VM.AI_Full_Project_Overview_v1.md) | Full project overview and architecture |
-| [NLP Parser](docs/NPL_Parser_v1.md) | Parser module documentation |
-| [Database Schema](docs/Database_Schema_v1.md) | Database schema reference |
-| [Task Matching](docs/Task_Matching_Module_v1.md) | Task matching module |
-| [Scheduling Engine](docs/Scheduling_Engine_v1.md) | Scheduling engine documentation |
-| [Enrichment Module](docs/Enrichment_module_v1.md) | Data enrichment module |
-| [Stats Recorder](docs/Stats_Recorder_v1.md) | Statistics recording module |
-| [Model Accuracy](docs/current_model_accuracy.md) | Current model accuracy metrics |
-| [Risks](docs/Risks.md) | Project risks and considerations |
+| VM.AI_Full_Project_Overview_v1.md | Full project overview and architecture |
+| NPL_Parser_v1.md | Parser module documentation |
+| Database_Schema_v1.md | Database schema reference |
+| Task_Matching_Module_v1.md | Task matching module |
+| Scheduling_Engine_v1.md | Scheduling engine documentation |
+| Enrichment_module_v1.md | Data enrichment module |
+| Stats_Recorder_v1.md | Statistics recording module |
+| current_model_accuracy.md | Model accuracy metrics |
+| Risks.md | Project risks and considerations |
 
+## Library Versions
 
+Key dependencies:
+
+- Python: 3.10+
+- PyTorch: Latest (CUDA recommended for training)
+- transformers: Latest (HuggingFace)
+- datasets: Latest
+- FastAPI: For backend
+- SQLAlchemy: 2.0
+- React: 19.x (frontend)
+- Vite: 8.x (frontend build)
+
+## Limitations and Ethical Considerations
+
+### Data Limitations
+
+- The model is trained on a limited dataset size
+- Performance may vary for unusual or ambiguous task descriptions
+- Category and difficulty inference is based on keyword patterns
+
+### Technical Limitations
+
+- The T5-base model has token limits that may affect complex inputs
+- Rule-based parsers handle common patterns, edge cases may fail
+- Time zone handling is not explicitly implemented
+
+### Ethical Considerations
+
+- No personal data is collected or stored by the parser
+- The system uses synthetic and human-written data only
+- No discrimination or bias is intentionally introduced in the model
+- Results are presented objectively without manipulation
+- All model outputs should be verified by users before critical use
+
+### Model Risks
+
+- Predicted fields (PRD) are inferred and may not always be accurate
+- The model should not be used for critical decision-making without human oversight
+- Duration and deadline extraction depends on clear language patterns
+
+## Repository Structure
+
+This repository follows best practices for AI projects:
+
+- `/src` - Source code
+- `/models` - Trained model files
+- `/data` - Training data
+- `/docs` - Documentation
+- `/assets` - Visualizations and charts
+- README.md - Complete project description with setup instructions
+
+No personal or confidential data is included.
+
+## References
+
+- Backend Setup: `src/backend/README.md`
+- HuggingFace Model: vaneaa/vmai-parser

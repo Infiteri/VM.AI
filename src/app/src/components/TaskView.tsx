@@ -39,26 +39,45 @@ export default function TaskView({ task, taskId, onDelete }: TaskViewProps) {
         fixed_start = formatTimeDisplay(task.fixed_start)
     } = task || {};
 
-    const handleSave = () => {
-        console.log("Saving Task Data:", { name, ...taskData });
+    const handleSave = async () => {
+        if (!taskId) return;
+        
+        try {
+            const completed = taskData.realization === true;
+            const actualDuration = completed ? taskData.duration : undefined;
+            const actualDifficulty = completed ? taskData.difficulty / 100 : undefined;
+            
+            await api.rateTask(taskId, completed, actualDuration, actualDifficulty);
+            setIsNoteOpen(false);
+        } catch (err) {
+            console.error("Failed to save task data:", err);
+            alert("Failed to save: " + (err instanceof Error ? err.message : "Unknown error"));
+        }
     };
 
-    const handleModifyClick = () => {
-        console.log("Modify clicked - current task state:", task);
-        const plainTask = {
-            name: task.name,
-            start: task.start,
-            deadline: task.deadline,
-            duration: task.duration,
-            difficulty: task.difficulty,
-            location: task.location,
-            importance: task.importance,
-            fixed_time: task.fixed_time,
-            fixed_start: task.fixed_start,
-            category: task.category,
-        };
-        console.log("Navigating with:", { task: plainTask, openMode: "modify" });
-        navigate("/task", { state: { task: plainTask, openMode: "modify" } });
+    const handleModifyClick = async () => {
+        if (!taskId) return;
+        
+        try {
+            const fullTaskData = await api.getTask(taskId);
+            const fullTask = fullTaskData.task;
+            navigate("/task", { state: { task: fullTask, openMode: "modify", task_id: taskId } });
+        } catch (err) {
+            console.error("Failed to load task details:", err);
+            const plainTask = {
+                name: task.name,
+                start: task.start,
+                deadline: task.deadline,
+                duration: task.duration,
+                difficulty: task.difficulty,
+                location: task.location,
+                importance: task.importance,
+                fixed_time: task.fixed_time,
+                fixed_start: task.fixed_start,
+                category: task.category,
+            };
+            navigate("/task", { state: { task: plainTask, openMode: "modify", task_id: taskId } });
+        }
     };
 
     return (
