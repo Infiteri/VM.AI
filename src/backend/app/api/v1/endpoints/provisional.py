@@ -104,7 +104,7 @@ def commit_provisional(
     
     committed_count = db.query(ScheduleChange).count()
     
-    scheduled_task_ids = db.query(ScheduleChange.task_id).distinct().all()
+    scheduled_task_ids = db.query(ProvisionalSlot.task_id).distinct().all()
     
     db.query(MainScheduleSlot).delete(synchronize_session=False)
     

@@ -114,6 +114,13 @@ export default function TaskModifyView({ task, onUpdate }: TaskModifyProps) {
   useEffect(() => {
     if (task) {
       setFormData(task);
+      if (task.fixed_start) {
+        setFixedDate(task.fixed_start.split("T")[0]);
+        setFixedTime(task.fixed_start.split("T")[1]?.slice(0, 5) ?? "");
+      } else {
+        setFixedDate("");
+        setFixedTime("");
+      }
     }
   }, [task]);
 

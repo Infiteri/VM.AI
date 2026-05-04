@@ -32,6 +32,9 @@ export default function NLPView({ mode, onParsedTask }: NLPViewProps) {
             if (onParsedTask) {
                 onParsedTask(result.task);
             }
+
+            console.log(result.task);
+            
         } catch (err: any) {
             setError(err.message || "Failed to parse task");
         } finally {
