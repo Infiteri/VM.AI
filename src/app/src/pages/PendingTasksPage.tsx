@@ -174,17 +174,22 @@ export default function PendingTasksPage() {
     };
 
     const handleReset = async () => {
+        setLoading(true);
         try {
             await api.resetProvisional();
-            fetchProvisionalChanges();
+            const response = await api.getProvisionalChanges();
+            setProvisionalChanges(response.changes);
         } catch (err) {
             console.error("Failed to reset:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleCommit = async () => {
         try {
             await api.commitProvisional();
+            setProvisionalChanges([]);
             setActiveView("unscheduled");
             fetchUnscheduled();
         } catch (err) {
@@ -234,11 +239,11 @@ export default function PendingTasksPage() {
                             <div className="flex flex-row gap-3">
                                 {activeView === "schedule" ? (
                                     <>
-                                        <button onClick={handleReset} className="border border-main-font/30 text-main-font py-4 px-6 rounded-xl text-sm font-medium tracking-wide hover:bg-main-font/10 transition-all">
-                                            Reset to main schedule
+                                        <button onClick={handleReset} disabled={loading} className="border border-main-font/30 text-main-font py-4 px-6 rounded-xl text-sm font-medium tracking-wide hover:bg-main-font/10 transition-all disabled:opacity-50">
+                                            {loading ? "Resetting..." : "Reset to main schedule"}
                                         </button>
-                                        <button onClick={handleCommit} className="border border-main-font/30 text-main-font py-4 px-6 rounded-xl text-sm font-medium tracking-wide hover:bg-main-font/10 transition-all">
-                                            Submit changes
+                                        <button onClick={handleCommit} disabled={loading} className="border border-main-font/30 text-main-font py-4 px-6 rounded-xl text-sm font-medium tracking-wide hover:bg-main-font/10 transition-all disabled:opacity-50">
+                                            {loading ? "Submitting..." : "Submit changes"}
                                         </button>
                                     </>
                                 ) : (

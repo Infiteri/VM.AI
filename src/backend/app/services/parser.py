@@ -28,7 +28,7 @@ REMOVE_FIELDS = {"recurrent", "recurrence_days"}
 
 def _setup_parser_path():
     """Add parser directory to path."""
-    parser_dir = r"C:\VM.AI\src\parser"
+    parser_dir = r"D:\Users\user\Desktop\VM.AI\src\parser"
     if parser_dir not in sys.path:
         sys.path.insert(0, parser_dir)
 

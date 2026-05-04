@@ -407,7 +407,7 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
             };
 
             if (openMode === "modify" && taskId) {
-              await api.updateTask(taskId, taskToSend, "unscheduled");
+              await api.updateTask(taskId, taskToSend, "main_schedule");
             } else {
               console.log("Sending task:", JSON.stringify(taskToSend));
               console.log("Calling API...");
