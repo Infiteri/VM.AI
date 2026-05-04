@@ -71,7 +71,13 @@ function formatTimeForInput(isoDate: string | null): string {
 function toISODateTime(dateStr: string, timeStr: string): string | null {
   if (!dateStr || !timeStr) return null;
   const d = new Date(`${dateStr}T${timeStr}:00`);
-  return d.toISOString();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = String(d.getHours()).padStart(2, "0");
+  const mins = String(d.getMinutes()).padStart(2, "0");
+  const secs = String(d.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${mins}:${secs}`;
 }
 
 function toFullDateTime(dateStr: string, defaultHour: number = 0): string | null {
@@ -126,11 +132,24 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
     }
   }, [task]);
 
+  useEffect(() => {
+    if (task) {
+      setStartTime(task.start ? task.start.split("T")[1]?.slice(0, 5) || "09:00" : "09:00");
+      setDeadlineTime(task.deadline ? task.deadline.split("T")[1]?.slice(0, 5) || "23:00" : "23:00");
+    }
+  }, [task]);
+
   const [fixedDate, setFixedDate] = useState(
     formData.fixed_start ? formData.fixed_start.split("T")[0] : ""
   );
   const [fixedTime, setFixedTime] = useState(
     formData.fixed_start ? formData.fixed_start.split("T")[1]?.slice(0, 5) : ""
+  );
+  const [startTime, setStartTime] = useState(
+    formData.start ? formData.start.split("T")[1]?.slice(0, 5) : "09:00"
+  );
+  const [deadlineTime, setDeadlineTime] = useState(
+    formData.deadline ? formData.deadline.split("T")[1]?.slice(0, 5) : "23:00"
   );
   const [categoryInput, setCategoryInput] = useState("");
 
@@ -173,6 +192,24 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
       setFormData((prev) => ({ ...prev, fixed_start: iso }));
     } else {
       setFormData((prev) => ({ ...prev, fixed_start: null }));
+    }
+  };
+
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeVal = e.target.value;
+    setStartTime(timeVal);
+    if (formData.start && timeVal) {
+      const datePart = formData.start.split("T")[0];
+      setFormData((prev) => ({ ...prev, start: toISODateTime(datePart, timeVal) }));
+    }
+  };
+
+  const handleDeadlineTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeVal = e.target.value;
+    setDeadlineTime(timeVal);
+    if (formData.deadline && timeVal) {
+      const datePart = formData.deadline.split("T")[0];
+      setFormData((prev) => ({ ...prev, deadline: toISODateTime(datePart, timeVal) }));
     }
   };
 
@@ -264,33 +301,49 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
               <span className="text-main-font/80 text-[10px] uppercase tracking-widest">
                 Start
               </span>
-              <input
-                type="date"
-                value={formatDateForInput(formData.start)}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    start: toFullDateTime(e.target.value, 9),
-                  }))
-                }
-                className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
-              />
+              <div className="flex gap-1">
+                <input
+                  type="date"
+                  value={formatDateForInput(formData.start)}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      start: toISODateTime(e.target.value, startTime),
+                    }))
+                  }
+                  className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
+                />
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={handleStartTimeChange}
+                  className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs w-20 focus:border-main-font/40 outline-none"
+                />
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               <span className="text-main-font/80 text-[10px] uppercase tracking-widest">
                 Deadline
               </span>
-              <input
-                type="date"
-                value={formatDateForInput(formData.deadline)}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    deadline: toFullDateTime(e.target.value, 23),
-                  }))
-                }
-                className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
-              />
+              <div className="flex gap-1">
+                <input
+                  type="date"
+                  value={formatDateForInput(formData.deadline)}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      deadline: toISODateTime(e.target.value, deadlineTime),
+                    }))
+                  }
+                  className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs flex-1 focus:border-main-font/40 outline-none"
+                />
+                <input
+                  type="time"
+                  value={deadlineTime}
+                  onChange={handleDeadlineTimeChange}
+                  className="bg-sec/40 border border-main-font/20 rounded-lg px-2 py-1.5 text-main-font text-xs w-20 focus:border-main-font/40 outline-none"
+                />
+              </div>
             </div>
           </div>
         )}
