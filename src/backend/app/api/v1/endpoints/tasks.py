@@ -367,7 +367,7 @@ def update_task(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(
     id: UUID = Path(..., description="ID of the task to delete"),
-    source: str = Query(..., description="main_schedule | unscheduled | provisional"),
+    source: str = Query(..., description="main_schedule | unscheduled | provisional | tasks"),
     db: Session = Depends(get_db),
 ):
     """
@@ -378,10 +378,16 @@ def delete_task(
         logger.info(f"Starting task delete: {id}, source: {source}")
         
         if source == "main_schedule":
+            slot = db.query(MainScheduleSlot).filter(MainScheduleSlot.task_id == id).first()
+            if not slot:
+                logger.info(f"Task not found in main_schedule: {id}")
+                raise HTTPException(status_code=404, detail="Task not found in main_schedule")
+            
             task = db.query(Task).filter(Task.id == id).first()
             if not task:
-                logger.info(f"Task not found in main_schedule: {id}")
+                logger.info(f"Task not found: {id}")
                 raise HTTPException(status_code=404, detail="Task not found")
+            
             db.query(Task).filter(Task.id == id).delete()
             logger.info(f"Deleted task from tasks table: {id}")
             
@@ -422,6 +428,14 @@ def delete_task(
                     raise HTTPException(status_code=404, detail="Task not found")
                 db.query(Task).filter(Task.id == id).delete()
                 logger.info(f"Deleted task from tasks table: {id}")
+                
+        elif source == "tasks":
+            task = db.query(Task).filter(Task.id == id).first()
+            if not task:
+                logger.info(f"Task not found: {id}")
+                raise HTTPException(status_code=404, detail="Task not found")
+            db.query(Task).filter(Task.id == id).delete()
+            logger.info(f"Deleted task from tasks table: {id}")
         else:
             raise HTTPException(status_code=400, detail="Invalid source parameter")
         

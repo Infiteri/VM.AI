@@ -238,7 +238,13 @@ class TaskPayload(BaseModel):
 **Query Parameters:**
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| source | string | Yes | `main_schedule` \| `unscheduled` \| `provisional` |
+| source | string | Yes | `main_schedule` \| `unscheduled` \| `provisional` \| `tasks` |
+
+**Source Options:**
+- `main_schedule`: Verifies task is in main_schedule, then deletes from tasks table
+- `unscheduled`: Removes from unscheduled queue or tasks table
+- `provisional`: Removes from provisional schedule
+- `tasks`: Directly deletes from tasks table
 
 **Response:** 204 No Content (empty)
 

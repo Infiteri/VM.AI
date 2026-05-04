@@ -12,7 +12,7 @@ build/
 Thumbs.db
 .qwen/
 **/.qwen/
-src/backend/Documentation/Past/
+src/backend/docs/Past/
 
 # Logs
 logs
