@@ -39,8 +39,20 @@ export default function TaskView({ task, taskId, onDelete }: TaskViewProps) {
         fixed_start = formatTimeDisplay(task.fixed_start)
     } = task || {};
 
-    const handleSave = () => {
-        console.log("Saving Task Data:", { name, ...taskData });
+    const handleSave = async () => {
+        if (!taskId) return;
+        
+        try {
+            const completed = taskData.realization === true;
+            const actualDuration = completed ? taskData.duration : undefined;
+            const actualDifficulty = completed ? taskData.difficulty / 100 : undefined;
+            
+            await api.rateTask(taskId, completed, actualDuration, actualDifficulty);
+            setIsNoteOpen(false);
+        } catch (err) {
+            console.error("Failed to save task data:", err);
+            alert("Failed to save: " + (err instanceof Error ? err.message : "Unknown error"));
+        }
     };
 
     const handleModifyClick = async () => {
