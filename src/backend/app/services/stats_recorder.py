@@ -117,7 +117,7 @@ class StatsRecorder:
         )
         avg_duration[bucket] = {
             "count": current_count + 1,
-            "avg": new_avg_duration
+            "avg": int(new_avg_duration)
         }
         stats.avg_duration = avg_duration
 
@@ -199,7 +199,7 @@ class StatsRecorder:
             )
             avg_duration[bucket] = {
                 "count": current_count + 1,
-                "avg": new_avg_duration
+                "avg": int(new_avg_duration)
             }
             cat_stats.avg_duration = avg_duration
 

@@ -54,6 +54,8 @@ const RangeSlider = ({ label, name, value, onChange }: RangeSliderProps) => (
 interface TaskModifyProps {
   task?: Task;
   onUpdate?: (task: Task) => void;
+  openMode?: "add" | "modify";
+  taskId?: string;
 }
 
 function formatDateForInput(isoDate: string | null): string {
@@ -92,7 +94,7 @@ function toBackendDateTime(isoDate: string | null): string | null {
   return `${year}-${month}-${day}T${hours}:${mins}:${secs}`;
 }
 
-export default function TaskModifyView({ task, onUpdate }: TaskModifyProps) {
+export default function TaskModifyView({ task, onUpdate, openMode = "add", taskId }: TaskModifyProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -403,10 +405,15 @@ export default function TaskModifyView({ task, onUpdate }: TaskModifyProps) {
               deadline: formData.fixed_time ? null : toBackendDateTime(formData.deadline),
               fixed_start: formData.fixed_time ? toBackendDateTime(finalFixedStart) : null,
             };
-            console.log("Sending task:", JSON.stringify(taskToSend));
-            console.log("Calling API...");
-            await api.createTask(taskToSend);
-            console.log("API call done");
+
+            if (openMode === "modify" && taskId) {
+              await api.updateTask(taskId, taskToSend, "unscheduled");
+            } else {
+              console.log("Sending task:", JSON.stringify(taskToSend));
+              console.log("Calling API...");
+              await api.createTask(taskToSend);
+              console.log("API call done");
+            }
             navigate("/pending");
           } catch (err: any) {
             console.error("Failed to create task:", err);

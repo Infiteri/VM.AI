@@ -60,7 +60,7 @@ function UnscheduledTaskView({ task, onDelete }: { task: UnscheduledTask; onDele
     const startTime = t.start ? t.start.split("T")[1]?.substring(0, 5) : "";
 
     const handleModify = () => {
-        navigate("/task", { state: { task: t, openMode: "modify" } });
+        navigate("/task", { state: { task: t, task_id: task.task_id, openMode: "modify" } });
     };
 
     const handleDelete = () => {

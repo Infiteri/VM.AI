@@ -41,7 +41,7 @@ def get_provisional_changes(
             "provisional_schedule_slot_id": slot.id,
             "task_id": task.id,
             "task_name": task.name,
-            "change_type": change.change_type,
+            "change_type": change.change_type if change else "insert",
             "new_slot_start": slot.start,
             "new_slot_end": slot.end,
             "location": location_name,

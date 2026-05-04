@@ -640,7 +640,7 @@ class EnrichmentService:
                     delta_val = delta_bucket if delta_bucket else 0
 
                 if avg_val is not None:
-                    return avg_val + delta_val
+                    return int(avg_val + delta_val)
 
             # Bucket not found - return None to let caller try next source
             logger.debug(f"Duration bucket '{bucket}' not found in task_stats")
@@ -712,7 +712,7 @@ class EnrichmentService:
                         delta_val = delta_bucket if delta_bucket else 0
 
                     if avg_val is not None:
-                        return avg_val + delta_val
+                        return int(avg_val + delta_val)
 
                 # Bucket not found in this category - continue to next category
                 logger.debug(
