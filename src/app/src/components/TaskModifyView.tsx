@@ -56,6 +56,7 @@ interface TaskModifyProps {
   onUpdate?: (task: Task) => void;
   openMode?: "add" | "modify";
   taskId?: string;
+  source?: "main_schedule" | "unscheduled" | "provisional";
 }
 
 function formatDateForInput(isoDate: string | null): string {
@@ -100,7 +101,7 @@ function toBackendDateTime(isoDate: string | null): string | null {
   return `${year}-${month}-${day}T${hours}:${mins}:${secs}`;
 }
 
-export default function TaskModifyView({ task, onUpdate, openMode = "add", taskId }: TaskModifyProps) {
+export default function TaskModifyView({ task, onUpdate, openMode = "add", taskId, source = "main_schedule" }: TaskModifyProps) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -460,7 +461,7 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
             };
 
             if (openMode === "modify" && taskId) {
-              await api.updateTask(taskId, taskToSend, "main_schedule");
+              await api.updateTask(taskId, taskToSend, source);
             } else {
               console.log("Sending task:", JSON.stringify(taskToSend));
               console.log("Calling API...");

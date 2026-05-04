@@ -33,18 +33,20 @@ function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[
                 const startTime = change.new_slot_start ? change.new_slot_start.split("T")[1]?.substring(0, 5) : "";
                 const endTime = change.new_slot_end ? change.new_slot_end.split("T")[1]?.substring(0, 5) : "";
                 return (
-                    <div key={change.task_id} className="flex flex-col gap-3 p-4 border border-white/20 rounded-lg bg-white/5">
+                    <div key={change.task_id} className="flex flex-col gap-3 p-4 border border-white/20 rounded-xl bg-white/5">
                         <div className="flex flex-row items-center justify-between">
-                            <span className="text-lg text-main-font font-medium">{change.task_name}</span>
-                            <span className="text-sm text-second-font">{startTime} - {endTime}</span>
+                            <span className="text-lg text-main-font font-medium truncate">{change.task_name}</span>
                         </div>
-                        <div className="flex flex-row gap-2">
-                            <div className="flex flex-row items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/10">
-                                <MapPin className="w-3.5 h-3.5 text-second-font" />
+                        <div className="text-sm text-second-font font-medium">
+                            {startTime} - {endTime}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                                <MapPin className="w-3 h-3 text-second-font" />
                                 <span className="text-xs text-second-font">{change.location}</span>
                             </div>
-                            <div className="px-2 py-1 rounded-md bg-white/5 border border-white/10">
-                                <span className="text-xs text-second-font">{change.change_type}</span>
+                            <div className="px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                                <span className="text-xs text-second-font capitalize">{change.change_type}</span>
                             </div>
                         </div>
                     </div>
@@ -58,32 +60,49 @@ function UnscheduledTaskView({ task, onDelete }: { task: UnscheduledTask; onDele
     const navigate = useNavigate();
     const t = task.task;
     const startTime = t.start ? t.start.split("T")[1]?.substring(0, 5) : "";
-
-    const handleModify = () => {
-        navigate("/task", { state: { task: t, task_id: task.task_id, openMode: "modify" } });
-    };
-
-    const handleDelete = () => {
-        onDelete(task.task_id);
-    };
+    const deadlineDisplay = t.deadline ? t.deadline.split("T")[0] : "";
+    const durationDisplay = t.duration ? `${t.duration}min` : "";
 
     return (
-        <div className="flex flex-col gap-3 p-4 border border-white/20 rounded-lg bg-white/5">
+        <div className="flex flex-col gap-2 p-4 border border-white/20 rounded-xl bg-white/5">
             <div className="flex flex-row items-center justify-between">
-                <span className="text-lg text-main-font font-medium">{t.name}</span>
-                <span className="text-sm text-second-font">{startTime}</span>
+                <span className="text-lg text-main-font font-medium truncate flex-1">{t.name}</span>
             </div>
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-wrap gap-1.5">
+                {startTime && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                        <span className="text-xs text-second-font font-medium">{startTime}</span>
+                    </div>
+                )}
+                {durationDisplay && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                        <span className="text-xs text-second-font">{durationDisplay}</span>
+                    </div>
+                )}
+                {deadlineDisplay && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                        <span className="text-xs text-second-font">{deadlineDisplay}</span>
+                    </div>
+                )}
                 {t.location && (
-                    <div className="flex flex-row items-center gap-1.5 px-2 py-1 rounded-md bg-white/5 border border-white/10">
-                        <MapPin className="w-3.5 h-3.5 text-second-font" />
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
+                        <MapPin className="w-3 h-3 text-second-font" />
                         <span className="text-xs text-second-font">{t.location}</span>
                     </div>
                 )}
             </div>
+            {t.category && t.category.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                    {t.category.map((cat, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-main-font/10 border border-main-font/20">
+                            <span className="text-[10px] text-main-font/80">{cat}</span>
+                        </span>
+                    ))}
+                </div>
+            )}
             <div className="flex justify-between mt-1 px-1 text-[9px] font-medium uppercase tracking-tighter">
-                <button onClick={handleModify} className="text-second hover:text-main transition-colors">Modify</button>
-                <button onClick={handleDelete} className="text-second hover:text-del transition-colors">Delete</button>
+                <button onClick={() => navigate("/task", { state: { task: t, task_id: task.task_id, openMode: "modify", source: "unscheduled" } })} className="text-second hover:text-main transition-colors">Modify</button>
+                <button onClick={() => onDelete(task.task_id)} className="text-second hover:text-del transition-colors">Delete</button>
             </div>
         </div>
     );
