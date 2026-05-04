@@ -217,6 +217,10 @@ class TaskPayload(BaseModel):
 |-----------|------|----------|-------------|
 | source | string | Yes | `main_schedule` \| `unscheduled` \| `provisional` |
 
+**Validation Rules (main_schedule only):**
+- Cannot update task if `slot.end < now` (task ended in the past) → 400
+- Cannot update task if `task.rated == True` → 409
+
 **Response (TaskResponse):**
 ```json
 {

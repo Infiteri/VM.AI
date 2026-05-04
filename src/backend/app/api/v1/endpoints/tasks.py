@@ -316,6 +316,15 @@ def update_task(
             slot = db.query(MainScheduleSlot).filter(MainScheduleSlot.task_id == id).first()
             if not slot:
                 raise HTTPException(status_code=400, detail="Task not in main schedule")
+            
+            now = datetime.now()
+            if slot.end < now:
+                raise HTTPException(status_code=400, detail="Cannot update task that ended in the past")
+            
+            task = db.query(Task).filter(Task.id == id).first()
+            if task and task.rated:
+                raise HTTPException(status_code=409, detail="Cannot update rated task")
+            
             stats_recorder.update_time_score(db, id, slot.start, boost=-1.0)
         
         normalize_task_payload(body.task)
