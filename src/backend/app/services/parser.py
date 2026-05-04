@@ -28,9 +28,18 @@ REMOVE_FIELDS = {"recurrent", "recurrence_days"}
 
 def _setup_parser_path():
     """Add parser directory to path."""
-    parser_dir = r"C:\VM.AI\src\parser"
-    if parser_dir not in sys.path:
-        sys.path.insert(0, parser_dir)
+    from pathlib import Path
+    from app.core.logging_config import setup_logging
+    
+    parser_dir = Path(__file__).resolve().parent.parent.parent.parent / "parser"
+    
+    if not parser_dir.exists():
+        logger = setup_logging()
+        logger.warning(f"Parser directory not found: {parser_dir}")
+        return
+    
+    if str(parser_dir) not in sys.path:
+        sys.path.insert(0, str(parser_dir))
 
 
 def _convert_value_to_type(field: str, value: Any) -> Any:

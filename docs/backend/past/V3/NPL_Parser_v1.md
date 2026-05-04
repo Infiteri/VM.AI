@@ -1,56 +1,61 @@
 # NLP Parser — Technical Documentation
 VM.AI Project · ONIA 2026
-Version 3.0 (Stable Pipeline Integration)
+Version 3.0 (Stable Pipeline Integration + Draft Pattern)
+Last Updated: April 13, 2026
 
 ## 1. Overview
 
-The NLP Parser is the entry point of the entire VM.AI pipeline. It transforms raw, conversational user input into a clean, structured JSON object that downstream modules can reliably consume.
+The NLP Parser is the entry point of the entire VM.AI pipeline. It transforms raw, conversational user input into a clean, structured `TaskPayload` object that downstream modules can reliably consume.
 
 ### Key Design Principles
-- **Predicted flags**: Every field carries a `predicted` boolean to signal whether the value came explicitly from the user or was estimated by the model.
+- **Draft Pattern**: Parsed tasks are saved to `task_drafts` table with a `draft_id`. Frontend edits data, then commits with `draft_id`. Prevents database pollution.
 - **Date passthrough**: Raw date strings (`"Friday"`, `"next Monday 3pm"`) are intentionally left unparsed. Date resolution is handled by the Enrichment module.
 - **CPU-optimized**: Uses fine-tuned T5-base, balancing accuracy with lightweight inference suitable for competition deployment.
-- **Strict boundary validation**: Output is validated before passing to Task Matching/Enrichment to prevent pipeline corruption.
+- **Strict boundary validation**: Output is validated against `TaskPayload` schema before passing to Task Matching/Enrichment to prevent pipeline corruption.
+- **No predicted flags**: The API returns clean data. Backend handles enrichment logic internally by comparing draft data with user edits.
 
 ### What It Does
 - Handles two operations: `Add` (full extraction) and `Modify` (delta extraction)
 - Prefixes inputs to switch model modes (`add: <prompt>` / `modify: <json> | <prompt>`)
-- Outputs JSON with per-field `predicted` flags
+- Outputs `TaskPayload` object with clean types (datetime, float, int)
 - Catches malformed outputs and returns structured error responses
 - Passes raw temporal strings to Enrichment for resolution
+- Saves enriched draft to `task_drafts` table for later commit
 
 ### What It Does NOT Do
 - Parse dates or resolve relative time references
 - Handle task deletion (managed directly by backend)
 - Make scheduling, enrichment, or matching decisions
-- Update any database tables
+- Update main database tables (only writes to `task_drafts`)
 - Process recurring task templates (out of scope)
 
 ## 2. Position in Pipeline
 
-```
+```text
 User Input (Chat or Form)
 ↓
-NLP Parser → structured JSON + predicted flags
+NLP Parser → TaskPayload object
 ↓
-Boundary Validation (Pydantic schema)
+Task Matching → {name_vector, associated_id, association_status}
 ↓
-Task Matching → {associated_id, name_vector, association_status}
+Enrichment → resolves dates, applies historical averages
 ↓
-Enrichment → resolves dates, applies historical averages, writes to DB
+Save to task_drafts → Return draft_id to frontend
 ↓
-Unscheduled Tasks (stored in DB)
+User reviews/edits → Frontend sends draft_id + edits
+↓
+Commit Endpoint → Moves from drafts to main DB
 ```
 
 ## 3. Key Concepts
 
 | Concept | Description |
 |---------|-------------|
-| `predicted: false` | User stated this explicitly. Enrichment will **never** override. |
-| `predicted: true` | Model estimated this. Enrichment **may** replace with historical data. |
-| Mode Prefix | T5 requires explicit mode switches: `add:` vs `modify: <existing_json> \| <change>` |
-| Date Passthrough | Raw strings preserved (`"Friday"`, `"tonight"`). Enrichment uses `dateparser`. |
-| Token Budget | Max 256 input / 128 output tokens. Truncation risk logged, not silently ignored. |
+| **Draft Pattern** | Parsed tasks saved temporarily in `task_drafts`. Frontend edits, then commits with `draft_id`. |
+| **Mode Prefix** | T5 requires explicit mode switches: `add:` vs `modify: <existing_json> \| <change>` |
+| **Date Passthrough** | Raw strings preserved (`"Friday"`, `"tonight"`). Enrichment uses `dateparser`. |
+| **Token Budget** | Max 256 input / 128 output tokens. Truncation risk logged, not silently ignored. |
+| **Clean Output** | Returns `TaskPayload` with strict types. No predicted flags in API response. |
 
 ## 4. Operations
 
@@ -64,8 +69,10 @@ add: finish chemistry homework before Friday, pretty hard
 
 **Behavior:**
 - Extracts `name`, `deadline`, `difficulty`, `duration`, `category`, `location`, `importance`
-- Sets `fixed_time: false`, `start: null`, `recurrent: false`
-- Marks explicitly stated fields as `predicted: false`, estimated fields as `predicted: true`
+- Sets `fixed_time: false`, `start: null`, `fixed_start: null`
+- Runs Task Matching + Enrichment to compute hidden fields
+- Saves complete draft to `task_drafts` table
+- Returns `draft_id` + `TaskPayload` to frontend
 
 ### 4.2 Modify
 Triggered when the user edits an existing task. The model receives the full current task JSON alongside the change prompt, and outputs **only the fields that changed**.
@@ -78,34 +85,36 @@ modify: {"name": "chemistry homework", "deadline": "Friday", "duration": 75, ...
 **Behavior:**
 - Compares prompt against existing JSON context
 - Returns delta JSON containing only modified fields
-- Preserves original `predicted` status for unchanged fields (handled downstream)
+- Preserves original values for unchanged fields
 - Converts fixed ↔ flexible tasks when explicitly requested
+- Saves updated draft to `task_drafts` table
 
 ### 4.3 Delete
 Handled entirely by the backend. No NLP inference required. User selects task → presses Delete → cascade removes from core tables (statistics preserved).
 
 ## 5. Output Schema
 
-Every field follows the `{ "value": <type>, "predicted": bool }` structure.
+Returns a `TaskPayload` object with clean types. Every field is strictly typed and validated.
 
 ```json
 {
-  "name":            { "value": "string",          "predicted": false },
-  "start":           { "value": "string | null",   "predicted": false },
-  "deadline":        { "value": "string | null",   "predicted": false },
-  "difficulty":      { "value": float (0.0–1.0),   "predicted": true },
-  "duration":        { "value": int (minutes),     "predicted": true },
-  "category":        { "value": ["string"],        "predicted": true },
-  "location":        { "value": "string",          "predicted": true },
-  "importance":      { "value": float (0.0–1.0),   "predicted": true },
-  "fixed_time":      { "value": bool,              "predicted": false },
-  "fixed_start":     { "value": "string | null",   "predicted": false },
-  "recurrent":       { "value": bool,              "predicted": false },
-  "recurrence_days": { "value": ["string"] | null, "predicted": false }
+  "draft_id": "123e4567-e89b-12d3-a456-426614174000",
+  "task": {
+    "name": "Chemistry Homework",
+    "start": "2026-04-14T09:00:00",
+    "deadline": "2026-04-18T23:59:00",
+    "difficulty": 0.8,
+    "duration": 90,
+    "category": ["study"],
+    "location": "Home",
+    "importance": 0.6,
+    "fixed_time": false,
+    "fixed_start": null
+  }
 }
 ```
 
-> 💡 **Fixed-Time Tasks**: When `fixed_time: true`, `start` and `deadline` are `null`. Only `fixed_start` contains a raw time string (e.g., `"Monday 09:00"`).
+> 💡 **Fixed-Time Tasks**: When `fixed_time: true`, `start` and `deadline` are `null`. Only `fixed_start` contains a datetime value.
 > 💡 **Recurrent Tasks**: `NOT IMPLEMENTED` for ONIA 2026. Fields remain in schema for future expansion but are ignored by downstream modules.
 
 ## 6. Model & Training
@@ -156,7 +165,7 @@ Catches malformed model outputs before they reach downstream modules.
 ```python
 try:
     result = json.loads(model_output)
-    if "name" not in result or result["name"]["value"] is None:
+    if "name" not in result or result["name"] is None:
         raise ValueError("missing name field")
 except (json.JSONDecodeError, ValueError) as e:
     result = {"error": "parse_failed", "raw": model_output, "reason": str(e)}
@@ -165,37 +174,33 @@ except (json.JSONDecodeError, ValueError) as e:
 ### 8.2 Pydantic Boundary Validation (Concrete)
 All outputs pass through a strict schema validator before Task Matching.
 ```python
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, Field
 
-class NLPField(BaseModel):
-    value: object
-    predicted: bool
+class TaskPayload(BaseModel):
+    name: str = Field(..., min_length=1)
+    duration: int = Field(..., gt=0, lt=1440)
+    difficulty: float = Field(..., gt=0.0, le=1.0)
+    category: List[str] = Field(..., min_length=1)
+    # ... other fields with strict validation
 
-class ParsedTask(BaseModel):
-    name: NLPField
-    duration: NLPField
-    difficulty: NLPField
-    category: NLPField
-    # ... other fields
-    
-    @validator('duration', 'difficulty', pre=True)
-    def coerce_numeric(cls, v):
-        if isinstance(v.get('value'), str):
-            raise ValueError(f"Expected numeric, got string: {v['value']}")
-        return v
+    @model_validator(mode='after')
+    def check_fixed_logic(self):
+        # Enforces flexible vs fixed task rules
+        ...
 ```
 If validation fails, the system returns a user-friendly prompt: `"Please rephrase your request. I couldn't extract the task details."`
 
 ### 8.3 Cold Start & Fallback
 - If the model fails to load or returns consistent parse errors, a lightweight regex-based fallback extracts `name`, `duration`, and `deadline` using keyword patterns.
-- Fallback marks all fields as `predicted: true` to force Enrichment to apply defaults or category averages.
+- Fallback forces Enrichment to apply defaults or category averages.
+- Draft is still saved to `task_drafts` for user review.
 
 ## 9. Cold Start Behavior
 
 When a new user has no history:
 - Model operates identically (trained on synthetic + general examples)
-- `predicted: true` fields will default to model estimates
 - Enrichment applies category-level averages or `0.5` cold-start defaults
+- Draft is saved with computed fields
 - No warmup period required. System works from first input.
 
 ## 10. Implementation Recommendations & Proposals
@@ -210,20 +215,22 @@ The following proposals are strongly recommended to ensure reliability, prevent 
 | **Date String Normalization** | Ensure all raw date strings passed to Enrichment are stripped of trailing punctuation/whitespace. | Prevents `dateparser` ambiguity on messy user input |
 | **Fallback Regex Parser** | Keep lightweight `re`-based extractor as backup if ML service crashes or times out. | Guarantees system never shows "500 Error" to judges or users |
 | **FastAPI Middleware Logging** | Log `NLP_INPUT`, `NLP_OUTPUT`, `NLP_VALIDATION_PASS`, `NLP_LATENCY_MS` at request boundaries. | Enables real-time debugging during live demos |
+| **Draft Cleanup** | Background async task runs every 24h to delete old drafts. | Prevents database pollution from abandoned tasks |
 
 ## 11. Summary
 
 | Aspect | Description |
 |--------|-------------|
-| **Purpose** | Transform natural language into structured JSON with predicted flags |
+| **Purpose** | Transform natural language into structured TaskPayload with draft_id |
 | **Model** | Fine-tuned T5-base (220M params, ~900MB) |
 | **Operations** | `Add` (full extraction), `Modify` (delta extraction), `Delete` (backend-only) |
 | **Date Handling** | Raw strings passed through. Resolved by Enrichment module. |
-| **Output Schema** | `{ "value": <type>, "predicted": bool }` per field |
-| **Predicted Flags** | `false` = explicit (never overridden), `true` = estimated (may be enriched) |
+| **Output Schema** | `{ draft_id: UUID, task: TaskPayload }` |
 | **Token Limits** | 256 input / 128 output. Logged warning if exceeded. |
 | **Validation** | JSON parse + Pydantic schema enforcement before pipeline handoff |
 | **Fallback** | Regex keyword extractor + safe defaults if ML fails |
 | **Cold Start** | Works immediately. Relies on model training + category defaults. |
 | **Recurring Tasks** | NOT IMPLEMENTED — documented as future scope |
 | **AI Content** | Fine-tuned transformer. Training data: synthetic (1x), real (2x), specific (1x) |
+| **Draft Pattern** | Saves to task_drafts, returns draft_id, cleanup after 24h |
+```

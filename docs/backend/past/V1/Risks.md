@@ -1,9 +1,11 @@
+```markdown
 # VM.AI — Risk Register & Mitigation Strategies
 **Project:** ONIA 2026 Competition  
 **Timeline:** 1 Month  
 **Last Updated:** April 5, 2026  
 **Status:** Finalized & Competition-Ready
 
+---
 
 ## 📋 Overview
 This document consolidates all architectural, data-integrity, and implementation risks identified during the VM.AI technical review. Each risk includes a clear explanation, real-world impact, concrete example, and a production-ready solution tailored to your **1-month timeline**, **10-day rolling window**, **immutable-executed-task constraints**, and **agreed-upon stable incremental scheduler**.
@@ -207,3 +209,4 @@ Pre-seed `category_statistics` with 3–5 synthetic completed tasks before demo.
 
 ---
 *Document prepared for ONIA 2026. All solutions are CPU-only, dependency-light, and aligned with competition deadlines.*
+```

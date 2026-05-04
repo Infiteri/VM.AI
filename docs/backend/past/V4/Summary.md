@@ -1,6 +1,6 @@
 # VM.AI Backend — Technical Summary
-**Version:** 4.1 (Current)
-**Last Updated:** May 3, 2026
+**Version:** 3.0 (Final)
+**Last Updated:** April 18, 2026
 **Competition:** ONIA 2026
 
 ---
@@ -26,7 +26,7 @@ VM.AI is an AI-driven personal scheduling system that transforms natural languag
 │                                                                             │
 │   Stage 1: NLP Parser                                                       │
 │   Input: "finish chemistry homework before Friday"                         │
-│   Process: T5-base conditional generation → JSON parsing                   │
+│   Process: T5-base conditional generation → JSON parsing                    │
 │   Output: TaskPayload (clean fields, {value, predicted} structure)          │
 │   Dependencies: transformers, sentence-transformers                         │
 │                                                                             │
@@ -38,25 +38,25 @@ VM.AI is an AI-driven personal scheduling system that transforms natural languag
 │   Dependencies: sentence-transformers                                       │
 │                                                                             │
 │   Stage 3: Enrichment                                                     │
-│   Input: TaskPayload + Match result                                        │
-│   Process: Date resolution → Historical averaging → Compute urgency/value     │
+│   Input: TaskPayload + Match result                                          │
+│   Process: Date resolution → Historical averaging → Compute urgency/value        │
 │   Priority: task_statistics (records≥3) → category_statistics → keep value   │
-│   Output: Full task data ready for DB insertion                             │
-│   Dependencies: dateparser, SQLAlchemy                                     │
+│   Output: Full task data ready for DB insertion                           │
+│   Dependencies: dateparser, SQLAlchemy                                   │
 │                                                                             │
-│   Stage 4: Scheduler (Complete - v4.0)                                     │
-│   Input: Task list (queue or task_ids)                                        │
-│   Process: Constraint solver → ALL slots scored → Stable scoring            │
-│   Implementation: ScheduleEngine class with scoring, displacement handling  │
-│   Output: provisional_schedule + schedule_changes                         │
-│   Dependencies: None (pure algorithm)                                     │
+│   Stage 4: Scheduler                                                      │
+│   Input: Task list from unscheduled_queue                                    │
+│   Process: Constraint solver → Top-15 pruning → Stable scoring            │
+│   Constraints: 12s timeout, 1-layer displacement, 25% value threshold    │
+│   Output: provisional_schedule + schedule_changes                        │
+│   Dependencies: None (pure algorithm)                                    │
 │                                                                             │
-│   Stage 5: Stats Recorder                                                   │
-│   Input: Completed/rated task + actual values                             │
+��   Stage 5: Stats Recorder                                                 │
+│   Input: Completed/rated task + actual values                           │
 │   Process: Synchronous update with two denominators                      │
-│   Denominators: records (plan), completed_count (delta)                    │
-│   Output: Updated statistics tables                                       │
-│   Dependencies: SQLAlchemy                                                │
+│   Denominators: records (plan), completed_count (delta)                   │
+│   Output: Updated statistics tables                                      │
+│   Dependencies: SQLAlchemy                                            │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -65,14 +65,7 @@ VM.AI is an AI-driven personal scheduling system that transforms natural languag
 
 ## 3. Key Architectural Decisions
 
-### 3.1 Class-Based Service Pattern
-All core services follow a class-based architecture:
-- **EnrichmentService** - Task enrichment and value computation
-- **ScheduleEngine** - Scheduling algorithm with scoring and displacement
-- **TaskMatchingService** - Task name matching via embeddings
-Services receive `db` session per-method, not in `__init__`.
-
-### 3.2 Draft System Pattern
+### 3.1 Draft System Pattern
 - **Purpose:** Safe task creation via Chat without polluting the main database
 - **Flow:**
   1. User enters NLP prompt → NLP Parser processes → saves to `task_drafts`
@@ -81,14 +74,14 @@ Services receive `db` session per-method, not in `__init__`.
   4. On commit: draft is loaded (match_result from content) → merged → saved to `tasks`
 - **Safety:** If user abandons, background cleanup deletes drafts after 24 hours
 
-### 3.3 No Predicted Flags in API
+### 3.2 No Predicted Flags in API
 - Frontend receives clean `TaskPayload` with no internal flags
 - Backend handles all overwrite logic internally by comparing:
   - Draft data (from NLP) vs User edits (source of truth)
   - `predicted: true` fields → checked against statistics
   - `predicted: false` fields → kept as user provided
 
-### 3.4 Strict Validation
+### 3.3 Strict Validation
 - All schemas use Pydantic `Field` with constraints:
   - `difficulty`: 0.0 - 1.0
   - `duration`: 1 - 1439 minutes
@@ -96,7 +89,7 @@ Services receive `db` session per-method, not in `__init__`.
 - All temporal fields are `datetime` types (automatic ISO validation)
 - Model validators enforce `fixed_time` logic
 
-### 3.5 Atomic Operations
+### 3.4 Atomic Operations
 - Schedule commit uses single PostgreSQL transaction:
   ```sql
   BEGIN
@@ -107,21 +100,13 @@ Services receive `db` session per-method, not in `__init__`.
   ```
 - Prevents blank calendar on network drop
 
-### 3.6 Background Cleanup
+### 3.5 Background Cleanup
 - Async task runs every 24 hours
 - Deletes old drafts: `DELETE FROM task_drafts WHERE created_at < NOW() - INTERVAL '24 hours'`
 
-### 3.7 Naive Datetime Format
-- **Format:** All datetime values use naive ISO 8601 format (no timezone info)
-- **Example:** `"2026-05-09T09:30:00"` (NOT `"2026-05-09T09:30:00+03:00"` or `"2026-05-09T09:30:00Z"`)
-- **Database:** All `DateTime` columns use `timezone=False`
-- **Validation:** Uses `datetime.now()` without timezone
-- **Rationale:** All users in +03:00 timezone, no cross-timezone collaboration needed
-- **Storage:** What frontend sends, backend stores, frontend receives - no conversion
-
 ---
 
-## 4. Database Schema (v4.0)
+## 4. Database Schema (v3.0)
 
 ### 4.1 Table Groups
 
@@ -140,7 +125,7 @@ Services receive `db` session per-method, not in `__init__`.
 
 ---
 
-## 5. API Endpoints (v4.0)
+## 5. API Endpoints (v3.0)
 
 ### 5.1 Tasks Endpoints
 | Method | Endpoint | Purpose |
@@ -155,7 +140,7 @@ Services receive `db` session per-method, not in `__init__`.
 | Method | Endpoint | Purpose |
 |--------|---------|---------|
 | GET | `/schedule` | Get main schedule |
-| POST | `/schedule/batch` | Run scheduler (hybrid queue or task_ids) |
+| POST | `/schedule/batch` | Run scheduler |
 
 ### 5.3 Provisional Endpoints
 | Method | Endpoint | Purpose |
@@ -205,18 +190,6 @@ Frontend → GET /tasks/{id} (get current task)
          → Response: modified TaskPayload
 ```
 
-### 6.4 Schedule Batch (Hybrid Queue/Task IDs)
-```
-Frontend → POST /schedule/batch (optional: task_ids list)
-         → If task_ids provided: use specific tasks
-         → If no task_ids: fetch from unscheduled_queue
-         → ScheduleEngine.process_batch()
-         → Constraint solving + ALL slots scoring
-         → DB: write provisional_schedule
-         → DB: record schedule_changes
-         → Response: scheduled_count, changes
-```
-
 ---
 
 ## 7. Field Overwrite Logic (Enrichment)
@@ -236,56 +209,18 @@ Buckets are: `0.0`, `0.5`, `1.0`
 ```
 base = nlp_importance
 deadline_boost = 0.3 (days_left ≤ 1)
-                = 0.2 (days_left ≤ 3)
-                = 0.1 (days_left ≤ 7)
-                = 0 otherwise
+               = 0.2 (days_left ≤ 3)
+               = 0.1 (days_left ≤ 7)
+               = 0 otherwise
 completion_boost = completion_rate × 0.2
 final = min(1.0, base + deadline_boost + completion_boost)
 ```
 
 ---
 
-## 8. Scheduler Implementation (v4.0)
+## 8. Statistics Structure
 
-### 8.1 ScheduleEngine Class
-```python
-class ScheduleEngine:
-    def process_batch(self, db: Session, task_ids: list[str] | None = None) -> BatchScheduleResponse
-    def _get_candidates(self, db: Session, task: Task, ...) -> list[SlotScore]
-    def _score_slot(self, task: Task, slot: TimeSlot, ...) -> float
-    def _check_overlap(self, task: Task, slot: TimeSlot, schedule: list[TaskSlot]) -> bool
-    def _place_task(self, db: Session, task: Task, slot: TimeSlot, ...) -> None
-    def _handle_displacement(self, db: Session, task: Task, slot: TimeSlot, layer: int = 1) -> list[DisplacedTask]
-    def _save_provisional(self, db: Session, results: list[ScheduleResult]) -> None
-```
-
-### 8.2 Scoring Formula
-```
-score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference + urgency_boost
-```
-
-### 8.3 Key Parameters
-- **TOP_N_CANDIDATES=400** - Score ALL slots (not just top-15)
-- **FREE_SLOT_BOOST=0.5** - Free slots bubble to top naturally
-- **MAX_LAYER=1** - 1-layer displacement maximum
-- **VALUE_THRESHOLD=0.25** - 25% value threshold for displacement
-
-### 8.4 Algorithm Flow
-1. Fetch tasks (from queue or task_ids list)
-2. Build free slot inventory from main_schedule
-3. For each task:
-   a. Get candidate slots (start_time window)
-   b. Score ALL slots (not top-N)
-   c. Place in highest-scoring slot
-   d. Handle displacement if needed
-4. Save to provisional_schedule
-5. Record schedule_changes
-
----
-
-## 9. Statistics Structure
-
-### 9.1 avg_duration Structure (v4.0)
+### 8.1 avg_duration Structure (v3.0)
 ```python
 # Both TaskStatistics and CategoryStatistics
 {
@@ -295,7 +230,7 @@ score = base_value + free_boost - stability_penalty + location_boost + overlap_p
 }
 ```
 
-### 9.2 Two Denominators
+### 8.2 Two Denominators
 | Average Type | Denominator | When Updated |
 |-------------|------------|--------------|
 | Plan averages (`avg_duration`, `avg_difficulty`) | `records` | On task commit |
@@ -303,22 +238,22 @@ score = base_value + free_boost - stability_penalty + location_boost + overlap_p
 
 ---
 
-## 10. Current Implementation Status
+## 9. Current Implementation Status
 
 | Component | Status | Notes |
 |-----------|--------|-------|
 | FastAPI Backend | 100% | Full application running |
-| Database Models | 100% | All v4.0 tables |
+| Database Models | 100% | All v3.0 tables |
 | Pydantic Schemas | 100% | Strict validation |
 | Task Matching | 100% | MiniLM + thresholds |
 | NLP Parser | 100% | Trained T5 model |
-| Enrichment | 100% | EnrichmentService class |
-| Scheduler | 100% | ScheduleEngine class - ALL slots scored |
-| Stats Recorder | 100% | Synchronous update |
+| Enrichment | 100% | All methods implemented |
+| Scheduler | 0% | Not implemented |
+| Stats Recorder | 0% | Not implemented |
 
 ---
 
-## 11. Technology Stack
+## 10. Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -333,7 +268,7 @@ score = base_value + free_boost - stability_penalty + location_boost + overlap_p
 
 ---
 
-## 12. File Structure
+## 11. File Structure
 
 ```
 src/backend/
@@ -343,17 +278,13 @@ src/backend/
 │   ├── api/v1/endpoints/    # Route handlers
 │   ├── models/              # SQLAlchemy ORM
 │   ├── schemas/            # Pydantic models
-│   ├── services/           # Business logic (class-based)
-│   │   ├── enrichment.py   # EnrichmentService
-│   │   ├── schedule_engine.py # ScheduleEngine
-│   │   ├── task_matching.py # TaskMatchingService
-│   │   └── stats_recorder.py # StatsRecorderService
-│   └── utils/              # Utilities
-├── alembic/                # Database migrations
-├── logs/                   # Application logs
-└── pyproject.toml          # Dependencies
+│   ├── services/          # Business logic
+│   └── utils/             # Utilities
+├── alembic/               # Database migrations
+��── logs/                  # Application logs
+└── pyproject.toml         # Dependencies
 ```
 
 ---
 
-*Document prepared for ONIA 2026. This summary reflects the current v4.0 implementation state as of April 26, 2026.*
+*Document prepared for ONIA 2026. This summary reflects the current v3.0 implementation state as of April 18, 2026.*

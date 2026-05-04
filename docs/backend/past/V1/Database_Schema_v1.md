@@ -1,3 +1,4 @@
+```markdown
 # VM.AI — Database Schema Documentation
 Version 1.8 · Competition-Ready  
 Last Updated: April 5, 2026
@@ -25,7 +26,7 @@ The VM.AI database consists of three logical groups: **Core Tables** (task stora
 
 ## 3. Table Map
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           CORE TABLES                                        │
 ├─────────────────────────────┐  ┌─────────────────┐  ┌─────────────────────┐  │
@@ -227,3 +228,4 @@ The following proposals are strongly recommended to ensure data integrity, preve
 
 ---
 *Document prepared for ONIA 2026. All schemas, indexes, and cascade rules are aligned with competition deadlines and 1-month implementation constraints.*
+```

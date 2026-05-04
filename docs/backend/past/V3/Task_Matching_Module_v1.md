@@ -1,6 +1,7 @@
 # Task Matching Model — Technical Documentation
 VM.AI Project · ONIA 2026
 Version 2.4 (Stable Pipeline Integration)
+Last Updated: April 13, 2026
 
 ## 1. Overview
 
@@ -25,10 +26,10 @@ This distinction is critical because the Enrichment module uses the match result
 
 ## 2. Position in Pipeline
 
-```
+```text
 User Input
 ↓
-NLP Parser → structured JSON + predicted flags
+NLP Parser → TaskPayload
 ↓
 Task Matching Model → { name_vector, associated_id, association_status }
 ↓
@@ -186,4 +187,3 @@ The following proposals are strongly recommended to ensure reliability, prevent 
 | **AI Content** | Semantic embedding only. No fine-tuning, no training loops. |
 | **Execution** | Synchronous, lightweight (`<10ms` end-to-end) |
 | **Next Stage** | Enrichment Module (uses payload to select historical data source) |
-```

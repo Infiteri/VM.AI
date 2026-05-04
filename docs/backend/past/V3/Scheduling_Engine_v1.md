@@ -1,6 +1,7 @@
 # Scheduling Engine — Technical Documentation
 VM.AI Project · ONIA 2026
 Version 4.0 (Stable Incremental Scheduler)
+Last Updated: April 13, 2026
 
 ## 1. Overview
 
@@ -27,7 +28,7 @@ The Scheduling Engine is the fourth stage in the VM.AI pipeline. It takes enrich
 
 ## 2. Position in Pipeline
 
-```
+```text
 User clicks "Schedule Tasks" on Pending Changes Page
 ↓
 Scheduler reads unscheduled_tasks (gets task_id list, FIFO order)
@@ -55,7 +56,7 @@ Stats Recorder updates time preference scores
 | Concept | Description |
 |---------|-------------|
 | Unscheduled Tasks | Task IDs of tasks created/modified but not yet placed. Stored in `unscheduled_tasks`. |
-| Main Schedule | Real, committed calendar. Source of truth. Stored in `scheduled_slots`. |
+| Main Schedule | Real, committed calendar. Source of truth. Stored in `main_schedule`. |
 | Provisional Schedule | Working copy where scheduled changes are applied before commit. Stored in `provisional_schedule`. |
 | Schedule Changes | Log of changes (insert, move) applied to transform Main → Provisional. Stored in `schedule_changes`. |
 | Stability Penalty | Score deduction applied when a candidate slot is already occupied. Prevents schedule thrashing. |
@@ -176,10 +177,10 @@ The following proposals are strongly recommended to ensure reliability, prevent 
 
 | Area | Proposal | Impact |
 |------|----------|--------|
-| **Commit Atomicity** | Wrap `provisional_schedule → scheduled_slots` copy in a single PostgreSQL transaction using `BEGIN` / `INSERT ... SELECT` / `COMMIT` | Prevents blank calendar on network drop or server restart |
+| **Commit Atomicity** | Wrap `provisional_schedule → main_schedule` copy in a single PostgreSQL transaction using `BEGIN` / `INSERT ... SELECT` / `COMMIT` | Prevents blank calendar on network drop or server restart |
 | **Stats Execution Mode** | Run Stats Recorder synchronously during MVP. Wrap `tasks_statistics` updates with `SELECT ... FOR UPDATE` if async is required later | Guarantees mathematical consistency, eliminates race conditions |
 | **NLP Boundary Validation** | Add Pydantic schema validation between NLP output and Enrichment input. Reject/fix type mismatches early | Catches 80% of silent pipeline breaks before they reach the scheduler |
-| **Database Indexes** | Create indexes: `idx_provisional_range (start, end)`, `idx_scheduled_range (start, end)`, `idx_unscheduled_fifo (created_at)` | 10–50x faster overlap checks and FIFO ordering |
+| **Database Indexes** | Create indexes: `idx_provisional_range (start, end)`, `idx_main_schedule_range (start, end)`, `idx_unscheduled_fifo (created_at)` | 10–50x faster overlap checks and FIFO ordering |
 | **Date Parsing Safety** | Configure `dateparser` with `PREFER_DATES_FROM: future`, `RELATIVE_BASE: now()` | Eliminates ambiguous "Friday" vs "last Friday" misinterpretations |
 | **JSONB Radial Updates** | Compute radial boosts in Python, then apply atomically via `task_time_scores = task_time_scores || %s` | Prevents partial updates and score corruption |
 | **Denominator Discipline** | Explicitly use `records` for plan averages, `completed_count` for delta averages in Stats Recorder formulas | Maintains mathematical soundness of enrichment pipeline |

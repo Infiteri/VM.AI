@@ -1,6 +1,7 @@
 # Stats Recorder — Technical Documentation
 VM.AI Project · ONIA 2026
 Version 2.0 (Synchronous MVP + Plan/Reality Separation)
+Last Updated: April 13, 2026
 
 ## 1. Overview
 
@@ -23,7 +24,7 @@ The Stats Recorder is the fifth and final stage in the VM.AI pipeline. It runs *
 
 ## 2. Position in Pipeline
 
-```
+```text
 User Action (Commit, Complete, Schedule, Commit Batch, Modify, Delete)
 ↓
 Stats Recorder triggered synchronously (MVP)
@@ -66,13 +67,12 @@ Other modules consume updated data on next request
 | `completed_count` | INTEGER | Task completion |
 | `uncompleted_count` | INTEGER | Task uncompleted |
 | `records` | INTEGER | Task commit |
-| `location_counts` | JSONB | Task completion |
 | `task_time_scores` | JSONB | Schedule / Commit / Modify events |
 
 ### 4.2 Category-Level Statistics (`category_statistics` table)
 | Field | Type | Updated By |
 |-------|------|------------|
-| `category_id` | INTEGER | System seed |
+| `id` | INTEGER | System seed |
 | `category_name` | TEXT | System seed |
 | `avg_duration` | JSONB | Task commit (plan, keyed by difficulty bucket) |
 | `avg_duration_delta` | JSONB | Task completion (delta, keyed by difficulty bucket) |
@@ -81,7 +81,6 @@ Other modules consume updated data on next request
 | `completed_count` | INTEGER | Task completion |
 | `uncompleted_count` | INTEGER | Task uncompleted |
 | `records` | INTEGER | Task commit |
-| `location_counts` | JSONB | Task completion |
 | `category_time_scores` | JSONB | Schedule / Commit / Modify events |
 
 ## 5. Running Average Formulas (Explicit)
@@ -119,8 +118,8 @@ Delta captures the systematic bias between a committed task value and the user's
 | Duration Delta | `actual_duration - committed_duration` |
 | Difficulty Delta | `actual_difficulty - committed_difficulty` |
 
-**Example:**  
-Committed duration: `90 min` → User rated: `75 min` → `duration_delta = -15`  
+**Example:**
+Committed duration: `90 min` → User rated: `75 min` → `duration_delta = -15`
 Committed difficulty: `0.85` → User rated: `0.60` → `difficulty_delta = -0.25`
 
 These deltas are consumed by Enrichment to calibrate future predictions: `predicted_duration = avg_duration + avg_duration_delta`.
@@ -130,7 +129,7 @@ These deltas are consumed by Enrichment to calibrate future predictions: `predic
 All events execute synchronously in the same database transaction as the user action for MVP reliability.
 
 ### Event 1 — Task Commit (Creation or Modification)
-**Trigger:** User creates or modifies task fields.  
+**Trigger:** User creates or modifies task fields.
 **Updates:**
 - `tasks_statistics.records += 1`
 - `tasks_statistics.avg_duration = (avg_duration × records + committed_duration) / (records + 1)`
@@ -139,44 +138,43 @@ All events execute synchronously in the same database transaction as the user ac
 - If name changed: Update `task_name` and `task_name_vector`
 
 ### Event 2 — Task Completion (with Rating)
-**Trigger:** User marks task completed and provides ratings.  
+**Trigger:** User marks task completed and provides ratings.
 **Updates:**
 - `tasks_statistics.completed_count += 1`
 - `tasks_statistics.avg_duration_delta = (avg_duration_delta × completed_count + duration_delta) / (completed_count + 1)`
 - `tasks_statistics.avg_difficulty_delta = (avg_difficulty_delta × completed_count + difficulty_delta) / (completed_count + 1)`
-- `tasks_statistics.location_counts[location_used] += 1`
 - Category-level: Mirrors exact task-level updates (delta bucketed by difficulty)
 
 ### Event 3 — Task Uncompleted
-**Trigger:** User marks task as failed/cancelled.  
+**Trigger:** User marks task as failed/cancelled.
 **Updates:**
 - `tasks_statistics.uncompleted_count += 1`
 - Category-level: `uncompleted_count += 1`
 
 ### Event 4 — Task Scheduled (Accepted without modification)
-**Trigger:** User accepts scheduler's proposed slot.  
+**Trigger:** User accepts scheduler's proposed slot.
 **Updates:**
 - Radial boost `+1.0` applied to `task_time_scores` and `category_time_scores` (see Section 8)
 
 ### Event 5 — Schedule Committed (Batch Commit)
-**Trigger:** User clicks "Commit" on Pending Changes Page.  
+**Trigger:** User clicks "Commit" on Pending Changes Page.
 **Updates:**
 - For every task in the committed schedule: Radial boost `+2.0` applied to time scores (see Section 8)
 
 ### Event 6 — Task Modified (Moved to Different Time)
-**Trigger:** User moves a task from Schedule Changes List or Main Schedule.  
+**Trigger:** User moves a task from Schedule Changes List or Main Schedule.
 **Updates:**
 - Original slot: Radial nerf `-2.0` (capped at `-10.0`)
 - New slot: Radial boost `+1.0`
 - Applied to both task-level and category-level time scores
 
 ### Event 7 — Task Deleted
-**Trigger:** User deletes a task.  
+**Trigger:** User deletes a task.
 **Updates:**
 - No stats changes. Statistics row persists for historical matching.
 
 ### Event 8 — Task Modified (Fields Changed, Not Time)
-**Trigger:** User modifies non-temporal fields.  
+**Trigger:** User modifies non-temporal fields.
 **Updates:**
 - Treated exactly as Event 1 (increments `records`, updates plan averages)
 - Time scores remain unchanged.
@@ -202,7 +200,7 @@ boost = max(0.0, boost)  # or min(-10.0, boost) for nerfs
 Computed in Python first, then applied in a single PostgreSQL query to prevent partial updates:
 ```sql
 -- Python builds update_dict = {"10:00": 2.5, "10:15": 1.75}
-UPDATE tasks_statistics 
+UPDATE tasks_statistics
 SET task_time_scores = task_time_scores || %s
 WHERE id = %s;
 ```
@@ -211,9 +209,9 @@ All scores are clamped to `[0.0, 10.0]` after application.
 ### 8.4 Weekly Normalization (Enabled by Default)
 Prevents score saturation. Runs as a background cron job every Sunday at 00:00:
 ```sql
-UPDATE tasks_statistics 
+UPDATE tasks_statistics
 SET task_time_scores = jsonb_object_agg(
-    key, 
+    key,
     GREATEST(0.0, LEAST(10.0, value * 0.99))
 ) FROM jsonb_each(task_time_scores);
 -- Same logic applied to category_time_scores
@@ -221,7 +219,7 @@ SET task_time_scores = jsonb_object_agg(
 
 ## 9. Important Rule — Threshold for Using Own Statistics
 
-Enrichment will only use a task's own statistics for future matches when `records >= 3`.  
+Enrichment will only use a task's own statistics for future matches when `records >= 3`.
 Until then, Enrichment falls back to:
 - `associated_task_statistics_id` (matched task's row)
 - OR `category_statistics`
@@ -249,7 +247,6 @@ The Stats Recorder naturally enables this threshold by incrementing `records` on
 | `completed_count` | `0` |
 | `uncompleted_count` | `0` |
 | `records` | `0` |
-| `location_counts` | `{}` |
 | `task_time_scores` | `{}` |
 | `category_time_scores` | `{}` |
 
