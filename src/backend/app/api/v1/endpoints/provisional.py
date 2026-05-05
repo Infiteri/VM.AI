@@ -12,7 +12,9 @@ from app.schemas.schedule import (
     ProvisionalCommitResponse
 )
 from app.services.stats_recorder import stats_recorder
+from app.core.logging_config import setup_logging
 
+logger = setup_logging()
 router = APIRouter()
 
 
@@ -23,33 +25,35 @@ def get_provisional_changes(
     """
     GET /provisional/changes
 
-    Fetches all pending inserts/moves in the working schedule.
+    Fetches all pending inserts/moves from schedule_changes table.
     """
-    slots = db.query(ProvisionalSlot).join(Task).all()
+    changes = (
+        db.query(ScheduleChange)
+        .join(ProvisionalSlot, ScheduleChange.provisional_schedule_slot_id == ProvisionalSlot.id)
+        .join(Task, ProvisionalSlot.task_id == Task.id)
+        .all()
+    )
 
-    changes = []
-    for slot in slots:
+    result = []
+    for change in changes:
+        slot = change.slot
         task = slot.task
-
-        change = db.query(ScheduleChange).filter(
-            ScheduleChange.provisional_schedule_slot_id == slot.id
-        ).first()
-
         location_name = task.location.name if task.location else ""
 
-        changes.append({
+        result.append({
             "provisional_schedule_slot_id": slot.id,
             "task_id": task.id,
             "task_name": task.name,
-            "change_type": change.change_type if change else "insert",
+            "change_type": change.change_type,
             "new_slot_start": slot.start,
             "new_slot_end": slot.end,
             "location": location_name,
         })
 
+    logger.debug(f"Schedule changes for response: {len(result)}")
     return ProvisionalChangesResponse(
-        changes=changes,
-        total_count=len(changes),
+        changes=result,
+        total_count=len(result),
     )
 
 
