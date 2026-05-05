@@ -40,11 +40,6 @@ def rate_task(
         logger.info(f"Task already rated: {id}")
         raise HTTPException(status_code=400, detail="Task already rated")
 
-    now = datetime.now()
-    if slot.end < now:
-        logger.info(f"Cannot rate task that ended in the past: {id}")
-        raise HTTPException(status_code=400, detail="Cannot rate task that ended in the past")
-
     success = stats_recorder.rate_task(
         db,
         id,
