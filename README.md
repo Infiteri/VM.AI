@@ -190,15 +190,14 @@ Detailed documentation is available in the `docs/` folder:
 
 | Document | Description |
 |---|---|
-| VM.AI_Full_Project_Overview_v1.md | Full project overview and architecture |
-| NPL_Parser_v1.md | Parser module documentation |
-| Database_Schema_v1.md | Database schema reference |
+| Full_Project_Overview.md | Full project overview and architecture |
+| VM.AI_Backend_Architecture.md | Backend architecture details |
+| Frontend_API_Documentation.md | Frontend API documentation |
+| Database_Schema_Documentation.md | Database schema reference |
 | Task_Matching_Module_v1.md | Task matching module |
 | Scheduling_Engine_v1.md | Scheduling engine documentation |
 | Enrichment_module_v1.md | Data enrichment module |
 | Stats_Recorder_v1.md | Statistics recording module |
-| current_model_accuracy.md | Model accuracy metrics |
-| Risks.md | Project risks and considerations |
 
 ## Library Versions
 
