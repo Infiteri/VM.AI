@@ -19,12 +19,13 @@ This aligns with ONIA competition requirements by providing a practical solution
 VM.AI/
 ├── src/
 │   ├── parser/           # NLP parser module (training + inference)
-│   ├── backend/          # FastAPI backend (see src/backend/README.md)
+│   ├── backend/          # FastAPI backend
+│   │   └── tests/      # Backend API tests
 │   └── frontend/         # React frontend (npm run dev)
 ├── models/
 │   └── finetuned_parser/ # Trained T5 model (after training)
 ├── data/                 # Training datasets
-├── tests/                # Test suite (documented in this README)
+├── tests/                # Parser test suite
 ├── scripts/              # Visualization and utility scripts
 ├── docs/                 # Detailed documentation
 ├── assets/               # Generated charts and visualizations
@@ -37,53 +38,83 @@ VM.AI/
 
 - Python 3.10+
 - Node.js 18+
-- PostgreSQL 15+ (for backend)
-- uv (Python package manager)
+- PostgreSQL 15+
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
 
-### Installation Steps
+---
 
-**Step 1: Pull the trained model from HuggingFace**
+### Step 1: Pull Trained Model
 
 ```bash
 cd VM.AI
 python src/parser/pull_from_hf.py
 ```
 
-This downloads the latest trained model to `models/finetuned_parser/`.
+This downloads the trained T5 model to `models/finetuned_parser/`.
 
-**Step 2: Set up the backend**
+---
 
-Follow the instructions in `src/backend/README.md`:
+### Step 2: Configure Database
+
+1. Create a PostgreSQL database:
+   ```sql
+   CREATE DATABASE vmai_db;
+   ```
+
+2. Navigate to backend directory:
+   ```bash
+   cd src/backend
+   ```
+
+3. Copy the example environment file:
+   ```bash
+   copy .env.example .env    # Windows
+   # cp .env.example .env    # Linux/Mac
+   ```
+
+4. Edit `.env` with your database credentials:
+   ```
+   DATABASE_URL=postgresql+psycopg://your_user:your_password@localhost:5432/vmai_db
+   ```
+
+---
+
+### Step 3: Backend Setup
+
+**Important**: This project uses `uv` - you do NOT need to manually activate virtual environments.
 
 ```bash
 cd src/backend
 
-# Create virtual environment
-uv venv
-.venv/Scripts/activate  # Windows
-# source .venv/bin/activate  # Linux/Mac
-
-# Install dependencies
+# Install dependencies (creates .venv automatically)
 uv sync
 
-# Create .env file with database credentials
-DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/dbname
-
-# Run migrations
+# Run database migrations
 uv run alembic upgrade head
 
-# Start server
+# Start the backend server
 uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-**Step 3: Run the frontend**
+The API documentation with interactive testing will be available at: http://127.0.0.1:8000/docs
+
+---
+
+### Step 4: Frontend Setup
 
 ```bash
 cd VM.AI
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-The application will be available at the URL shown in the terminal (typically http://localhost:5173).
+The application will be available at: http://localhost:5173
+
+---
 
 ## Datasets
 
@@ -139,17 +170,38 @@ Commands:
 
 ## Testing
 
-Run the test suite to validate parser functionality:
+### Parser Tests (src/parser)
 
 ```bash
-# Individual test suites
-python tests/test_core.py       # Pipe-format parsing
-python tests/test_generator.py  # Data generation
-python tests/test_add.py         # Add mode parsing
-python tests/test_modify.py      # Modify mode parsing
+cd VM.AI
+
+# Core parser functionality
+python tests/test_core.py
+
+# Data generation
+python tests/test_generator.py
+
+# Add/Modify mode parsing
+python tests/test_add.py
+python tests/test_modify.py
 
 # Regression testing
-python tests/test_chat_suite.py  # Before/after comparison
+python tests/test_chat_suite.py
+```
+
+### Backend API Tests (src/backend)
+
+```bash
+cd src/backend
+
+# Run all backend tests
+uv run pytest
+
+# Individual test modules
+uv run pytest tests/test_parser_service.py
+uv run pytest tests/test_enrichment.py
+uv run pytest tests/test_task_matching.py
+uv run pytest tests/test_update_time_score.py
 ```
 
 ## Visualization
@@ -255,5 +307,5 @@ No personal or confidential data is included.
 
 ## References
 
-- Backend Setup: `src/backend/README.md`
+- API Documentation: `docs/Frontend_API_Documentation.md`
 - HuggingFace Model: vaneaa/vmai-parser
