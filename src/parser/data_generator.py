@@ -35,10 +35,8 @@ FIELD_MAP = vars.FIELD_MAP if hasattr(vars, "FIELD_MAP") else {}
 DAYS = vars.DAYS
 DAYS_LOWER = {d.lower(): d for d in DAYS}
 
-
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
-
 
 def _rand_deadline():
     return random.choice(
@@ -965,9 +963,9 @@ if __name__ == "__main__":
             print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
             if "[EXP]" not in tgt and "[PRD]" not in tgt:
-                print(f"    ⚠️ MISSING TAGS!")
+                print(f"    [WARN] MISSING TAGS!")
             if "= null" in tgt.lower():
-                print(f"    ⚠️ NULL VALUE!")
+                print(f"    [WARN] NULL VALUE!")
             print()
 
     if args.mode in ("modify", "both"):
@@ -979,9 +977,9 @@ if __name__ == "__main__":
             print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
             if "[EXP]" not in tgt and "[PRD]" not in tgt:
-                print(f"    ⚠️ MISSING TAGS!")
+                print(f"    [WARN] MISSING TAGS!")
             if "modify:" in inp.lower():
-                print(f"    ⚠️ STILL HAS modify: PREFIX!")
+                print(f"    [WARN] STILL HAS modify: PREFIX!")
             if "\u2502" in inp:
-                print(f"    ⚠️ STILL HAS │ SEPARATOR!")
+                print(f"    [WARN] STILL HAS | SEPARATOR!")
             print()

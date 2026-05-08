@@ -275,7 +275,7 @@ def print_report(results: list):
                 print(f"    {etype}: {count}")
             total_errors += len(res['errors'])
         else:
-            print(f"\n  ✅ No errors found")
+            print(f"\n  [OK] No errors found")
     
     print("\n" + "="*80)
     print("SUMMARY")
@@ -286,9 +286,9 @@ def print_report(results: list):
     print("="*80)
     
     if total_errors == 0:
-        print("\n✅ ALL VALIDATIONS PASSED - DATA IS READY FOR TRAINING")
+        print("\n[OK] ALL VALIDATIONS PASSED - DATA IS READY FOR TRAINING")
     else:
-        print(f"\n⚠️  {total_errors} ERRORS FOUND - REVIEW BEFORE TRAINING")
+        print(f"\n[WARN] {total_errors} ERRORS FOUND - REVIEW BEFORE TRAINING")
 
 def main():
     parser = argparse.ArgumentParser(description="VM.AI Dataset Validator")
