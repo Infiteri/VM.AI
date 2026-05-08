@@ -32,8 +32,6 @@ export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProp
         setError("");
         
         try {
-            console.log(parsedResult);
-            
             let result;
             if (mode === "modify" && parsedResult) {
                 result = await api.parseNLPModify(parsedResult, inputText);
