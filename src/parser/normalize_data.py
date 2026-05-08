@@ -2,7 +2,10 @@
     VM-AI - Data Normalizer with EXP/PRD Tag Support
     Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats with tags.
     Run: python src/parser/normalize_data.py
+
+    Written by: Vanea
 """
+
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

@@ -1,7 +1,9 @@
 """
-VM-AI - Chat Testing Interface
-Tests add and modify modes with EXP/PRD tag format.
-Run: python src/parser/chat.py
+    VM-AI - Chat Testing Interface
+    Tests add and modify modes with EXP/PRD tag format.
+    Run: python src/parser/chat.py
+
+    Written by: Vanea
 """
 
 import torch

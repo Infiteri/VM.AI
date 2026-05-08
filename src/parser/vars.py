@@ -1,6 +1,8 @@
 """
     VM-AI - Global Variables and Constants
     Stores dataset names, field definitions, and shared constants.
+
+    Written by: Vanea
 """
 
 PARSER_MODEL_NAME    = "finetuned_parser"

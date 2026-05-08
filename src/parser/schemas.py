@@ -4,6 +4,8 @@
     
     Format: field=value[TAG] | field2=value2[TAG2]
     Tags: EXP = Explicit (user stated), PRD = Predicted (model inferred)
+
+    Written by: Vanea
 """
 
 import re

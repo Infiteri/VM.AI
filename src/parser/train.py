@@ -1,7 +1,9 @@
 """
-VM-AI - Parser Training Script
-Trains the parser model with EXP/PRD tag format.
-Run: python src/parser/train.py
+    VM-AI - Parser Training Script
+    Trains the parser model with EXP/PRD tag format.
+    Run: python src/parser/train.py
+
+    Written by: Vanea
 """
 
 import os

@@ -1,6 +1,8 @@
 """
-VM-AI - Rule-based Add Mode Parser (MVP)
-Extracts basic fields from natural language without a model.
+    VM-AI - Rule-based Add Mode Parser (MVP)
+    Extracts basic fields from natural language without a model.
+
+    Written by: Vanea
 """
 
 import re

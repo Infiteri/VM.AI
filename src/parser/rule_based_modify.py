@@ -1,6 +1,8 @@
 """
-Rule-based Modify Mode Parser
-Handles importance/difficulty changes with explicit keyword mappings.
+    VM-AI - Rule-based Modify Mode Parser
+    Handles importance/difficulty changes with explicit keyword mappings.
+
+    Written by: Vanea
 """
 
 import re

@@ -2,6 +2,8 @@
     VM-AI - Dataset Validator with EXP/PRD Consistency Checking
     Validates schema structure, keyword consistency, and tag correctness.
     Run: python src/parser/validate_dataset.py data/VMAI_REAL_Data.yaml
+
+    Written by: Vanea
 """
 
 import sys

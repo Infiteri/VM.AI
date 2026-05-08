@@ -1,8 +1,10 @@
 """
-VM-AI - Data Generator with EXP/PRD Tag Support
-Generates training data in pipe format with explicit/predicted tags:
-name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
-Run: python src/parser/data_generator.py
+    VM-AI - Data Generator with EXP/PRD Tag Support
+    Generates training data in pipe format with explicit/predicted tags:
+    name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
+    Run: python src/parser/data_generator.py
+
+    Written by: Vanea
 """
 
 import vars
