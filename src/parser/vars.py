@@ -8,19 +8,13 @@ SYNTHETIC_DATASET    = "VMAI_SYNTHETIC_Data.yaml"
 REAL_DATASET         = "VMAI_REAL_Data.yaml"
 SPECIFIC_DATASET     = "VMAI_SPECIFIC_Data.yaml"
 
-# Field Classification
-# EXP = Explicit (user stated it in input)
-# PRD = Predicted (model inferred it)
 EXP = "EXP"
 PRD = "PRD"
 
-# Fields that CAN be explicit (depend on input keywords)
 PREDICTED_FIELDS = {"difficulty", "duration", "category", "location", "importance", "start", "deadline", "fixed_time", "fixed_start", "recurrent", "recurrence_days"}
 
-# Always-explicit fields (extracted directly)
 ALWAYS_EXPLICIT = {"name"}
 
-# All schema fields with defaults
 ALL_FIELDS = {
     "name":            None,
     "start":           None,

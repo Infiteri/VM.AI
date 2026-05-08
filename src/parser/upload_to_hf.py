@@ -13,11 +13,9 @@ import argparse
 from getpass import getpass
 from huggingface_hub import HfApi, login
 
-# Configuration
 HF_USERNAME = "vaneaa"
 REPO_NAME = "vmai-parser"
 
-# Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
@@ -56,19 +54,16 @@ def main():
     print("=" * 60)
     print()
 
-    # Get token via hidden input
     token = getpass("Enter HuggingFace token (hidden): ").strip()
     if not token:
         print("Error: No token provided")
         print("Get one at: https://huggingface.co/settings/tokens")
         return
 
-    # Check model exists
     if not os.path.exists(MODEL_PATH):
         print(f"Error: Model not found at {MODEL_PATH}")
         return
 
-    # Count files (excluding checkpoints and .cache)
     file_count = 0
     for root, dirs, filenames in os.walk(MODEL_PATH):
         dirs[:] = [d for d in dirs if not d.startswith("checkpoint-") and d != ".cache"]
@@ -85,7 +80,6 @@ def main():
     print(f"Commit message: {args.message}")
     print()
 
-    # Login
     print("Logging in...")
     try:
         login(token=token)
@@ -95,11 +89,9 @@ def main():
         print("Check your token at: https://huggingface.co/settings/tokens")
         return
 
-    # Create API
     api = HfApi()
     repo_id = f"{HF_USERNAME}/{REPO_NAME}"
 
-    # Check/create repo
     try:
         api.model_info(repo_id=repo_id)
         print("Repository exists")
@@ -112,7 +104,6 @@ def main():
             print(f"Failed to create repo: {e}")
             return
 
-    # Upload
     print()
     print("Uploading files...")
     try:

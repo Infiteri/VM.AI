@@ -170,12 +170,10 @@ def build_dataset(cfg, mode):
         dataset = Dataset.from_dict(data)
     elif mode == "specific":
         data = {"input_text": [], "target_text": []}
-        # Include modify examples from specific data
         for example in specific_examples:
             inp, tgt = gen._convert_real(example)
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
-        # Also include generated modify samples for better coverage
         import random
 
         random.seed(42)
@@ -334,10 +332,8 @@ def main():
     train_ds, test_ds = build_dataset(cfg, args.mode)
     tok_train, tok_test = tokenize(train_ds, test_ds, tokenizer)
 
-    resume_path = None  # Force fresh start to avoid torch version issues
+    resume_path = None
 
-    # Don't resume from checkpoint for specific mode — avoid torch.load version conflicts.
-    # The model weights are loaded from the saved safetensors files instead.
     if args.mode == "specific":
         resume_path = None
 

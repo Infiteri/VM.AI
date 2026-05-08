@@ -41,14 +41,12 @@ def parse_add(sentence: str) -> dict:
     schema["recurrent"]["predicted"] = False
     schema["recurrence_days"]["predicted"] = False
 
-    # Default values (will be overridden if explicit keywords found)
     schema["difficulty"]["value"] = "0.5"
     schema["importance"]["value"] = "0.5"
     schema["category"]["value"] = "personal"
     schema["duration"]["value"] = "30"
     schema["location"]["value"] = None
 
-    # Name extraction - strip prefixes and trailing qualifiers
     name = s
     for prefix in [
         "i need to ",
@@ -61,15 +59,12 @@ def parse_add(sentence: str) -> dict:
     ]:
         if name.startswith(prefix):
             name = name[len(prefix) :]
-    # For recurrence, keep the full phrase (handle "yoga every monday")
     if "every " in s or "daily" in s:
-        # Extract task name before "every"
         for kw in [" every ", " daily "]:
             idx = name.find(kw)
             if idx > 0:
                 name = name[:idx].strip()
     else:
-        # Normal extraction - stop at qualifiers
         for kw in [
             " at ",
             " by ",
@@ -83,7 +78,6 @@ def parse_add(sentence: str) -> dict:
             idx = name.find(kw)
             if idx > 0:
                 name = name[:idx]
-    # Strip leading duration/difficulty phrases
     name = re.sub(r"^\d+\s*(minute|min|hour|hr)s?\s*", "", name)
     name = re.sub(
         r"^(hard|difficult|easy|simple|quick|moderate|light|challenging)\s+", "", name
@@ -91,7 +85,6 @@ def parse_add(sentence: str) -> dict:
     name = re.sub(r"^(urgent|important|critical|optional)\s+", "", name)
     schema["name"]["value"] = name.strip()
 
-    # Fixed time
     tm = re.search(r"at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
     if tm:
         n = normalize_time(tm.group(1))
@@ -99,7 +92,6 @@ def parse_add(sentence: str) -> dict:
             schema["fixed_time"]["value"] = True
             schema["fixed_start"]["value"] = n
 
-    # Duration (override default if explicit)
     dm = re.search(r"(\d+(?:\.\d+)?)\s*(?:minute|min|hour|hr)s?", s)
     if dm:
         v = float(dm.group(1))
@@ -108,7 +100,6 @@ def parse_add(sentence: str) -> dict:
         schema["duration"]["value"] = str(int(v))
         schema["duration"]["predicted"] = False
     else:
-        # Infer duration from task type
         duration_map = {
             "gym": 45,
             "workout": 45,
@@ -151,7 +142,6 @@ def parse_add(sentence: str) -> dict:
                 schema["duration"]["predicted"] = True
                 break
 
-    # Recurrence
     if "every " in s or "daily" in s or "each " in s:
         schema["recurrent"]["value"] = True
         days = [d for d in DAYS if d.lower() in s]
@@ -163,7 +153,6 @@ def parse_add(sentence: str) -> dict:
         if days:
             schema["recurrence_days"]["value"] = ",".join(days)
 
-    # Difficulty (override default if keyword match)
     for kw, val in [
         ("hard", 0.85),
         ("difficult", 0.85),
@@ -180,7 +169,6 @@ def parse_add(sentence: str) -> dict:
             schema["difficulty"]["predicted"] = False
             break
 
-    # Importance (override default if keyword match)
     for kw, val in [
         ("urgent", 0.95),
         ("critical", 0.95),
@@ -196,7 +184,6 @@ def parse_add(sentence: str) -> dict:
             schema["importance"]["predicted"] = False
             break
     else:
-        # Infer importance from task type if no keyword matched
         importance_map = {
             "rent": 0.8,
             "bill": 0.8,
@@ -218,7 +205,6 @@ def parse_add(sentence: str) -> dict:
                 schema["importance"]["predicted"] = True
                 break
 
-    # Difficulty (infer from task type if no keyword matched)
     if schema["difficulty"]["value"] == "0.5":
         difficulty_map = {
             "bug": 0.7,
@@ -240,7 +226,6 @@ def parse_add(sentence: str) -> dict:
                 schema["difficulty"]["predicted"] = True
                 break
 
-    # Deadline
     if "tomorrow" in s:
         schema["deadline"]["value"] = "tomorrow"
     elif "next week" in s:
@@ -251,7 +236,6 @@ def parse_add(sentence: str) -> dict:
                 schema["deadline"]["value"] = d
                 break
 
-    # Location (override default if keyword match)
     for kw, loc in [
         ("at the library", "library"),
         ("at the gym", "gym"),
@@ -266,8 +250,6 @@ def parse_add(sentence: str) -> dict:
             schema["location"]["predicted"] = False
             break
 
-    # Category (override default if keyword match)
-    # Order matters - longer phrases first
     for kw, cat in [
         ("call mom", "personal"),
         ("call dad", "personal"),

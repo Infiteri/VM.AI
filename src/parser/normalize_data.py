@@ -18,10 +18,8 @@ def normalize_example(ex):
     out = ex.get("output", {})
     inp = ex.get("input", "")
     
-    # Detect explicit fields from input
     explicit_fields = detect_explicit_fields(inp)
     
-    # Duration -> integer minutes
     dur = out.get("duration")
     if dur is not None:
         dur = normalize_duration(dur)
@@ -30,7 +28,6 @@ def normalize_example(ex):
         else:
             del out["duration"]
 
-    # Difficulty -> float rounded to 2
     diff = out.get("difficulty")
     if diff is not None:
         try:
@@ -38,7 +35,6 @@ def normalize_example(ex):
         except (ValueError, TypeError):
             del out["difficulty"]
 
-    # Importance -> float rounded to 2
     imp = out.get("importance")
     if imp is not None:
         try:
@@ -46,35 +42,29 @@ def normalize_example(ex):
         except (ValueError, TypeError):
             del out["importance"]
 
-    # Category -> clamped to enum
     cat = out.get("category")
     if cat is not None:
         out["category"] = clamp_category(cat)
 
-    # Start -> normalized vocab
     start = out.get("start")
     if start is not None:
         start = normalize_deadline(start)
         out["start"] = start if start else None
 
-    # Deadline -> normalized vocab
     dl = out.get("deadline")
     if dl is not None:
         dl = normalize_deadline(dl)
         out["deadline"] = dl if dl else None
 
-    # fixed_start -> HH:MM
     fs = out.get("fixed_start")
     if fs is not None:
         fs = normalize_time(str(fs))
         out["fixed_start"] = fs if fs else None
 
-    # Booleans
     for key in ("fixed_time", "recurrent"):
         if key in out:
             out[key] = bool(out[key])
 
-    # recurrence_days -> list of valid day names
     rd = out.get("recurrence_days")
     if rd is not None:
         if isinstance(rd, str):
@@ -82,7 +72,6 @@ def normalize_example(ex):
         rd = [d for d in rd if d in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]]
         out["recurrence_days"] = rd if rd else None
 
-    # Remove None values
     ex["output"] = {k: v for k, v in out.items() if v is not None}
     return ex
 

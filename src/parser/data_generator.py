@@ -34,7 +34,6 @@ DAYS = vars.DAYS
 DAYS_LOWER = {d.lower(): d for d in DAYS}
 
 
-# ── Random Generators ────────────────────────────────────────────────────────
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
 
@@ -133,34 +132,25 @@ def _rand_recurrence_days():
     return ",".join(random.sample(DAYS, k=count))
 
 
-# ── CHANGE_TEMPLATES ──────────────────────────────────────────────────────────
-# Format: (field_name, phrase_function, value_generator)
-# These generate natural language modify instructions for training.
-
 CHANGE_TEMPLATES = [
-    # ── Duration ──────────────────────────────────────────────────────
     ("duration", lambda v: f"make it {v} minutes", _rand_duration),
     ("duration", lambda v: f"change duration to {v} minutes", _rand_duration),
     ("duration", lambda v: f"it should take {v} minutes", _rand_duration),
     ("duration", lambda v: f"set it to {v} minutes", _rand_duration),
     ("duration", lambda v: f"{v} minutes instead", _rand_duration),
-    # ── Deadline ──────────────────────────────────────────────────────
     ("deadline", lambda v: f"push deadline to {v}", _rand_deadline),
     ("deadline", lambda v: f"move the deadline to {v}", _rand_deadline),
     ("deadline", lambda v: f"due {v} now", _rand_deadline),
     ("deadline", lambda v: f"change deadline to {v}", _rand_deadline),
     ("deadline", lambda v: f"i need it by {v}", _rand_deadline),
-    # ── Start ─────────────────────────────────────────────────────────
     ("start", lambda v: f"start on {v}", _rand_start),
     ("start", lambda v: f"begin {v}", _rand_start),
     ("start", lambda v: f"kick off {v}", _rand_start),
     ("start", lambda v: f"move start to {v}", _rand_start),
-    # ── Location ──────────────────────────────────────────────────────
     ("location", lambda v: f"do it at {v}", _rand_location),
     ("location", lambda v: f"change location to {v}", _rand_location),
     ("location", lambda v: f"move it to {v}", _rand_location),
     ("location", lambda v: f"at {v} instead", _rand_location),
-    # ── Difficulty (EXPLICIT mappings for consistent training) ───────
     ("difficulty", lambda v: f"make it hard", lambda: "0.85"),
     ("difficulty", lambda v: f"make it harder", lambda: "0.85"),
     ("difficulty", lambda v: f"make it easy", lambda: "0.15"),
@@ -170,7 +160,6 @@ CHANGE_TEMPLATES = [
     ("difficulty", lambda v: f"make it moderate", lambda: "0.45"),
     ("difficulty", lambda v: f"mark it as hard", lambda: "0.85"),
     ("difficulty", lambda v: f"mark it as easy", lambda: "0.15"),
-    # ── Importance (EXPLICIT mappings for consistent training) ───────
     ("importance", lambda v: f"make it urgent", lambda: "0.95"),
     ("importance", lambda v: f"make it critical", lambda: "0.98"),
     ("importance", lambda v: f"make it optional", lambda: "0.15"),
@@ -181,22 +170,18 @@ CHANGE_TEMPLATES = [
     ("importance", lambda v: f"mark it as critical", lambda: "0.98"),
     ("importance", lambda v: f"mark it as high priority", lambda: "0.85"),
     ("importance", lambda v: f"mark it as low priority", lambda: "0.15"),
-    # ── Category ──────────────────────────────────────────────────────
     ("category", lambda v: f"categorize it as {v}", _rand_category),
     ("category", lambda v: f"put it under {v}", _rand_category),
     ("category", lambda v: f"it's {v} not work", _rand_category),
     ("category", lambda v: f"change category to {v}", _rand_category),
-    # ── Name ──────────────────────────────────────────────────────────
     ("name", lambda v: f"rename it to {v}", _rand_name),
     ("name", lambda v: f"call it {v}", _rand_name),
-    # ── Fixed Time ────────────────────────────────────────────────────
     ("fixed_time+fixed_start", lambda v: f"set it for {v}", _rand_time),
     ("fixed_time+fixed_start", lambda v: f"at {v} instead", _rand_time),
     ("fixed_time+fixed_start", lambda v: f"scheduled for {v}", _rand_time),
     ("cancel_fixed_time", lambda v: "cancel fixed time", lambda: "false"),
     ("cancel_fixed_time", lambda v: "remove the time", lambda: "false"),
     ("cancel_fixed_time", lambda v: "no specific time", lambda: "false"),
-    # ── Recurrence ────────────────────────────────────────────────────
     (
         "recurrent+recurrence_days",
         lambda v: f"make it repeat every {v}",
@@ -278,7 +263,6 @@ class DataGenerator:
                 placeholder_map[ph] = value
         return sentence.lower().strip(), placeholder_map
 
-    # ── Keyword-based Inference ───────────────────────────────────────────────
 
     _TASK_CATEGORY_MAP = {
         "migration": "work",
@@ -364,7 +348,6 @@ class DataGenerator:
 
     def _infer_difficulty(self, sentence: str) -> str:
         s = sentence.lower()
-        # Use local keywords since imported ones are sets
         local_keywords = {
             "hard": 0.8,
             "difficult": 0.85,
@@ -417,7 +400,6 @@ class DataGenerator:
 
     def _infer_importance(self, sentence: str) -> str:
         s = sentence.lower()
-        # Use local keywords since imported ones are sets
         local_keywords = {
             "urgent": 0.9,
             "critical": 0.95,
@@ -562,7 +544,6 @@ class DataGenerator:
             schema[field]["value"] = value
             schema[field]["predicted"] = False
 
-        # Always infer predicted fields from sentence content
         schema["category"]["value"] = self._infer_category(s)
         schema["difficulty"]["value"] = self._infer_difficulty(s)
         schema["importance"]["value"] = self._infer_importance(s)
@@ -572,7 +553,6 @@ class DataGenerator:
         if loc:
             schema["location"]["value"] = loc
 
-        # Handle time/explicit time
         time_match = re.search(r"(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
         if time_match:
             schema["fixed_time"]["value"] = True
@@ -580,7 +560,6 @@ class DataGenerator:
             schema["start"]["value"] = None
             schema["deadline"]["value"] = None
 
-        # Handle recurrence
         if any(kw in s for kw in ["every", "daily", "each", "weekday"]):
             schema["recurrent"]["value"] = True
             if "every day" in s or "daily" in s:
@@ -601,7 +580,6 @@ class DataGenerator:
                     else random.sample(DAYS, k=random.randint(1, 3))
                 )
 
-        # Handle deadline/start keywords (only if not already set from placeholders)
         deadline_keywords = [
             "by",
             "due",
@@ -615,7 +593,6 @@ class DataGenerator:
         has_deadline_kw = any(kw in s for kw in deadline_keywords)
         has_start_kw = any(kw in s for kw in start_keywords)
 
-        # Only set day-based values if not already populated from placeholders
         if not schema["deadline"]["value"] and not schema["start"]["value"]:
             day_found = None
             for d in DAYS:
@@ -629,7 +606,6 @@ class DataGenerator:
                 elif has_deadline_kw:
                     schema["deadline"]["value"] = day_found
                 else:
-                    # No keyword: mostly start, some deadline for variety
                     if random.random() < 0.6:
                         schema["start"]["value"] = day_found
                     else:
@@ -677,7 +653,6 @@ class DataGenerator:
                     else:
                         schema["deadline"]["value"] = "today"
 
-        # Update predicted flags based on what was actually found
         for field in [
             "fixed_time",
             "fixed_start",
@@ -744,16 +719,12 @@ class DataGenerator:
                 "name",
                 "recurrence_days",
             ):
-                # User stated a specific value — explicit
                 changed_fields[field_name] = {"value": new_value, "predicted": False}
             elif field_name in ("difficulty", "importance"):
-                # Model must infer from vague language like "hard", "urgent" — predicted
                 changed_fields[field_name] = {"value": new_value, "predicted": True}
             else:
-                # Category — keyword stated but exact value assigned — explicit
                 changed_fields[field_name] = {"value": new_value, "predicted": False}
 
-        # Direct instruction — no JSON prefix
         instruction = ", ".join(change_phrases)
         return instruction.lower(), changed_to_pipe(changed_fields)
 
@@ -801,12 +772,10 @@ class DataGenerator:
             else:
                 changed_fields[field_name] = {"value": new_value, "predicted": False}
 
-        # Merge changes into existing schema
         schema = dict(existing)
         for k, v in changed_fields.items():
             schema[k] = v
 
-        # Direct instruction format — matches new modify format
         instruction = ", ".join(change_phrases)
         return instruction.lower(), schema_to_pipe(schema)
 
@@ -814,11 +783,9 @@ class DataGenerator:
         sentence = example["input"]
         output = example["output"]
 
-        # Route modify examples to the new direct-instruction handler
         if sentence.startswith("modify:"):
             return self._convert_real_modify(example)
 
-        # Detect explicit fields from input
         explicit_fields = detect_explicit_fields(sentence)
 
         difficulty = output.get("difficulty")
@@ -920,15 +887,12 @@ class DataGenerator:
         sentence = example["input"]
         output = example["output"]
 
-        # Extract the change instruction after the │ separator
         if "\u2502" in sentence:
             _, _, change_part = sentence.partition("\u2502")
             instruction = change_part.strip().lower()
         else:
-            # Fallback: use the whole sentence as instruction
             instruction = sentence.replace("modify:", "").strip().lower()
 
-        # Build changed_fields from the output
         changed = {}
         for field, value in output.items():
             if value is None:
@@ -975,7 +939,6 @@ if __name__ == "__main__":
     import os
     from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
 
-    # Navigate to project root from src/parser/
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     data_dir = os.path.join(project_root, "data")
     yp = VMAI_YamlParser(os.path.join(data_dir, vars.SYNTHETIC_DATASET))
@@ -999,7 +962,6 @@ if __name__ == "__main__":
             inp, tgt = gen._generate_add()
             print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
-            # Quick validation
             if "[EXP]" not in tgt and "[PRD]" not in tgt:
                 print(f"    ⚠️ MISSING TAGS!")
             if "= null" in tgt.lower():
@@ -1014,7 +976,6 @@ if __name__ == "__main__":
             inp, tgt = gen._generate_modify()
             print(f"[{i + 1}] IN:  {inp}")
             print(f"    OUT: {tgt}")
-            # Quick validation
             if "[EXP]" not in tgt and "[PRD]" not in tgt:
                 print(f"    ⚠️ MISSING TAGS!")
             if "modify:" in inp.lower():
