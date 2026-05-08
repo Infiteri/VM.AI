@@ -100,7 +100,7 @@ def normalize_file(path):
     print(f"{path}: {fixed}/{len(examples)} examples normalized")
     return fixed, len(examples)
 
-
+# TODO:
 if __name__ == "__main__":
     files = [
         "D:/Users/user/Desktop/VM.AI/data/VMAI_REAL_Data.yaml",
