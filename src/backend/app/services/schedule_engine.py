@@ -112,12 +112,35 @@ class ScheduleEngine:
         """
         logger.info(f"Scheduling task: {task.name} (ID: {task.id})")
 
+        # Savepoint: allows restoring deleted slot if scheduling fails
+        sp = db.begin_nested()
+
+        # Delete task's existing slot BEFORE overlap checks
+        existing_slot = db.query(ProvisionalSlot).filter(
+            ProvisionalSlot.task_id == task.id
+        ).first()
+        if existing_slot:
+            logger.debug(f"Deleting existing slot for task {task.id} before scheduling")
+            self._old_start = existing_slot.start
+            self._old_end = existing_slot.end
+            db.delete(existing_slot)
+            db.flush()  # Make delete visible to subsequent queries
+        else:
+            self._old_start = self._old_end = None
+
         try:
             if task.fixed_time:
-                return self._schedule_fixed_task(task, db)
+                result = self._schedule_fixed_task(task, db)
             else:
-                return self._schedule_flexible_task(task, db)
+                result = self._schedule_flexible_task(task, db)
+
+            if not result.success:
+                sp.rollback()  # Restore deleted slot on failure
+                return result
+
+            return result
         except Exception as e:
+            sp.rollback()
             db.rollback()
             logger.error(f"Scheduling failed for task {task.id}: {e}")
             return SchedulingResult(
@@ -303,37 +326,7 @@ class ScheduleEngine:
             else:
                 logger.warning(f"Task {displaced_id} not found for displacement")
 
-        slot = ProvisionalSlot(
-            task_id=task.id,
-            start=fixed_start,
-            end=fixed_end,
-            value=task.value,
-            fixed=True,
-            location=task.location.name if task.location else None,
-        )
-        db.add(slot)
-        db.flush()
-
-        change = ScheduleChange(
-            provisional_schedule_slot_id=slot.id,
-            change_type="insert",
-            new_slot_start=fixed_start,
-            new_slot_end=fixed_end,
-        )
-        db.add(change)
-        db.commit()
-
-        logger.info(f"Fixed task scheduled at {fixed_start}")
-
-        return SchedulingResult(
-            success=True,
-            task_id=task.id,
-            slot_id=slot.id,
-            slot_start=fixed_start,
-            slot_end=fixed_end,
-            displaced_tasks=displaced_ids,
-            message="Task scheduled at fixed time",
-        )
+        return self._place_task(task, fixed_start, fixed_end, db, displaced_ids)
     
     
     # ============================================================================
@@ -426,11 +419,9 @@ class ScheduleEngine:
                 displaced_tasks=[],
                 message=f"Max displacement layers ({MAX_DISPLACEMENT_LAYERS}) exceeded",
             )
-        
-        if task.fixed_time:
-            return self._schedule_fixed_task(task, db)
-        else:
-            return self._schedule_flexible_task(task, db)
+
+        # Use schedule_single() which handles slot deletion before overlap checks
+        return self.schedule_single(task, db)
     
     
     # ============================================================================
@@ -901,15 +892,7 @@ class ScheduleEngine:
         displaced_ids: List[UUID],
     ) -> SchedulingResult:
         """Place task in provisional schedule."""
-        existing = db.query(ProvisionalSlot).filter(
-            ProvisionalSlot.task_id == task.id
-        ).first()
-        
-        change_type = "move" if existing else "insert"
-        
-        if existing:
-            db.delete(existing)
-        
+        # Slot already deleted in schedule_single() — just insert
         slot = ProvisionalSlot(
             task_id=task.id,
             start=slot_start,
@@ -923,9 +906,9 @@ class ScheduleEngine:
 
         change = ScheduleChange(
             provisional_schedule_slot_id=slot.id,
-            change_type=change_type,
-            old_slot_start=existing.start if existing else None,
-            old_slot_end=existing.end if existing else None,
+            change_type="move" if self._old_start else "insert",
+            old_slot_start=self._old_start,
+            old_slot_end=self._old_end,
             new_slot_start=slot_start,
             new_slot_end=slot_end,
         )
