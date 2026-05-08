@@ -2,6 +2,8 @@
     VM-AI - Dataset Validator with EXP/PRD Consistency Checking
     Validates schema structure, keyword consistency, and tag correctness.
     Run: python src/parser/validate_dataset.py data/VMAI_REAL_Data.yaml
+
+    Written by: Vanea
 """
 
 import sys
@@ -51,7 +53,6 @@ def parse_dict_output(out_dict: dict) -> dict:
     """Convert YAML dict output to tagged schema format for validation."""
     result = {}
     for k, v in out_dict.items():
-        # Determine tag based on field type
         if k in ["name", "fixed_time", "fixed_start", "recurrent", "recurrence_days", "deadline", "start"]:
             tag = "EXP"
         else:
@@ -74,10 +75,8 @@ def validate_consistency(input_text: str, output_text: str, example_idx: int) ->
         if val is None and field not in ALWAYS_EXPLICIT:
             continue
             
-        # If tagged EXP, check if input has keywords for it
         if tag == "EXP":
             if field in PREDICTED_FIELDS and field not in explicit_fields:
-                # Allow some flexibility - don't error on borderline cases
                 if field not in ["name", "fixed_time", "fixed_start", "recurrent", "recurrence_days"]:
                     errors.append({
                         "idx": example_idx,
@@ -87,7 +86,6 @@ def validate_consistency(input_text: str, output_text: str, example_idx: int) ->
                         "input": input_text[:50],
                     })
         elif tag == "PRD":
-            # If tagged PRD but input HAS keywords, that's a mismatch
             if field in explicit_fields and field in PREDICTED_FIELDS:
                 errors.append({
                     "idx": example_idx,
@@ -102,7 +100,6 @@ def validate_consistency(input_text: str, output_text: str, example_idx: int) ->
 def validate_schema(output_text: str, example_idx: int) -> list:
     """Validate field values are within expected ranges/types."""
     errors = []
-    # Try parsing as pipe with tags first, fallback to simple pipe or dict
     try:
         if "[" in output_text:
             parsed = parse_pipe_with_tags(output_text)
@@ -174,7 +171,6 @@ def validate_file(path: str, fix: bool = False) -> dict:
     all_errors = []
     stats = Counter()
     
-    # Collect field statistics
     field_tags = defaultdict(lambda: {"EXP": 0, "PRD": 0})
     
     for i, ex in enumerate(examples):
@@ -184,7 +180,6 @@ def validate_file(path: str, fix: bool = False) -> dict:
         is_modify = inp.startswith("modify:")
         stats["modify" if is_modify else "add"] += 1
         
-        # Handle dict output (standard YAML format)
         if isinstance(out_raw, dict):
             parsed = {k: {"value": v, "tag": "EXP" if k in ["name", "fixed_time", "fixed_start", "recurrent", "recurrence_days", "deadline", "start"] else "PRD"} for k, v in out_raw.items()}
             skip_tag_check = True
@@ -192,17 +187,14 @@ def validate_file(path: str, fix: bool = False) -> dict:
             parsed = parse_pipe_with_tags(str(out_raw))
             skip_tag_check = False
             
-        # Count tags per field
         for field, entry in parsed.items():
             tag = entry.get("tag", "UNKNOWN")
             if tag in ("EXP", "PRD"):
                 field_tags[field][tag] += 1
         
-        # Track feature coverage
         for field in parsed:
             stats[f"has_{field}"] += 1
         
-        # Validate schema values (always)
         if not is_modify:
             for field, entry in parsed.items():
                 val = entry["value"]
@@ -233,13 +225,10 @@ def validate_file(path: str, fix: bool = False) -> dict:
                     if normalize_time(str(val)) is None and val is not None:
                         all_errors.append({"idx": i, "type": "VALUE_FORMAT", "field": field, "detail": f"Time '{val}' invalid format"})
     
-    # Check duplicates
     all_errors.extend(validate_duplicates(examples))
     
-    # Apply fixes if requested
     if fix and all_errors:
         print(f"Applying fixes to {path}...")
-        # Fixing would involve regenerating tags, but we just report for now
         print("Auto-fix not implemented. Review errors manually.")
     
     return {
@@ -267,21 +256,18 @@ def print_report(results: list):
         print(f"  Add examples: {res['stats'].get('add', 0)}")
         print(f"  Modify examples: {res['stats'].get('modify', 0)}")
         
-        # Feature coverage
         features = ["difficulty", "importance", "category", "duration", "location", 
                     "deadline", "fixed_time", "fixed_start", "recurrent", "recurrence_days"]
         for feat in features:
             count = res['stats'].get(f"has_{feat}", 0)
             print(f"  {feat.capitalize()} examples: {count}")
         
-        # Tag distribution
         print(f"\n  TAG DISTRIBUTION:")
         for field, tags in res['field_tags'].items():
             exp = tags.get("EXP", 0)
             prd = tags.get("PRD", 0)
             print(f"    {field:15s}: EXP={exp:3d}  PRD={prd:3d}")
         
-        # Errors
         if res['errors']:
             print(f"\n  ERRORS ({len(res['errors'])}):")
             error_types = Counter(e['type'] for e in res['errors'])
@@ -289,7 +275,7 @@ def print_report(results: list):
                 print(f"    {etype}: {count}")
             total_errors += len(res['errors'])
         else:
-            print(f"\n  ✅ No errors found")
+            print(f"\n  [OK] No errors found")
     
     print("\n" + "="*80)
     print("SUMMARY")
@@ -300,9 +286,9 @@ def print_report(results: list):
     print("="*80)
     
     if total_errors == 0:
-        print("\n✅ ALL VALIDATIONS PASSED - DATA IS READY FOR TRAINING")
+        print("\n[OK] ALL VALIDATIONS PASSED - DATA IS READY FOR TRAINING")
     else:
-        print(f"\n⚠️  {total_errors} ERRORS FOUND - REVIEW BEFORE TRAINING")
+        print(f"\n[WARN] {total_errors} ERRORS FOUND - REVIEW BEFORE TRAINING")
 
 def main():
     parser = argparse.ArgumentParser(description="VM.AI Dataset Validator")

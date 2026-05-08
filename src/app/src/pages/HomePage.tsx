@@ -66,18 +66,19 @@ function MainView({ selectedDate, onDateSelect }: { selectedDate: Date; onDateSe
                     >
                         {tasks.map((t, i) => (
                             <div key={t.task_id || i} className="shrink-0">
-                                <TaskView 
+                                <TaskView
                                     task={{
                                         name: t.name,
                                         start: t.start,
+                                        end: t.end,
                                         deadline: null,
-                                        duration: 60,
-                                        difficulty: 0.5,
+                                        duration: t.duration ?? 60,
+                                        difficulty: t.difficulty ?? 0.5,
                                         location: t.location,
-                                        importance: 0.5,
-                                        fixed_time: false,
-                                        fixed_start: null,
-                                        category: []
+                                        importance: t.importance ?? 0.5,
+                                        fixed_time: t.fixed_time ?? false,
+                                        fixed_start: t.fixed_start ?? null,
+                                        category: t.category ?? []
                                     }}
                                     taskId={t.task_id}
                                     onDelete={(id) => setTasks(prev => prev.filter(t => t.task_id !== id))}

@@ -65,7 +65,7 @@ class VMAI_YamlTrainingParsedData:
             if hasattr(self, field_name):
                 values = getattr(self, field_name)
                 if values:
-                    icon = "📝" if field_name == "templates" else "✅"
+                    icon = "[UNKNOWN]" if field_name == "templates" else ""
                     print(f"\n{icon} {field_name.upper()} ({len(values)} items):")
                     for i, v in enumerate(values, 1):
                         print(f"  {i}. {v}")
@@ -118,7 +118,7 @@ class VMAI_RealDataParser:
 
 
 if __name__ == "__main__":
-    parser = VMAI_YamlParser(f"./data/{vars.SYNTHETIC_DATASET_PATH}")
+    parser = VMAI_YamlParser(f"./data/{vars.SYNTHETIC_DATASET}")
     parser.load_yaml()
     parsed_data = parser.parse()
     parsed_data.print_nice()

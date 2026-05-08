@@ -12,11 +12,9 @@ import sys
 import shutil
 from huggingface_hub import snapshot_download
 
-# Configuration
 HF_USERNAME = "vaneaa"
 REPO_NAME = "vmai-parser"
 
-# Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
@@ -31,12 +29,10 @@ def backup_existing_model():
         print()
         return False
     
-    # Remove old backup if exists
     if os.path.exists(BACKUP_PATH):
         print(f"  Removing old backup...")
         shutil.rmtree(BACKUP_PATH)
     
-    # Move current model to backup
     shutil.move(MODEL_PATH, BACKUP_PATH)
     print(f"  Backed up to: finetuned_parser_backup")
     print()
@@ -48,7 +44,6 @@ def main():
     print("=" * 60)
     print()
     
-    # Get token from command line (optional for public repos)
     token = sys.argv[1].strip() if len(sys.argv) > 1 else None
     
     if token:
@@ -57,10 +52,8 @@ def main():
         print("No token provided - will attempt public repo download")
     print()
     
-    # Always backup first
     backup_existing_model()
     
-    # Create models directory
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
     
     repo_id = f"{HF_USERNAME}/{REPO_NAME}"
@@ -69,7 +62,6 @@ def main():
     print(f"Download to: {MODEL_PATH}")
     print()
     
-    # Download
     print("Downloading model...")
     try:
         download_kwargs = {"repo_id": repo_id, "local_dir": MODEL_PATH}
@@ -78,7 +70,6 @@ def main():
         
         snapshot_download(**download_kwargs)
         
-        # Verify download
         files = os.listdir(MODEL_PATH)
         if not files:
             print()

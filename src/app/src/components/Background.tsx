@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const DEV_MODE = true;
+const DEV_MODE = false; // damn
 
 const DEFAULTS = {
     scale: 1.,

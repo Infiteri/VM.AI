@@ -4,6 +4,8 @@
     
     Format: field=value[TAG] | field2=value2[TAG2]
     Tags: EXP = Explicit (user stated), PRD = Predicted (model inferred)
+
+    Written by: Vanea
 """
 
 import re
@@ -12,8 +14,6 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vars import PREDICTED_FIELDS, ALWAYS_EXPLICIT, ALL_FIELDS, VALID_CATEGORIES, DAYS
 
-
-# ─── Keyword Detection ───────────────────────────────────────────────────────
 
 DIFFICULTY_KEYWORDS = {
     "hard", "difficult", "challenging", "complex", "intense", "heavy", "tough",
@@ -44,44 +44,34 @@ def detect_explicit_fields(input_text: str) -> set:
     s = input_text.lower()
     explicit = set()
     
-    # Name is always explicit
     explicit.add("name")
     
-    # Difficulty keywords
     if any(kw in s for kw in DIFFICULTY_KEYWORDS):
         explicit.add("difficulty")
     
-    # Importance keywords
     if any(kw in s for kw in IMPORTANCE_KEYWORDS):
         explicit.add("importance")
     
-    # Category keywords
     if any(kw in s for kw in CATEGORY_KEYWORDS):
         explicit.add("category")
     
-    # Duration keywords
     if any(kw in s for kw in DURATION_KEYWORDS) or re.search(r'\d+\s*(min|hour|hr)', s):
         explicit.add("duration")
     
-    # Time keywords
     if any(kw in s for kw in TIME_KEYWORDS) or re.search(r'\d{1,2}(:\d{2})?\s*(am|pm)', s):
         explicit.add("fixed_time")
         explicit.add("fixed_start")
     
-    # Recurrence keywords
     if any(kw in s for kw in RECURRENCE_KEYWORDS):
         explicit.add("recurrent")
         explicit.add("recurrence_days")
     
-    # Deadline keywords
     if any(kw in s for kw in ["tomorrow", "next week", "by", "due", "deadline", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]):
         explicit.add("deadline")
         explicit.add("start")
     
     return explicit
 
-
-# ─── Normalization Functions ─────────────────────────────────────────────────
 
 def normalize_time(time_str: str) -> str | None:
     """Convert various time formats to HH:MM."""
@@ -184,8 +174,6 @@ def clamp_category(cat):
     return cat if cat in VALID_CATEGORIES else "personal"
 
 
-# ─── Pipe Format Parsing (WITH TAGS) ─────────────────────────────────────────
-
 def pipe_to_schema(flat: str, input_text: str = "") -> dict:
     """
     Parse pipe-format string with EXP/PRD tags into schema dict.
@@ -193,9 +181,7 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
     If no tags present, auto-detect based on input_text.
     Handles T5 sentinel tokens (<extra_id_*>) — strips them entirely.
     """
-    # Strip T5 sentinel tokens entirely (they appear as artifacts after tags/values)
     flat = re.sub(r'<extra_id_\d+>', '', flat)
-    # Also handle any that replaced pipe separators
     flat = re.sub(r'\s*\|\s*<extra_id_\d+>\s*\|\s*', ' | ', flat)
     flat = re.sub(r'\s*\|\s*\|\s*', ' | ', flat)
 
@@ -207,7 +193,6 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
         k, _, rest = part.partition("=")
         k = k.strip()
         
-        # Extract tag if present
         tag = None
         if "[" in rest and rest.endswith("]"):
             val_str, tag = rest[:-1].split("[", 1)
@@ -217,7 +202,6 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
             
         val_str = val_str.strip()
         
-        # Parse value
         if val_str.lower() == "null":
             v = None
         elif val_str.lower() in ("true", "tru", "t"):
@@ -229,7 +213,6 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
             
         raw[k] = {"value": v, "tag": tag}
 
-    # Build schema with tags
     schema = {}
     for field, default in ALL_FIELDS.items():
         if field in raw:
@@ -237,14 +220,12 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
             val = entry["value"]
             tag = entry.get("tag")
             
-            # If no tag, auto-detect from input
             if not tag:
                 explicit_fields = detect_explicit_fields(input_text)
                 tag = "EXP" if field in explicit_fields else "PRD"
                 
             schema[field] = {"value": val, "predicted": tag == "PRD"}
         else:
-            # Field not in output, use default
             explicit_fields = detect_explicit_fields(input_text)
             tag = "EXP" if field in explicit_fields else "PRD"
             schema[field] = {"value": default, "predicted": tag == "PRD"}
@@ -310,8 +291,6 @@ def changed_to_pipe(changed: dict) -> str:
             parts.append(f"{field}={val}[{tag}]")
     return " | ".join(parts)
 
-
-# ─── Legacy Support (without tags) ───────────────────────────────────────────
 
 def parse_pipe_simple(flat: str) -> dict:
     """Parse pipe-format string WITHOUT tags into simple dict."""

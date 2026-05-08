@@ -1,6 +1,7 @@
 export interface Task {
   name: string;
   start: string | null;
+  end?: string | null;
   deadline: string | null;
   duration: number;
   difficulty: number;
@@ -40,6 +41,12 @@ export interface ScheduleTask {
   end: string;
   location: string;
   rated: boolean;
+  fixed_time: boolean;
+  fixed_start: string | null;
+  duration: number;
+  category: string[];
+  difficulty: number;
+  importance: number; 
 }
 
 export interface ScheduleResponse {

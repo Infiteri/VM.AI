@@ -1,6 +1,8 @@
 """
-Rule-based Modify Mode Parser
-Handles importance/difficulty changes with explicit keyword mappings.
+    VM-AI - Rule-based Modify Mode Parser
+    Handles importance/difficulty changes with explicit keyword mappings.
+
+    Written by: Vanea
 """
 
 import re
@@ -22,7 +24,6 @@ def parse_modify_rule_based(
     s = change_prompt.lower().strip()
     result = {}
 
-    # Importance mappings
     importance_map = {
         "urgent": 0.95,
         "critical": 0.98,
@@ -40,7 +41,6 @@ def parse_modify_rule_based(
         "whenever": 0.1,
     }
 
-    # Difficulty mappings
     difficulty_map = {
         "hard": 0.85,
         "difficult": 0.85,
@@ -58,25 +58,22 @@ def parse_modify_rule_based(
         "medium": 0.45,
     }
 
-    # Check for importance keywords (most specific first)
     for keyword in sorted(importance_map.keys(), key=len, reverse=True):
         if keyword in s:
             result["importance"] = {
                 "value": str(importance_map[keyword]),
-                "predicted": False,  # Explicit since user stated the keyword
+                "predicted": False,
             }
             break
 
-    # Check for difficulty keywords
     for keyword in sorted(difficulty_map.keys(), key=len, reverse=True):
         if keyword in s:
             result["difficulty"] = {
                 "value": str(difficulty_map[keyword]),
-                "predicted": False,  # Explicit since user stated the keyword
+                "predicted": False,
             }
             break
 
-    # Check for "cancel" or "remove" patterns
     if "cancel" in s or "remove" in s or "clear" in s:
         if "fixed" in s or "time" in s:
             result["fixed_time"] = {"value": False, "predicted": False}
@@ -85,7 +82,6 @@ def parse_modify_rule_based(
             result["recurrent"] = {"value": False, "predicted": False}
             result["recurrence_days"] = {"value": None, "predicted": False}
 
-    # Check for "set time" or "at X pm/am" patterns
     time_match = re.search(r"at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
     if time_match:
         from rule_based_add import normalize_time
@@ -95,7 +91,6 @@ def parse_modify_rule_based(
             result["fixed_time"] = {"value": True, "predicted": False}
             result["fixed_start"] = {"value": normalized, "predicted": False}
 
-    # Check for "push deadline" or "change deadline" patterns
     deadline_match = re.search(
         r"(?:push|change|move)\s+(?:the\s+)?deadline\s+to\s+(\w+)", s
     )
@@ -109,12 +104,10 @@ def parse_modify_rule_based(
             "predicted": False,
         }
 
-    # Check for "start on" patterns
     start_match = re.search(r"(?:start|begin|kick off)\s+(?:on\s+)?(\w+)", s)
     if start_match:
         result["start"] = {"value": start_match.group(1).title(), "predicted": False}
 
-    # Check for duration changes
     duration_match = re.search(r"(\d+)\s*(?:minute|min|hour|hr)s?", s)
     if duration_match:
         v = int(duration_match.group(1))
@@ -122,7 +115,6 @@ def parse_modify_rule_based(
             v *= 60
         result["duration"] = {"value": str(v), "predicted": False}
 
-    # Check for category changes
     category_map = {
         "work": "work",
         "job": "work",
@@ -153,7 +145,6 @@ def parse_modify_rule_based(
             result["category"] = {"value": cat, "predicted": True}
             break
 
-    # Check for location changes
     location_map = {
         "home": "home",
         "office": "office",
@@ -178,7 +169,6 @@ def parse_modify_rule_based(
 
 
 if __name__ == "__main__":
-    # Test
     tests = [
         "make it urgent",
         "make it critical",
