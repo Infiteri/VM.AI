@@ -144,26 +144,21 @@ class TaskPlannerPredictor:
         Uses rule-based parser for importance/difficulty (reliable).
         Uses ML model for other fields (deadline, time, location, etc).
         """
-        # First, use rule-based parser for importance/difficulty (most reliable)
         rule_based = parse_modify_rule_based(change_prompt, existing_task)
 
-        # Also run model for other fields
         output = self._run_model(change_prompt.lower(), start_token="")
         new_fields = pipe_to_schema(output, input_text=change_prompt)
 
-        # Merge results: ML model for most fields, rule-based for importance/difficulty
         changed = {}
 
-        # Add rule-based importance/difficulty (these are most accurate)
         for field in ["importance", "difficulty"]:
             if field in rule_based:
                 changed[field] = rule_based[field]
 
-        # Add other fields from ML model
         if "error" not in new_fields:
             for field, entry in new_fields.items():
                 if field in ["importance", "difficulty"]:
-                    continue  # Skip, already handled by rule-based
+                    continue  
                 if not isinstance(entry, dict):
                     continue
                 val = entry.get("value")
@@ -176,7 +171,6 @@ class TaskPlannerPredictor:
                 if str(val).lower() != str(old_val).lower():
                     changed[field] = entry
 
-        # Add rule-based fields that ML might have missed (time, location, etc)
         for field in [
             "fixed_time",
             "fixed_start",

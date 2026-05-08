@@ -5,20 +5,25 @@ import type { Task } from "../types/Task";
 
 interface NLPViewProps {
   mode: "add" | "modify";
+  initialTask?: Task;
   onParsedTask?: (task: Task) => void;
 }
 
-export default function NLPView({ mode, onParsedTask }: NLPViewProps) {
+export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProps) {
     const [modeText, setModeText] = useState("Add");
     const [inputText, setInputText] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [parsedResult, setParsedResult] = useState<any>(null);
+    const [parsedResult, setParsedResult] = useState<Task | null>(initialTask ?? null);
 
     useEffect(() => {
         if (mode === "add") setModeText("Add");
         else setModeText("Modify");
     }, [mode]);
+
+    useEffect(() => {
+        setParsedResult(initialTask ?? null);
+    }, [initialTask]);
 
     const handleSubmit = async () => {
         if (!inputText.trim()) return;
@@ -27,14 +32,25 @@ export default function NLPView({ mode, onParsedTask }: NLPViewProps) {
         setError("");
         
         try {
-            const result = await api.parseNLPAdd(inputText);
-            setParsedResult(result.task);
-            if (onParsedTask) {
-                onParsedTask(result.task);
-            }
-
-            console.log(result.task);
+            console.log(parsedResult);
             
+            let result;
+            if (mode === "modify" && parsedResult) {
+                result = await api.parseNLPModify(parsedResult, inputText);
+                const updatedTask = { ...parsedResult, ...result.task };
+                setParsedResult(updatedTask);
+                if (onParsedTask) {
+                    onParsedTask(updatedTask);
+                }
+                console.log(updatedTask);
+            } else {
+                result = await api.parseNLPAdd(inputText);
+                setParsedResult(result.task);
+                if (onParsedTask) {
+                    onParsedTask(result.task);
+                }
+                console.log(result.task);
+            }
         } catch (err: any) {
             setError(err.message || "Failed to parse task");
         } finally {

@@ -27,7 +27,7 @@ export default function AddTaskPage() {
 
             <main className="flex justify-end">
                 <div className="min-w-75 h-full border-l border-white/5 bg-sec/20 shadow-2xl">
-                    <NLPView mode={openMode} onParsedTask={handleParsedTask} />
+                    <NLPView mode={openMode} initialTask={task} onParsedTask={handleParsedTask} />
                 </div>
             </main>
         </div>
