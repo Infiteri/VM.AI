@@ -171,9 +171,28 @@ Applied when:
 ```json
 {
     "success": true,
-    "slot_id": "uuid"
+    "task_id": "uuid"
 }
 ```
+
+### Time Score Updates
+
+The `update_time_score()` method automatically adjusts time preferences when a task is rated:
+
+| Completion Status | Boost Value |
+|-------------------|-------------|
+| Completed | `+0.5` |
+| Uncompleted | `-0.5` |
+
+Time scores are clamped to `[-10.0, 10.0]` with step size `0.25`.
+
+**Internal Constants:**
+
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `RECORDS_NR_TRACK` | 30 | Max records before recalculating rolling average |
+| `TIME_SCORE_CLAMP` | `(-10.0, 10.0)` | Time score bounds |
+| `TIME_SCORE_STEP` | `0.25` | Increment/decrement step |
 
 ---
 

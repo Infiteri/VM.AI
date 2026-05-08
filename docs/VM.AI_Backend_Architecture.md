@@ -1,6 +1,6 @@
 # VM.AI Backend Architecture & Implementation Guide
-**Version:** 3.0 (Final)
-**Last Updated:** April 18, 2026
+**Version:** 3.1 (Updated)
+**Last Updated:** May 8, 2026
 **Competition:** ONIA 2026
 
 ---
@@ -85,7 +85,9 @@ src/backend/
 │   │   └── shared.py     # SuccessResponse
 │   └── services/
 │       ├── task_matcher.py   # MiniLM embeddings
-│       └── enrichment.py    # Date resolution, overwrites
+│       ├── enrichment.py    # Date resolution, overwrites
+│       ├── schedule_engine.py # Stable incremental scheduler
+│       └── stats_recorder.py # Two-denominator statistics
 ├── alembic/                   # Migrations
 ├── logs/                     # backend.log
 └── pyproject.toml           # Dependencies

@@ -362,7 +362,7 @@ class TaskPayload(BaseModel):
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | completed | bool | Yes | Whether the task was completed |
-| actual_duration | int | If completed | Actual duration in minutes (0-1440) |
+| actual_duration | int | If completed | Actual duration in minutes (1-1439) |
 | actual_difficulty | float | If completed | Actual difficulty (0.0-1.0) |
 
 **Example:**
@@ -388,7 +388,6 @@ class TaskPayload(BaseModel):
 |-------|------|-------|
 | Task in main_schedule | 400 | "Task not in main schedule" |
 | Task.rated == True | 400 | "Task already rated" |
-| slot.end < now | 400 | "Cannot rate task that ended in the past" |
 
 **Schema:** `RateResponse`
 
@@ -426,7 +425,7 @@ class TaskPayload(BaseModel):
 
 ---
 
-### 3.10 GET /provisional/changes — Get Pending Changes
+### 3.11 GET /provisional/changes — Get Pending Changes
 
 **Purpose:** Get scheduled changes before committing.
 
@@ -452,7 +451,7 @@ class TaskPayload(BaseModel):
 
 ---
 
-### 3.11 POST /provisional/reset — Reset Provisional
+### 3.12 POST /provisional/reset — Reset Provisional
 
 **Purpose:** Discard provisional schedule and reset to main schedule.
 
@@ -469,7 +468,7 @@ class TaskPayload(BaseModel):
 
 ---
 
-### 3.12 POST /provisional/commit — Commit Changes
+### 3.13 POST /provisional/commit — Commit Changes
 
 **Purpose:** Atomically copy provisional to main schedule.
 
@@ -484,36 +483,6 @@ class TaskPayload(BaseModel):
 ```
 
 **Schema:** `ProvisionalCommitResponse`
-
----
-
-### 3.13 POST /tasks/{id}/rate — Rate Task
-
-**Purpose:** Rate task completion to update statistics.
-
-**Request (RateRequest):**
-```json
-{
-    "completed": true,
-    "actual_duration": 75,
-    "actual_difficulty": 0.8
-}
-```
-
-**Validation Rules:**
-- If `completed=true`: `actual_duration` and `actual_difficulty` required
-- If `completed=false`: `actual_duration` and `actual_difficulty` cannot be sent
-
-**Response (RateResponse):**
-```json
-{
-    "success": true,
-    "slot_id": "550e8400-e29b-41d4-a716-446655440000",
-    "message": "Task rated successfully"
-}
-```
-
-**Schema:** `RateRequest` → `RateResponse`
 
 ---
 

@@ -67,7 +67,7 @@ uv venv
 uv sync
 
 # Create .env file with database credentials
-# DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/dbname
+DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/dbname
 
 # Run migrations
 uv run alembic upgrade head
