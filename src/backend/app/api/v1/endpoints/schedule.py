@@ -26,6 +26,7 @@ def get_schedule(
     
     Returns all tasks from main_schedule that start on the specified date.
     """
+    logger.debug(f"Fetching tasks for date: {date.strftime('%Y-%m-%d')}")
     day_start = datetime.combine(date, datetime.min.time())
     day_end = day_start + timedelta(days=1)
     

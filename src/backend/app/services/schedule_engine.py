@@ -61,8 +61,18 @@ DEAD_ZONES = [
 class TimeWindow:
     """Represents a continuous time window for scheduling."""
     date: str
-    start_time: str
-    end_time: str
+    start_dt: datetime
+    end_dt: datetime
+
+    @property
+    def start_time(self) -> str:
+        """Backward-compatible property returning HH:MM format."""
+        return self.start_dt.strftime("%H:%M")
+
+    @property
+    def end_time(self) -> str:
+        """Backward-compatible property returning HH:MM format."""
+        return self.end_dt.strftime("%H:%M")
 
 
 @dataclass
@@ -112,12 +122,35 @@ class ScheduleEngine:
         """
         logger.info(f"Scheduling task: {task.name} (ID: {task.id})")
 
+        # Savepoint: allows restoring deleted slot if scheduling fails
+        sp = db.begin_nested()
+
+        # Delete task's existing slot BEFORE overlap checks
+        existing_slot = db.query(ProvisionalSlot).filter(
+            ProvisionalSlot.task_id == task.id
+        ).first()
+        if existing_slot:
+            logger.debug(f"Deleting existing slot for task {task.id} before scheduling")
+            self._old_start = existing_slot.start
+            self._old_end = existing_slot.end
+            db.delete(existing_slot)
+            db.flush()  # Make delete visible to subsequent queries
+        else:
+            self._old_start = self._old_end = None
+
         try:
             if task.fixed_time:
-                return self._schedule_fixed_task(task, db)
+                result = self._schedule_fixed_task(task, db)
             else:
-                return self._schedule_flexible_task(task, db)
+                result = self._schedule_flexible_task(task, db)
+
+            if not result.success:
+                sp.rollback()  # Restore deleted slot on failure
+                return result
+
+            return result
         except Exception as e:
+            sp.rollback()
             db.rollback()
             logger.error(f"Scheduling failed for task {task.id}: {e}")
             return SchedulingResult(
@@ -303,37 +336,7 @@ class ScheduleEngine:
             else:
                 logger.warning(f"Task {displaced_id} not found for displacement")
 
-        slot = ProvisionalSlot(
-            task_id=task.id,
-            start=fixed_start,
-            end=fixed_end,
-            value=task.value,
-            fixed=True,
-            location=task.location.name if task.location else None,
-        )
-        db.add(slot)
-        db.flush()
-
-        change = ScheduleChange(
-            provisional_schedule_slot_id=slot.id,
-            change_type="insert",
-            new_slot_start=fixed_start,
-            new_slot_end=fixed_end,
-        )
-        db.add(change)
-        db.commit()
-
-        logger.info(f"Fixed task scheduled at {fixed_start}")
-
-        return SchedulingResult(
-            success=True,
-            task_id=task.id,
-            slot_id=slot.id,
-            slot_start=fixed_start,
-            slot_end=fixed_end,
-            displaced_tasks=displaced_ids,
-            message="Task scheduled at fixed time",
-        )
+        return self._place_task(task, fixed_start, fixed_end, db, displaced_ids)
     
     
     # ============================================================================
@@ -426,11 +429,9 @@ class ScheduleEngine:
                 displaced_tasks=[],
                 message=f"Max displacement layers ({MAX_DISPLACEMENT_LAYERS}) exceeded",
             )
-        
-        if task.fixed_time:
-            return self._schedule_fixed_task(task, db)
-        else:
-            return self._schedule_flexible_task(task, db)
+
+        # Use schedule_single() which handles slot deletion before overlap checks
+        return self.schedule_single(task, db)
     
     
     # ============================================================================
@@ -466,7 +467,9 @@ class ScheduleEngine:
         
         while current <= end:
             date_str = current.strftime("%Y-%m-%d")
-            windows[date_str] = [TimeWindow(date=date_str, start_time="00:00", end_time="23:59")]
+            start_dt = datetime.strptime(f"{date_str} 00:00", "%Y-%m-%d %H:%M")
+            end_dt = datetime.strptime(f"{date_str} 23:59", "%Y-%m-%d %H:%M")
+            windows[date_str] = [TimeWindow(date=date_str, start_dt=start_dt, end_dt=end_dt)]
             current += timedelta(days=1)
         
         windows = self._subtract_fixed_tasks(windows, db)
@@ -475,7 +478,7 @@ class ScheduleEngine:
         valid_windows = {}
         for date_str, ws in windows.items():
             for w in ws:
-                if self._parse_time(w.end_time) > self._parse_time(w.start_time):
+                if w.end_dt > w.start_dt:
                     if date_str not in valid_windows:
                         valid_windows[date_str] = []
                     valid_windows[date_str].append(w)
@@ -490,29 +493,30 @@ class ScheduleEngine:
     ) -> Dict[str, List[TimeWindow]]:
         """Subtract slots occupied by fixed tasks."""
         fixed_tasks = db.query(ProvisionalSlot).filter(ProvisionalSlot.fixed == True).all()
-        
+
         for slot in fixed_tasks:
             date_str = slot.start.strftime("%Y-%m-%d")
             if date_str in windows:
                 new_windows = []
                 for window in windows[date_str]:
-                    if slot.start.time() >= self._parse_time(window.end_time) or slot.end.time() <= self._parse_time(window.start_time):
+                    # Compare datetimes directly (both are datetime objects now)
+                    if slot.start >= window.end_dt or slot.end <= window.start_dt:
                         new_windows.append(window)
                     else:
-                        if self._parse_time(window.start_time) < slot.start.time():
+                        if window.start_dt < slot.start:
                             new_windows.append(TimeWindow(
                                 date=date_str,
-                                start_time=window.start_time,
-                                end_time=slot.start.strftime("%H:%M"),
+                                start_dt=window.start_dt,
+                                end_dt=slot.start,
                             ))
-                        if slot.end.time() < self._parse_time(window.end_time):
+                        if slot.end < window.end_dt:
                             new_windows.append(TimeWindow(
                                 date=date_str,
-                                start_time=slot.end.strftime("%H:%M"),
-                                end_time=window.end_time,
+                                start_dt=slot.end,
+                                end_dt=window.end_dt,
                             ))
                 windows[date_str] = new_windows
-        
+
         return windows
     
     
@@ -522,17 +526,17 @@ class ScheduleEngine:
     ) -> Dict[str, List[TimeWindow]]:
         """Subtract dead zones from time windows."""
         for zone_start_str, zone_end_str in DEAD_ZONES:
-            zs = self._parse_time(zone_start_str)
-            ze = self._parse_time(zone_end_str)
-
             for date_str in windows:
+                zs = datetime.strptime(f"{date_str} {zone_start_str}", "%Y-%m-%d %H:%M")
+                ze = datetime.strptime(f"{date_str} {zone_end_str}", "%Y-%m-%d %H:%M")
+
                 new_windows = []
                 for window in windows[date_str]:
-                    ws = self._parse_time(window.start_time)
-                    we = self._parse_time(window.end_time)
+                    ws = window.start_dt
+                    we = window.end_dt
 
                     # Check if dead zone spans midnight (e.g., 23:00-06:00)
-                    if ze < zs:  # Zone spans midnight
+                    if ze < ws:  # Zone spans midnight (zone_end < zone_start)
                         # Valid time is ONLY: zone_end (06:00) to zone_start (23:00)
                         # Skip morning dead zone: if window starts before ze, start at ze
                         if ws < ze:
@@ -545,8 +549,8 @@ class ScheduleEngine:
                         if ws < we:
                             new_windows.append(TimeWindow(
                                 date=date_str,
-                                start_time=self._format_time(ws),
-                                end_time=self._format_time(we),
+                                start_dt=ws,
+                                end_dt=we,
                             ))
                     else:
                         # Normal case: dead zone doesn't span midnight (e.g., 09:00-11:00)
@@ -556,14 +560,14 @@ class ScheduleEngine:
                             if ws < zs:
                                 new_windows.append(TimeWindow(
                                     date=date_str,
-                                    start_time=window.start_time,
-                                    end_time=zone_start_str,
+                                    start_dt=ws,
+                                    end_dt=zs,
                                 ))
                             if we > ze:
                                 new_windows.append(TimeWindow(
                                     date=date_str,
-                                    start_time=zone_end_str,
-                                    end_time=window.end_time,
+                                    start_dt=ze,
+                                    end_dt=we,
                                 ))
                 windows[date_str] = new_windows
 
@@ -581,32 +585,31 @@ class ScheduleEngine:
     ) -> List[datetime]:
         """Split windows into 15-min slot start times."""
         slots: List[datetime] = []
-        
+
         for date_str, ws in windows.items():
             for window in ws:
-                start_minutes = self._parse_time(window.start_time)
-                end_minutes = self._parse_time(window.end_time)
-                
-                window_end_total_minutes = end_minutes[0] * 60 + end_minutes[1]
+                start_dt = window.start_dt
+                end_dt = window.end_dt
+
+                window_end_total_minutes = end_dt.hour * 60 + end_dt.minute
                 duration_total_minutes = self._round_up_to_interval(duration_minutes)
-                
+
                 deadzone_start_minutes = 23 * 60
                 valid_end_minutes = min(window_end_total_minutes - duration_total_minutes, deadzone_start_minutes - duration_total_minutes)
-                
+
                 if valid_end_minutes <= 0:
                     continue
-                
-                current_hour = start_minutes[0]
-                current_minute = start_minutes[1]
-                
-                while (current_hour * 60 + current_minute) <= valid_end_minutes:
-                    slot_dt = datetime.strptime(f"{date_str} {current_hour:02d}:{current_minute:02d}", "%Y-%m-%d %H:%M")
-                    slots.append(slot_dt)
-                    
-                    current_minute += SLOT_INTERVAL_MINUTES
-                    if current_minute >= 60:
-                        current_hour += 1
-                        current_minute = 0
+
+                current_dt = start_dt
+
+                while (current_dt.hour * 60 + current_dt.minute) <= valid_end_minutes:
+                    slots.append(current_dt)
+
+                    # Add SLOT_INTERVAL_MINUTES to current_dt
+                    new_minute = current_dt.minute + SLOT_INTERVAL_MINUTES
+                    new_hour = current_dt.hour + new_minute // 60
+                    new_minute = new_minute % 60
+                    current_dt = current_dt.replace(hour=new_hour, minute=new_minute)
         
         slots.sort()
         return slots
@@ -901,15 +904,7 @@ class ScheduleEngine:
         displaced_ids: List[UUID],
     ) -> SchedulingResult:
         """Place task in provisional schedule."""
-        existing = db.query(ProvisionalSlot).filter(
-            ProvisionalSlot.task_id == task.id
-        ).first()
-        
-        change_type = "move" if existing else "insert"
-        
-        if existing:
-            db.delete(existing)
-        
+        # Slot already deleted in schedule_single() — just insert
         slot = ProvisionalSlot(
             task_id=task.id,
             start=slot_start,
@@ -923,9 +918,9 @@ class ScheduleEngine:
 
         change = ScheduleChange(
             provisional_schedule_slot_id=slot.id,
-            change_type=change_type,
-            old_slot_start=existing.start if existing else None,
-            old_slot_end=existing.end if existing else None,
+            change_type="move" if self._old_start else "insert",
+            old_slot_start=self._old_start,
+            old_slot_end=self._old_end,
             new_slot_start=slot_start,
             new_slot_end=slot_end,
         )
@@ -991,20 +986,9 @@ class ScheduleEngine:
         if rounded >= 24 * 60:
             return dt.replace(hour=23, minute=59, second=59, microsecond=0)
         return dt.replace(hour=rounded // 60, minute=rounded % 60, second=0, microsecond=0)
-    
-    
-    def _parse_time(self, time_str: str) -> Tuple[int, int]:
-        """Parse HH:MM string to (hour, minute) tuple."""
-        parts = time_str.split(":")
-        return int(parts[0]), int(parts[1])
-    
-    
-    def _format_time(self, minutes: Tuple[int, int]) -> str:
-        """Format (hours, minutes) tuple to HH:MM string."""
-        hours, mins = minutes
-        return f"{hours:02d}:{mins:02d}"
 
-
+    
+    
 # ============================================================================
 # EXPORT SINGLETON INSTANCE
 # ============================================================================

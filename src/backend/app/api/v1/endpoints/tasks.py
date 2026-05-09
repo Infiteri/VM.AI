@@ -352,6 +352,13 @@ def update_task(
         db.query(UnscheduledTask).filter(UnscheduledTask.task_id == id).delete()
         unscheduled = UnscheduledTask(task_id=id)
         db.add(unscheduled)
+
+        # Clean up any existing provisional slot when re-adding to unscheduled
+        from app.models.schedule import ProvisionalSlot
+        existing_slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
+        if existing_slot:
+            logger.debug(f"Deleting provisional slot for task {id} when re-adding to unscheduled")
+            db.delete(existing_slot)
         
         db.commit()
         

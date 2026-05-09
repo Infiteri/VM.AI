@@ -124,11 +124,26 @@ class EnrichmentService:
             value, _ = self._extract_field(entry)
             flat_payload[field] = value
 
-        parsed_task = self._date_parse(flat_payload)
+        # Get fixed_time value BEFORE parsing dates
+        fixed_time_value = flat_payload.get("fixed_time", False)
+
+        # For fixed_time tasks, force start=None and deadline=None
+        if fixed_time_value:
+            flat_payload["start"] = None
+            flat_payload["deadline"] = None
+
+        # Pass fixed_time flag to _date_parse()
+        parsed_task = self._date_parse(flat_payload, fixed_time=fixed_time_value)
 
         # Rebuild nlp_payload with parsed datetime for importance calculation
         nlp_payload_with_dates = nlp_payload.copy()
-        for field in ["start", "deadline", "fixed_start"]:
+        
+        # For fixed_time tasks, ONLY include fixed_start (not start/deadline)
+        date_fields = ["fixed_start"]
+        if not fixed_time_value:
+            date_fields = ["start", "deadline", "fixed_start"]
+        
+        for field in date_fields:
             if field in parsed_task and parsed_task[field] is not None:
                 nlp_payload_with_dates[field] = {
                     "value": parsed_task[field],
@@ -140,6 +155,11 @@ class EnrichmentService:
         )
 
         enriched_task = self._overwrite_fields(parsed_task, overwrite_map)
+
+        # Enforce fixed_time consistency on enriched task
+        if fixed_time_value:
+            enriched_task["start"] = None
+            enriched_task["deadline"] = None
 
         draft_id = self._draft_save(db, enriched_task, match_result)
 
@@ -1217,18 +1237,24 @@ class EnrichmentService:
     # HELPER: DATE PARSING
     # ================================================================
 
-    def _date_parse(self, task: dict[str, Any]) -> dict[str, Any]:
+    def _date_parse(self, task: dict[str, Any], fixed_time: bool = False) -> dict[str, Any]:
         """
         Parse date strings to datetime objects.
 
         Input:
             task: Task data (may have raw string dates)
+            fixed_time: If True, only parse fixed_start (skip start/deadline)
 
         Returns:
             task: Task with datetime objects for date fields
         """
         result = task.copy()
-        date_fields = ["start", "deadline", "fixed_start"]
+        
+        # For fixed_time tasks, only parse fixed_start
+        if fixed_time:
+            date_fields = ["fixed_start"]
+        else:
+            date_fields = ["start", "deadline", "fixed_start"]
 
         for field in date_fields:
             value = result.get(field)
