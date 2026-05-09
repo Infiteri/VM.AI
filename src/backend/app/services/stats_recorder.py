@@ -421,8 +421,8 @@ class StatsRecorder:
         actual_difficulty: Optional[float],
     ) -> None:
         """Handle completed task rating."""
-        difficulty_delta = task.difficulty - actual_difficulty
-        duration_delta = task.duration - actual_duration
+        difficulty_delta = actual_difficulty - task.difficulty
+        duration_delta = actual_duration - task.duration
         bucket = self._get_duration_bucket(actual_difficulty)
 
         self._update_difficulty_delta(db, task.task_statistics_id, difficulty_delta, is_category=False)
