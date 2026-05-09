@@ -16,7 +16,12 @@ interface ProvisionalChange {
     location: string;
 }
 
-function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[]; loading: boolean }) {
+function ScheduleChangesView({ changes, loading, onModify, onDelete }: {
+    changes: ProvisionalChange[];
+    loading: boolean;
+    onModify: (taskId: string) => void;
+    onDelete: (taskId: string) => void;
+}) {
     if (loading) {
         return <div className="text-second-font">Loading...</div>;
     }
@@ -30,6 +35,7 @@ function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[
     return (
         <div className="w-full grid grid-cols-4 auto-rows-fr gap-4">
             {changes.map((change) => {
+                const changeDate = change.new_slot_start ? change.new_slot_start.split("T")[0] : "";
                 const startTime = change.new_slot_start ? change.new_slot_start.split("T")[1]?.substring(0, 5) : "";
                 const endTime = change.new_slot_end ? change.new_slot_end.split("T")[1]?.substring(0, 5) : "";
                 return (
@@ -38,7 +44,7 @@ function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[
                             <span className="text-lg text-main-font font-medium truncate">{change.task_name}</span>
                         </div>
                         <div className="text-sm text-second-font font-medium">
-                            {startTime} - {endTime}
+                            {changeDate} &middot; {startTime} - {endTime}
                         </div>
                         <div className="flex flex-wrap gap-1.5">
                             <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-sec/40 border border-white/10">
@@ -48,6 +54,10 @@ function ScheduleChangesView({ changes, loading }: { changes: ProvisionalChange[
                             <div className="px-2 py-1 rounded-md bg-sec/40 border border-white/10">
                                 <span className="text-xs text-second-font capitalize">{change.change_type}</span>
                             </div>
+                        </div>
+                        <div className="flex justify-between mt-1 px-1 text-[9px] font-medium uppercase tracking-tighter">
+                            <button onClick={() => onModify(change.task_id)} className="text-second hover:text-main transition-colors">Modify</button>
+                            <button onClick={() => onDelete(change.task_id)} className="text-second hover:text-del transition-colors">Delete</button>
                         </div>
                     </div>
                 );
@@ -129,6 +139,7 @@ function UnscheduledChangesView({ tasks, loading, onDelete }: { tasks: Unschedul
 }
 
 export default function PendingTasksPage() {
+    const navigate = useNavigate();
     const [activeView, setActiveView] = useState("unscheduled");
     const [unscheduledTasks, setUnscheduledTasks] = useState<UnscheduledTask[]>([]);
     const [provisionalChanges, setProvisionalChanges] = useState<ProvisionalChange[]>([]);
@@ -184,11 +195,31 @@ export default function PendingTasksPage() {
         setLoading(true);
         try {
             await api.runScheduler();
-            fetchUnscheduled();
+            setActiveView("schedule");
+            await fetchProvisionalChanges();
         } catch (err) {
             console.error("Failed to run scheduler:", err);
+            alert("Failed to run scheduler: " + (err instanceof Error ? err.message : "Unknown error"));
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleProvisionalDelete = async (taskId: string) => {
+        try {
+            await api.deleteTask(taskId, "provisional");
+            fetchProvisionalChanges();
+        } catch (err) {
+            console.error("Failed to delete provisional change:", err);
+        }
+    };
+
+    const handleProvisionalModify = async (taskId: string) => {
+        try {
+            const fullTaskData = await api.getTask(taskId);
+            navigate("/task", { state: { task: fullTaskData.task, task_id: taskId, openMode: "modify", source: "provisional" } });
+        } catch (err) {
+            console.error("Failed to load task details:", err);
         }
     };
 
@@ -277,7 +308,7 @@ export default function PendingTasksPage() {
                     <div className="flex-1 p-8">
                         {error && <div className="text-red-500 mb-4">{error}</div>}
                         {activeView === "schedule" ? (
-                            <ScheduleChangesView changes={provisionalChanges} loading={loading} />
+                            <ScheduleChangesView changes={provisionalChanges} loading={loading} onModify={handleProvisionalModify} onDelete={handleProvisionalDelete} />
                         ) : (
                             <UnscheduledChangesView tasks={unscheduledTasks} loading={loading} onDelete={handleDelete} />
                         )}
