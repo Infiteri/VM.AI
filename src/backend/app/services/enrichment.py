@@ -626,7 +626,9 @@ class EnrichmentService:
             delta = task_stats.get("avg_difficulty_delta")
             if avg is not None:
                 delta = delta if delta is not None else 0.0
-                return round(avg + delta, 2)
+                result = avg + delta
+                result = max(0.05, min(1.0, result))
+                return round(result, 2)
         elif field == "duration":
             if difficulty is None:
                 logger.warning("Duration lookup requires difficulty value")
@@ -660,7 +662,9 @@ class EnrichmentService:
                     delta_val = delta_bucket if delta_bucket else 0
 
                 if avg_val is not None:
-                    return int(avg_val + delta_val)
+                    result = avg_val + delta_val
+                    result = max(5, min(1439, result))
+                    return int(result)
 
             # Bucket not found - return None to let caller try next source
             logger.debug(f"Duration bucket '{bucket}' not found in task_stats")
@@ -700,7 +704,9 @@ class EnrichmentService:
                 delta = cat_stats.avg_difficulty_delta
                 if avg is not None:
                     delta = delta if delta is not None else 0.0
-                    return round(avg + delta, 2)
+                    result = avg + delta
+                    result = max(0.05, min(1.0, result))
+                    return round(result, 2)
 
             elif field == "duration":
                 if difficulty is None:
@@ -732,7 +738,9 @@ class EnrichmentService:
                         delta_val = delta_bucket if delta_bucket else 0
 
                     if avg_val is not None:
-                        return int(avg_val + delta_val)
+                        result = avg_val + delta_val
+                        result = max(5, min(1439, result))
+                        return int(result)
 
                 # Bucket not found in this category - continue to next category
                 logger.debug(
