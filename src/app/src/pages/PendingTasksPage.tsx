@@ -145,6 +145,7 @@ export default function PendingTasksPage() {
     const [provisionalChanges, setProvisionalChanges] = useState<ProvisionalChange[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [warnings, setWarnings] = useState<{ task_id: string; task_name: string; message: string }[]>([]);
 
     const fetchUnscheduled = async () => {
         setLoading(true);
@@ -193,8 +194,18 @@ export default function PendingTasksPage() {
 
     const handleSchedule = async () => {
         setLoading(true);
+        setWarnings([]);
         try {
-            await api.runScheduler();
+            const result = await api.runScheduler(); console.log(result);
+            const failed = result.results.filter(r => !r.success);
+            if (failed.length > 0) {
+                const nameMap = new Map(unscheduledTasks.map(t => [t.task_id, t.task.name]));
+                setWarnings(failed.map(f => ({
+                    task_id: f.task_id,
+                    task_name: nameMap.get(f.task_id) || f.task_id.slice(0, 8),
+                    message: f.message,
+                })));
+            }
             setActiveView("schedule");
             await fetchProvisionalChanges();
         } catch (err) {
@@ -305,8 +316,24 @@ export default function PendingTasksPage() {
                         </div>
                     </div>
 
-                    <div className="flex-1 p-8">
+                    <div className="flex-1 p-8 relative">
                         {error && <div className="text-red-500 mb-4">{error}</div>}
+                        {warnings.length > 0 && (
+                            <div className="mb-4 p-4 rounded-xl border border-yellow-500/40 bg-yellow-500/10 text-yellow-200 text-sm">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="font-semibold">{warnings.length} task{warnings.length > 1 ? "s" : ""} couldn't be scheduled:</span>
+                                        {warnings.map(w => (
+                                            <div key={w.task_id} className="flex gap-2">
+                                                <span className="font-medium">• {w.task_name}:</span>
+                                                <span>{w.message}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button onClick={() => setWarnings([])} className="text-yellow-300/60 hover:text-yellow-200 shrink-0 text-lg leading-none">&times;</button>
+                                </div>
+                            </div>
+                        )}
                         {activeView === "schedule" ? (
                             <ScheduleChangesView changes={provisionalChanges} loading={loading} onModify={handleProvisionalModify} onDelete={handleProvisionalDelete} />
                         ) : (
