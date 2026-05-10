@@ -14,11 +14,6 @@ function formatDateForAPI(date: Date): string {
     return `${year}-${month}-${day}`;
 }
 
-function extractTime(datetime: string): string {
-    if (!datetime) return "";
-    return datetime.split("T")[1]?.substring(0, 5) || "";
-}
-
 function MainView({ selectedDate, onDateSelect }: { selectedDate: Date; onDateSelect: (date: Date) => void }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [constraints, setConstraints] = useState({ left: 0, right: 0 });
