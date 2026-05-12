@@ -74,7 +74,7 @@ def parse_add_task(
             logger.error("Enrichment returned None")
             raise HTTPException(status_code=500, detail="Enrichment failed")
 
-        logger.debug(f"Enrichment output: name={task_payload.name}, fixed_time={task_payload.fixed_time}, value={task_payload.value}")
+        logger.debug(f"Enrichment output: name={task_payload.name}, fixed_time={task_payload.fixed_time}")
 
         logger.info(f"Parse add complete. Draft ID: {draft_id}")
 
@@ -85,8 +85,8 @@ def parse_add_task(
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Parse add failed: {e}")
-        raise HTTPException(status_code=500, detail="Parse add failed")
+        logger.exception("Parse add failed:")  # This prints full traceback
+        raise HTTPException(status_code=500, detail=f"Parse add failed")
 
 
 @router.post("/parse/modify", response_model=ParseModifyResponse)
@@ -354,7 +354,6 @@ def update_task(
         db.add(unscheduled)
 
         # Clean up any existing provisional slot when re-adding to unscheduled
-        from app.models.schedule import ProvisionalSlot
         existing_slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
         if existing_slot:
             logger.debug(f"Deleting provisional slot for task {id} when re-adding to unscheduled")
