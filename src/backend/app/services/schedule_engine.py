@@ -96,6 +96,10 @@ class ScheduleEngine:
         schedule_batch() - Schedule multiple tasks
     """
     
+    def __init__(self):
+        self._old_start: Optional[datetime] = None
+        self._old_end: Optional[datetime] = None
+    
     # ============================================================================
     # PUBLIC METHODS
     # ============================================================================
@@ -104,6 +108,8 @@ class ScheduleEngine:
         self,
         task: Task,
         db: Session,
+        create_change: bool = True,
+        exclude_ranges: Optional[List[Tuple[datetime, datetime]]] = None,
     ) -> SchedulingResult:
         """
         Schedule a single task into the provisional schedule.
@@ -116,6 +122,8 @@ class ScheduleEngine:
         Args:
             task: Task to schedule
             db: Database session
+            create_change: If False, skip creating ScheduleChange (for rescheduling)
+            exclude_ranges: Optional list of (start, end) tuples to exclude from windows
 
         Returns:
             SchedulingResult with success status and slot info.
@@ -140,9 +148,9 @@ class ScheduleEngine:
 
         try:
             if task.fixed_time:
-                result = self._schedule_fixed_task(task, db)
+                result = self._schedule_fixed_task(task, db, create_change=create_change)
             else:
-                result = self._schedule_flexible_task(task, db)
+                result = self._schedule_flexible_task(task, db, create_change=create_change, exclude_ranges=exclude_ranges)
 
             if not result.success:
                 sp.rollback()  # Restore deleted slot on failure
@@ -258,6 +266,7 @@ class ScheduleEngine:
         self,
         task: Task,
         db: Session,
+        create_change: bool = True,
     ) -> SchedulingResult:
         """Schedule a fixed-time task at its fixed_start."""
         if not task.fixed_start or not task.duration:
@@ -310,8 +319,10 @@ class ScheduleEngine:
             
             existing_task_for_displacement = db.query(Task).filter(Task.id == displaced_id).first()
             if existing_task_for_displacement:
-                reschedule_result = self._try_reschedule_task(existing_task_for_displacement, db, layer=1)
-                
+                # Pass fixed task's time range to exclude when rescheduling
+                exclude_ranges = [(fixed_start, fixed_end)]
+                reschedule_result = self._try_reschedule_task(existing_task_for_displacement, db, layer=1, exclude_ranges=exclude_ranges)
+
                 if not reschedule_result.success:
                     db.rollback()
                     return SchedulingResult(
@@ -322,7 +333,7 @@ class ScheduleEngine:
                         displaced_tasks=[],
                         message=f"Cannot displace {displaced_id}: cannot be rescheduled",
                     )
-                
+
                 new_change = ScheduleChange(
                     provisional_schedule_slot_id=reschedule_result.slot_id,
                     change_type="move",
@@ -336,7 +347,7 @@ class ScheduleEngine:
             else:
                 logger.warning(f"Task {displaced_id} not found for displacement")
 
-        return self._place_task(task, fixed_start, fixed_end, db, displaced_ids)
+        return self._place_task(task, fixed_start, fixed_end, db, displaced_ids, create_change=create_change)
     
     
     # ============================================================================
@@ -347,11 +358,13 @@ class ScheduleEngine:
         self,
         task: Task,
         db: Session,
+        create_change: bool = True,
+        exclude_ranges: Optional[List[Tuple[datetime, datetime]]] = None,
     ) -> SchedulingResult:
         """Schedule a flexible task with full scheduling pipeline."""
         logger.debug(f"Flexible task: {task.name}")
         
-        windows = self._get_time_windows(task, db)
+        windows = self._get_time_windows(task, db, exclude_ranges=exclude_ranges)
         if not windows:
             return SchedulingResult(
                 success=False,
@@ -394,7 +407,7 @@ class ScheduleEngine:
             )
         
         for candidate in top_slots:
-            result = self._handle_displacement(task, candidate.start, candidate.end, db, layer=1)
+            result = self._handle_displacement(task, candidate.start, candidate.end, db, layer=1, create_change=create_change)
             if result.success:
                 logger.info(f"Task scheduled at {candidate.start}")
                 return result
@@ -418,6 +431,7 @@ class ScheduleEngine:
         task: Task,
         db: Session,
         layer: int = 1,
+        exclude_ranges: Optional[List[Tuple[datetime, datetime]]] = None,
     ) -> SchedulingResult:
         """Try to reschedule a displaced task."""
         if layer > MAX_DISPLACEMENT_LAYERS:
@@ -430,8 +444,8 @@ class ScheduleEngine:
                 message=f"Max displacement layers ({MAX_DISPLACEMENT_LAYERS}) exceeded",
             )
 
-        # Use schedule_single() which handles slot deletion before overlap checks
-        return self.schedule_single(task, db)
+        # Rescheduling creates slot but NOT change - the displacer creates the "move" change
+        return self.schedule_single(task, db, create_change=False, exclude_ranges=exclude_ranges)
     
     
     # ============================================================================
@@ -442,8 +456,16 @@ class ScheduleEngine:
         self,
         task: Task,
         db: Session,
+        exclude_ranges: Optional[List[Tuple[datetime, datetime]]] = None,
     ) -> Dict[str, List[TimeWindow]]:
-        """Build viable time windows for task."""
+        """Build viable time windows for task.
+        
+        Args:
+            task: Task to schedule
+            db: Database session
+            exclude_ranges: Optional list of (start, end) datetime tuples to exclude
+                           (used when rescheduling a displaced task to exclude the displacer's slot)
+        """
         windows: Dict[str, List[TimeWindow]] = {}
         
         now = datetime.now()
@@ -472,7 +494,33 @@ class ScheduleEngine:
             windows[date_str] = [TimeWindow(date=date_str, start_dt=start_dt, end_dt=end_dt)]
             current += timedelta(days=1)
         
+        if exclude_ranges:
+            logger.debug(f"Excluding {len(exclude_ranges)} ranges from windows")
+            for excl_start, excl_end in exclude_ranges:
+                logger.debug(f"  Excluding: {excl_start.strftime('%H:%M')}-{excl_end.strftime('%H:%M')}")
+                excl_date_str = excl_start.strftime("%Y-%m-%d")
+                if excl_date_str in windows:
+                    new_windows = []
+                    for window in windows[excl_date_str]:
+                        if excl_start >= window.end_dt or excl_end <= window.start_dt:
+                            new_windows.append(window)
+                        else:
+                            if window.start_dt < excl_start:
+                                new_windows.append(TimeWindow(
+                                    date=excl_date_str,
+                                    start_dt=window.start_dt,
+                                    end_dt=excl_start,
+                                ))
+                            if excl_end < window.end_dt:
+                                new_windows.append(TimeWindow(
+                                    date=excl_date_str,
+                                    start_dt=excl_end,
+                                    end_dt=window.end_dt,
+                                ))
+                    windows[excl_date_str] = new_windows
+        
         windows = self._subtract_fixed_tasks(windows, db)
+        
         windows = self._subtract_dead_zones(windows)
         
         valid_windows = {}
@@ -482,6 +530,9 @@ class ScheduleEngine:
                     if date_str not in valid_windows:
                         valid_windows[date_str] = []
                     valid_windows[date_str].append(w)
+        
+        for ds, ws in valid_windows.items():
+            logger.debug(f"  Date {ds}: {len(ws)} windows")
         
         return valid_windows
     
@@ -818,12 +869,13 @@ class ScheduleEngine:
         slot_end: datetime,
         db: Session,
         layer: int = 1,
+        create_change: bool = True,
     ) -> SchedulingResult:
         """Try to place task in slot, displacing if needed."""
         overlapping = self._get_overlapping_tasks(slot_start, slot_end, db)
         
         if not overlapping:
-            return self._place_task(task, slot_start, slot_end, db, [])
+            return self._place_task(task, slot_start, slot_end, db, [], create_change=create_change)
         
         fixed_tasks = [t for t in overlapping if t.fixed]
         if fixed_tasks:
@@ -860,7 +912,9 @@ class ScheduleEngine:
             
             db.delete(existing)
             
-            reschedule_result = self._try_reschedule_task(displaced_task, db, layer=layer + 1)
+            # Pass the displacer's time range to exclude when rescheduling
+            exclude_ranges = [(slot_start, slot_end)]
+            reschedule_result = self._try_reschedule_task(displaced_task, db, layer=layer + 1, exclude_ranges=exclude_ranges)
             
             if not reschedule_result.success:
                 db.rollback()
@@ -884,7 +938,7 @@ class ScheduleEngine:
             db.add(new_change)
             displaced_ids.append(existing.task_id)
         
-        return self._place_task(task, slot_start, slot_end, db, displaced_ids)
+        return self._place_task(task, slot_start, slot_end, db, displaced_ids, create_change=create_change)
     
     
     def _can_displace(self, new_task: Task, existing: ProvisionalSlot) -> bool:
@@ -902,6 +956,7 @@ class ScheduleEngine:
         slot_end: datetime,
         db: Session,
         displaced_ids: List[UUID],
+        create_change: bool = True,
     ) -> SchedulingResult:
         """Place task in provisional schedule."""
         # Slot already deleted in schedule_single() — just insert
@@ -916,15 +971,16 @@ class ScheduleEngine:
         db.add(slot)
         db.flush()
 
-        change = ScheduleChange(
-            provisional_schedule_slot_id=slot.id,
-            change_type="move" if self._old_start else "insert",
-            old_slot_start=self._old_start,
-            old_slot_end=self._old_end,
-            new_slot_start=slot_start,
-            new_slot_end=slot_end,
-        )
-        db.add(change)
+        if create_change:
+            change = ScheduleChange(
+                provisional_schedule_slot_id=slot.id,
+                change_type="move" if self._old_start else "insert",
+                old_slot_start=self._old_start,
+                old_slot_end=self._old_end,
+                new_slot_start=slot_start,
+                new_slot_end=slot_end,
+            )
+            db.add(change)
         db.commit()
 
         return SchedulingResult(
@@ -949,10 +1005,11 @@ class ScheduleEngine:
         db: Session,
     ) -> List[ProvisionalSlot]:
         """Get all slots that overlap with the given time range."""
-        return db.query(ProvisionalSlot).filter(
+        result = db.query(ProvisionalSlot).filter(
             ProvisionalSlot.start < slot_end,
             ProvisionalSlot.end > slot_start,
         ).all()
+        return result
     
     
     def _round_up_to_interval(self, minutes: int) -> int:
