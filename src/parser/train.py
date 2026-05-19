@@ -232,7 +232,6 @@ def tokenize(train_ds, test_ds, tokenizer):
 
 
 def find_latest_checkpoint(output_dir):
-    """Finds the latest checkpoint folder and returns its path."""
     import re
 
     if not os.path.exists(output_dir):
@@ -346,7 +345,6 @@ def main():
     h, rem = divmod(elapsed, 3600)
     m, s = divmod(rem, 60)
     print(f"\nDone in {h:02d}h {m:02d}m {s:02d}s")
-
 
 if __name__ == "__main__":
     main()
