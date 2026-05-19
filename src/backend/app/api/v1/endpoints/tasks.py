@@ -65,7 +65,7 @@ def parse_add_task(
             logger.error("Task matcher returned None")
             raise HTTPException(status_code=500, detail="Task matcher failed")
 
-        logger.debug(f"Match result: {match_result.model_dump()}")
+        logger.debug(f"Match result: status={match_result.association_status}, id={match_result.associated_id}")
 
         # Step 3: Enrichment
         task_payload, draft_id = enrichment_service.predict_nlp_add(db, nlp_payload, match_result)
@@ -74,7 +74,7 @@ def parse_add_task(
             logger.error("Enrichment returned None")
             raise HTTPException(status_code=500, detail="Enrichment failed")
 
-        logger.debug(f"Enrichment output: {task_payload.model_dump()}")
+        logger.debug(f"Enrichment output: name={task_payload.name}, fixed_time={task_payload.fixed_time}")
 
         logger.info(f"Parse add complete. Draft ID: {draft_id}")
 
@@ -85,8 +85,8 @@ def parse_add_task(
         raise
     except Exception as e:
         db.rollback()
-        logger.error(f"Parse add failed: {e}")
-        raise HTTPException(status_code=500, detail="Parse add failed")
+        logger.exception("Parse add failed:")  # This prints full traceback
+        raise HTTPException(status_code=500, detail=f"Parse add failed")
 
 
 @router.post("/parse/modify", response_model=ParseModifyResponse)
@@ -245,7 +245,7 @@ def create_task(
                     status_code=500,
                     detail="The task matching failed"
                 )
-            logger.info(f"Output from find_match(): {match_result.model_dump()}")
+            logger.info(f"Match result: status={match_result.association_status}, id={match_result.associated_id}")
             enriched = enrichment_service.commit_manual(db, body.task, match_result)
             if not enriched:
                 logger.warning("No output from enrichment")
@@ -253,7 +253,7 @@ def create_task(
                     status_code=500,
                     detail="The enrichment failed for commit_manual"
                 )
-            logger.info(f"Output from commit_manual(): {enriched.model_dump()}")
+            logger.info(f"Committed task: name={enriched.name}, value={enriched.value}")
 
         saved = save_commited_task(db, enriched)
 
@@ -354,7 +354,6 @@ def update_task(
         db.add(unscheduled)
 
         # Clean up any existing provisional slot when re-adding to unscheduled
-        from app.models.schedule import ProvisionalSlot
         existing_slot = db.query(ProvisionalSlot).filter(ProvisionalSlot.task_id == id).first()
         if existing_slot:
             logger.debug(f"Deleting provisional slot for task {id} when re-adding to unscheduled")
