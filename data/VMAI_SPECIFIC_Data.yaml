@@ -887,3 +887,308 @@ examples:
     difficulty: 0.15
     fixed_time: true
     fixed_start: 09:00
+
+# ── Negation edge cases ────────────────────────────────────────────────────────
+- input: not urgent, can wait a while
+  output:
+    name: task
+    importance: 0.15
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    fixed_time: false
+    recurrent: false
+- input: this is not a priority
+  output:
+    name: task
+    importance: 0.1
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    fixed_time: false
+    recurrent: false
+- input: not that important really
+  output:
+    name: task
+    importance: 0.2
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    fixed_time: false
+    recurrent: false
+- input: its not difficult at all
+  output:
+    name: task
+    difficulty: 0.1
+    duration: 30
+    category: personal
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+- input: not super important
+  output:
+    name: task
+    importance: 0.25
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    fixed_time: false
+    recurrent: false
+- input: not urgent matter
+  output:
+    name: task
+    importance: 0.15
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    fixed_time: false
+    recurrent: false
+
+# ── Complex multi-field changes ────────────────────────────────────────────────
+- input: make it harder and move deadline to friday
+  output:
+    difficulty: 0.85
+    deadline: Friday
+- input: change location to home and make it urgent
+  output:
+    location: home
+    importance: 0.9
+- input: set time to 3pm and extend to 90 minutes
+  output:
+    fixed_time: true
+    fixed_start: '15:00'
+    duration: 90
+- input: categorize as fitness and make it easy
+  output:
+    category: fitness
+    difficulty: 0.15
+- input: make it high priority and set at 8am
+  output:
+    importance: 0.9
+    fixed_time: true
+    fixed_start: 08:00
+- input: add location and change duration to 45
+  output:
+    location: home
+    duration: 45
+- input: make it important and add deadline today
+  output:
+    importance: 0.85
+    deadline: today
+- input: set category to work and make it 2 hours
+  output:
+    category: work
+    duration: 120
+
+# ── Relative time changes ─────────────────────────────────────────────────────
+- input: make it 30 minutes longer
+  output:
+    duration: 45
+- input: add an hour to this
+  output:
+    duration: 75
+- input: extend by 45 minutes
+  output:
+    duration: 60
+- input: shorten this by 15 minutes
+  output:
+    duration: 15
+- input: make it take longer
+  output:
+    difficulty: 0.6
+
+# ── Edge case start field ─────────────────────────────────────────────────────
+- input: starts monday at 10am
+  output:
+    name: task
+    start: Monday
+    fixed_time: true
+    fixed_start: '10:00'
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: true
+    recurrent: false
+- input: begins tomorrow morning
+  output:
+    name: task
+    start: tomorrow
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+- input: starting next week at the office
+  output:
+    name: task
+    start: next week
+    location: office
+    duration: 60
+    category: work
+    difficulty: 0.4
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+
+# ── Combined start + deadline ────────────────────────────────────────────────
+- input: start on monday and due friday
+  output:
+    name: task
+    start: Monday
+    deadline: Friday
+    duration: 60
+    category: work
+    difficulty: 0.5
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+- input: begin tomorrow and complete by end of week
+  output:
+    name: task
+    start: tomorrow
+    deadline: this weekend
+    duration: 45
+    category: work
+    difficulty: 0.4
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+
+# ── Implied time-of-day ───────────────────────────────────────────────────────
+- input: morning yoga session
+  output:
+    name: yoga session
+    duration: 45
+    category: fitness
+    difficulty: 0.3
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+- input: afternoon study time
+  output:
+    name: study time
+    duration: 60
+    category: study
+    difficulty: 0.5
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+- input: evening meditation
+  output:
+    name: meditation
+    duration: 15
+    category: health
+    difficulty: 0.1
+    importance: 0.4
+    fixed_time: false
+    recurrent: false
+
+# ── More modify edge cases ────────────────────────────────────────────────────
+- input: remove the start date
+  output:
+    start: null
+- input: clear the location
+  output:
+    location: null
+- input: cancel the location
+  output:
+    location: null
+- input: make it not recurring
+  output:
+    recurrent: false
+    recurrence_days: null
+- input: remove the recurrence
+  output:
+    recurrent: false
+    recurrence_days: null
+- input: add a start date of wednesday
+  output:
+    start: Wednesday
+- input: add a deadline of next week
+  output:
+    deadline: next week
+
+# ── Conversational edge cases ─────────────────────────────────────────────────
+- input: um, i need to do this by friday
+  output:
+    name: do this
+    deadline: Friday
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+- input: oh right, also gotta do this tomorrow
+  output:
+    name: do this
+    deadline: tomorrow
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+- input: yeah so basically need this done by monday
+  output:
+    name: need this
+    deadline: Monday
+    duration: 30
+    category: personal
+    difficulty: 0.3
+    importance: 0.5
+    fixed_time: false
+    recurrent: false
+
+# ── Multi-intent examples ───────────────────────────────────────────────────────
+- input: important work task due friday morning
+  output:
+    name: work task
+    deadline: Friday
+    category: work
+    difficulty: 0.5
+    importance: 0.85
+    duration: 60
+    fixed_time: false
+    recurrent: false
+- input: easy fitness activity in the evening
+  output:
+    name: fitness activity
+    duration: 30
+    category: fitness
+    difficulty: 0.15
+    importance: 0.3
+    fixed_time: false
+    recurrent: false
+- input: urgent finance matter needs attention today
+  output:
+    name: finance matter
+    deadline: today
+    category: finance
+    difficulty: 0.5
+    importance: 0.95
+    duration: 30
+    fixed_time: false
+    recurrent: false
+- input: hard learning session this weekend
+  output:
+    name: learning session
+    start: this weekend
+    duration: 120
+    category: learning
+    difficulty: 0.85
+    importance: 0.6
+    fixed_time: false
+    recurrent: false
+- input: creative hobby time on saturday
+  output:
+    name: hobby time
+    start: Saturday
+    duration: 60
+    category: creative
+    difficulty: 0.3
+    importance: 0.4
+    fixed_time: false
+    recurrent: false

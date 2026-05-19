@@ -209,32 +209,32 @@ uv run pytest tests/test_update_time_score.py
 Generate charts and graphs for data analysis:
 
 ```bash
-# Dataset overview
-python scripts/visualize_dataset.py data/VMAI_REAL_Data.yaml
+# Real dataset (7 plots → scripts/output/real/)
+python scripts/plot_dataset.py --dataset real
 
-# Category comparison
-python scripts/plot_categories.py
+# Specific dataset (7 plots → scripts/output/specific/)
+python scripts/plot_dataset.py --dataset specific
 
-# Real data visualization
-python scripts/plot_real.py
+# Synthetic dataset (8 plots → scripts/output/synthetic/)
+python scripts/plot_synthetic.py
 
 # Training metrics
 python scripts/plot_training.py
 ```
 
-Generated visualizations are saved to `scripts/output/` and can be copied to `assets/` for documentation.
+Generated visualizations are saved to `scripts/output/<dataset>/` and can be copied to `assets/` for documentation.
 
-### Dataset Overview
-
-![Dataset Visualization](assets/dataset_visualization.png)
-
-### Combined Analysis (2x2 Grid)
-
-![Combined Analysis](assets/combined_grid.png)
-
-### Real Data Overview
+### Real Dataset
 
 ![Real Overview](assets/real_overview.png)
+
+### Specific Dataset
+
+![Specific Overview](assets/specific_overview.png)
+
+### Synthetic Dataset
+
+![Synthetic Overview](assets/synthetic_overview.png)
 
 ## Documentation
 

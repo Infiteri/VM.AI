@@ -34,7 +34,7 @@ CATEGORY_KEYWORDS = {
 
 DURATION_KEYWORDS = {"minute", "minutes", "min", "hour", "hours", "hr"}
 
-TIME_KEYWORDS = {"at", "am", "pm", "morning", "afternoon", "evening", "noon", "midnight"}
+TIME_KEYWORDS = {"am", "pm", "morning", "afternoon", "evening", "noon", "midnight"}
 
 RECURRENCE_KEYWORDS = {"every", "daily", "each", "weekday", "weekly", "repeat"}
 
@@ -66,7 +66,11 @@ def detect_explicit_fields(input_text: str) -> set:
         explicit.add("recurrent")
         explicit.add("recurrence_days")
     
-    if any(kw in s for kw in ["tomorrow", "next week", "by", "due", "deadline", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]):
+    if any(kw in s for kw in ["tomorrow", "next week", "due", "deadline", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]):
+        explicit.add("deadline")
+        explicit.add("start")
+    
+    if re.search(r'\bby\s+(tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|next week|today|tonight|the weekend|eod)', s):
         explicit.add("deadline")
         explicit.add("start")
     

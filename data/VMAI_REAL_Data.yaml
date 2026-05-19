@@ -579,3 +579,444 @@ examples:
   output:
     difficulty: 0.9
     importance: 0.85
+
+# ── Balanced category examples (admin, travel, family, learning) ─────────────
+- input: backup all files to the cloud
+  output:
+    name: cloud backup
+    difficulty: 0.3
+    importance: 0.7
+    category: admin
+    duration: 30
+- input: configure the email settings
+  output:
+    name: configure email
+    difficulty: 0.25
+    importance: 0.4
+    category: admin
+    duration: 15
+- input: update all software on the computer
+  output:
+    name: update software
+    difficulty: 0.2
+    importance: 0.5
+    category: admin
+    duration: 45
+- input: clean up and organize the files
+  output:
+    name: organize files
+    difficulty: 0.35
+    importance: 0.35
+    category: admin
+    duration: 60
+- input: change the password for security
+  output:
+    name: change password
+    difficulty: 0.1
+    importance: 0.7
+    category: admin
+    duration: 5
+- input: set up the VPN for remote access
+  output:
+    name: setup VPN
+    difficulty: 0.4
+    importance: 0.6
+    category: admin
+    duration: 20
+- input: book a flight to tokyo
+  output:
+    name: book flight tokyo
+    difficulty: 0.35
+    importance: 0.6
+    category: travel
+    duration: 30
+- input: reserve a hotel room
+  output:
+    name: reserve hotel
+    difficulty: 0.25
+    importance: 0.5
+    category: travel
+    duration: 20
+- input: renew the passport
+  output:
+    name: renew passport
+    difficulty: 0.3
+    importance: 0.7
+    category: travel
+    duration: 15
+- input: apply for the tourist visa
+  output:
+    name: apply visa
+    difficulty: 0.5
+    importance: 0.8
+    category: travel
+    duration: 45
+- input: pack for the business trip
+  output:
+    name: pack for trip
+    difficulty: 0.15
+    importance: 0.6
+    category: travel
+    duration: 30
+- input: arrange airport pickup
+  output:
+    name: airport pickup
+    difficulty: 0.2
+    importance: 0.5
+    category: travel
+    duration: 10
+- input: pick up the kids from soccer practice
+  output:
+    name: pick up kids
+    difficulty: 0.1
+    importance: 0.9
+    category: family
+    duration: 20
+- input: have dinner with family
+  output:
+    name: family dinner
+    difficulty: 0.1
+    importance: 0.6
+    category: family
+    duration: 60
+- input: attend the parent-teacher conference
+  output:
+    name: parent conference
+    difficulty: 0.3
+    importance: 0.8
+    category: family
+    duration: 60
+- input: help with homework
+  output:
+    name: help with homework
+    difficulty: 0.4
+    importance: 0.7
+    category: family
+    duration: 45
+- input: schedule family doctor checkup
+  output:
+    name: family checkup
+    difficulty: 0.2
+    importance: 0.7
+    category: family
+    duration: 15
+- input: learn spanish vocabulary
+  output:
+    name: learn spanish
+    difficulty: 0.5
+    importance: 0.4
+    category: learning
+    duration: 30
+- input: take an online course
+  output:
+    name: online course
+    difficulty: 0.6
+    importance: 0.5
+    category: learning
+    duration: 60
+- input: practice the piano
+  output:
+    name: piano practice
+    difficulty: 0.45
+    importance: 0.4
+    category: learning
+    duration: 45
+- input: read the programming tutorial
+  output:
+    name: read tutorial
+    difficulty: 0.4
+    importance: 0.5
+    category: learning
+    duration: 45
+
+# ── Start field examples ────────────────────────────────────────────────────────
+- input: start the project on monday
+  output:
+    name: start project
+    start: Monday
+    difficulty: 0.5
+    importance: 0.6
+    category: work
+    duration: 60
+- input: begin the task tomorrow
+  output:
+    name: begin task
+    start: tomorrow
+    difficulty: 0.4
+    importance: 0.5
+    category: personal
+    duration: 30
+- input: kick off the meeting next week
+  output:
+    name: kick off meeting
+    start: next week
+    difficulty: 0.3
+    importance: 0.6
+    category: work
+    duration: 45
+- input: plan to start the diet on monday
+  output:
+    name: start diet
+    start: Monday
+    difficulty: 0.6
+    importance: 0.7
+    category: health
+    duration: 15
+- input: commencing the training on friday
+  output:
+    name: start training
+    start: Friday
+    difficulty: 0.5
+    importance: 0.5
+    category: fitness
+    duration: 60
+
+# ── Location-aware examples ────────────────────────────────────────────────────
+- input: study at the library
+  output:
+    name: study
+    difficulty: 0.5
+    importance: 0.6
+    category: study
+    duration: 60
+    location: library
+- input: work from home today
+  output:
+    name: work from home
+    difficulty: 0.3
+    importance: 0.5
+    category: work
+    duration: 480
+    location: home
+- input: meet at the coffee shop
+  output:
+    name: coffee meeting
+    difficulty: 0.1
+    importance: 0.4
+    category: social
+    duration: 45
+    location: coffee shop
+- input: run in the park
+  output:
+    name: run in park
+    difficulty: 0.4
+    importance: 0.4
+    category: fitness
+    duration: 30
+    location: park
+- input: shop at the supermarket
+  output:
+    name: supermarket shopping
+    difficulty: 0.2
+    importance: 0.5
+    category: shopping
+    duration: 45
+    location: supermarket
+- input: swim at the community pool
+  output:
+    name: swim
+    difficulty: 0.5
+    importance: 0.4
+    category: fitness
+    duration: 45
+    location: pool
+
+# ── More complex modify patterns ──────────────────────────────────────────────
+- input: rename it to monthly report review
+  output:
+    name: monthly report review
+- input: change the name to sprint planning
+  output:
+    name: sprint planning
+- input: rename this to client call
+  output:
+    name: client call
+- input: also add a location at the office
+  output:
+    location: office
+- input: set location to home
+  output:
+    location: home
+- input: start it on wednesday instead
+  output:
+    start: Wednesday
+- input: move start to next monday
+  output:
+    start: next Monday
+- input: begin from tomorrow
+  output:
+    start: tomorrow
+- input: also make it urgent
+  output:
+    importance: 0.9
+- input: add priority to this
+  output:
+    importance: 0.7
+- input: remove the deadline
+  output:
+    deadline: null
+- input: cancel the deadline
+  output:
+    deadline: null
+- input: clear the start date
+  output:
+    start: null
+- input: make it longer by 30 minutes
+  output:
+    duration: 75
+- input: extend by an hour
+  output:
+    duration: 90
+- input: shorten by 15 minutes
+  output:
+    duration: 15
+- input: make it 30 min longer
+  output:
+    duration: 45
+
+# ── Negation examples ──────────────────────────────────────────────────────────
+- input: not urgent, can wait
+  output:
+    importance: 0.2
+- input: not a priority
+  output:
+    importance: 0.15
+- input: this is not hard
+  output:
+    difficulty: 0.2
+- input: its not difficult
+  output:
+    difficulty: 0.15
+- input: not that important
+  output:
+    importance: 0.3
+- input: not critical at all
+  output:
+    importance: 0.1
+
+# ── Compound time expressions ─────────────────────────────────────────────────
+- input: finish this in 2 hours
+  output:
+    duration: 120
+- input: do it in 30 minutes
+  output:
+    duration: 30
+- input: within an hour
+  output:
+    duration: 60
+- input: needs to be done in 3 hours
+  output:
+    duration: 180
+- input: by noon today
+  output:
+    deadline: today
+    fixed_time: true
+    fixed_start: '12:00'
+- input: by midnight
+  output:
+    deadline: today
+    fixed_time: true
+    fixed_start: '00:00'
+
+# ── Multi-field add examples ──────────────────────────────────────────────────
+- input: morning standup at 9am from home
+  output:
+    name: standup
+    start: today
+    fixed_time: true
+    fixed_start: 09:00
+    location: home
+    category: work
+    difficulty: 0.1
+    importance: 0.6
+    duration: 15
+- input: important doctor appointment tomorrow at 2pm
+  output:
+    name: doctor appointment
+    start: tomorrow
+    fixed_time: true
+    fixed_start: '14:00'
+    category: health
+    difficulty: 0.2
+    importance: 0.9
+    duration: 60
+- input: hard coding session at the office by friday
+  output:
+    name: coding session
+    deadline: Friday
+    location: office
+    category: work
+    difficulty: 0.85
+    importance: 0.7
+    duration: 120
+- input: easy yoga every morning at 7am
+  output:
+    name: yoga
+    fixed_time: true
+    fixed_start: 07:00
+    category: fitness
+    difficulty: 0.15
+    importance: 0.4
+    duration: 45
+    recurrent: true
+    recurrence_days:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+
+# ── More varied modify patterns ──────────────────────────────────────────────
+- input: change category to fitness
+  output:
+    category: fitness
+- input: mark as personal task
+  output:
+    category: personal
+- input: categorize as study
+  output:
+    category: study
+- input: make it creative work
+  output:
+    category: creative
+- input: set to home category
+  output:
+    category: home
+- input: change to finance related
+  output:
+    category: finance
+- input: add location at gym
+  output:
+    location: gym
+- input: set the place to library
+  output:
+    location: library
+- input: move to coffee shop location
+  output:
+    location: coffee shop
+- input: also schedule it for 4pm
+  output:
+    fixed_time: true
+    fixed_start: '16:00'
+- input: change to evening at 6pm
+  output:
+    fixed_time: true
+    fixed_start: '18:00'
+- input: make it morning at 8am
+  output:
+    fixed_time: true
+    fixed_start: 08:00
+- input: add recurrence on monday
+  output:
+    recurrent: true
+    recurrence_days: Monday
+- input: repeat on wednesday and friday
+  output:
+    recurrent: true
+    recurrence_days: Wednesday,Friday
+- input: add daily recurrence
+  output:
+    recurrent: true
+    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday

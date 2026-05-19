@@ -184,7 +184,7 @@ templates:
 - daily [TASK] at [TIME]
 - '[TASK] every morning'
 - '[TASK] every evening'
-- weekly [TASK] on [RECURRENCE_DAY]
+- weekly [TASK] on [RECURRENCE_DAY]'
 - '[TASK] every [RECURRENCE_DAY] and [RECURRENCE_DAY]'
 - '[TASK] every weekday'
 - '[TASK] every day'
@@ -193,6 +193,76 @@ templates:
 - '[TASK] every [RECURRENCE_DAY] at [LOCATION]'
 - '[CATEGORY] [TASK] every [RECURRENCE_DAY]'
 - '[CATEGORY] [TASK] every [RECURRENCE_DAY] for [DURATION]'
+
+# ── Start field templates ─────────────────────────────────────────────────────
+- start [TASK] on [DATE]
+- begin [TASK] on [DATE]
+- '[TASK] starting [DATE]'
+- '[TASK] begins [DATE]'
+- kick off [TASK] on [DATE]
+- commencing [TASK] on [DATE]
+- '[TASK] from [DATE]'
+- plan to start [TASK] on [DATE]
+- want to begin [TASK] [DATE]
+- will start [TASK] next [DATE]
+- '[TASK] on [DATE], starting then'
+- schedule [TASK] to start on [DATE]
+- '[TASK] begins this [DATE]'
+- '[TASK] starts [DATE]'
+- '[TASK] starting next [DATE]'
+
+# ── Combined fixed_time + deadline templates ────────────────────────────────
+- '[TASK] at [TIME], due [DEADLINE]'
+- '[TASK] by [DEADLINE] at [TIME]'
+- '[TASK] at [TIME] before [DEADLINE]'
+- '[TASK] by [DEADLINE], at [TIME]'
+- '[TASK] scheduled for [TIME] on [DATE], due [DEADLINE]'
+- '[TASK] at [TIME] on [DATE], deadline is [DEADLINE]'
+- need [TASK] done by [DEADLINE] at [TIME]
+- '[TASK] at [TIME] - due [DEADLINE]'
+- '[TASK] by [DEADLINE], should be done by [TIME]'
+- '[TASK] at [LOCATION] at [TIME], due [DEADLINE]'
+- complete [TASK] by [DEADLINE] at [TIME]
+- '[TASK] for [DURATION] at [TIME], due [DEADLINE]'
+
+# ── Morning/Afternoon/Evening time templates ────────────────────────────────
+- '[TASK] in the morning'
+- '[TASK] in the afternoon'
+- '[TASK] in the evening'
+- '[TASK] this morning'
+- '[TASK] this afternoon'
+- '[TASK] this evening'
+- '[TASK] tomorrow morning'
+- '[TASK] tomorrow afternoon'
+- '[TASK] tomorrow evening'
+- '[TASK] on [DATE] morning'
+- '[TASK] on [DATE] afternoon'
+- '[TASK] on [DATE] evening'
+- 'morning [TASK] at [TIME]'
+- 'afternoon [TASK] at [TIME]'
+- 'evening [TASK] at [TIME]'
+- '[TASK] early morning'
+- '[TASK] late afternoon'
+
+# ── Compound time expressions ────────────────────────────────────────────────
+- '[TASK] in 2 hours'
+- '[TASK] in 3 hours'
+- '[TASK] in half an hour'
+- '[TASK] in an hour'
+- '[TASK] by noon'
+- '[TASK] by midnight'
+- '[TASK] by end of day'
+- '[TASK] within [DURATION]'
+- need [TASK] done in [DURATION]
+- finish [TASK] within [DURATION]
+- '[TASK] ASAP'
+
+# ── Multi-field complex templates ─────────────────────────────────────────────
+- '[TASK] for [CATEGORY], [DIFFICULTY], [DURATION], [PRIORITY] priority'
+- '[TASK] at [LOCATION], [DIFFICULTY], [PRIORITY], [DURATION]'
+- '[TASK] by [DEADLINE], [DIFFICULTY], [PRIORITY], [DURATION], at [LOCATION]'
+- '[CATEGORY] [TASK] at [LOCATION] for [DURATION] starting [DATE]'
+- 'urgent [CATEGORY] [TASK] due [DEADLINE] at [TIME]'
 
 # ── Casual/conversational templates ───────────────────────────────────────────
 - 'todo: [TASK]'
@@ -448,6 +518,49 @@ tasks:
 - order pizza delivery
 - get the keys cut
 - buy a phone case
+- pick up the dry cleaning
+- return the rented car
+- drop off the rental
+- renew the driver's license
+- apply for a permit
+- schedule the oil change
+- pick up the prescription
+- buy office supplies
+- ship the return package
+- go to the DMV
+- apply for the parking pass
+- register for the event
+- collect the repair
+- pick up the custom order
+- buy birthday candles
+- get the photos printed
+- submit the warranty claim
+- pick up the tailor
+- return the borrowed item
+- buy craft supplies
+
+# ── Admin tasks ────────────────────────────────────────────────────────────────
+- update the contact list
+- clean up the inbox
+- organize the files
+- back up the computer
+- update the software
+- change the password
+- set up the VPN
+- configure the email
+- update the calendar
+- clear the cache
+- delete old files
+- archive the documents
+- scan the receipts
+- shred sensitive documents
+- update the address book
+- set up automatic replies
+- configure notifications
+- update the signature
+- back up photos
+- sync the devices
+
 # ── Creative/Learning tasks ───────────────────────────────────────────────────
 - practice guitar
 - write the blog post
@@ -495,6 +608,19 @@ deadlines:
 - next month
 - this Friday
 - this weekend
+- starts Monday
+- starts tomorrow
+- starts next week
+- starts today
+- start Monday
+- start tomorrow
+- start next week
+- beginning Monday
+- beginning tomorrow
+- beginning next week
+- Monday morning
+- Monday afternoon
+- Monday evening
 - noon
 - 5pm
 - 6pm
@@ -603,6 +729,29 @@ times:
 - 8pm
 - 9pm
 - 10pm
+- early morning
+- late morning
+- early afternoon
+- late afternoon
+- early evening
+- late evening
+- around noon
+- around 3pm
+- around 5pm
+- around 7pm
+- sunrise
+- sunset
+- dinnertime
+- lunchtime
+- breakfast time
+- 11:00
+- 14:00
+- 15:00
+- 16:00
+- 17:00
+- 18:00
+- 19:00
+- 20:00
 locations:
 - home
 - the office

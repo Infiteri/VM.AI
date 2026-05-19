@@ -220,11 +220,6 @@ class DataGenerator:
             data["input_text"].append(inp)
             data["target_text"].append(tgt)
 
-        for example in self.real_examples:
-            inp, tgt = self._convert_real(example)
-            data["input_text"].append(inp)
-            data["target_text"].append(tgt)
-
         for example in self.specific_examples:
             inp, tgt = self._convert_real(example)
             data["input_text"].append(inp)
@@ -557,8 +552,6 @@ class DataGenerator:
         if time_match:
             schema["fixed_time"]["value"] = True
             schema["fixed_start"]["value"] = normalize_time(time_match.group(0))
-            schema["start"]["value"] = None
-            schema["deadline"]["value"] = None
 
         if any(kw in s for kw in ["every", "daily", "each", "weekday"]):
             schema["recurrent"]["value"] = True
@@ -653,14 +646,7 @@ class DataGenerator:
                     else:
                         schema["deadline"]["value"] = "today"
 
-        for field in [
-            "fixed_time",
-            "fixed_start",
-            "recurrent",
-            "recurrence_days",
-            "deadline",
-            "start",
-        ]:
+        for field in ["fixed_time", "fixed_start", "recurrent", "recurrence_days"]:
             if (
                 schema[field]["value"] is not None
                 and schema[field]["value"] is not False

@@ -33,7 +33,7 @@ ALL_FIELDS = {
 }
 
 TRACKED_FIELDS = [
-    "name", "deadline", "difficulty", "importance",
+    "name", "start", "deadline", "difficulty", "importance",
     "duration", "category", "location",
     "fixed_time", "fixed_start", "recurrent", "recurrence_days",
 ]
@@ -44,7 +44,7 @@ FIELD_MAP = {
     "TASK":       "name",
     "DEADLINE":   "deadline",
     "DATE":       "start",
-    "TIME":       "start",
+    "TIME":       "fixed_start",
     "DURATION":   "duration",
     "LOCATION":   "location",
     "PRIORITY":   "importance",
