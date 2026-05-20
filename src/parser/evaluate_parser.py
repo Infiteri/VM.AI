@@ -1,4 +1,4 @@
-"""
+﻿"""
     VM-AI - Parser Evaluation Script
     Evaluates trained model on test data.
     Computes per-field F1, precision, recall, accuracy, and regression metrics.
@@ -13,6 +13,7 @@ import re
 import sys
 import json
 import time
+from datetime import datetime
 import argparse
 import numpy as np
 import torch
@@ -211,6 +212,12 @@ def evaluate():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     cfg = Config(args.mode)
 
+    evals_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "evals")
+    os.makedirs(evals_dir, exist_ok=True)
+    if not args.output_json:
+        ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
+        args.output_json = os.path.join(evals_dir, f"eval_{ts}.json")
+
     checkpoint = args.checkpoint or cfg.output_dir
     print(f"Loading model from: {checkpoint}")
     if not os.path.exists(checkpoint):
@@ -290,17 +297,17 @@ def evaluate():
     decoded_labels = tokenizer.batch_decode(label_ids, skip_special_tokens=True)
 
     print()
-    print("─" * 60)
+    print("-" * 60)
     print("Accuracy per field (training eval)")
-    print("─" * 60)
+    print("-" * 60)
     orig_metrics = compute_metrics((predictions, label_ids), tokenizer)
     for key, val in orig_metrics.items():
         print(f"  {key}: {val}")
 
     print()
-    print("─" * 60)
+    print("-" * 60)
     print("Detailed metrics")
-    print("─" * 60)
+    print("-" * 60)
 
     pred_values, label_values, valid_mask = _gather_field_values(decoded_preds, decoded_labels)
     all_metrics = {}
@@ -365,11 +372,11 @@ def evaluate():
             print(f"    acc={metrics['accuracy']}  ({metrics['correct']}/{metrics['total']})")
 
     print()
-    print("─" * 60)
+    print("-" * 60)
     print("Summary")
-    print("─" * 60)
+    print("-" * 60)
     print(f"  {'Field':<20} {'Metric':<15} {'Value':<10} {'N':<6}")
-    print(f"  {'─'*18}  {'─'*13}  {'─'*8}  {'─'*4}")
+    print(f"  {'-'*18}  {'-'*13}  {'-'*8}  {'-'*4}")
     for field in TRACKED_FIELDS:
         m = all_metrics.get(field, {})
         ftype = m.get("type", "?")
@@ -395,24 +402,23 @@ def evaluate():
         print(f"  {field:<20} {metric:<15} {str(val):<10} {str(support):<6}")
 
     acc_overall = orig_metrics.get("acc_overall", 0)
-    print(f"  {'─'*18}  {'─'*13}  {'─'*8}  {'─'*4}")
+    print(f"  {'-'*18}  {'-'*13}  {'-'*8}  {'-'*4}")
     print(f"  {'overall':<20} {'acc':<15} {str(acc_overall):<10}")
 
-    if args.output_json:
-        output = {
-            "config": {
-                "mode": args.mode,
-                "seed": args.seed,
-                "test_size": args.test_size,
-                "checkpoint": checkpoint,
-                "num_beams": args.num_beams,
-            },
-            "accuracy": orig_metrics,
-            "detailed": all_metrics,
-        }
-        with open(args.output_json, "w") as f:
-            json.dump(output, f, indent=2)
-        print(f"\nMetrics saved to {args.output_json}")
+    output = {
+        "config": {
+            "mode": args.mode,
+            "seed": args.seed,
+            "test_size": args.test_size,
+            "checkpoint": checkpoint,
+            "num_beams": args.num_beams,
+        },
+        "accuracy": orig_metrics,
+        "detailed": all_metrics,
+    }
+    with open(args.output_json, "w") as f:
+        json.dump(output, f, indent=2)
+    print(f"\nMetrics saved to {args.output_json}")
 
     if args.output_csv:
         import csv

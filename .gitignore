@@ -13,6 +13,7 @@ Thumbs.db
 .qwen/
 **/.qwen/
 src/backend/docs/Past/
+*.zip
 
 # Logs
 logs
