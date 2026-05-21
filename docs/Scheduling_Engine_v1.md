@@ -46,7 +46,7 @@ Unlike global optimization algorithms that reshuffle the entire schedule for mat
 | **1-Layer Displacement** | Tasks can only displace at most 1 other task | Prevents cascade effects |
 | **Value Threshold** | Can't displace unless 25% more valuable | Protects low-value tasks |
 | **12s Timeout** | Hard limit on execution time | Prevents hanging |
-| **All Slots Scored** | Try all viable slots, not just top-15 | Low-value tasks can still get scheduled |
+| **All Slots Scored** | Score all viable slots (TOP_N_CANDIDATES=400) | Low-value tasks can still get scheduled |
 
 ### 1.3 What It Does
 
@@ -469,7 +469,6 @@ penalty = OVERLAP_BASE_PENALTY × number_of_overlapping_tasks
 ```python
 DEAD_ZONES = [
     ("23:00", "06:00"),  # Sleep time
-    ("13:00", "15:00"),  # Lunch/break
 ]
 ```
 
@@ -725,7 +724,7 @@ Remove any windows where end <= start (empty windows).
 - Task start: April 20, 10:00
 - Task deadline: April 21, 20:00
 - Fixed task: April 20, 14:00-15:00
-- Dead zone: 13:00-15:00
+- Dead zone: 23:00-06:00 (overnight)
 
 **Process:**
 
@@ -738,19 +737,19 @@ Remove any windows where end <= start (empty windows).
 3. **Subtract fixed (14:00-15:00):**
    - April 20: 00:00-14:00, 15:00-23:59
 
-4. **Subtract dead zone (13:00-15:00):**
-   - April 20: 00:00-13:00, 15:00-23:59
-   - April 21: 00:00-23:59
+4. **Subtract dead zone (23:00-06:00):**
+   - April 20: 06:00-14:00, 15:00-23:00
+   - April 21: 06:00-23:00
 
 **Output:**
 ```python
 {
     "2026-04-20": [
-        TimeWindow("2026-04-20", "00:00", "13:00"),
-        TimeWindow("2026-04-20", "15:00", "23:59")
+        TimeWindow("2026-04-20", "06:00", "14:00"),
+        TimeWindow("2026-04-20", "15:00", "23:00")
     ],
     "2026-04-21": [
-        TimeWindow("2026-04-21", "00:00", "23:59")
+        TimeWindow("2026-04-21", "06:00", "23:00")
     ]
 }
 ```

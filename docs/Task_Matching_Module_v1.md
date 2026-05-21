@@ -80,9 +80,9 @@ If no exact match:
 
 | Threshold | Result |
 |-----------|--------|
-| `>= 0.92` | `"same"` |
-| `0.65 - 0.91` | `"similar"` |
-| `< 0.65` | `"none"` |
+| `>= 0.90` | `"same"` |
+| `0.60 - 0.89` | `"similar"` |
+| `< 0.60` | `"none"` |
 
 ```python
 def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
@@ -127,9 +127,9 @@ The model always returns exactly three fields:
 
 | Constant | Default Value | Meaning |
 |----------|---------------|---------|
-| `EXACT_THRESHOLD` | `0.92` | `>= 0.92` → `"same"` |
-| `SIMILAR_THRESHOLD` | `0.65` | `0.65–0.91` → `"similar"` |
-| Fallback | `< 0.65` | `"none"` |
+| `EXACT_THRESHOLD` | `0.90` | `>= 0.90` → `"same"` |
+| `SIMILAR_THRESHOLD` | `0.60` | `0.60–0.89` → `"similar"` |
+| Fallback | `< 0.60` | `"none"` |
 
 **Tuning Guidance:**
 - Too high → fails to recognize paraphrases (`"chem hw"` vs `"chemistry homework"`)
@@ -165,12 +165,11 @@ When a new user has zero task history:
 
 ## 10. Implementation Notes
 
-### Environment Thresholds
-Load thresholds from environment variables for easy tuning:
+### Thresholds
+Hardcoded constants for classification:
 ```python
-import os
-EXACT_THRESHOLD = float(os.getenv("EXACT_THRESHOLD", "0.92"))
-SIMILAR_THRESHOLD = float(os.getenv("SIMILAR_THRESHOLD", "0.65"))
+EXACT_THRESHOLD = 0.90
+SIMILAR_THRESHOLD = 0.60
 ```
 
 ### Batch Similarity Optimization
@@ -194,7 +193,7 @@ If `sentence-transformers` fails to initialize, return `association_status: "non
 | **Purpose** | Classify new task name against existing history |
 | **Model** | `paraphrase-MiniLM-L6-v2` (384-dim, off-the-shelf) |
 | **Matching Order** | Exact string → Cosine similarity → Threshold |
-| **Thresholds** | `>= 0.92` = same, `0.65-0.91` = similar, `< 0.65` = none |
+| **Thresholds** | `>= 0.90` = same, `0.60-0.89` = similar, `< 0.60` = none |
 | **Output** | `{ name_vector, associated_id, association_status }` |
 | `associated_id` Type | `tasks_statistics.id` (never `tasks.id`) |
 | **DB Interaction** | Read-only on `tasks_statistics` |

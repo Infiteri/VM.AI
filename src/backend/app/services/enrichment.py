@@ -35,7 +35,6 @@ logger = setup_logging()
 class EnrichmentService:
     """
     Task enrichment service with two-phase execution.
-
     Phase 1 (Predict):  Overwrite -> DateParse -> DraftSave
     Phase 2 (Commit):   DraftLoad/DraftMerge/ChangeMerge -> Compute
 

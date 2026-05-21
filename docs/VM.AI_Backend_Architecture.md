@@ -82,6 +82,9 @@ src/backend/
 │   │   ├── task.py          # TaskPayload, responses
 │   │   ├── schedule.py    # Schedule responses
 │   │   ├── stats.py       # RateRequest/Response
+│   │   ├── enrichment.py # TaskPayloadComputed, refs
+│   │   ├── nlp.py        # NlpAddPayload, NlpPayloadField
+│   │   ├── task_matcher.py # MatchResult
 │   │   └── shared.py     # SuccessResponse
 │   └── services/
 │       ├── task_matcher.py   # MiniLM embeddings
@@ -141,7 +144,7 @@ src/backend/
 
 ### Stage 4: Scheduler
 - Input: Unscheduled tasks (FIFO)
-- Process: Constraint solver → Top-15 → Stable scoring
+- Process: Constraint solver → Score all slots (TOP_N_CANDIDATES=400) → Stable scoring
 - Constraints: 12s timeout, 1-layer displacement, 25% value threshold
 - Output: provisional_schedule + schedule_changes
 

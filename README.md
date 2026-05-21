@@ -21,7 +21,7 @@ VM.AI/
 │   ├── parser/           # NLP parser module (training + inference)
 │   ├── backend/          # FastAPI backend
 │   │   └── tests/      # Backend API tests
-│   └── frontend/         # React frontend (npm run dev)
+│   └── app/              # React frontend (npm run dev)
 ├── models/
 │   └── finetuned_parser/ # Trained T5 model (after training)
 ├── data/                 # Training datasets
@@ -36,7 +36,7 @@ VM.AI/
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.12+
 - Node.js 18+
 - PostgreSQL 15+
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
@@ -118,7 +118,7 @@ The application will be available at: http://localhost:5173
 
 ## Datasets
 
-The model is trained on two datasets:
+The model is trained on three datasets:
 
 ### 1. Synthetic Dataset (VMAI_SYNTHETIC_Data.yaml)
 
@@ -131,6 +131,11 @@ The model is trained on two datasets:
 - Human-written examples
 - More natural language variations
 - Includes both "add" and "modify" task patterns
+
+### 3. Specific Dataset (VMAI_SPECIFIC_Data.yaml)
+
+- Targeted examples for fields the model struggles with
+- Focused on improving weak areas identified during evaluation
 
 Both datasets are human-written (no public datasets used). All data follows the pipe-format schema with EXP/PRD tags:
 
@@ -185,8 +190,13 @@ python tests/test_generator.py
 python tests/test_add.py
 python tests/test_modify.py
 
-# Regression testing
-python tests/test_chat_suite.py
+# Schema conversion
+python tests/test_schemas.py
+
+# Dataset validation
+python tests/test_validate_dataset.py
+python tests/test_data_no_duplicates.py
+python tests/test_explicit_fields.py
 ```
 
 ### Backend API Tests (src/backend)
@@ -219,7 +229,7 @@ python scripts/plot_dataset.py --dataset specific
 python scripts/plot_synthetic.py
 
 # Training metrics
-python scripts/plot_training.py
+python scripts/report.py
 ```
 
 Generated visualizations are saved to `scripts/output/<dataset>/` and can be copied to `assets/` for documentation.
@@ -241,11 +251,12 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 Detailed documentation is available in the `docs/` folder:
 
 | Document | Description |
-|---|---|
+|---|---|---|
 | Full_Project_Overview.md | Full project overview and architecture |
 | VM.AI_Backend_Architecture.md | Backend architecture details |
 | Frontend_API_Documentation.md | Frontend API documentation |
 | Database_Schema_Documentation.md | Database schema reference |
+| Parser.md | NLP parser module documentation |
 | Task_Matching_Module_v1.md | Task matching module |
 | Scheduling_Engine_v1.md | Scheduling engine documentation |
 | Enrichment_module_v1.md | Data enrichment module |
@@ -255,7 +266,7 @@ Detailed documentation is available in the `docs/` folder:
 
 Key dependencies:
 
-- Python: 3.10+
+- Python: 3.12+
 - PyTorch: Latest (CUDA recommended for training)
 - transformers: Latest (HuggingFace)
 - datasets: Latest
