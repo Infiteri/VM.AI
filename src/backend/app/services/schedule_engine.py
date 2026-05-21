@@ -363,8 +363,12 @@ class ScheduleEngine:
     ) -> SchedulingResult:
         """Schedule a flexible task with full scheduling pipeline."""
         logger.debug(f"Flexible task: {task.name}")
-        
-        windows = self._get_time_windows(task, db, exclude_ranges=exclude_ranges)
+
+        # Pre-fetch all provisional slots once for in-memory scoring
+        all_slots = db.query(ProvisionalSlot).all()
+        fixed_slots = [s for s in all_slots if s.fixed]
+
+        windows = self._get_time_windows(task, db, exclude_ranges=exclude_ranges, fixed_slots=fixed_slots)
         if not windows:
             return SchedulingResult(
                 success=False,
@@ -386,11 +390,13 @@ class ScheduleEngine:
                 displaced_tasks=[],
                 message="No viable slots after generation",
             )
-        
+
+        stats_cache = self._prefetch_scoring_data(task, db)
+
         scored_slots = []
         for slot_start in slots:
             slot_end = self._calculate_end(slot_start, duration)
-            score = self._score_slot(slot_start, slot_end, task, db)
+            score = self._score_slot(slot_start, slot_end, task, all_slots, stats_cache)
             scored_slots.append(CandidateSlot(slot_start, slot_end, score))
         
         scored_slots.sort(key=lambda s: s.score, reverse=True)
@@ -457,6 +463,7 @@ class ScheduleEngine:
         task: Task,
         db: Session,
         exclude_ranges: Optional[List[Tuple[datetime, datetime]]] = None,
+        fixed_slots: Optional[List[ProvisionalSlot]] = None,
     ) -> Dict[str, List[TimeWindow]]:
         """Build viable time windows for task.
         
@@ -464,7 +471,7 @@ class ScheduleEngine:
             task: Task to schedule
             db: Database session
             exclude_ranges: Optional list of (start, end) datetime tuples to exclude
-                           (used when rescheduling a displaced task to exclude the displacer's slot)
+            fixed_slots: Optional pre-fetched list of fixed ProvisionalSlots
         """
         windows: Dict[str, List[TimeWindow]] = {}
         
@@ -519,7 +526,7 @@ class ScheduleEngine:
                                 ))
                     windows[excl_date_str] = new_windows
         
-        windows = self._subtract_fixed_tasks(windows, db)
+        windows = self._subtract_fixed_tasks(windows, db, fixed_slots=fixed_slots)
         
         windows = self._subtract_dead_zones(windows)
         
@@ -541,9 +548,13 @@ class ScheduleEngine:
         self,
         windows: Dict[str, List[TimeWindow]],
         db: Session,
+        fixed_slots: Optional[List[ProvisionalSlot]] = None,
     ) -> Dict[str, List[TimeWindow]]:
         """Subtract slots occupied by fixed tasks."""
-        fixed_tasks = db.query(ProvisionalSlot).filter(ProvisionalSlot.fixed == True).all()
+        if fixed_slots is not None:
+            fixed_tasks = fixed_slots
+        else:
+            fixed_tasks = db.query(ProvisionalSlot).filter(ProvisionalSlot.fixed == True).all()
 
         for slot in fixed_tasks:
             date_str = slot.start.strftime("%Y-%m-%d")
@@ -675,18 +686,19 @@ class ScheduleEngine:
         slot_start: datetime,
         slot_end: datetime,
         task: Task,
-        db: Session,
+        all_slots: List[ProvisionalSlot],
+        stats_cache: dict,
     ) -> float:
-        """Calculate total score for a slot."""
+        """Calculate total score for a slot (no DB queries)."""
         score = BASE_SLOT_SCORE
-        
-        score += self._get_location_boost(slot_start, task, db)
-        score += self._get_free_slot_boost(slot_start, slot_end, db)
-        score += self._get_time_score_boost(slot_start, task, db)
+
+        score += self._get_location_boost(slot_start, task, all_slots)
+        score += self._get_free_slot_boost(slot_start, slot_end, all_slots)
+        score += self._get_time_score_boost(slot_start, stats_cache)
         score += self._get_urgency_boost(slot_start, task)
-        score += self._get_continuity_boost(slot_start, db)
-        score -= self._get_overlap_penalty(slot_start, slot_end, db)
-        
+        score += self._get_continuity_boost(slot_start, all_slots)
+        score -= self._get_overlap_penalty(slot_start, slot_end, all_slots)
+
         return score
     
     
@@ -694,32 +706,33 @@ class ScheduleEngine:
         self,
         slot_start: datetime,
         task: Task,
-        db: Session,
+        all_slots: List[ProvisionalSlot],
     ) -> float:
-        """Calculate location continuity boost."""
+        """Calculate location continuity boost (in-memory)."""
         if not task.location:
             return 0.0
-        
+
         task_location = task.location.name
-        
-        before = db.query(ProvisionalSlot).filter(
-            ProvisionalSlot.end <= slot_start,
-            ProvisionalSlot.end > slot_start - timedelta(hours=2),
-        ).order_by(ProvisionalSlot.end.desc()).first()
-        
-        after = db.query(ProvisionalSlot).filter(
-            ProvisionalSlot.start >= slot_start,
-            ProvisionalSlot.start < slot_start + timedelta(hours=2),
-        ).order_by(ProvisionalSlot.start).first()
-        
+
+        before = None
+        after = None
+
+        for s in all_slots:
+            if s.end <= slot_start and s.end > slot_start - timedelta(hours=2):
+                if before is None or s.end > before.end:
+                    before = s
+            if s.start >= slot_start and s.start < slot_start + timedelta(hours=2):
+                if after is None or s.start < after.start:
+                    after = s
+
         continuity_count = 0
-        
+
         if before and before.location == task_location:
             continuity_count += 0.5
-        
+
         if after and after.location == task_location:
             continuity_count += 0.5
-        
+
         return LOCATION_BASE_BOOST * continuity_count
     
     
@@ -727,60 +740,44 @@ class ScheduleEngine:
         self,
         slot_start: datetime,
         slot_end: datetime,
-        db: Session,
+        all_slots: List[ProvisionalSlot],
     ) -> float:
-        """Calculate free slot boost."""
-        overlapping = self._get_overlapping_tasks(slot_start, slot_end, db)
-        
+        """Calculate free slot boost (in-memory)."""
+        overlapping = self._filter_overlapping(slot_start, slot_end, all_slots)
+
         if not overlapping:
             return FREE_SLOT_BOOST
-        
+
         return 0.0
     
     
     def _get_time_score_boost(
         self,
         slot_start: datetime,
-        task: Task,
-        db: Session,
+        stats_cache: dict,
     ) -> float:
-        """Calculate time preference score boost."""
+        """Calculate time preference score boost (using cached stats)."""
         time_key = slot_start.strftime("%H:%M")
-        
-        if task.task_statistics_id:
-            stats = db.query(TaskStatistics).filter(
-                TaskStatistics.id == task.task_statistics_id
-            ).first()
-            if stats and stats.task_time_scores and stats.records > 3:
-                if time_key in stats.task_time_scores:
-                    score = stats.task_time_scores[time_key]
-                    return TIME_SCORE_AMPLIFIER * (score / 10)
-        
-        if task.associated_task_statistics_id:
-            stats = db.query(TaskStatistics).filter(
-                TaskStatistics.id == task.associated_task_statistics_id
-            ).first()
-            if stats and stats.task_time_scores and stats.records > 3:
-                if time_key in stats.task_time_scores:
-                    score = stats.task_time_scores[time_key]
-                    return TIME_SCORE_AMPLIFIER * (score / 10)
-        
-        task_cats = (
-            db.query(TaskCategory)
-            .filter(TaskCategory.task_id == task.id)
-            .order_by(TaskCategory.priority)
-            .all()
-        )
-        
-        for tc in task_cats:
-            cat_stats = db.query(CategoryStatistics).filter(
-                CategoryStatistics.category_id == tc.category_id
-            ).first()
+
+        task_stats = stats_cache.get("task_stats")
+        if task_stats and task_stats.task_time_scores and task_stats.records > 3:
+            if time_key in task_stats.task_time_scores:
+                score = task_stats.task_time_scores[time_key]
+                return TIME_SCORE_AMPLIFIER * (score / 10)
+
+        assoc_stats = stats_cache.get("assoc_stats")
+        if assoc_stats and assoc_stats.task_time_scores and assoc_stats.records > 3:
+            if time_key in assoc_stats.task_time_scores:
+                score = assoc_stats.task_time_scores[time_key]
+                return TIME_SCORE_AMPLIFIER * (score / 10)
+
+        for tc in stats_cache.get("task_cats", []):
+            cat_stats = stats_cache.get("cat_stats", {}).get(tc.category_id)
             if cat_stats and cat_stats.category_time_scores:
                 if time_key in cat_stats.category_time_scores:
                     score = cat_stats.category_time_scores[time_key]
                     return TIME_SCORE_AMPLIFIER * (score / 10)
-        
+
         return 0.0
     
     
@@ -813,24 +810,26 @@ class ScheduleEngine:
     def _get_continuity_boost(
         self,
         slot_start: datetime,
-        db: Session,
+        all_slots: List[ProvisionalSlot],
     ) -> float:
-        """Calculate proximity boost to previous task."""
+        """Calculate proximity boost to previous task (in-memory)."""
         if slot_start.tzinfo:
             slot_start = slot_start.replace(tzinfo=None)
-        
-        prev_task = db.query(ProvisionalSlot).filter(
-            ProvisionalSlot.end <= slot_start,
-        ).order_by(ProvisionalSlot.end.desc()).first()
-        
+
+        prev_task = None
+        for s in all_slots:
+            if s.end <= slot_start:
+                if prev_task is None or s.end > prev_task.end:
+                    prev_task = s
+
         if not prev_task:
             return 0.0
-        
+
         prev_end = prev_task.end.replace(tzinfo=None) if prev_task.end.tzinfo else prev_task.end
         minutes_diff = (slot_start - prev_end).total_seconds() / 60
-        
+
         slots_diff = round(minutes_diff / SLOT_INTERVAL_MINUTES)
-        
+
         if slots_diff <= 0:
             return 0.0
         elif slots_diff == 1:
@@ -847,14 +846,14 @@ class ScheduleEngine:
         self,
         slot_start: datetime,
         slot_end: datetime,
-        db: Session,
+        all_slots: List[ProvisionalSlot],
     ) -> float:
-        """Calculate overlap penalty."""
-        overlapping = self._get_overlapping_tasks(slot_start, slot_end, db)
-        
+        """Calculate overlap penalty (in-memory)."""
+        overlapping = self._filter_overlapping(slot_start, slot_end, all_slots)
+
         if not overlapping:
             return 0.0
-        
+
         return OVERLAP_BASE_PENALTY * len(overlapping)
     
     
@@ -1010,6 +1009,60 @@ class ScheduleEngine:
             ProvisionalSlot.end > slot_start,
         ).all()
         return result
+
+
+    @staticmethod
+    def _filter_overlapping(
+        slot_start: datetime,
+        slot_end: datetime,
+        slots: List[ProvisionalSlot],
+    ) -> List[ProvisionalSlot]:
+        """Filter pre-fetched slots overlapping with the given time range (in-memory)."""
+        return [
+            s for s in slots
+            if s.start < slot_end and s.end > slot_start
+        ]
+
+
+    def _prefetch_scoring_data(
+        self,
+        task: Task,
+        db: Session,
+    ) -> dict:
+        """Pre-fetch task statistics and category stats for scoring (one-time per task)."""
+        cache = {
+            "task_stats": None,
+            "assoc_stats": None,
+            "task_cats": [],
+            "cat_stats": {},
+        }
+
+        if task.task_statistics_id:
+            cache["task_stats"] = db.query(TaskStatistics).filter(
+                TaskStatistics.id == task.task_statistics_id
+            ).first()
+
+        if task.associated_task_statistics_id:
+            cache["assoc_stats"] = db.query(TaskStatistics).filter(
+                TaskStatistics.id == task.associated_task_statistics_id
+            ).first()
+
+        task_cats = (
+            db.query(TaskCategory)
+            .filter(TaskCategory.task_id == task.id)
+            .order_by(TaskCategory.priority)
+            .all()
+        )
+        cache["task_cats"] = task_cats
+
+        for tc in task_cats:
+            cat_stats = db.query(CategoryStatistics).filter(
+                CategoryStatistics.category_id == tc.category_id
+            ).first()
+            if cat_stats:
+                cache["cat_stats"][tc.category_id] = cat_stats
+
+        return cache
     
     
     def _round_up_to_interval(self, minutes: int) -> int:
