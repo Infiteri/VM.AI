@@ -1,0 +1,503 @@
+text,difficulty,importance
+extreme,0.95,0.8
+urgent,0.6,0.95
+critical,0.8,0.98
+easy,0.1,0.2
+simple,0.15,0.25
+routine,0.2,0.3
+moderate,0.45,0.5
+intense,0.9,0.75
+challenging,0.75,0.7
+minor,0.1,0.15
+easy stretch,0.15,0.3
+hard workout,0.8,0.65
+quick email,0.1,0.4
+urgent fix,0.5,0.9
+simple cleanup,0.1,0.2
+complex analysis,0.85,0.8
+light jog,0.2,0.35
+heavy lifting,0.85,0.6
+tough deadline,0.7,0.9
+basic review,0.2,0.4
+not that difficult,0.2,0.4
+not urgent at all,0.3,0.1
+not important right now,0.2,0.1
+doesnt need much effort,0.15,0.25
+no rush on this,0.2,0.15
+not a priority,0.25,0.1
+nothing too complicated,0.2,0.3
+not really hard,0.25,0.35
+wont take much time,0.15,0.3
+not critical but should do,0.3,0.4
+urgent but pretty simple fix,0.2,0.9
+hard but not really important,0.75,0.25
+easy task but super important,0.15,0.9
+complex but low priority,0.8,0.2
+simple but time sensitive,0.15,0.85
+tough workout but optional,0.8,0.3
+quick task but really matters,0.1,0.85
+intense but not necessary,0.85,0.2
+light effort but high stakes,0.2,0.9
+moderate difficulty but critical deadline,0.5,0.95
+hard homework assignment,0.6,0.75
+hard gym workout,0.85,0.6
+hard conversation with boss,0.7,0.85
+hard math problem,0.8,0.7
+hard deadline to meet,0.5,0.9
+easy walk in park,0.1,0.2
+easy email to send,0.05,0.3
+easy stretch routine,0.15,0.35
+easy recipe to follow,0.2,0.25
+easy fix for bug,0.15,0.6
+need to finish the quarterly report by friday,0.7,0.85
+just a quick water break,0.05,0.3
+prepare a detailed presentation for the board meeting,0.8,0.95
+organize my desk a bit,0.15,0.2
+debug the production server issue ASAP,0.75,0.98
+take a short walk to clear my head,0.1,0.4
+study for the final exam next week,0.7,0.9
+reply to that one slack message,0.05,0.25
+plan the entire vacation itinerary,0.6,0.7
+do a quick stretch before bed,0.1,0.35
+intense workout session,0.9,0.7
+grueling marathon training,0.95,0.65
+demanding project deadline,0.8,0.85
+strenuous physical task,0.85,0.5
+arduous research paper,0.8,0.75
+quick email reply,0.1,0.3
+simple file organization,0.15,0.2
+breeze of a task,0.05,0.15
+straightforward data entry,0.2,0.3
+effortless morning routine,0.1,0.25
+moderate study session,0.5,0.6
+average complexity task,0.45,0.5
+standard weekly review,0.4,0.55
+decent amount of work,0.5,0.5
+fairly regular assignment,0.45,0.45
+critical system backup,0.4,0.95
+minor cleanup task,0.1,0.15
+nice to have feature,0.3,0.25
+must do today or else,0.6,0.98
+can wait till next week,0.3,0.15
+life or death situation,0.7,1.0
+would be good to tackle,0.4,0.5
+absolutely cannot skip this,0.5,0.95
+low priority housework,0.2,0.2
+top of the list,0.55,0.9
+super easy stuff,0.1,0.2
+pretty tough one,0.7,0.65
+kinda important,0.4,0.6
+meh not a big deal,0.15,0.1
+gotta get this done now,0.5,0.9
+no biggie just a quick thing,0.1,0.15
+this ones a beast,0.9,0.7
+piece of cake,0.05,0.2
+pretty mid level effort,0.45,0.5
+kinda urgent ngl,0.4,0.8
+I really need to finish this report before the meeting tomorrow,0.65,0.9
+just going to take a quick five minute walk outside,0.05,0.3
+this project is going to take a lot of focus and energy,0.85,0.8
+need to send a quick thank you email to the team,0.05,0.4
+have to study for three hours before the exam on monday,0.7,0.95
+just organizing my files nothing too serious,0.15,0.2
+this is the most important thing on my plate right now,0.6,0.98
+going to do some light stretching before going to bed,0.1,0.35
+need to figure out why the server keeps crashing,0.8,0.9
+was thinking of doing a quick grocery run later,0.15,0.5
+this assignment is going to require a lot of research and writing,0.8,0.75
+just need to water the plants real quick,0.05,0.2
+I should probably start preparing for the presentation next week,0.6,0.8
+going to do a quick meditation session to clear my head,0.05,0.45
+need to completely restructure the database schema,0.9,0.85
+just folding some laundry while watching tv,0.1,0.15
+this is a really complex problem that needs careful thought,0.85,0.75
+should probably reply to that message from my boss,0.15,0.7
+going to spend the afternoon building a new feature from scratch,0.75,0.7
+just a quick tidy up of the living room,0.15,0.25
+I have to prepare a full budget proposal by end of week,0.75,0.9
+going to take a slow easy bike ride around the neighborhood,0.2,0.3
+this is a pretty straightforward task shouldnt take long,0.2,0.4
+need to have a difficult conversation with my manager about workload,0.7,0.85
+just going to review some notes before the quiz,0.25,0.6
+this workout is going to push me to my limits,0.95,0.65
+I should probably schedule that dentist appointment soon,0.1,0.65
+need to write a detailed technical document for the new api,0.7,0.8
+just going to make a quick cup of tea and relax,0.05,0.2
+this is going to be a long and exhausting day of work,0.8,0.85
+I really should start meal prepping for the week,0.4,0.6
+need to completely redesign the landing page from scratch,0.75,0.8
+just going to do a quick ten minute yoga flow,0.15,0.35
+this is absolutely critical and needs to be done today no matter what,0.6,1.0
+was planning to just read a bit before sleeping,0.05,0.2
+need to debug a really tricky race condition in the codebase,0.9,0.85
+going to take out the trash and do a quick sweep of the kitchen,0.15,0.3
+this presentation needs to be perfect for the investors,0.7,0.95
+just going to jot down some ideas in my notebook,0.1,0.25
+I have to prepare a full legal contract by tomorrow morning,0.85,0.95
+going to do a light warmup before the actual training session,0.2,0.4
+this is not that hard but I should still get it done soon,0.3,0.6
+need to completely overhaul the authentication system,0.9,0.9
+just going to check my emails and respond to anything urgent,0.15,0.5
+this is going to be a really intense coding session,0.8,0.75
+I should probably start packing for the trip this weekend,0.25,0.6
+need to write a comprehensive test suite for the new module,0.65,0.8
+just going to do some light reading while having coffee,0.05,0.15
+this is a massive undertaking and I dont know where to start,0.95,0.8
+going to quickly update the dependencies and run the tests,0.2,0.5
+emergency server migration that must happen tonight,0.95,0.98
+prepare for the final exam that determines my entire grade,0.85,0.95
+perform emergency surgery on a critical patient,0.98,1.0
+negotiate a multi million dollar contract with a hostile client,0.9,0.95
+fix a security breach that exposed user data,0.9,0.98
+climb the most difficult route on the mountain before sunset,0.95,0.85
+defend my thesis in front of a panel of experts,0.85,0.9
+handle a PR crisis that is going viral on social media,0.8,0.95
+complete an ironman triathlon with an injury,0.98,0.8
+rebuild the entire payment system before the holiday sale,0.9,0.95
+perform a complex dental surgery on a nervous patient,0.9,0.9
+lead a high stakes hostage negotiation,0.95,1.0
+write and defend a patent application against legal challenges,0.85,0.9
+complete a dangerous rescue mission in a storm,0.95,0.95
+migrate the entire company infrastructure to a new cloud provider in one weekend,0.9,0.9
+pass the bar exam after failing twice before,0.85,0.95
+perform live brain surgery on a high profile patient,1.0,1.0
+launch a product that the entire company depends on,0.8,0.95
+run an ultramarathon in extreme heat conditions,0.95,0.75
+audit the entire financial system before the regulatory deadline,0.85,0.9
+handle a major data breach while the press is waiting outside,0.85,0.98
+complete a black belt exam after years of training,0.9,0.85
+deliver a keynote speech to thousands of people in a second language,0.8,0.9
+fix a critical bug in production that is costing thousands per minute,0.85,0.95
+complete a grueling special forces selection course,0.98,0.9
+write the weekly status report,0.4,0.7
+fix the critical server crash immediately,0.95,0.99
+reply to the internal slack message,0.1,0.2
+prepare the quarterly presentation,0.75,0.85
+attend the daily standup meeting,0.1,0.6
+debug the login page issue,0.6,0.75
+send the invoice to the client,0.2,0.85
+update the project documentation,0.35,0.5
+review the pull request,0.5,0.7
+plan the sprint for next week,0.6,0.8
+pay the rent,0.1,0.95
+review the investment portfolio,0.6,0.8
+cancel the unused subscription,0.2,0.4
+file the annual taxes,0.8,0.95
+pay the electricity bill,0.1,0.85
+transfer money to savings,0.1,0.7
+check the credit card balance,0.1,0.45
+take daily vitamins,0.05,0.5
+schedule the dentist appointment,0.2,0.7
+do a intense HIIT workout,0.85,0.6
+meditate for ten minutes,0.15,0.4
+pick up the prescription,0.1,0.85
+go for a light jog,0.3,0.4
+do a heavy leg day at the gym,0.9,0.5
+stretch after working out,0.1,0.3
+study for the final exam,0.85,0.95
+read the textbook chapter,0.5,0.6
+review flashcards for spanish,0.2,0.4
+write the thesis proposal,0.9,0.9
+submit the assignment,0.4,0.85
+practice the piano for an hour,0.4,0.35
+cook dinner,0.4,0.6
+clean the bathroom,0.5,0.5
+water the indoor plants,0.05,0.3
+do the laundry,0.2,0.6
+take out the trash,0.05,0.5
+fix the leaking kitchen tap,0.55,0.75
+write a blog post,0.5,0.4
+paint a landscape,0.4,0.3
+edit the youtube video,0.7,0.6
+record a podcast episode,0.55,0.5
+sketch a quick design,0.3,0.35
+call mom,0.1,0.6
+meet friends for coffee,0.1,0.4
+plan the family vacation,0.4,0.7
+pick up kids from school,0.1,0.9
+go for a walk in the park,0.1,0.3
+read a novel for pleasure,0.15,0.25
+buy groceries at the supermarket,0.15,0.6
+send the package via post office,0.15,0.5
+return the shoes to the store,0.2,0.4
+backup the hard drive to the cloud,0.3,0.6
+organize the email inbox,0.25,0.35
+book a flight to paris,0.3,0.7
+team meeting at 3pm,0.1,0.75
+gym session at 6am,0.6,0.5
+dentist at 10:30am,0.2,0.85
+lunch with the team at noon,0.1,0.4
+take medication every morning,0.05,0.95
+daily standup every weekday,0.1,0.7
+go to the gym every monday and thursday,0.6,0.5
+make it harder,0.85,0.6
+make it easier,0.2,0.6
+its actually very complex,0.9,0.6
+just a quick reply,0.1,0.6
+make it urgent,0.4,0.95
+low priority,0.4,0.2
+critical for the project,0.4,0.99
+"not urgent, can wait",0.4,0.3
+make it 1 hour,0.4,0.6
+shorten to 30 minutes,0.4,0.6
+make it 2 hours,0.4,0.6
+just 5 minutes,0.4,0.6
+categorize it as fitness,0.4,0.6
+actually its finance,0.4,0.6
+make it a health task,0.4,0.6
+this is a work task,0.4,0.6
+move to 7am,0.4,0.6
+move to 3pm,0.4,0.6
+reschedule to 2pm,0.4,0.6
+move to 9:30am,0.4,0.6
+change to 7pm,0.4,0.6
+cancel fixed time,0.4,0.6
+make it flexible,0.4,0.6
+push deadline to next monday,0.4,0.6
+extend to next week,0.4,0.6
+do it at the library instead,0.4,0.6
+working from home today,0.4,0.6
+meeting at the coffee shop instead,0.4,0.6
+do it at home,0.4,0.6
+do it at the restaurant on main street,0.4,0.6
+take it remotely,0.4,0.6
+change it to the park,0.4,0.6
+its urgent and will take 3 hours,0.4,0.95
+do it at the library for 2 hours,0.4,0.6
+light 30 min session at home,0.2,0.6
+"very important, due tomorrow",0.4,0.95
+move to 2pm and cut to 30 min,0.4,0.6
+30 minutes and its very important today,0.4,0.82
+"actually this is a hard competition prep session, very important",0.9,0.85
+backup all files to the cloud,0.3,0.7
+configure the email settings,0.25,0.4
+update all software on the computer,0.2,0.5
+clean up and organize the files,0.35,0.35
+change the password for security,0.1,0.7
+set up the VPN for remote access,0.4,0.6
+book a flight to tokyo,0.35,0.6
+reserve a hotel room,0.25,0.5
+renew the passport,0.3,0.7
+apply for the tourist visa,0.5,0.8
+pack for the business trip,0.15,0.6
+arrange airport pickup,0.2,0.5
+pick up the kids from soccer practice,0.1,0.9
+have dinner with family,0.1,0.6
+attend the parent-teacher conference,0.3,0.8
+help with homework,0.4,0.7
+schedule family doctor checkup,0.2,0.7
+learn spanish vocabulary,0.5,0.4
+take an online course,0.6,0.5
+practice the piano,0.45,0.4
+read the programming tutorial,0.4,0.5
+start the project on monday,0.5,0.6
+begin the task tomorrow,0.4,0.5
+kick off the meeting next week,0.3,0.6
+plan to start the diet on monday,0.6,0.7
+commencing the training on friday,0.5,0.5
+study at the library,0.5,0.6
+work from home today,0.3,0.5
+meet at the coffee shop,0.1,0.4
+run in the park,0.4,0.4
+shop at the supermarket,0.2,0.5
+swim at the community pool,0.5,0.4
+rename it to monthly report review,0.4,0.6
+change the name to sprint planning,0.4,0.6
+rename this to client call,0.4,0.6
+also add a location at the office,0.4,0.6
+set location to home,0.4,0.6
+start it on wednesday instead,0.4,0.6
+move start to next monday,0.4,0.6
+begin from tomorrow,0.4,0.6
+also make it urgent,0.4,0.9
+add priority to this,0.4,0.7
+remove the deadline,0.4,0.6
+cancel the deadline,0.4,0.6
+clear the start date,0.4,0.6
+make it longer by 30 minutes,0.4,0.6
+extend by an hour,0.4,0.6
+shorten by 15 minutes,0.4,0.6
+make it 30 min longer,0.4,0.6
+not a priority,0.4,0.15
+this is not hard,0.2,0.6
+its not difficult,0.15,0.6
+not that important,0.4,0.3
+not critical at all,0.4,0.1
+finish this in 2 hours,0.4,0.6
+do it in 30 minutes,0.4,0.6
+within an hour,0.4,0.6
+needs to be done in 3 hours,0.4,0.6
+by noon today,0.4,0.6
+by midnight,0.4,0.6
+morning standup at 9am from home,0.1,0.6
+important doctor appointment tomorrow at 2pm,0.2,0.9
+hard coding session at the office by friday,0.85,0.7
+easy yoga every morning at 7am,0.15,0.4
+change category to fitness,0.4,0.6
+mark as personal task,0.4,0.6
+categorize as study,0.4,0.6
+make it creative work,0.4,0.6
+set to home category,0.4,0.6
+change to finance related,0.4,0.6
+add location at gym,0.4,0.6
+set the place to library,0.4,0.6
+move to coffee shop location,0.4,0.6
+also schedule it for 4pm,0.4,0.6
+change to evening at 6pm,0.4,0.6
+make it morning at 8am,0.4,0.6
+add recurrence on monday,0.4,0.6
+repeat on wednesday and friday,0.4,0.6
+add daily recurrence,0.4,0.6
+gym at 6am,0.5,0.5
+dinner at 7pm,0.1,0.5
+call client at 10:30am,0.3,0.7
+yoga at 8am,0.3,0.4
+standup at 9am,0.1,0.6
+lunch at noon,0.1,0.4
+movie at 8pm,0.1,0.3
+30 minute stretch,0.2,0.3
+2 hour study session,0.6,0.7
+15 minute meditation,0.1,0.4
+45 minute workout,0.6,0.5
+10 minute call,0.2,0.5
+90 minute coding session,0.7,0.7
+hard workout,0.85,0.5
+easy task,0.15,0.3
+challenging project,0.8,0.6
+simple email reply,0.1,0.3
+tough exam preparation,0.9,0.8
+moderate reading,0.4,0.3
+complex data analysis,0.85,0.7
+urgent fix,0.5,0.95
+critical bug,0.7,0.95
+low priority reading,0.2,0.15
+very important presentation,0.6,0.9
+asap fix,0.6,0.95
+optional cleanup,0.2,0.2
+gym every monday,0.5,0.5
+yoga every tuesday and thursday,0.3,0.4
+meeting every monday wednesday friday,0.3,0.6
+weekly review every friday,0.3,0.5
+meditate,0.1,0.4
+grocery shopping,0.2,0.5
+file the taxes,0.7,0.85
+write blog post,0.5,0.4
+book flight to paris,0.3,0.5
+pick up kids,0.2,0.8
+practice guitar,0.3,0.4
+work from home,0.5,0.6
+team meeting at the office,0.3,0.6
+workout at the gym,0.5,0.5
+finish report by friday,0.5,0.6
+pay bill tomorrow,0.2,0.7
+submit by next week,0.4,0.5
+project starting monday,0.6,0.6
+begin next week,0.4,0.5
+urgent 30 min gym at 7am tomorrow,0.7,0.9
+easy 15 min meditation every morning at home,0.15,0.3
+hard 2 hour coding session at office by friday,0.85,0.7
+weekly yoga every monday at 6pm for 45 minutes,0.3,0.4
+quick 10 min call at the coffee shop,0.2,0.4
+finish the quarterly report by next week really hard and very important 3 hours,0.9,0.9
+every morning meditate for 20 minutes at home easy and not urgent,0.15,0.25
+team standup at office every monday wednesday friday at 9am for 30 minutes,0.2,0.6
+gym,0.5,0.5
+study,0.5,0.5
+pay rent,0.2,0.8
+i need to go to the gym tomorrow morning at 7am it should be an hour long medium difficulty and important for health,0.5,0.7
+schedule a quick 15 minute standup meeting every monday at 9am with the team at the office,0.1,0.6
+its urgent that i finish this really hard coding project by next week should take about 4 hours working from home,0.9,0.95
+push deadline to friday,0.4,0.6
+move deadline to next week,0.4,0.6
+due tomorrow now,0.4,0.6
+change deadline to next month,0.4,0.6
+start on monday,0.4,0.6
+kick off this weekend,0.4,0.6
+move start to tomorrow,0.4,0.6
+set it for 3pm,0.4,0.6
+at 10:30am instead,0.4,0.6
+schedule for 18:00,0.4,0.6
+remove the time,0.4,0.6
+make it 90 minutes,0.4,0.6
+change to 2 hours,0.4,0.6
+shorten to 15 minutes,0.4,0.6
+make it 30 minutes,0.4,0.6
+make it more challenging,0.8,0.6
+make it very easy,0.1,0.6
+make it very important,0.4,0.9
+make it low priority,0.4,0.15
+make it critical,0.4,0.98
+change to work,0.4,0.6
+do it at home instead,0.4,0.6
+move to the library,0.4,0.6
+at the office,0.4,0.6
+do it at the coffee shop,0.4,0.6
+do it at the gym,0.4,0.6
+make it repeat every monday,0.4,0.6
+repeat on monday wednesday and friday,0.4,0.6
+cancel recurrence,0.4,0.6
+make it one-time,0.4,0.6
+set it for 9am and make it 60 minutes,0.4,0.6
+change deadline to friday and categorize as work,0.4,0.6
+make it harder and change location to gym,0.85,0.6
+push deadline to next week and make it 90 minutes,0.4,0.6
+start on monday and make it repeat every wednesday,0.4,0.6
+make it at 3pm 45 minutes and urgent,0.4,0.95
+mark it as urgent,0.4,0.95
+mark it as critical,0.4,0.98
+mark it as high priority,0.4,0.85
+mark it as low priority,0.4,0.15
+mark it as hard,0.85,0.6
+mark it as easy,0.15,0.6
+make it moderate,0.45,0.6
+make it optional,0.4,0.15
+30 minute meditation session,0.1,0.4
+hard workout at the gym,0.85,0.5
+2 hour study session for the exam,0.7,0.8
+easy 15 min coffee break,0.1,0.2
+make it urgent and change to work category,0.4,0.95
+make it harder and extend to 2 hours,0.85,0.6
+make it high priority and move to tomorrow,0.4,0.85
+make it easy and set at 9am,0.15,0.6
+"not urgent, can wait a while",0.3,0.15
+this is not a priority,0.3,0.1
+not that important really,0.3,0.2
+its not difficult at all,0.1,0.3
+not super important,0.3,0.25
+not urgent matter,0.3,0.15
+make it harder and move deadline to friday,0.85,0.6
+change location to home and make it urgent,0.4,0.9
+set time to 3pm and extend to 90 minutes,0.4,0.6
+categorize as fitness and make it easy,0.15,0.6
+make it high priority and set at 8am,0.4,0.9
+add location and change duration to 45,0.4,0.6
+make it important and add deadline today,0.4,0.85
+set category to work and make it 2 hours,0.4,0.6
+make it 30 minutes longer,0.4,0.6
+add an hour to this,0.4,0.6
+extend by 45 minutes,0.4,0.6
+shorten this by 15 minutes,0.4,0.6
+make it take longer,0.6,0.6
+starts monday at 10am,0.3,0.5
+begins tomorrow morning,0.3,0.5
+starting next week at the office,0.4,0.6
+start on monday and due friday,0.5,0.6
+begin tomorrow and complete by end of week,0.4,0.6
+morning yoga session,0.3,0.4
+afternoon study time,0.5,0.5
+evening meditation,0.1,0.4
+remove the start date,0.4,0.6
+clear the location,0.4,0.6
+cancel the location,0.4,0.6
+make it not recurring,0.4,0.6
+remove the recurrence,0.4,0.6
+add a start date of wednesday,0.4,0.6
+add a deadline of next week,0.4,0.6
+"um, i need to do this by friday",0.3,0.5
+"oh right, also gotta do this tomorrow",0.3,0.5
+yeah so basically need this done by monday,0.3,0.5
+important work task due friday morning,0.5,0.85
+easy fitness activity in the evening,0.15,0.3
+urgent finance matter needs attention today,0.5,0.95
+hard learning session this weekend,0.85,0.6
+creative hobby time on saturday,0.3,0.4
