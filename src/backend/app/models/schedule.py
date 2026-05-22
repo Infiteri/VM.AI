@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Text
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Index, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -55,6 +55,14 @@ class ProvisionalSlot(BaseModel):
     value = Column(Float, nullable=True)  # Task value
     fixed = Column(Boolean, default=False, nullable=False)  # Cannot be displaced
     location = Column(Text, nullable=True)  # For location continuity
+
+    __table_args__ = (
+        Index("ix_prov_slot_task_id", "task_id"),
+        Index("ix_prov_slot_start_end", "start", "end"),
+        Index("ix_prov_slot_fixed", "fixed"),
+        Index("ix_prov_slot_end", "end"),
+        Index("ix_prov_slot_start", "start"),
+    )
 
     # Relationships
     task = relationship(

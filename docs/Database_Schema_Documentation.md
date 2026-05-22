@@ -295,7 +295,8 @@ Pre-seeded with: `study`, `fitness`, `work`, `personal`.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| id | INTEGER | Primary key. Auto-increment. |
+| id | UUID | Primary key. Inherited from BaseModel. |
+| category_id | UUID | FK → `categories.id`. Unique constraint. |
 | category_name | TEXT | Category label. Unique. |
 | avg_duration | JSONB | Keyed by difficulty bucket with counts: `{"0.0": {"count": 5, "avg": 30}, "0.5": {"count": 3, "avg": 45}}` |
 | avg_duration_delta | JSONB | Same structure as avg_duration |

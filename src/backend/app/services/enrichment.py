@@ -35,7 +35,6 @@ logger = setup_logging()
 class EnrichmentService:
     """
     Task enrichment service with two-phase execution.
-
     Phase 1 (Predict):  Overwrite -> DateParse -> DraftSave
     Phase 2 (Commit):   DraftLoad/DraftMerge/ChangeMerge -> Compute
 
@@ -108,9 +107,9 @@ class EnrichmentService:
             nlp_payload = nlp_payload_dict
 
         # ============================================================================
-        # VALIDATION: Validate and set defaults for NLP payload
+        # VALIDATION: Validate and set defaults for NLP payload (basic defaults only)
         # ============================================================================
-        nlp_payload = self._validate_nlp_add_dict(nlp_payload)
+        nlp_payload = self._validate_nlp_add_new(nlp_payload)
 
         if hasattr(match_result, 'model_dump'):
             # It's a MatchResult schema - convert to dict
@@ -124,24 +123,17 @@ class EnrichmentService:
             value, _ = self._extract_field(entry)
             flat_payload[field] = value
 
-        # Get fixed_time value BEFORE parsing dates
-        fixed_time_value = flat_payload.get("fixed_time", False)
+        # Parse ALL date fields regardless of fixed_time
+        parsed_task = self._date_parse(flat_payload, fixed_time=False)
 
-        # For fixed_time tasks, force start=None and deadline=None
-        if fixed_time_value:
-            flat_payload["start"] = None
-            flat_payload["deadline"] = None
-
-        # Pass fixed_time flag to _date_parse()
-        parsed_task = self._date_parse(flat_payload, fixed_time=fixed_time_value)
+        # Apply fixed-time rules AFTER date parsing (combine, defaults, etc.)
+        parsed_task = self._enforce_fixed_time_rules(parsed_task)
 
         # Rebuild nlp_payload with parsed datetime for importance calculation
         nlp_payload_with_dates = nlp_payload.copy()
         
-        # For fixed_time tasks, ONLY include fixed_start (not start/deadline)
-        date_fields = ["fixed_start"]
-        if not fixed_time_value:
-            date_fields = ["start", "deadline", "fixed_start"]
+        # Include all date fields (rules already resolved state)
+        date_fields = ["start", "deadline", "fixed_start"]
         
         for field in date_fields:
             if field in parsed_task and parsed_task[field] is not None:
@@ -155,11 +147,6 @@ class EnrichmentService:
         )
 
         enriched_task = self._overwrite_fields(parsed_task, overwrite_map)
-
-        # Enforce fixed_time consistency on enriched task
-        if fixed_time_value:
-            enriched_task["start"] = None
-            enriched_task["deadline"] = None
 
         draft_id = self._draft_save(db, enriched_task, match_result)
 
@@ -297,8 +284,10 @@ class EnrichmentService:
             merged_task: Task with merged changes and resolved dates
 
         Steps:
-            1. Merge changed fields with existing task
-            2. Parse date strings
+            1. Parse date strings from changed fields
+            2. Apply fixed-time rules on raw NLP output (before merge)
+            3. Merge validated changes with existing task
+            4. Set defaults for non-temporal fields
 
         Integration Notes:
             - Accept TaskPayload schema or legacy dict
@@ -313,13 +302,23 @@ class EnrichmentService:
         if hasattr(existing_task, 'model_dump'):
             existing_task = existing_task.model_dump()
 
-        merged_task = self._change_merge(existing_task, changed_fields)
+        # Parse dates from raw NLP output first
+        parsed_changed = self._date_parse(changed_fields)
 
-        merged_task = self._enforce_fixed_time_consistency(merged_task, changed_fields)
+        # Apply fixed-time rules on raw NLP output BEFORE merge
+        if "fixed_time" in parsed_changed:
+            validated_changed = self._enforce_fixed_time_rules(parsed_changed)
+        elif "start" in parsed_changed or "deadline" in parsed_changed:
+            validated_changed = parsed_changed.copy()
+            validated_changed["fixed_time"] = False
+            validated_changed["fixed_start"] = None
+            logger.info("Modify: temporal change without fixed_time -> set fixed_time=False, fixed_start=null")
+        else:
+            validated_changed = parsed_changed
 
-        parsed_task = self._date_parse(merged_task)
+        merged_task = self._change_merge(existing_task, validated_changed)
 
-        validated_task = self._validate_nlp_modify(parsed_task)
+        validated_task = self._validate_nlp_modify_new(merged_task)
 
         logger.info(f"Enrichment: merge_nlp_modify complete")
 
@@ -1090,6 +1089,96 @@ class EnrichmentService:
 
         return result
 
+    def _validate_nlp_add_new(self, nlp_payload: dict) -> dict:
+        """
+        Validate and set defaults for NLP add payload (basic defaults only).
+
+        Rules:
+            1. name=None -> "task"
+            2. difficulty=None -> 0.5
+            3. duration=None -> 30
+            4. category=None or [] -> []
+            5. location=None -> "home"
+            6. importance=None -> 0.5
+            7. fixed_time=None -> False
+
+        NOTE: fixed_time/fixed_start/start/deadline relationship logic
+        is deferred to _enforce_fixed_time_rules() (called after date parse).
+
+        Input:
+            nlp_payload: dict with {value, predicted} structure
+
+        Returns:
+            nlp_payload: same structure with validated values
+        """
+        result = nlp_payload.copy()
+
+        # Rule 1: name=None -> "task"
+        name_entry = result.get("name", {})
+        name_value = name_entry.get("value") if name_entry else None
+        if name_value is None or name_value == "":
+            result["name"] = {"value": "task", "predicted": True}
+            logger.info("Validation: name set to 'task' (was None)")
+        else:
+            name_value = str(name_value).strip()
+            if name_value:
+                name_value = name_value[0].upper() + name_value[1:]
+            result["name"] = {"value": name_value, "predicted": name_entry.get("predicted", True)}
+            logger.info(f"Validation: name normalized to '{name_value}'")
+
+        # Rule 7: fixed_time=None -> False
+        fixed_time_entry = result.get("fixed_time", {})
+        fixed_time_value = fixed_time_entry.get("value") if fixed_time_entry else False
+        if fixed_time_value is None:
+            result["fixed_time"] = {"value": False, "predicted": True}
+            logger.info("Validation: fixed_time set to False (was None)")
+
+        # Rule 4: difficulty=None -> 0.5
+        difficulty_entry = result.get("difficulty", {})
+        difficulty_value = difficulty_entry.get("value") if difficulty_entry else None
+        if difficulty_value is None:
+            result["difficulty"] = {"value": 0.5, "predicted": True}
+            logger.warning("Validation: difficulty set to 0.5 (was None)")
+
+        # Rule 5: duration=None -> 30
+        duration_entry = result.get("duration", {})
+        duration_value = duration_entry.get("value") if duration_entry else None
+        if duration_value is None:
+            result["duration"] = {"value": 30, "predicted": True}
+            logger.warning("Validation: duration set to 30 (was None)")
+
+        # Rule 6: category=None or [] -> []
+        category_entry = result.get("category", {})
+        category_value = category_entry.get("value") if category_entry else None
+        if category_value is None or (isinstance(category_value, list) and len(category_value) == 0):
+            result["category"] = {"value": [], "predicted": True}
+            logger.warning("Validation: category set to [] (was None or empty)")
+        else:
+            if isinstance(category_value, list):
+                category_value = [str(cat).lower().strip() for cat in category_value if cat]
+            result["category"] = {"value": category_value, "predicted": category_entry.get("predicted", True)}
+            logger.info(f"Validation: category normalized to {category_value}")
+
+        # Rule 7: location=None -> "home"
+        location_entry = result.get("location", {})
+        location_value = location_entry.get("value") if location_entry else None
+        if location_value is None or location_value == "":
+            result["location"] = {"value": "home", "predicted": True}
+            logger.warning("Validation: location set to 'home' (was None)")
+        else:
+            location_value = str(location_value).lower().strip()
+            result["location"] = {"value": location_value, "predicted": location_entry.get("predicted", True)}
+            logger.info(f"Validation: location normalized to '{location_value}'")
+
+        # Rule 8: importance=None -> 0.5
+        importance_entry = result.get("importance", {})
+        importance_value = importance_entry.get("value") if importance_entry else None
+        if importance_value is None:
+            result["importance"] = {"value": 0.5, "predicted": True}
+            logger.warning("Validation: importance set to 0.5 (was None)")
+
+        return result
+
     def _validate_nlp_modify(self, task: dict[str, Any]) -> dict[str, Any]:
         """
         Validate and set defaults for NLP modify payload.
@@ -1238,6 +1327,176 @@ class EnrichmentService:
 
         if result_changed:
             logger.debug(f"Fixed time consistency changes: {result_changed}")
+
+        return result
+
+    def _enforce_fixed_time_rules(self, task: dict) -> dict:
+        """
+        Enforce fixed-time logic on a flat task dict with parsed datetime objects.
+
+        Rules:
+            1. fixed_time is True:
+               a. fixed_start not null, deadline not null:
+                  -> combine: fixed_start = deadline.date + fixed_start.time
+                  -> deadline = null, start = null
+               b. fixed_start not null, deadline null:
+                  -> start = null
+               c. fixed_start null, deadline not null:
+                  -> fixed_time = False, fixed_start = null
+                  -> if start is null: start = now
+               d. fixed_start null, deadline null:
+                  -> start = now, deadline = tomorrow 23:59
+                  -> fixed_time = False, fixed_start = null
+            2. fixed_time is not True:
+               -> fixed_start = null
+               -> if deadline is null: start = now, deadline = tomorrow 23:59
+               -> elif start is null: start = now
+
+        Input:
+            task: flat dict with datetime objects (after date parsing)
+
+        Returns:
+            task: corrected flat dict
+        """
+        result = task.copy()
+        now = datetime.now().replace(second=0, microsecond=0)
+
+        fixed_time_value = result.get("fixed_time")
+        if fixed_time_value is None:
+            fixed_time_value = False
+
+        if fixed_time_value is True:
+            fixed_start = result.get("fixed_start")
+            deadline = result.get("deadline")
+            start = result.get("start")
+
+            if fixed_start is not None:
+                if deadline is not None:
+                    combined = deadline.replace(
+                        hour=fixed_start.hour,
+                        minute=fixed_start.minute,
+                        second=0,
+                        microsecond=0,
+                    )
+                    result["fixed_start"] = combined
+                    result["deadline"] = None
+                    result["start"] = None
+                    logger.info(
+                        f"Fixed-time rules: combined deadline ({deadline}) + fixed_start ({fixed_start}) "
+                        f"-> fixed_start ({combined}), deadline=null, start=null"
+                    )
+                else:
+                    result["start"] = None
+                    logger.info("Fixed-time rules: fixed_start set, deadline null -> start=null")
+            else:
+                if deadline is not None:
+                    result["fixed_time"] = False
+                    result["fixed_start"] = None
+                    if start is None:
+                        result["start"] = now
+                        logger.info(
+                            "Fixed-time rules: fixed_time=True, fixed_start=null, deadline not null "
+                            "-> converted to non-fixed, start=now"
+                        )
+                    else:
+                        logger.info(
+                            "Fixed-time rules: fixed_time=True, fixed_start=null, deadline not null "
+                            "-> converted to non-fixed, start kept"
+                        )
+                else:
+                    result["start"] = now
+                    deadline_dt = now.replace(hour=23, minute=59, second=0, microsecond=0)
+                    start_time = start if isinstance(start, datetime) else now
+                    hours_diff = (deadline_dt - start_time).seconds / 3600
+                    if hours_diff < 7:
+                        deadline_dt = deadline_dt + timedelta(days=1)
+                    result["deadline"] = deadline_dt
+                    result["fixed_time"] = False
+                    result["fixed_start"] = None
+                    logger.info(
+                        "Fixed-time rules: fixed_time=True, fixed_start=null, deadline=null "
+                        "-> converted to non-fixed with defaults"
+                    )
+        else:
+            result["fixed_start"] = None
+            if result.get("deadline") is None:
+                result["start"] = now
+                deadline_dt = now.replace(hour=23, minute=59, second=0, microsecond=0)
+                start_time = result.get("start", now)
+                if not isinstance(start_time, datetime):
+                    start_time = now
+                hours_diff = (deadline_dt - start_time).seconds / 3600
+                if hours_diff < 7:
+                    deadline_dt = deadline_dt + timedelta(days=1)
+                result["deadline"] = deadline_dt
+                logger.info("Fixed-time rules: deadline=null, set default start and deadline")
+            elif result.get("start") is None:
+                result["start"] = now
+                logger.info("Fixed-time rules: start=null, set start=now")
+            else:
+                logger.info("Fixed-time rules: non-fixed with valid start/deadline, no changes")
+
+        return result
+
+    def _validate_nlp_modify_new(self, task: dict[str, Any]) -> dict[str, Any]:
+        """
+        Validate and set defaults for NLP modify payload.
+
+        Same basic defaults as _validate_nlp_modify, but uses new _enforce_fixed_time_rules.
+
+        Input:
+            task: dict with plain values (already parsed and merged)
+
+        Returns:
+            task: dict with validated values
+        """
+        result = task.copy()
+        now = datetime.now()
+
+        name_value = result.get("name")
+        if name_value is None or name_value == "":
+            result["name"] = "task"
+            logger.info("Validation: name set to 'task' (was None)")
+        else:
+            name_value = str(name_value).strip()
+            if name_value:
+                name_value = name_value[0].upper() + name_value[1:]
+            result["name"] = name_value
+            logger.info(f"Validation: name normalized to '{name_value}'")
+
+        # Apply fixed-time rules
+        result = self._enforce_fixed_time_rules(result)
+
+        if result.get("difficulty") is None:
+            result["difficulty"] = 0.5
+            logger.warning("Validation: difficulty set to 0.5 (was None)")
+
+        if result.get("duration") is None:
+            result["duration"] = 30
+            logger.warning("Validation: duration set to 30 (was None)")
+
+        category_value = result.get("category")
+        if category_value is None or (isinstance(category_value, list) and len(category_value) == 0):
+            result["category"] = []
+            logger.warning("Validation: category set to [] (was None or empty)")
+        else:
+            if isinstance(category_value, list):
+                category_value = [str(cat).lower().strip() for cat in category_value if cat]
+            result["category"] = category_value
+            logger.info(f"Validation: category normalized to {category_value}")
+
+        location_value = result.get("location")
+        if location_value is None or location_value == "":
+            result["location"] = "home"
+            logger.warning("Validation: location set to 'home' (was None)")
+        else:
+            location_value = str(location_value).lower().strip()
+            result["location"] = location_value
+            logger.info(f"Validation: location normalized to '{location_value}'")
+
+        if result.get("importance") is None:
+            result["importance"] = 0.5
+            logger.warning("Validation: importance set to 0.5 (was None)")
 
         return result
 
