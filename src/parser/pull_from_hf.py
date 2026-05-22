@@ -23,16 +23,16 @@ BACKUP_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser_backup")
 def backup_existing_model():
     """Always backup existing model before downloading"""
     print("Backing up existing model...")
-    
+
     if not os.path.exists(MODEL_PATH):
         print("  No existing model to backup")
         print()
         return False
-    
+
     if os.path.exists(BACKUP_PATH):
         print(f"  Removing old backup...")
         shutil.rmtree(BACKUP_PATH)
-    
+
     shutil.move(MODEL_PATH, BACKUP_PATH)
     print(f"  Backed up to: finetuned_parser_backup")
     print()
@@ -43,33 +43,33 @@ def main():
     print("VM.AI Parser - Download from Hugging Face")
     print("=" * 60)
     print()
-    
+
     token = sys.argv[1].strip() if len(sys.argv) > 1 else None
-    
+
     if token:
         print("Using provided token")
     else:
         print("No token provided - will attempt public repo download")
     print()
-    
+
     backup_existing_model()
-    
+
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-    
+
     repo_id = f"{HF_USERNAME}/{REPO_NAME}"
-    
+
     print(f"Repository: https://huggingface.co/{repo_id}")
     print(f"Download to: {MODEL_PATH}")
     print()
-    
+
     print("Downloading model...")
     try:
         download_kwargs = {"repo_id": repo_id, "local_dir": MODEL_PATH}
         if token:
             download_kwargs["token"] = token
-        
+
         snapshot_download(**download_kwargs)
-        
+
         files = os.listdir(MODEL_PATH)
         if not files:
             print()
@@ -79,7 +79,7 @@ def main():
                 shutil.move(BACKUP_PATH, MODEL_PATH)
                 print("Backup restored")
             return
-        
+
         print()
         print("=" * 60)
         print("SUCCESS")
@@ -91,7 +91,7 @@ def main():
         print()
         print("To restore backup if needed:")
         print(f"  Move {BACKUP_PATH} to {MODEL_PATH}")
-        
+
     except Exception as e:
         print()
         print(f"Download failed: {e}")

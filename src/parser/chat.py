@@ -158,7 +158,7 @@ class TaskPlannerPredictor:
         if "error" not in new_fields:
             for field, entry in new_fields.items():
                 if field in ["importance", "difficulty"]:
-                    continue  
+                    continue
                 if not isinstance(entry, dict):
                     continue
                 val = entry.get("value")
