@@ -79,7 +79,7 @@ minor cleanup task,0.1,0.15
 nice to have feature,0.3,0.25
 must do today or else,0.6,0.98
 can wait till next week,0.3,0.15
-life or death situation,0.7,1.0
+life or death situation,0.7,1
 would be good to tackle,0.4,0.5
 absolutely cannot skip this,0.5,0.95
 low priority housework,0.2,0.2
@@ -127,7 +127,7 @@ this is going to be a long and exhausting day of work,0.8,0.85
 I really should start meal prepping for the week,0.4,0.6
 need to completely redesign the landing page from scratch,0.75,0.8
 just going to do a quick ten minute yoga flow,0.15,0.35
-this is absolutely critical and needs to be done today no matter what,0.6,1.0
+this is absolutely critical and needs to be done today no matter what,0.6,1
 was planning to just read a bit before sleeping,0.05,0.2
 need to debug a really tricky race condition in the codebase,0.9,0.85
 going to take out the trash and do a quick sweep of the kitchen,0.15,0.3
@@ -146,7 +146,7 @@ this is a massive undertaking and I dont know where to start,0.95,0.8
 going to quickly update the dependencies and run the tests,0.2,0.5
 emergency server migration that must happen tonight,0.95,0.98
 prepare for the final exam that determines my entire grade,0.85,0.95
-perform emergency surgery on a critical patient,0.98,1.0
+perform emergency surgery on a critical patient,0.98,1
 negotiate a multi million dollar contract with a hostile client,0.9,0.95
 fix a security breach that exposed user data,0.9,0.98
 climb the most difficult route on the mountain before sunset,0.95,0.85
@@ -155,12 +155,12 @@ handle a PR crisis that is going viral on social media,0.8,0.95
 complete an ironman triathlon with an injury,0.98,0.8
 rebuild the entire payment system before the holiday sale,0.9,0.95
 perform a complex dental surgery on a nervous patient,0.9,0.9
-lead a high stakes hostage negotiation,0.95,1.0
+lead a high stakes hostage negotiation,0.95,1
 write and defend a patent application against legal challenges,0.85,0.9
 complete a dangerous rescue mission in a storm,0.95,0.95
 migrate the entire company infrastructure to a new cloud provider in one weekend,0.9,0.9
 pass the bar exam after failing twice before,0.85,0.95
-perform live brain surgery on a high profile patient,1.0,1.0
+perform live brain surgery on a high profile patient,1,1
 launch a product that the entire company depends on,0.8,0.95
 run an ultramarathon in extreme heat conditions,0.95,0.75
 audit the entire financial system before the regulatory deadline,0.85,0.9
@@ -169,7 +169,7 @@ complete a black belt exam after years of training,0.9,0.85
 deliver a keynote speech to thousands of people in a second language,0.8,0.9
 fix a critical bug in production that is costing thousands per minute,0.85,0.95
 complete a grueling special forces selection course,0.98,0.9
-write the weekly status report,0.4,0.7
+write the weekly status report,0.2,0.5
 fix the critical server crash immediately,0.95,0.99
 reply to the internal slack message,0.1,0.2
 prepare the quarterly presentation,0.75,0.85
