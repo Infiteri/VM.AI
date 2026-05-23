@@ -17,10 +17,13 @@ import time
 from datetime import date
 from pathlib import Path
 
+from dotenv import load_dotenv
 import fiftyone as fo
 import fiftyone.zoo as foz
 import pandas as pd
 import requests
+
+load_dotenv(Path(__file__).parent / ".env")
 
 DATA_ROOT = Path("data/image_to_prompt/raw")
 
@@ -78,20 +81,6 @@ CATEGORIES = {
             },
         ],
     },
-    "studying": {
-        "sources": [
-            {
-                "type": "openimages",
-                "labels": ["Desk"],
-                "target": 100,
-            },
-            {
-                "type": "pixabay",
-                "keywords": ["student studying", "person textbook desk", "homework notes"],
-                "target": 1200,
-            },
-        ],
-    },
     "cooking": {
         "sources": [
             {
@@ -111,7 +100,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person cooking kitchen", "chef stove"],
+                "keywords": ["kitchen", "cooking", "cookware", "kitchenware", "chef stove"],
                 "target": 500,
             },
         ],
@@ -133,6 +122,11 @@ CATEGORIES = {
                 "balanced": True,
                 "target": 900,
             },
+            {
+                "type": "pixabay",
+                "keywords": ["restaurant", "cafe", "restaurant inside"],
+                "target": 300,
+            },
         ],
     },
     "shopping": {
@@ -150,7 +144,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["shopping mall", "grocery store cart", "person buying"],
+                "keywords": ["grocery store", "mall", "clothes store"],
                 "target": 1100,
             },
         ],
@@ -173,7 +167,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["office work desk"],
+                "keywords": ["office", "office room", "office desk"],
                 "target": 200,
             },
         ],
@@ -193,7 +187,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["football player"],
+                "keywords": ["football"],
                 "target": 200,
             },
         ],
@@ -207,7 +201,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["concert crowd", "cinema audience"],
+                "keywords": ["concert", "cinema audience", "TV", "headphones"],
                 "target": 700,
             },
         ],
@@ -221,7 +215,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person cleaning house", "mopping floor"],
+                "keywords": ["cleaning", "person cleaning house", "mopping floor", "washing dishes"],
                 "target": 1000,
             },
         ],
@@ -241,7 +235,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person driving car"],
+                "keywords": ["person driving car", "car"],
                 "target": 200,
             },
         ],
@@ -255,12 +249,12 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person reading book", "reading sofa", "book library"],
+                "keywords": ["person reading book", "reading", "reading on the sofa", "reading library", "book"],
                 "target": 1200,
             },
         ],
     },
-    "programing": {
+    "computer_work": {
         "sources": [
             {
                 "type": "openimages",
@@ -269,7 +263,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["programmer coding", "developer laptop code", "software coding"],
+                "keywords": ["person and laptop", "developer coding", "work in laptop"],
                 "target": 1200,
             },
         ],
@@ -308,7 +302,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["basketball player", "basketball game court"],
+                "keywords": ["basketball", "basketball field"],
                 "target": 500,
             },
         ],
@@ -334,12 +328,12 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person walking dog"],
+                "keywords": ["pet", "person walking dog"],
                 "target": 200,
             },
         ],
     },
-    "workout": {
+    "gym": {
         "sources": [
             {
                 "type": "openimages",
