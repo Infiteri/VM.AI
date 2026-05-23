@@ -11,7 +11,6 @@
 |------------|---------------|------------------------|
 | **v3.0 Database Schema** | State derived from table presence. No `status` field. Draft pattern. | Eliminates state-sync bugs. Requires strict cascade rules. |
 | **v3.0 API Contracts** | 13 endpoints, strict validation, `draft_id` for commit flow. | Guarantees frontend-backend parity. |
-| **CPU-Only Inference** | Competition hardware limits. | NLP (T5-base) and Matching (MiniLM) run synchronously. |
 | **Stable Incremental Scheduler** | Prevents schedule thrashing. | 12s timeout, 1-layer displacement, 25% value threshold. |
 | **Synchronous Stats Recorder** | Eliminates race conditions. | Runs in same DB transaction. |
 | **Atomic Commits** | Prevents blank calendar. | Single PostgreSQL transaction. |
