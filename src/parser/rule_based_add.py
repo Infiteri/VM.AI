@@ -8,7 +8,6 @@
 import re
 from vars import ALL_FIELDS, DAYS
 
-
 def normalize_time(time_str):
     if not time_str:
         return None
@@ -32,7 +31,6 @@ def normalize_time(time_str):
     if "midnight" in time_str:
         return "00:00"
     return None
-
 
 def parse_add(sentence: str) -> dict:
     s = sentence.lower().strip()
@@ -297,4 +295,3 @@ def parse_add(sentence: str) -> dict:
             break
 
     return schema
-    

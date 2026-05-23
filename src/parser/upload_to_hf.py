@@ -1,17 +1,15 @@
 """
     VM-AI - HuggingFace Model Uploader
-    Uploads trained model to Hugging Face Hub.
+    Uploads trained model folders to Hugging Face Hub.
     Usage: python upload_to_hf.py [--message "commit msg"]
 
     Written by: Vanea
 """
 
 import os
-import sys
-import shutil
 import argparse
 from getpass import getpass
-from huggingface_hub import HfApi, login
+from huggingface_hub import HfApi, login, CommitOperationAdd
 
 HF_USERNAME = "vaneaa"
 REPO_NAME = "vmai-parser"
@@ -19,30 +17,33 @@ REPO_NAME = "vmai-parser"
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
-DATA_SOURCE = os.path.join(PROJECT_ROOT, "data")
-DATA_COLAB = os.path.join(SCRIPT_DIR, "colab", "data")
+REGRESSOR_PATH = os.path.join(PROJECT_ROOT, "models", "regressors")
 
-def copy_data_to_colab():
-    """Copy data files from root to colab folder"""
-    print("Copying data to colab folder...")
+IGNORE_PREFIXES = ["checkpoint-", ".cache"]
 
-    if not os.path.exists(DATA_SOURCE):
-        print(f"  Source not found: {DATA_SOURCE}")
-        return
+def collect_files(folder_path, prefix_in_repo):
+    """Walk folder_path and return CommitOperationAdd list, skipping IGNORE_PREFIXES."""
+    ops = []
+    for root, dirs, filenames in os.walk(folder_path):
+        dirs[:] = [d for d in dirs if not any(d.startswith(p) for p in IGNORE_PREFIXES)]
+        for fn in filenames:
+            if any(fn.startswith(p) for p in IGNORE_PREFIXES):
+                continue
+            full = os.path.join(root, fn)
+            rel = os.path.relpath(full, folder_path)
+            path_in_repo = f"{prefix_in_repo}/{rel}".replace("\\", "/")
+            ops.append(CommitOperationAdd(path_in_repo=path_in_repo, path_or_fileobj=full))
+    return ops
 
-    os.makedirs(DATA_COLAB, exist_ok=True)
-
-    copied = 0
-    for filename in os.listdir(DATA_SOURCE):
-        if filename.endswith(".yaml"):
-            src = os.path.join(DATA_SOURCE, filename)
-            dst = os.path.join(DATA_COLAB, filename)
-            shutil.copy2(src, dst)
-            print(f"  Copied: {filename}")
-            copied += 1
-
-    print(f"  Done: {copied} files copied")
-    print()
+def check_folder(path, label):
+    if not os.path.isdir(path):
+        print(f"  Error: {label} folder not found at {path}")
+        return False
+    files = collect_files(path, "")
+    if not files:
+        print(f"  Error: {label} folder is empty (or all files filtered)")
+        return False
+    return True
 
 def main():
     argp = argparse.ArgumentParser(description="Upload VM.AI parser to HuggingFace Hub")
@@ -60,33 +61,39 @@ def main():
         print("Get one at: https://huggingface.co/settings/tokens")
         return
 
-    if not os.path.exists(MODEL_PATH):
-        print(f"Error: Model not found at {MODEL_PATH}")
-        return
+    print()
+    print("Checking folders...")
 
-    file_count = 0
-    for root, dirs, filenames in os.walk(MODEL_PATH):
-        dirs[:] = [d for d in dirs if not d.startswith("checkpoint-") and d != ".cache"]
-        file_count += len(filenames)
+    all_ops = []
+    if check_folder(MODEL_PATH, "finetuned_parser"):
+        parser_files = collect_files(MODEL_PATH, "finetuned_parser")
+        all_ops.extend(parser_files)
+        print(f"  finetuned_parser {len(parser_files)} files")
+    else:
+        print("  finetuned_parser (skipped - folder not found)")
 
-    if file_count == 0:
-        print(f"Error: Model folder is empty")
+    if check_folder(REGRESSOR_PATH, "regressors"):
+        regressor_files = collect_files(REGRESSOR_PATH, "regressors")
+        all_ops.extend(regressor_files)
+        print(f"  regressors       {len(regressor_files)} files")
+    else:
+        print("  regressors (skipped - folder not found)")
+
+    if not all_ops:
+        print("\nNothing to upload.")
         return
 
     print()
-    print(f"Model: {MODEL_PATH}")
-    print(f"Files to upload: {file_count} (excluding checkpoints)")
-    print(f"Repo: https://huggingface.co/{HF_USERNAME}/{REPO_NAME}")
-    print(f"Commit message: {args.message}")
+    print(f"  Repo: https://huggingface.co/{HF_USERNAME}/{REPO_NAME}")
+    print(f"  Commit: {args.message}")
     print()
 
     print("Logging in...")
     try:
         login(token=token)
-        print("Login OK")
+        print("  OK")
     except Exception as e:
-        print(f"Login failed: {e}")
-        print("Check your token at: https://huggingface.co/settings/tokens")
+        print(f"  Failed: {e}")
         return
 
     api = HfApi()
@@ -95,35 +102,27 @@ def main():
     try:
         api.model_info(repo_id=repo_id)
         print("Repository exists")
-    except:
+    except Exception:
         print("Creating repository...")
-        try:
-            api.create_repo(repo_id=repo_id, repo_type="model", private=False)
-            print(f"Created: {repo_id}")
-        except Exception as e:
-            print(f"Failed to create repo: {e}")
-            return
+        api.create_repo(repo_id=repo_id, repo_type="model", private=False)
+        print(f"  Created: {repo_id}")
 
     print()
-    print("Uploading files...")
+    print(f"Uploading {len(all_ops)} files in one commit...")
     try:
-        api.upload_folder(
-            folder_path=MODEL_PATH,
+        api.create_commit(
             repo_id=repo_id,
             repo_type="model",
+            operations=all_ops,
             commit_message=args.message,
             token=token,
-            ignore_patterns=["checkpoint-*", ".cache/*"],
         )
         print()
         print("=" * 60)
         print("SUCCESS")
         print("=" * 60)
         print()
-        print(f"Model: https://huggingface.co/{repo_id}")
-        print()
-        print("Download with:")
-        print(f"  snapshot_download('{repo_id}', local_dir='models/finetuned_parser')")
+        print(f"https://huggingface.co/{repo_id}")
     except Exception as e:
         print()
         print(f"Upload failed: {e}")

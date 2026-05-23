@@ -67,18 +67,14 @@ def _rand_location():
         ]
     )
 
-
 def _rand_difficulty():
     return str(round(random.uniform(0.1, 0.95), 2))
-
 
 def _rand_importance():
     return str(round(random.uniform(0.1, 0.99), 2))
 
-
 def _rand_category():
     return random.choice(list(vars.VALID_CATEGORIES))
-
 
 def _rand_name():
     return random.choice(
@@ -91,7 +87,6 @@ def _rand_name():
             "fix the bug",
         ]
     )
-
 
 def _rand_time():
     return random.choice(
@@ -111,7 +106,6 @@ def _rand_time():
         ]
     )
 
-
 def _rand_start():
     return random.choice(
         [
@@ -126,11 +120,9 @@ def _rand_start():
         ]
     )
 
-
 def _rand_recurrence_days():
     count = random.randint(1, 3)
     return ",".join(random.sample(DAYS, k=count))
-
 
 CHANGE_TEMPLATES = [
     ("duration", lambda v: f"make it {v} minutes", _rand_duration),
@@ -192,7 +184,6 @@ CHANGE_TEMPLATES = [
     ("cancel_recurrent", lambda v: "make it one-time", lambda: "false"),
     ("cancel_recurrent", lambda v: "don't repeat it", lambda: "false"),
 ]
-
 
 class DataGenerator:
     def __init__(self, training_data, real_examples=None, specific_examples=None):

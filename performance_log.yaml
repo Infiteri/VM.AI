@@ -1758,3 +1758,269 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-05-20T21:13:36.940742'
+  mode: add
+  input: go to gym, very hard
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:39.855540'
+  mode: add
+  input: go to gym, very very hard
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:44.371249'
+  mode: add
+  input: go to gym, extreme
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:48.695278'
+  mode: add
+  input: go to gym, extremely
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.5'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:50.764444'
+  mode: add
+  input: go to gym, extremely difficult
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:53.034077'
+  mode: add
+  input: go to gym, difficult
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:13:54.832428'
+  mode: add
+  input: go to gym, not difficult
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:14:00.721412'
+  mode: add
+  input: go to gym, easy
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:14:37.640494'
+  mode: add
+  input: go to gym, not easy
+  raw_output: (rule-based)
+  parsed:
+    name: go
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:17:32.646526'
+  mode: add
+  input: hard homework
+  raw_output: (rule-based)
+  parsed:
+    name: homework
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: study
+    location: null
+    importance: '0.7'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:17:42.098471'
+  mode: add
+  input: hard gym session
+  raw_output: (rule-based)
+  parsed:
+    name: gym session
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:18:12.613499'
+  mode: add
+  input: hard gym session
+  raw_output: (rule-based)
+  parsed:
+    name: gym session
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.5'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:18:17.546331'
+  mode: add
+  input: hard gym session, very important
+  raw_output: (rule-based)
+  parsed:
+    name: gym session, very important
+    start: null
+    deadline: null
+    difficulty: '0.85'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-20T21:18:23.305077'
+  mode: add
+  input: easy gym session, very important
+  raw_output: (rule-based)
+  parsed:
+    name: gym session, very important
+    start: null
+    deadline: null
+    difficulty: '0.15'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.9'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
