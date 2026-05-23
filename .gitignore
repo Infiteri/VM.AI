@@ -3,6 +3,7 @@ logs/
 __pycache__/
 *.py[cod]
 .*
+!src/image_to_promp/.env.example
 .venv/
 *.egg-info/
 dist/

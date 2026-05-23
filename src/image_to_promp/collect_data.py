@@ -2,27 +2,30 @@
 VM.AI — Image Data Collection Script
 
 Downloads images for the image-to-prompt classifier from multiple sources.
-Sources: Open Images V7 (via fiftyone), Kaggle (via kagglehub), Bing Images (via icrawler)
+Sources: Open Images V7 (via fiftyone), Kaggle (via kagglehub), Pixabay (via API)
 
 Usage:
     uv run python src/image_to_promp/collect_data.py
 """
 
-import concurrent.futures
 import hashlib
 import json
 import os
 import shutil
 import random
+import time
 from datetime import date
 from pathlib import Path
 
 import fiftyone as fo
 import fiftyone.zoo as foz
 import pandas as pd
-from icrawler.builtin import BingImageCrawler
+import requests
 
 DATA_ROOT = Path("data/image_to_prompt/raw")
+
+PIXABAY_API_KEY = os.getenv("PIXABAY_API_KEY", "YOUR_KEY")
+PIXABAY_BASE_URL = "https://pixabay.com/api/"
 
 CATEGORIES = {
     "running": {
@@ -38,12 +41,15 @@ CATEGORIES = {
                 "target": 800,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "running", "person running", "jogging outdoors",
-                    "trail running", "sprint track", "marathon race",
-                ],
+                "type": "pixabay",
+                "keywords": ["person running"],
                 "target": 400,
+            },
+            {
+                "type": "kaggle_subfolder",
+                "dataset": "lumierebatalong/human-activity-recognition-train-and-test-folders",
+                "subfolder": "HAR/train/running",
+                "target": 840,
             },
         ],
     },
@@ -60,12 +66,15 @@ CATEGORIES = {
                 "target": 800,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "cycling", "person cycling", "biking outdoors",
-                    "mountain biking", "road bike race", "city cyclist",
-                ],
+                "type": "pixabay",
+                "keywords": ["cycling bicycle"],
                 "target": 400,
+            },
+            {
+                "type": "kaggle_subfolder",
+                "dataset": "lumierebatalong/human-activity-recognition-train-and-test-folders",
+                "subfolder": "HAR/train/cycling",
+                "target": 840,
             },
         ],
     },
@@ -77,15 +86,8 @@ CATEGORIES = {
                 "target": 100,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "study", "person studying", "student studying desk",
-                    "library reading", "student taking notes", "classroom lecture",
-                    "exam preparation", "homework desk", "online learning",
-                    "student laptop", "university campus study", "study group",
-                    "cramming for exam", "school books", "writing notes",
-                    "education", "focused student", "tutoring session",
-                ],
+                "type": "pixabay",
+                "keywords": ["student studying", "person textbook desk", "homework notes"],
                 "target": 1200,
             },
         ],
@@ -105,15 +107,12 @@ CATEGORIES = {
                 "type": "kaggle_subfolder",
                 "dataset": "dataclusterlabs/kitchen-full-image-dataset",
                 "subfolder": "",
-                "target": 200,
+                "target": 400,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "cooking", "kitchen", "person cooking", "cooking meal",
-                    "baking in kitchen",
-                ],
-                "target": 300,
+                "type": "pixabay",
+                "keywords": ["person cooking kitchen", "chef stove"],
+                "target": 500,
             },
         ],
     },
@@ -150,15 +149,8 @@ CATEGORIES = {
                 "target": 45,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "shopping", "supermarket", "person shopping",
-                    "mall shopping", "clothing store", "grocery shopping",
-                    "shopping bags", "retail store", "buying groceries",
-                    "shopping cart", "farmer market", "shopping aisle",
-                    "cashier checkout", "department store", "shopping center",
-                    "window shopping",
-                ],
+                "type": "pixabay",
+                "keywords": ["shopping mall", "grocery store cart", "person buying"],
                 "target": 1100,
             },
         ],
@@ -180,8 +172,8 @@ CATEGORIES = {
                 "target": 500,
             },
             {
-                "type": "icrawler",
-                "queries": ["office work", "office", "working at desk office"],
+                "type": "pixabay",
+                "keywords": ["office work desk"],
                 "target": 200,
             },
         ],
@@ -200,8 +192,8 @@ CATEGORIES = {
                 "target": 900,
             },
             {
-                "type": "icrawler",
-                "queries": ["football", "soccer", "playing football"],
+                "type": "pixabay",
+                "keywords": ["football player"],
                 "target": 200,
             },
         ],
@@ -214,12 +206,8 @@ CATEGORIES = {
                 "target": 300,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "concert", "music event", "watching TV", "cinema",
-                    "live performance", "movie theater", "amusement park",
-                    "video games", "nightclub", "festival crowd",
-                ],
+                "type": "pixabay",
+                "keywords": ["concert crowd", "cinema audience"],
                 "target": 700,
             },
         ],
@@ -232,15 +220,8 @@ CATEGORIES = {
                 "target": 300,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "vacuum cleaner", "dishes cleaning",
-                    "clothes washing machine", "cleaning house",
-                    "mopping floor", "dusting furniture", "cleaning kitchen",
-                    "bathroom cleaning", "window cleaning", "laundry folding",
-                    "organizing closet", "cleaning supplies", "scrubbing",
-                    "wiping surfaces", "house chores",
-                ],
+                "type": "pixabay",
+                "keywords": ["person cleaning house", "mopping floor"],
                 "target": 1000,
             },
         ],
@@ -259,8 +240,8 @@ CATEGORIES = {
                 "target": 600,
             },
             {
-                "type": "icrawler",
-                "queries": ["driving", "person driving car", "driving car"],
+                "type": "pixabay",
+                "keywords": ["person driving car"],
                 "target": 200,
             },
         ],
@@ -273,16 +254,8 @@ CATEGORIES = {
                 "target": 150,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "sofa reading", "person reading book",
-                    "reading", "reading at home",
-                    "reading in bed", "reading outdoors", "library reading",
-                    "reading newspaper", "reading magazine", "reading on tablet",
-                    "reading cafe", "reading in park", "reading at beach",
-                    "bedtime reading", "reading under tree", "reading lamp",
-                    "reading glasses", "morning reading",
-                ],
+                "type": "pixabay",
+                "keywords": ["person reading book", "reading sofa", "book library"],
                 "target": 1200,
             },
         ],
@@ -295,15 +268,8 @@ CATEGORIES = {
                 "target": 400,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "programming", "coding", "person coding laptop", "software developer",
-                    "computer programmer", "hacker coding", "developer workspace",
-                    "data scientist", "code on screen", "web developer",
-                    "programming monitor", "keyboard typing", "software engineer",
-                    "IT professional", "coding night", "multi monitor setup",
-                    "developer team", "algorithm coding",
-                ],
+                "type": "pixabay",
+                "keywords": ["programmer coding", "developer laptop code", "software coding"],
                 "target": 1200,
             },
         ],
@@ -329,13 +295,21 @@ CATEGORIES = {
                 "target": 495,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "basketball", "basketball player", "basketball game",
-                    "basketball court", "NBA game", "shooting basketball",
-                    "basketball hoop", "street basketball",
-                ],
-                "target": 300,
+                "type": "kaggle_subfolder",
+                "dataset": "mmoreaux/caltech256",
+                "subfolder": "256_ObjectCategories/256_ObjectCategories/006/basketball-hoop",
+                "target": 90,
+            },
+            {
+                "type": "kaggle_subfolder",
+                "dataset": "sheikhzaib/sports-image-image-classification",
+                "subfolder": "sports/basketball",
+                "target": 486,
+            },
+            {
+                "type": "pixabay",
+                "keywords": ["basketball player", "basketball game court"],
+                "target": 500,
             },
         ],
     },
@@ -359,8 +333,8 @@ CATEGORIES = {
                 "target": 350,
             },
             {
-                "type": "icrawler",
-                "queries": ["pet care", "dog", "cat", "pet"],
+                "type": "pixabay",
+                "keywords": ["person walking dog"],
                 "target": 200,
             },
         ],
@@ -383,11 +357,8 @@ CATEGORIES = {
                 "target": 700,
             },
             {
-                "type": "icrawler",
-                "queries": [
-                    "workout gym exercise", "fitness training gym",
-                    "gym equipment weights", "exercise routine",
-                ],
+                "type": "pixabay",
+                "keywords": ["gym workout"],
                 "target": 200,
             },
         ],
@@ -588,73 +559,64 @@ def handle_kaggle_subfolder(category: str, source: dict) -> dict:
     return {"type": "kaggle_subfolder", "dataset": dataset, "subfolder": subfolder, "per_folder": results, "downloaded": total}
 
 
-def _deduplicate_by_hash(folder: Path) -> int:
-    by_hash = {}
-    removed = 0
-    for img in sorted(folder.glob("*.*g")):
-        h = hashlib.sha256(img.read_bytes()).hexdigest()
-        if h in by_hash:
-            img.unlink()
-            removed += 1
-        else:
-            by_hash[h] = img
-    return removed
-
-
-def handle_icrawler(category: str, source: dict) -> dict:
-    engine = source.get("engine", "bing")
-    queries = source["queries"]
+def handle_pixabay(category: str, source: dict) -> dict:
+    keywords = source["keywords"]
     target = source["target"]
-    max_per_query = 150
-    out_dir = DATA_ROOT / category / "icrawler"
+    out_dir = DATA_ROOT / category / "pixabay"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    per_query_results = {}
-    for i, query in enumerate(queries):
-        running = len(list(out_dir.glob("*.*g")))
-        if running >= target:
-            print(f"  [icrawler] Target {target} reached, skipping remaining queries")
+    per_keyword = max(1, target // len(keywords))
+    results = {}
+    total = 0
+
+    for kw in keywords:
+        page = 1
+        kw_total = 0
+        while kw_total < per_keyword:
+            resp = requests.get(PIXABAY_BASE_URL, params={
+                "key": PIXABAY_API_KEY,
+                "q": kw,
+                "image_type": "photo",
+                "orientation": "horizontal",
+                "safesearch": "true",
+                "per_page": 200,
+                "page": page,
+                "min_width": 380,
+                "min_height": 380,
+            })
+            remaining = int(resp.headers.get("X-RateLimit-Remaining", 100))
+            if remaining < 5:
+                print("    Rate limit low — waiting 60s...")
+                time.sleep(60)
+
+            data = resp.json()
+            hits = data.get("hits", [])
+            if not hits:
+                break
+
+            for photo in hits:
+                img_url = photo.get("largeImageURL") or photo["webformatURL"].replace("_640", "_960")
+                try:
+                    img_data = requests.get(img_url, timeout=10).content
+                    fname = f"{total:04d}.jpg"
+                    (out_dir / fname).write_bytes(img_data)
+                    total += 1
+                    kw_total += 1
+                except Exception:
+                    continue
+                if kw_total >= per_keyword:
+                    break
+
+            page += 1
+            time.sleep(0.5)
+
+        results[kw] = kw_total
+        print(f"  [pixabay] '{kw}': {kw_total} images")
+        if total >= target:
             break
 
-        query_dir = out_dir / f"q{i}"
-        query_dir.mkdir(parents=True, exist_ok=True)
-
-        print(f"  [icrawler] Scraping via {engine} for '{query}'...")
-
-        if engine == "bing":
-            crawler = BingImageCrawler(storage={"root_dir": str(query_dir)})
-        else:
-            raise ValueError(f"Unknown icrawler engine: {engine}")
-
-        with concurrent.futures.ThreadPoolExecutor() as pool:
-            future = pool.submit(crawler.crawl, keyword=query, max_num=max_per_query)
-            try:
-                future.result(timeout=60)
-            except concurrent.futures.TimeoutError:
-                print(f"    Query timed out after 60s, processing partial results")
-
-        downloaded = len(list(query_dir.glob("*.*g")))
-        for img in query_dir.glob("*.*g"):
-            dest = out_dir / img.name
-            if dest.exists():
-                dest = out_dir / f"q{i}_{img.name}"
-            shutil.move(str(img), str(dest))
-        query_dir.rmdir()
-
-        removed = _deduplicate_by_hash(out_dir)
-        running = len(list(out_dir.glob("*.*g")))
-        per_query_results[query] = {"downloaded": downloaded, "dedup_removed": removed, "running_total": running}
-        print(f"    Query got {downloaded}, dedup removed {removed}, running total: {running}")
-
-    count = len(list(out_dir.glob("*.*g")))
-    print(f"  [icrawler] Final: {count} images from {len(per_query_results)} queries")
-    return {
-        "type": "icrawler",
-        "engine": engine,
-        "queries": list(per_query_results.keys()),
-        "per_query": per_query_results,
-        "downloaded": count,
-    }
+    print(f"  [pixabay] Total: {total} images")
+    return {"type": "pixabay", "keywords": list(results.keys()), "per_keyword": results, "downloaded": total}
 
 
 SOURCE_HANDLERS = {
@@ -662,7 +624,7 @@ SOURCE_HANDLERS = {
     "kaggle": handle_kaggle,
     "kaggle_csv": handle_kaggle_csv,
     "kaggle_subfolder": handle_kaggle_subfolder,
-    "icrawler": handle_icrawler,
+    "pixabay": handle_pixabay,
 }
 
 
