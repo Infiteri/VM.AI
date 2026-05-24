@@ -58,7 +58,7 @@ Enrichment → inserts task_id into unscheduled_tasks
 | Inference Speed | ~5ms per sentence on CPU |
 | Disk Size | ~90MB |
 | Training Required | No — used off-the-shelf |
-| ONIA Compliance | Yes — fully open-source, documented, CPU-only |
+| ONIA Compliance | Yes — fully open-source, documented |
 
 ---
 
