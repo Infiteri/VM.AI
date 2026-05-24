@@ -11,17 +11,17 @@ Usage:
 import hashlib
 import json
 import os
-import random
 import shutil
+import random
 import time
 from datetime import date
 from pathlib import Path
 
+from dotenv import load_dotenv
 import fiftyone as fo
 import fiftyone.zoo as foz
 import pandas as pd
 import requests
-from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -86,16 +86,9 @@ CATEGORIES = {
             {
                 "type": "openimages",
                 "labels": [
-                    "Gas stove",
-                    "Frying pan",
-                    "Cutting board",
-                    "Wok",
-                    "Cooking spray",
-                    "Kitchen utensil",
-                    "Kitchenware",
-                    "Slow cooker",
-                    "Pressure cooker",
-                    "Mixing bowl",
+                    "Gas stove", "Frying pan", "Cutting board", "Wok",
+                    "Cooking spray", "Kitchen utensil", "Kitchenware",
+                    "Slow cooker", "Pressure cooker", "Mixing bowl",
                 ],
                 "target": 700,
             },
@@ -107,13 +100,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": [
-                    "kitchen",
-                    "cooking",
-                    "cookware",
-                    "kitchenware",
-                    "chef stove",
-                ],
+                "keywords": ["kitchen", "cooking", "cookware", "kitchenware", "chef stove"],
                 "target": 500,
             },
         ],
@@ -123,11 +110,8 @@ CATEGORIES = {
             {
                 "type": "openimages",
                 "labels": [
-                    "Fast food",
-                    "Kitchen & dining room table",
-                    "Tableware",
-                    "Coffee",
-                    "Wine",
+                    "Fast food", "Kitchen & dining room table",
+                    "Tableware", "Coffee", "Wine",
                 ],
                 "target": 400,
             },
@@ -170,12 +154,8 @@ CATEGORIES = {
             {
                 "type": "openimages",
                 "labels": [
-                    "Office building",
-                    "Office supplies",
-                    "Computer monitor",
-                    "Whiteboard",
-                    "Filing cabinet",
-                    "Printer",
+                    "Office building", "Office supplies", "Computer monitor",
+                    "Whiteboard", "Filing cabinet", "Printer",
                 ],
                 "target": 500,
             },
@@ -188,7 +168,7 @@ CATEGORIES = {
             {
                 "type": "pixabay",
                 "keywords": ["office", "office room", "office desk"],
-                "target": 200,
+                "target": 500,
             },
         ],
     },
@@ -208,21 +188,7 @@ CATEGORIES = {
             {
                 "type": "pixabay",
                 "keywords": ["football"],
-                "target": 200,
-            },
-        ],
-    },
-    "entertainment": {
-        "sources": [
-            {
-                "type": "openimages",
-                "labels": ["Television", "Microphone", "Musical instrument", "Poster"],
                 "target": 300,
-            },
-            {
-                "type": "pixabay",
-                "keywords": ["concert", "cinema audience", "TV", "headphones"],
-                "target": 700,
             },
         ],
     },
@@ -235,12 +201,7 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": [
-                    "cleaning",
-                    "person cleaning house",
-                    "mopping floor",
-                    "washing dishes",
-                ],
+                "keywords": ["cleaning", "person cleaning house", "mopping floor", "washing dishes"],
                 "target": 1000,
             },
         ],
@@ -274,14 +235,8 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": [
-                    "person reading book",
-                    "reading",
-                    "reading on the sofa",
-                    "reading library",
-                    "book",
-                ],
-                "target": 1200,
+                "keywords": ["person reading book", "reading", "reading on the sofa", "reading library", "book", "library"],
+                "target": 2000,
             },
         ],
     },
@@ -289,12 +244,7 @@ CATEGORIES = {
         "sources": [
             {
                 "type": "openimages",
-                "labels": [
-                    "Computer monitor",
-                    "Computer keyboard",
-                    "Laptop",
-                    "Computer mouse",
-                ],
+                "labels": ["Computer monitor", "Computer keyboard", "Laptop", "Computer mouse"],
                 "target": 400,
             },
             {
@@ -338,8 +288,8 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["basketball", "basketball field"],
-                "target": 500,
+                "keywords": ["basketball", "basketball field", "basketball player"],
+                "target": 1000,
             },
         ],
     },
@@ -374,13 +324,9 @@ CATEGORIES = {
             {
                 "type": "openimages",
                 "labels": [
-                    "Dumbbell",
-                    "Treadmill",
-                    "Indoor rower",
-                    "Stationary bicycle",
-                    "Training bench",
-                    "Punching bag",
-                    "Horizontal bar",
+                    "Dumbbell", "Treadmill", "Indoor rower",
+                    "Stationary bicycle", "Training bench",
+                    "Punching bag", "Horizontal bar",
                 ],
                 "target": 400,
             },
@@ -410,9 +356,7 @@ def handle_openimages(category: str, source: dict) -> dict:
     out_dir = DATA_ROOT / category / "openimages"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    print(
-        f"  [openimages] Loading up to ~{per_label} per label (from train+val): {labels}"
-    )
+    print(f"  [openimages] Loading up to ~{per_label} per label (from train+val): {labels}")
 
     results = {}
     for label in labels:
@@ -429,9 +373,7 @@ def handle_openimages(category: str, source: dict) -> dict:
                     split=split,
                     label_types="detections",
                     classes=[label],
-                    max_samples=max(1, per_label // 2)
-                    if split == "validation"
-                    else per_label,
+                    max_samples=max(1, per_label // 2) if split == "validation" else per_label,
                     dataset_name=ds_name,
                 )
             except Exception as e:
@@ -454,12 +396,7 @@ def handle_openimages(category: str, source: dict) -> dict:
 
     grand_total = sum(results.values())
     print(f"  [openimages] Total: {grand_total} images")
-    return {
-        "type": "openimages",
-        "labels": labels,
-        "per_label_results": results,
-        "downloaded": grand_total,
-    }
+    return {"type": "openimages", "labels": labels, "per_label_results": results, "downloaded": grand_total}
 
 
 def handle_kaggle(category: str, source: dict) -> dict:
@@ -473,21 +410,19 @@ def handle_kaggle(category: str, source: dict) -> dict:
     print(f"  [kaggle] Downloading dataset '{dataset_slug}'...")
     download_path = Path(kagglehub.dataset_download(dataset_slug))
 
-    subfolders = sorted(
-        [
-            d
-            for d in download_path.iterdir()
-            if d.is_dir() and not d.name.startswith(".")
-        ]
-    )
+    subfolders = sorted([
+        d for d in download_path.iterdir()
+        if d.is_dir() and not d.name.startswith(".")
+    ])
     print(f"  [kaggle] Found {len(subfolders)} subfolders")
 
     total = 0
     folder_results = {}
     for folder in subfolders:
-        images = sorted(
-            [f for f in folder.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
-        )
+        images = sorted([
+            f for f in folder.iterdir()
+            if f.suffix.lower() in IMAGE_EXTENSIONS
+        ])
         if not images:
             continue
         sampled = random.sample(images, min(samples_per, len(images)))
@@ -501,12 +436,7 @@ def handle_kaggle(category: str, source: dict) -> dict:
         print(f"    {folder.name}: {count}/{len(images)} images sampled")
 
     print(f"  [kaggle] Total: {total} images")
-    return {
-        "type": "kaggle",
-        "dataset": dataset_slug,
-        "per_folder": folder_results,
-        "downloaded": total,
-    }
+    return {"type": "kaggle", "dataset": dataset_slug, "per_folder": folder_results, "downloaded": total}
 
 
 def handle_kaggle_csv(category: str, source: dict) -> dict:
@@ -568,39 +498,21 @@ def handle_kaggle_subfolder(category: str, source: dict) -> dict:
 
     if not source_dir.exists():
         print(f"  [kaggle_subfolder] ERROR: subfolder '{subfolder}' not found")
-        return {
-            "type": "kaggle_subfolder",
-            "dataset": dataset,
-            "error": "subfolder not found",
-            "downloaded": 0,
-        }
+        return {"type": "kaggle_subfolder", "dataset": dataset, "error": "subfolder not found", "downloaded": 0}
 
     total = 0
     results = {}
 
     if balanced:
-        subdirs = sorted(
-            [
-                d
-                for d in source_dir.iterdir()
-                if d.is_dir() and not d.name.startswith(".")
-            ]
-        )
+        subdirs = sorted([d for d in source_dir.iterdir() if d.is_dir() and not d.name.startswith(".")])
         per_folder = max(1, target // len(subdirs))
-        print(
-            f"  [kaggle_subfolder] Balanced mode: {len(subdirs)} subdirs, {per_folder} each"
-        )
+        print(f"  [kaggle_subfolder] Balanced mode: {len(subdirs)} subdirs, {per_folder} each")
         for sd in subdirs:
-            images = sorted(
-                [f for f in sd.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
-            )
+            images = sorted([f for f in sd.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS])
             if not images:
                 continue
             sampled = random.sample(images, min(per_folder, len(images)))
-            sub_out = (
-                out_dir
-                / f"{dataset.replace('/', '_')}_{sd.name.replace(' ', '_').lower()}"
-            )
+            sub_out = out_dir / f"{dataset.replace('/', '_')}_{sd.name.replace(' ', '_').lower()}"
             sub_out.mkdir(parents=True, exist_ok=True)
             for img in sampled:
                 shutil.copy2(img, sub_out / img.name)
@@ -608,37 +520,23 @@ def handle_kaggle_subfolder(category: str, source: dict) -> dict:
             total += len(sampled)
             print(f"    {sd.name}: {len(sampled)}/{len(images)} images")
     else:
-        images = sorted(
-            [f for f in source_dir.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS]
-        )
+        images = sorted([f for f in source_dir.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS])
         if not images:
             print(f"  [kaggle_subfolder] No images found in '{subfolder}'")
             return {"type": "kaggle_subfolder", "dataset": dataset, "downloaded": 0}
 
         sampled = random.sample(images, min(target, len(images)))
-        slug = (
-            subfolder.replace(" ", "_").replace("/", "_").lower()
-            if subfolder
-            else dataset.replace("/", "_")
-        )
+        slug = subfolder.replace(" ", "_").replace("/", "_").lower() if subfolder else dataset.replace("/", "_")
         sub_out = out_dir / slug
         sub_out.mkdir(parents=True, exist_ok=True)
         for img in sampled:
             shutil.copy2(img, sub_out / img.name)
         results[subfolder] = len(sampled)
         total = len(sampled)
-        print(
-            f"    Sampled {len(sampled)}/{len(images)} images from '{subfolder or '(root)'}'"
-        )
+        print(f"    Sampled {len(sampled)}/{len(images)} images from '{subfolder or '(root)'}'")
 
     print(f"  [kaggle_subfolder] Total: {total} images")
-    return {
-        "type": "kaggle_subfolder",
-        "dataset": dataset,
-        "subfolder": subfolder,
-        "per_folder": results,
-        "downloaded": total,
-    }
+    return {"type": "kaggle_subfolder", "dataset": dataset, "subfolder": subfolder, "per_folder": results, "downloaded": total}
 
 
 def handle_pixabay(category: str, source: dict) -> dict:
@@ -655,20 +553,17 @@ def handle_pixabay(category: str, source: dict) -> dict:
         page = 1
         kw_total = 0
         while kw_total < per_keyword:
-            resp = requests.get(
-                PIXABAY_BASE_URL,
-                params={
-                    "key": PIXABAY_API_KEY,
-                    "q": kw,
-                    "image_type": "photo",
-                    "orientation": "horizontal",
-                    "safesearch": "true",
-                    "per_page": 200,
-                    "page": page,
-                    "min_width": 380,
-                    "min_height": 380,
-                },
-            )
+            resp = requests.get(PIXABAY_BASE_URL, params={
+                "key": PIXABAY_API_KEY,
+                "q": kw,
+                "image_type": "photo",
+                "orientation": "horizontal",
+                "safesearch": "true",
+                "per_page": 200,
+                "page": page,
+                "min_width": 380,
+                "min_height": 380,
+            })
             remaining = int(resp.headers.get("X-RateLimit-Remaining", 100))
             if remaining < 5:
                 print("    Rate limit low — waiting 60s...")
@@ -680,9 +575,7 @@ def handle_pixabay(category: str, source: dict) -> dict:
                 break
 
             for photo in hits:
-                img_url = photo.get("largeImageURL") or photo["webformatURL"].replace(
-                    "_640", "_960"
-                )
+                img_url = photo.get("largeImageURL") or photo["webformatURL"].replace("_640", "_960")
                 try:
                     img_data = requests.get(img_url, timeout=10).content
                     fname = f"{total:04d}.jpg"
@@ -703,12 +596,7 @@ def handle_pixabay(category: str, source: dict) -> dict:
             break
 
     print(f"  [pixabay] Total: {total} images")
-    return {
-        "type": "pixabay",
-        "keywords": list(results.keys()),
-        "per_keyword": results,
-        "downloaded": total,
-    }
+    return {"type": "pixabay", "keywords": list(results.keys()), "per_keyword": results, "downloaded": total}
 
 
 SOURCE_HANDLERS = {
@@ -734,9 +622,9 @@ def write_metadata(category: str, source_results: list[dict]):
 
 
 def process_category(category: str, config: dict):
-    print(f"\n{'=' * 60}")
+    print(f"\n{'='*60}")
     print(f"  Category: {category}")
-    print(f"{'=' * 60}")
+    print(f"{'='*60}")
 
     source_results = []
     for source in config["sources"]:
@@ -774,9 +662,9 @@ def main():
             continue
         process_category(category, CATEGORIES[category])
 
-    print(f"\n{'=' * 60}")
+    print(f"\n{'='*60}")
     print("  Done! All categories processed.")
-    print(f"{'=' * 60}")
+    print(f"{'='*60}")
 
 
 if __name__ == "__main__":
