@@ -2024,3 +2024,223 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-05-24T20:32:44.722488'
+  mode: add
+  input: finish project report by friday
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: finish project report
+    start: null
+    deadline: Friday
+    difficulty: '0.479'
+    duration: '60'
+    category: personal
+    location: null
+    importance: '0.630'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:32:45.331783'
+  mode: modify
+  input: make it urgent
+  raw_output: importance=0.95[PRD]
+  parsed:
+    difficulty: '0.410'
+    importance: '0.797'
+    fixed_time: false
+    recurrent: false
+  error: null
+
+- timestamp: '2026-05-24T20:33:24.905942'
+  mode: add
+  input: go homne
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go homne
+    start: null
+    deadline: null
+    difficulty: '0.427'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.484'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:27.892710'
+  mode: add
+  input: go home
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.334'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.500'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:30.023621'
+  mode: add
+  input: go home not easy
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not easy
+    start: null
+    deadline: null
+    difficulty: '0.304'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.630'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:34.572859'
+  mode: add
+  input: go home not hard
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not hard
+    start: null
+    deadline: null
+    difficulty: '0.481'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.573'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:37.390809'
+  mode: add
+  input: go home hard
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home hard
+    start: null
+    deadline: null
+    difficulty: '0.654'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.644'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:39.972919'
+  mode: add
+  input: go home extreme
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home extreme
+    start: null
+    deadline: null
+    difficulty: '0.601'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.631'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:46.026739'
+  mode: add
+  input: go home very important
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home very important
+    start: null
+    deadline: null
+    difficulty: '0.400'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.838'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:50.225327'
+  mode: add
+  input: go home very not important
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home very not important
+    start: null
+    deadline: null
+    difficulty: '0.248'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.561'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:54.282255'
+  mode: add
+  input: go home not very important
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not very important
+    start: null
+    deadline: null
+    difficulty: '0.266'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.596'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T20:33:58.272539'
+  mode: add
+  input: go home not very important but very hard
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not very important but very hard
+    start: null
+    deadline: null
+    difficulty: '0.549'
+    duration: '30'
+    category: personal
+    location: null
+    importance: '0.800'
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
