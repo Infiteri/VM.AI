@@ -1,8 +1,8 @@
 """
 VM-AI - HuggingFace Model Downloader
-Downloads model from Hugging Face.
+Downloads both T5 parser and regressor models from Hugging Face.
 Usage: python pull_from_hf.py [token]
-ALWAYS backs up existing model to finetuned_parser_backup before downloading
+ALWAYS backs up existing models before downloading
 
 Written by: Vanea
 """
@@ -10,6 +10,7 @@ Written by: Vanea
 import os
 import shutil
 import sys
+import tempfile
 
 from huggingface_hub import snapshot_download
 
@@ -18,26 +19,26 @@ REPO_NAME = "vmai-parser"
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
-MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
-BACKUP_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser_backup")
+
+PARSER_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
+PARSER_BACKUP_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser_backup")
+
+REGRESSOR_PATH = os.path.join(PROJECT_ROOT, "models", "regressors")
+REGRESSOR_BACKUP_PATH = os.path.join(PROJECT_ROOT, "models", "regressors_backup")
 
 
-def backup_existing_model():
-    """Always backup existing model before downloading"""
-    print("Backing up existing model...")
-
-    if not os.path.exists(MODEL_PATH):
-        print("  No existing model to backup")
-        print()
+def backup_existing(path, backup_path, label):
+    """Backup a model directory if it exists."""
+    if not os.path.exists(path):
+        print(f"  No existing {label} to backup")
         return False
 
-    if os.path.exists(BACKUP_PATH):
-        print(f"  Removing old backup...")
-        shutil.rmtree(BACKUP_PATH)
-
-    shutil.move(MODEL_PATH, BACKUP_PATH)
-    print(f"  Backed up to: finetuned_parser_backup")
-    print()
+    print(f"  Backing up {label}...")
+    if os.path.exists(backup_path):
+        print(f"    Removing old backup...")
+        shutil.rmtree(backup_path)
+    shutil.move(path, backup_path)
+    print(f"    Backed up to: {os.path.basename(backup_path)}")
     return True
 
 
@@ -55,45 +56,76 @@ def main():
         print("No token provided - will attempt public repo download")
     print()
 
-    backup_existing_model()
-
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    # Backup both existing models
+    print("Backing up existing models...")
+    backup_existing(PARSER_PATH, PARSER_BACKUP_PATH, "T5 parser")
+    backup_existing(REGRESSOR_PATH, REGRESSOR_BACKUP_PATH, "regressors")
+    print()
 
     repo_id = f"{HF_USERNAME}/{REPO_NAME}"
 
     print(f"Repository: https://huggingface.co/{repo_id}")
-    print(f"Download to: {MODEL_PATH}")
     print()
 
-    print("Downloading model...")
+    # Download to a temp directory to flatten the structure
+    tmp_dir = tempfile.mkdtemp(prefix="vmai_hf_")
+    print(f"Downloading to temporary directory...")
+
     try:
-        download_kwargs = {"repo_id": repo_id, "local_dir": MODEL_PATH}
+        download_kwargs = {"repo_id": repo_id, "local_dir": tmp_dir}
         if token:
             download_kwargs["token"] = token
 
         snapshot_download(**download_kwargs)
 
-        files = os.listdir(MODEL_PATH)
-        if not files:
-            print()
-            print("Error: Download completed but folder is empty")
-            print("Restoring backup...")
-            if os.path.exists(BACKUP_PATH):
-                shutil.move(BACKUP_PATH, MODEL_PATH)
-                print("Backup restored")
-            return
+        # Check what subdirs we got
+        items = os.listdir(tmp_dir)
+        print(f"  Downloaded items: {items}")
+
+        # Move T5 parser model files
+        src_parser = os.path.join(tmp_dir, "finetuned_parser")
+        if os.path.isdir(src_parser):
+            os.makedirs(PARSER_PATH, exist_ok=True)
+            for item in os.listdir(src_parser):
+                shutil.move(os.path.join(src_parser, item), os.path.join(PARSER_PATH, item))
+            parser_files = os.listdir(PARSER_PATH)
+            print(f"  T5 parser: {len(parser_files)} files → {PARSER_PATH}")
+        else:
+            print("  Warning: finetuned_parser/ not found in repo")
+
+        # Move regressor model files
+        src_regressor = os.path.join(tmp_dir, "regressors")
+        if os.path.isdir(src_regressor):
+            os.makedirs(REGRESSOR_PATH, exist_ok=True)
+            for item in os.listdir(src_regressor):
+                shutil.move(os.path.join(src_regressor, item), os.path.join(REGRESSOR_PATH, item))
+            reg_files = os.listdir(REGRESSOR_PATH)
+            print(f"  Regressors: {len(reg_files)} files → {REGRESSOR_PATH}")
+        else:
+            print("  Warning: regressors/ not found in repo")
+
+        # Verify everything worked
+        if not os.listdir(PARSER_PATH):
+            raise Exception("Parser model directory is empty after download")
+
+        if not os.listdir(REGRESSOR_PATH):
+            raise Exception("Regressor directory is empty after download")
 
         print()
         print("=" * 60)
         print("SUCCESS")
         print("=" * 60)
         print()
-        print(f"Model downloaded to: {MODEL_PATH}")
-        print(f"Files: {len(files)}")
-        print(f"Backup saved at: {BACKUP_PATH}")
+        print(f"  T5 parser: {PARSER_PATH}")
+        print(f"  Regressors: {REGRESSOR_PATH}")
         print()
-        print("To restore backup if needed:")
-        print(f"  Move {BACKUP_PATH} to {MODEL_PATH}")
+        print("Backups saved at:")
+        print(f"  {PARSER_BACKUP_PATH}")
+        print(f"  {REGRESSOR_BACKUP_PATH}")
+        print()
+        print("To restore:")
+        print(f"  Replace {os.path.basename(PARSER_PATH)} with {os.path.basename(PARSER_BACKUP_PATH)}")
+        print(f"  Replace {os.path.basename(REGRESSOR_PATH)} with {os.path.basename(REGRESSOR_BACKUP_PATH)}")
 
     except Exception as e:
         print()
@@ -104,10 +136,19 @@ def main():
         print("  2. Check repo exists: https://huggingface.co/vaneaa/vmai-parser")
         print("  3. Check internet connection")
         print()
-        print("Restoring backup...")
-        if os.path.exists(BACKUP_PATH):
-            shutil.move(BACKUP_PATH, MODEL_PATH)
-            print("Backup restored to finetuned_parser")
+        print("Restoring backups...")
+        if os.path.exists(PARSER_BACKUP_PATH) and not os.path.exists(PARSER_PATH):
+            shutil.move(PARSER_BACKUP_PATH, PARSER_PATH)
+            print(f"  Restored {os.path.basename(PARSER_PATH)}")
+        if os.path.exists(REGRESSOR_BACKUP_PATH) and not os.path.exists(REGRESSOR_PATH):
+            shutil.move(REGRESSOR_BACKUP_PATH, REGRESSOR_PATH)
+            print(f"  Restored {os.path.basename(REGRESSOR_PATH)}")
+
+    finally:
+        if os.path.exists(tmp_dir):
+            shutil.rmtree(tmp_dir)
+            print()
+            print("Cleaned up temporary files")
 
 
 if __name__ == "__main__":

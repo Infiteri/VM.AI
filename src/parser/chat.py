@@ -112,7 +112,6 @@ class TaskPlannerPredictor:
 
         gen_kwargs = {
             "max_new_tokens": 256,
-            "max_length": 256,
             "no_repeat_ngram_size": 3,
             "repetition_penalty": 1.1,
             "use_cache": True,
@@ -135,12 +134,15 @@ class TaskPlannerPredictor:
         return raw
 
     def predict_add(self, sentence: str) -> Dict:
-        """Add mode: rule-based for structure + ML regressor for diff/imp."""
-        result = rule_based_parse(sentence)
+        """Add mode: T5 for structure + ML regressor for diff/imp."""
+        output = self._run_model(f"add: {sentence}", start_token="name=")
+        result = pipe_to_schema(output, input_text=sentence)
+        if "error" in result:
+            result = rule_based_parse(sentence)
         diff, imp = self.regressor.predict(sentence)
         result["difficulty"] = {"value": f"{diff:.3f}", "predicted": True}
         result["importance"] = {"value": f"{imp:.3f}", "predicted": True}
-        log_entry("add", sentence, "(rule-based + regressor)", result)
+        log_entry("add", sentence, self._last_raw_output, result)
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:

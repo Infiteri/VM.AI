@@ -14,6 +14,15 @@ URGENT = {'urgent', 'asap', 'critical', 'deadline', 'important', 'immediately'}
 HARD = {'hard', 'difficult', 'complex', 'tough', 'challenging', 'heavy', 'intense'}
 EASY = {'easy', 'simple', 'quick', 'light', 'trivial', 'basic', 'gentle'}
 TIME = {'minute', 'hour', 'day', 'week', 'month', 'today', 'tomorrow'}
+NEGATION = {'not', 'no', 'never', 'without', "n't"}
+
+
+def _is_negated(words, i):
+    """Check if word at index i is preceded by a negation token within 2 positions."""
+    for j in range(max(0, i - 2), i):
+        if words[j] in NEGATION or words[j].endswith("n't"):
+            return True
+    return False
 
 
 def extract_features(texts):
@@ -22,6 +31,36 @@ def extract_features(texts):
         w = t.lower().split()
         n_chars = len(t)
         n_words = len(w)
+
+        urgent_raw = hard_raw = easy_raw = time_raw = 0
+        urgent_neg = hard_neg = easy_neg = time_neg = 0
+        negation_count = 0
+
+        for i, x in enumerate(w):
+            if x in NEGATION or x.endswith("n't"):
+                negation_count += 1
+            negated = _is_negated(w, i)
+            if x in URGENT:
+                if negated:
+                    urgent_neg += 1
+                else:
+                    urgent_raw += 1
+            if x in HARD:
+                if negated:
+                    hard_neg += 1
+                else:
+                    hard_raw += 1
+            if x in EASY:
+                if negated:
+                    easy_neg += 1
+                else:
+                    easy_raw += 1
+            if x in TIME:
+                if negated:
+                    time_neg += 1
+                else:
+                    time_raw += 1
+
         feats.append([
             n_words,
             n_chars,
@@ -29,10 +68,15 @@ def extract_features(texts):
             t.count('!'),
             sum(1 for c in t if c.isupper()),
             sum(1 for c in t if c.isupper()) / max(n_chars, 1),
-            sum(1 for x in w if x in URGENT),
-            sum(1 for x in w if x in HARD),
-            sum(1 for x in w if x in EASY),
-            sum(1 for x in w if x in TIME),
+            urgent_raw,
+            hard_raw,
+            easy_raw,
+            time_raw,
+            urgent_neg,
+            hard_neg,
+            easy_neg,
+            time_neg,
+            negation_count,
             int(bool(re.search(r'\d+', t))),
         ])
     return np.array(feats)
