@@ -1,15 +1,16 @@
 """
-    VM-AI - HuggingFace Model Uploader
-    Uploads trained model folders to Hugging Face Hub.
-    Usage: python upload_to_hf.py [--message "commit msg"]
+VM-AI - HuggingFace Model Uploader
+Uploads trained model folders to Hugging Face Hub.
+Usage: python upload_to_hf.py [--message "commit msg"]
 
-    Written by: Vanea
+Written by: Vanea
 """
 
-import os
 import argparse
+import os
 from getpass import getpass
-from huggingface_hub import HfApi, login, CommitOperationAdd
+
+from huggingface_hub import CommitOperationAdd, HfApi, login
 
 HF_USERNAME = "vaneaa"
 REPO_NAME = "vmai-parser"
@@ -20,6 +21,7 @@ MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
 REGRESSOR_PATH = os.path.join(PROJECT_ROOT, "models", "regressors")
 
 IGNORE_PREFIXES = ["checkpoint-", ".cache"]
+
 
 def collect_files(folder_path, prefix_in_repo):
     """Walk folder_path and return CommitOperationAdd list, skipping IGNORE_PREFIXES."""
@@ -32,8 +34,11 @@ def collect_files(folder_path, prefix_in_repo):
             full = os.path.join(root, fn)
             rel = os.path.relpath(full, folder_path)
             path_in_repo = f"{prefix_in_repo}/{rel}".replace("\\", "/")
-            ops.append(CommitOperationAdd(path_in_repo=path_in_repo, path_or_fileobj=full))
+            ops.append(
+                CommitOperationAdd(path_in_repo=path_in_repo, path_or_fileobj=full)
+            )
     return ops
+
 
 def check_folder(path, label):
     if not os.path.isdir(path):
@@ -45,9 +50,12 @@ def check_folder(path, label):
         return False
     return True
 
+
 def main():
     argp = argparse.ArgumentParser(description="Upload VM.AI parser to HuggingFace Hub")
-    argp.add_argument("--message", default="Upload VM.AI parser model", help="Commit message")
+    argp.add_argument(
+        "--message", default="Upload VM.AI parser model", help="Commit message"
+    )
     args = argp.parse_args()
 
     print("=" * 60)
@@ -131,6 +139,7 @@ def main():
         print("  1. Check token has WRITE permission")
         print("  2. Make sure repo exists on huggingface.co")
         print("  3. Check internet connection")
+
 
 if __name__ == "__main__":
     main()

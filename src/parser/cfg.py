@@ -1,35 +1,41 @@
 """
-    VM-AI - Configuration Manager
-    Loads and manages training config from config.yaml.
+VM-AI - Configuration Manager
+Loads and manages training config from config.yaml.
 
-    Written by: Vanea
+Written by: Vanea
 """
 
 import os
+
 import torch
 import yaml
 
 # for colab easier setup, set to "/content/" if running in colab, otherwise keep as "" for local runs
 ROOT = ""
 
+
 class Config:
     def __init__(self, mode="both", config_path=ROOT + "config.yaml"):
-        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        root = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
 
         yaml_path = os.path.join(root, config_path)
         with open(yaml_path, "r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
 
-        self.model_cache        = os.path.join(root, ROOT, cfg["paths"]["model_cache"])
-        self.output_dir         = os.path.join(root, ROOT, cfg["paths"]["output_dir"])
-        self.data_path          = os.path.join(root, ROOT, cfg["paths"]["synthetic_data"])
-        self.real_data_path     = os.path.join(root, ROOT, cfg["paths"]["real_data"])
-        self.specific_data_path = os.path.join(root, ROOT, cfg["paths"]["specific_data"])
+        self.model_cache = os.path.join(root, ROOT, cfg["paths"]["model_cache"])
+        self.output_dir = os.path.join(root, ROOT, cfg["paths"]["output_dir"])
+        self.data_path = os.path.join(root, ROOT, cfg["paths"]["synthetic_data"])
+        self.real_data_path = os.path.join(root, ROOT, cfg["paths"]["real_data"])
+        self.specific_data_path = os.path.join(
+            root, ROOT, cfg["paths"]["specific_data"]
+        )
 
-        self.fp16                   = torch.cuda.is_available()
+        self.fp16 = torch.cuda.is_available()
         self.dataloader_num_workers = 4 if torch.cuda.is_available() else 0
-        self.dataloader_pin_memory  = torch.cuda.is_available()
-        self.logging_steps          = 50
+        self.dataloader_pin_memory = torch.cuda.is_available()
+        self.logging_steps = 50
         self.per_device_eval_batch_size = 8
 
         mode_data = cfg.get("modes", {}).get(mode, cfg["modes"]["default"])

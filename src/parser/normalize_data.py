@@ -1,28 +1,33 @@
 """
-    VM-AI - Data Normalizer with EXP/PRD Tag Support
-    Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats with tags.
-    Run: python src/parser/normalize_data.py
+VM-AI - Data Normalizer with EXP/PRD Tag Support
+Normalizes VMAI_REAL_Data.yaml and VMAI_SPECIFIC_Data.yaml to consistent formats with tags.
+Run: python src/parser/normalize_data.py
 
-    Written by: Vanea
+Written by: Vanea
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import yaml
 from schemas import (
-    normalize_duration, normalize_deadline, normalize_time, clamp_category,
-    detect_explicit_fields
+    clamp_category,
+    detect_explicit_fields,
+    normalize_deadline,
+    normalize_duration,
+    normalize_time,
 )
+
 
 def normalize_example(ex):
     """Normalize a single example's output dict, preserving or adding EXP/PRD tags."""
     out = ex.get("output", {})
     inp = ex.get("input", "")
-    
+
     explicit_fields = detect_explicit_fields(inp)
-    
+
     dur = out.get("duration")
     if dur is not None:
         dur = normalize_duration(dur)
@@ -72,7 +77,20 @@ def normalize_example(ex):
     if rd is not None:
         if isinstance(rd, str):
             rd = [d.strip() for d in rd.split(",")]
-        rd = [d for d in rd if d in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]]
+        rd = [
+            d
+            for d in rd
+            if d
+            in [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+            ]
+        ]
         out["recurrence_days"] = rd if rd else None
 
     ex["output"] = {k: v for k, v in out.items() if v is not None}
@@ -99,6 +117,7 @@ def normalize_file(path):
 
     print(f"{path}: {fixed}/{len(examples)} examples normalized")
     return fixed, len(examples)
+
 
 # TODO:
 if __name__ == "__main__":

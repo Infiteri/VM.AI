@@ -1,15 +1,16 @@
 """
-    VM-AI - HuggingFace Model Downloader
-    Downloads model from Hugging Face.
-    Usage: python pull_from_hf.py [token]
-    ALWAYS backs up existing model to finetuned_parser_backup before downloading
+VM-AI - HuggingFace Model Downloader
+Downloads model from Hugging Face.
+Usage: python pull_from_hf.py [token]
+ALWAYS backs up existing model to finetuned_parser_backup before downloading
 
-    Written by: Vanea
+Written by: Vanea
 """
 
 import os
-import sys
 import shutil
+import sys
+
 from huggingface_hub import snapshot_download
 
 HF_USERNAME = "vaneaa"
@@ -19,6 +20,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 MODEL_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser")
 BACKUP_PATH = os.path.join(PROJECT_ROOT, "models", "finetuned_parser_backup")
+
 
 def backup_existing_model():
     """Always backup existing model before downloading"""
@@ -37,6 +39,7 @@ def backup_existing_model():
     print(f"  Backed up to: finetuned_parser_backup")
     print()
     return True
+
 
 def main():
     print("=" * 60)
@@ -105,6 +108,7 @@ def main():
         if os.path.exists(BACKUP_PATH):
             shutil.move(BACKUP_PATH, MODEL_PATH)
             print("Backup restored to finetuned_parser")
+
 
 if __name__ == "__main__":
     main()

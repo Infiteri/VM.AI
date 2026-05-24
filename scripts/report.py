@@ -1,16 +1,17 @@
 """
-    VM.AI - Dataset Text Report Generator
-    Outputs concise text-based statistics for all datasets.
-    Run: python scripts/report.py
-         python scripts/report.py --dataset real
+VM.AI - Dataset Text Report Generator
+Outputs concise text-based statistics for all datasets.
+Run: python scripts/report.py
+     python scripts/report.py --dataset real
 """
 
-import sys
-import os
-import yaml
-import re
 import argparse
+import os
+import re
+import sys
 from collections import Counter
+
+import yaml
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -42,16 +43,46 @@ def report_real_or_specific(name, data):
     mods = [ex for ex, r in zip(examples, records) if r == "modify"]
 
     cats = [str(ex.get("output", {}).get("category", "?")).lower() for ex in examples]
-    diffs = [float(ex["output"]["difficulty"]) for ex in examples if ex.get("output", {}).get("difficulty") is not None]
-    imps = [float(ex["output"]["importance"]) for ex in examples if ex.get("output", {}).get("importance") is not None]
-    durs = [float(ex["output"]["duration"]) for ex in examples if ex.get("output", {}).get("duration") is not None]
+    diffs = [
+        float(ex["output"]["difficulty"])
+        for ex in examples
+        if ex.get("output", {}).get("difficulty") is not None
+    ]
+    imps = [
+        float(ex["output"]["importance"])
+        for ex in examples
+        if ex.get("output", {}).get("importance") is not None
+    ]
+    durs = [
+        float(ex["output"]["duration"])
+        for ex in examples
+        if ex.get("output", {}).get("duration") is not None
+    ]
     fixed_time = sum(1 for ex in examples if ex.get("output", {}).get("fixed_time"))
     recurrent = sum(1 for ex in examples if ex.get("output", {}).get("recurrent"))
-    deadlines = [ex["output"]["deadline"] for ex in examples if ex.get("output", {}).get("deadline")]
-    starts = [ex["output"]["start"] for ex in examples if ex.get("output", {}).get("start")]
-    locations = [str(ex["output"]["location"]).lower() for ex in examples if ex.get("output", {}).get("location")]
-    fixed_starts = [ex["output"]["fixed_start"] for ex in examples if ex.get("output", {}).get("fixed_start")]
-    rec_days = [ex["output"]["recurrence_days"] for ex in examples if ex.get("output", {}).get("recurrence_days")]
+    deadlines = [
+        ex["output"]["deadline"]
+        for ex in examples
+        if ex.get("output", {}).get("deadline")
+    ]
+    starts = [
+        ex["output"]["start"] for ex in examples if ex.get("output", {}).get("start")
+    ]
+    locations = [
+        str(ex["output"]["location"]).lower()
+        for ex in examples
+        if ex.get("output", {}).get("location")
+    ]
+    fixed_starts = [
+        ex["output"]["fixed_start"]
+        for ex in examples
+        if ex.get("output", {}).get("fixed_start")
+    ]
+    rec_days = [
+        ex["output"]["recurrence_days"]
+        for ex in examples
+        if ex.get("output", {}).get("recurrence_days")
+    ]
 
     cat_counts = Counter(cats)
     dl_counts = Counter(str(d) for d in deadlines)
@@ -86,11 +117,17 @@ def report_real_or_specific(name, data):
         print(f"  {c}: {n}")
 
     if diffs:
-        print(f"difficulty: min={min(diffs):.2f}  max={max(diffs):.2f}  avg={sum(diffs)/len(diffs):.2f}")
+        print(
+            f"difficulty: min={min(diffs):.2f}  max={max(diffs):.2f}  avg={sum(diffs) / len(diffs):.2f}"
+        )
     if imps:
-        print(f"importance:  min={min(imps):.2f}  max={max(imps):.2f}  avg={sum(imps)/len(imps):.2f}")
+        print(
+            f"importance:  min={min(imps):.2f}  max={max(imps):.2f}  avg={sum(imps) / len(imps):.2f}"
+        )
     if durs:
-        print(f"duration:    min={min(durs):.0f}  max={max(durs):.0f}  avg={sum(durs)/len(durs):.0f}")
+        print(
+            f"duration:    min={min(durs):.0f}  max={max(durs):.0f}  avg={sum(durs) / len(durs):.0f}"
+        )
 
     print(f"fixed_time: {fixed_time}  recurrent: {recurrent}")
 
@@ -129,21 +166,86 @@ def report_real_or_specific(name, data):
 
 def classify_template_section(template):
     t = template.lower()
-    if any(k in t for k in ["[difficult", "hard one", "easy one", "moderate", "pretty ", "seems ", "looks ", "somewhat ", "quite ", "rather "]):
+    if any(
+        k in t
+        for k in [
+            "[difficult",
+            "hard one",
+            "easy one",
+            "moderate",
+            "pretty ",
+            "seems ",
+            "looks ",
+            "somewhat ",
+            "quite ",
+            "rather ",
+        ]
+    ):
         return "difficulty"
-    if any(k in t for k in ["important", "urgent", "priority", "critical", "can wait", "optional", "mandatory", "essential", "nice to have", "top priority", "not a priority", "mildly", "absolutely"]):
+    if any(
+        k in t
+        for k in [
+            "important",
+            "urgent",
+            "priority",
+            "critical",
+            "can wait",
+            "optional",
+            "mandatory",
+            "essential",
+            "nice to have",
+            "top priority",
+            "not a priority",
+            "mildly",
+            "absolutely",
+        ]
+    ):
         return "importance"
     if "[category]" in t:
         return "category"
     if any(k in t for k in ["every ", "daily", "weekday", "repeat"]):
         return "recurrence"
-    if any(k in t for k in ["start ", "begin", "kick off", "commenc", "starting", "begins", "from [date"]):
+    if any(
+        k in t
+        for k in [
+            "start ",
+            "begin",
+            "kick off",
+            "commenc",
+            "starting",
+            "begins",
+            "from [date",
+        ]
+    ):
         return "start"
     if any(k in t for k in ["due ", "deadline", "before ", "by [deadline"]):
         return "deadline+time"
-    if any(k in t for k in ["morning", "afternoon", "evening", "noon", "midnight", "early ", "late "]):
+    if any(
+        k in t
+        for k in [
+            "morning",
+            "afternoon",
+            "evening",
+            "noon",
+            "midnight",
+            "early ",
+            "late ",
+        ]
+    ):
         return "time-of-day"
-    if any(k in t for k in ["todo:", "task:", "reminder:", "don't let", "flag this", "heads up:", "note:", "action item"]):
+    if any(
+        k in t
+        for k in [
+            "todo:",
+            "task:",
+            "reminder:",
+            "don't let",
+            "flag this",
+            "heads up:",
+            "note:",
+            "action item",
+        ]
+    ):
         return "casual"
     return "basic"
 
@@ -154,16 +256,18 @@ def report_synthetic(name, data):
         print(f"{name}: no templates")
         return
 
-    all_ph = [ph for t in templates for ph in re.findall(r'\[([A-Z_]+)\]', t)]
+    all_ph = [ph for t in templates for ph in re.findall(r"\[([A-Z_]+)\]", t)]
     ph_counts = Counter(all_ph)
-    fields_per = [len(re.findall(r'\[([A-Z_]+)\]', t)) for t in templates]
+    fields_per = [len(re.findall(r"\[([A-Z_]+)\]", t)) for t in templates]
     section_counts = Counter(classify_template_section(t) for t in templates)
 
     print(f"--- {name} ---")
     print(f"templates: {len(templates)}")
     print(f"tasks: {len(data.get('tasks', []))}")
 
-    print(f"fields/template: min={min(fields_per)}  max={max(fields_per)}  avg={sum(fields_per)/len(fields_per):.1f}")
+    print(
+        f"fields/template: min={min(fields_per)}  max={max(fields_per)}  avg={sum(fields_per) / len(fields_per):.1f}"
+    )
     fields_hist = Counter(fields_per)
     for fc in sorted(fields_hist.keys()):
         print(f"  {fc} fields: {fields_hist[fc]} templates")
@@ -177,14 +281,26 @@ def report_synthetic(name, data):
         print(f"  {ph}: {n}")
 
     print(f"pools:")
-    for key in ["deadlines", "durations", "dates", "times", "locations", "categories", "priorities", "difficulties", "recurrence_days"]:
+    for key in [
+        "deadlines",
+        "durations",
+        "dates",
+        "times",
+        "locations",
+        "categories",
+        "priorities",
+        "difficulties",
+        "recurrence_days",
+    ]:
         print(f"  {key}: {len(data.get(key, []))}")
     print()
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", choices=["real", "specific", "synthetic", "all"], default="all")
+    parser.add_argument(
+        "--dataset", choices=["real", "specific", "synthetic", "all"], default="all"
+    )
     args = parser.parse_args()
 
     targets = list(DATASETS.keys()) if args.dataset == "all" else [args.dataset]

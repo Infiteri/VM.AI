@@ -1,31 +1,32 @@
 """
-    VM-AI - Parser Training Script
-    Trains the parser model with EXP/PRD tag format.
-    Run: python src/parser/train.py
+VM-AI - Parser Training Script
+Trains the parser model with EXP/PRD tag format.
+Run: python src/parser/train.py
 
-    Written by: Vanea
+Written by: Vanea
 """
 
+import argparse
 import os
 import time
-import argparse
-import torch
+
 import numpy as np
+import torch
+from cfg import Config
+from data_generator import DataGenerator
 from datasets import Dataset
+from huggingface_hub import snapshot_download
+from schemas import parse_pipe_simple
 from transformers import (
     AutoTokenizer,
-    T5ForConditionalGeneration,
-    Seq2SeqTrainingArguments,
-    Seq2SeqTrainer,
     DataCollatorForSeq2Seq,
     EvalPrediction,
+    Seq2SeqTrainer,
+    Seq2SeqTrainingArguments,
+    T5ForConditionalGeneration,
 )
-from huggingface_hub import snapshot_download
-from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
-from data_generator import DataGenerator
-from cfg import Config
-from schemas import parse_pipe_simple
 from vars import TRACKED_FIELDS
+from yaml_parser import VMAI_RealDataParser, VMAI_YamlParser
 
 if os.name != "nt":
     os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -345,6 +346,7 @@ def main():
     h, rem = divmod(elapsed, 3600)
     m, s = divmod(rem, 60)
     print(f"\nDone in {h:02d}h {m:02d}m {s:02d}s")
+
 
 if __name__ == "__main__":
     main()

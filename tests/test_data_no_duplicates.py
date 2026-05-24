@@ -1,15 +1,18 @@
 """
-    VM-AI - Duplicate Input Checker
-    Verifies no duplicate input texts exist in REAL and SPECIFIC datasets.
-    No model required.
-    Run: python tests/test_data_no_duplicates.py
+VM-AI - Duplicate Input Checker
+Verifies no duplicate input texts exist in REAL and SPECIFIC datasets.
+No model required.
+Run: python tests/test_data_no_duplicates.py
 """
 
-import sys, os
+import os
+import sys
+
 import yaml
 
 passed = 0
 failed = 0
+
 
 def c(n, ok, d=""):
     global passed, failed
@@ -20,12 +23,13 @@ def c(n, ok, d=""):
         failed += 1
         print(f"  FAIL | {n} | {d}")
 
+
 print("=" * 80)
 print("  DUPLICATE INPUT CHECKER")
 print("=" * 80)
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-data_dir = os.path.join(project_root, 'data')
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+data_dir = os.path.join(project_root, "data")
 FILES = [
     os.path.join(data_dir, "VMAI_REAL_Data.yaml"),
     os.path.join(data_dir, "VMAI_SPECIFIC_Data.yaml"),
@@ -37,14 +41,14 @@ for f in FILES:
     if not os.path.exists(f):
         c(f"{fname} exists", False, "file not found")
         continue
-    with open(f, 'r', encoding='utf-8') as fh:
+    with open(f, "r", encoding="utf-8") as fh:
         data = yaml.safe_load(fh)
-    examples = data.get('examples', [])
+    examples = data.get("examples", [])
     c(f"{fname} loaded", len(examples) > 0, f"examples={len(examples)}")
     seen = {}
     dups = []
     for i, ex in enumerate(examples):
-        inp = ex.get('input', '')
+        inp = ex.get("input", "")
         if inp in seen:
             dups.append((i, seen[inp], inp[:60]))
         else:
@@ -55,6 +59,8 @@ for f in FILES:
             print(f"    dup idx={idx} of idx={orig}: '{snippet}'")
 
 print(f"\n{'=' * 80}")
-print(f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)")
+print(
+    f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)"
+)
 print(f"{'=' * 80}")
 sys.exit(0 if failed == 0 else 1)

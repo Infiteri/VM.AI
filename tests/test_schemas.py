@@ -1,16 +1,25 @@
 """
-    VM-AI - Schema Function Tests
-    Tests normalize_time, normalize_duration, normalize_deadline, clamp_category, detect_explicit_fields.
-    No model required.
-    Run: python tests/test_schemas.py
+VM-AI - Schema Function Tests
+Tests normalize_time, normalize_duration, normalize_deadline, clamp_category, detect_explicit_fields.
+No model required.
+Run: python tests/test_schemas.py
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
-from schemas import normalize_time, normalize_duration, normalize_deadline, clamp_category, detect_explicit_fields
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src", "parser"))
+from schemas import (
+    clamp_category,
+    detect_explicit_fields,
+    normalize_deadline,
+    normalize_duration,
+    normalize_time,
+)
 
 passed = 0
 failed = 0
+
 
 def c(n, ok, d=""):
     global passed, failed
@@ -20,6 +29,7 @@ def c(n, ok, d=""):
     else:
         failed += 1
         print(f"  FAIL | {n} | {d}")
+
 
 print("=" * 80)
 print("  SCHEMA FUNCTION TESTS")
@@ -99,6 +109,8 @@ c("no fixed_time", "fixed_time" not in r)
 c("no difficulty", "difficulty" not in r)
 
 print(f"\n{'=' * 80}")
-print(f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)")
+print(
+    f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)"
+)
 print(f"{'=' * 80}")
 sys.exit(0 if failed == 0 else 1)

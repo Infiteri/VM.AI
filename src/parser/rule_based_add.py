@@ -1,12 +1,14 @@
 """
-    VM-AI - Rule-based Add Mode Parser (MVP)
-    Extracts basic fields from natural language without a model.
+VM-AI - Rule-based Add Mode Parser (MVP)
+Extracts basic fields from natural language without a model.
 
-    Written by: Vanea
+Written by: Vanea
 """
 
 import re
+
 from vars import ALL_FIELDS, DAYS
+
 
 def normalize_time(time_str):
     if not time_str:
@@ -31,6 +33,7 @@ def normalize_time(time_str):
     if "midnight" in time_str:
         return "00:00"
     return None
+
 
 def parse_add(sentence: str) -> dict:
     s = sentence.lower().strip()
