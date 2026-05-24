@@ -1,33 +1,34 @@
 """
-    VM-AI - Data Generator with EXP/PRD Tag Support
-    Generates training data in pipe format with explicit/predicted tags:
-    name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
-    Run: python src/parser/data_generator.py
+VM-AI - Data Generator with EXP/PRD Tag Support
+Generates training data in pipe format with explicit/predicted tags:
+name=gym[EXP] | difficulty=0.6[PRD] | category=fitness[PRD]
+Run: python src/parser/data_generator.py
 
-    Written by: Vanea
+Written by: Vanea
 """
 
-import vars
-import json
-import random
 import argparse
-import re
+import json
 import os
+import random
+import re
+
+import vars
 from datasets import Dataset
 from schemas import (
-    schema_to_pipe,
+    CATEGORY_KEYWORDS,
+    DIFFICULTY_KEYWORDS,
+    DURATION_KEYWORDS,
+    IMPORTANCE_KEYWORDS,
+    RECURRENCE_KEYWORDS,
+    TIME_KEYWORDS,
     changed_to_pipe,
-    normalize_duration,
-    normalize_deadline,
-    normalize_time,
     clamp_category,
     detect_explicit_fields,
-    DIFFICULTY_KEYWORDS,
-    IMPORTANCE_KEYWORDS,
-    CATEGORY_KEYWORDS,
-    DURATION_KEYWORDS,
-    TIME_KEYWORDS,
-    RECURRENCE_KEYWORDS,
+    normalize_deadline,
+    normalize_duration,
+    normalize_time,
+    schema_to_pipe,
 )
 
 PREDICTED_FIELDS = vars.PREDICTED_FIELDS
@@ -35,8 +36,10 @@ FIELD_MAP = vars.FIELD_MAP if hasattr(vars, "FIELD_MAP") else {}
 DAYS = vars.DAYS
 DAYS_LOWER = {d.lower(): d for d in DAYS}
 
+
 def _rand_duration():
     return str(random.choice([10, 15, 20, 25, 30, 45, 60, 90, 120, 150, 180]))
+
 
 def _rand_deadline():
     return random.choice(
@@ -67,14 +70,18 @@ def _rand_location():
         ]
     )
 
+
 def _rand_difficulty():
     return str(round(random.uniform(0.1, 0.95), 2))
+
 
 def _rand_importance():
     return str(round(random.uniform(0.1, 0.99), 2))
 
+
 def _rand_category():
     return random.choice(list(vars.VALID_CATEGORIES))
+
 
 def _rand_name():
     return random.choice(
@@ -87,6 +94,7 @@ def _rand_name():
             "fix the bug",
         ]
     )
+
 
 def _rand_time():
     return random.choice(
@@ -106,6 +114,7 @@ def _rand_time():
         ]
     )
 
+
 def _rand_start():
     return random.choice(
         [
@@ -120,9 +129,11 @@ def _rand_start():
         ]
     )
 
+
 def _rand_recurrence_days():
     count = random.randint(1, 3)
     return ",".join(random.sample(DAYS, k=count))
+
 
 CHANGE_TEMPLATES = [
     ("duration", lambda v: f"make it {v} minutes", _rand_duration),
@@ -184,6 +195,7 @@ CHANGE_TEMPLATES = [
     ("cancel_recurrent", lambda v: "make it one-time", lambda: "false"),
     ("cancel_recurrent", lambda v: "don't repeat it", lambda: "false"),
 ]
+
 
 class DataGenerator:
     def __init__(self, training_data, real_examples=None, specific_examples=None):
@@ -248,7 +260,6 @@ class DataGenerator:
                 sentence = sentence.replace(tag, value)
                 placeholder_map[ph] = value
         return sentence.lower().strip(), placeholder_map
-
 
     _TASK_CATEGORY_MAP = {
         "migration": "work",
@@ -914,7 +925,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     import os
-    from yaml_parser import VMAI_YamlParser, VMAI_RealDataParser
+
+    from yaml_parser import VMAI_RealDataParser, VMAI_YamlParser
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
     data_dir = os.path.join(project_root, "data")

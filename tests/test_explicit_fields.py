@@ -1,16 +1,19 @@
 """
-    VM-AI - Explicit Field Detection Tests
-    Verifies detect_explicit_fields() doesn't over-trigger on common words like "at", "by".
-    No model required.
-    Run: python tests/test_explicit_fields.py
+VM-AI - Explicit Field Detection Tests
+Verifies detect_explicit_fields() doesn't over-trigger on common words like "at", "by".
+No model required.
+Run: python tests/test_explicit_fields.py
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src", "parser"))
 from schemas import detect_explicit_fields
 
 passed = 0
 failed = 0
+
 
 def c(n, ok, d=""):
     global passed, failed
@@ -20,6 +23,7 @@ def c(n, ok, d=""):
     else:
         failed += 1
         print(f"  FAIL | {n} | {d}")
+
 
 print("=" * 80)
 print("  EXPLICIT FIELD DETECTION TESTS")
@@ -67,6 +71,8 @@ r = detect_explicit_fields("by the way, do something")
 c("'by the way' no trigger", "deadline" not in r, f"got: {r}")
 
 print(f"\n{'=' * 80}")
-print(f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)")
+print(
+    f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)"
+)
 print(f"{'=' * 80}")
 sys.exit(0 if failed == 0 else 1)

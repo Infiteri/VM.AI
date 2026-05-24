@@ -1,13 +1,15 @@
 """
-    VM-AI - Core Parser Tests
-    Tests pipe format parsing, schema conversion, and diff logic.
-    No model required.
-    Run: python tests/test_core.py
+VM-AI - Core Parser Tests
+Tests pipe format parsing, schema conversion, and diff logic.
+No model required.
+Run: python tests/test_core.py
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'parser'))
-from schemas import pipe_to_schema, schema_to_pipe, changed_to_pipe
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src", "parser"))
+from schemas import changed_to_pipe, pipe_to_schema, schema_to_pipe
 
 passed = 0
 failed = 0
@@ -131,6 +133,7 @@ new = {
     "fixed_start": {"value": "07:00", "predicted": False},
 }
 from chat import TaskPlannerPredictor
+
 ch = TaskPlannerPredictor._diff_schemas(old, new)
 c("d: diff changed", "difficulty" in ch)
 c("d: diff val", ch.get("difficulty", {}).get("value") == "0.8")
@@ -139,8 +142,14 @@ c("d: fs val", ch.get("fixed_start", {}).get("value") == "07:00")
 c("d: name skipped", "name" not in ch)
 
 # None values skipped
-old = {"name": {"value": "gym", "predicted": False}, "difficulty": {"value": "0.35", "predicted": True}}
-new = {"name": {"value": "gym", "predicted": False}, "difficulty": {"value": None, "predicted": True}}
+old = {
+    "name": {"value": "gym", "predicted": False},
+    "difficulty": {"value": "0.35", "predicted": True},
+}
+new = {
+    "name": {"value": "gym", "predicted": False},
+    "difficulty": {"value": None, "predicted": True},
+}
 c("d: none skip", len(TaskPlannerPredictor._diff_schemas(old, new)) == 0)
 
 # Bool changes
@@ -149,12 +158,20 @@ new = {"fixed_time": {"value": False, "predicted": False}}
 c("d: bool change", "fixed_time" in TaskPlannerPredictor._diff_schemas(old, new))
 
 # Case insensitive
-old = {"name": {"value": "Gym", "predicted": False}, "category": {"value": "FITNESS", "predicted": True}}
-new = {"name": {"value": "gym", "predicted": False}, "category": {"value": "fitness", "predicted": True}}
+old = {
+    "name": {"value": "Gym", "predicted": False},
+    "category": {"value": "FITNESS", "predicted": True},
+}
+new = {
+    "name": {"value": "gym", "predicted": False},
+    "category": {"value": "fitness", "predicted": True},
+}
 c("d: case skip", len(TaskPlannerPredictor._diff_schemas(old, new)) == 0)
 
 # ── Summary ─────────────────────────────────────────────────────────────────
 print(f"\n{'=' * 80}")
-print(f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)")
+print(
+    f"  RESULTS: {passed}/{passed + failed} passed ({100 * passed // (passed + failed) if passed + failed else 0}%)"
+)
 print(f"{'=' * 80}")
 sys.exit(0 if failed == 0 else 1)

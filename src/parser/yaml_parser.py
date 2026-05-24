@@ -1,30 +1,32 @@
 """
-    VM-AI - YAML Training Data Parser
-    Parses YAML training data into structured format for training.
-    Run: imported by other modules
+VM-AI - YAML Training Data Parser
+Parses YAML training data into structured format for training.
+Run: imported by other modules
 
-    Written by: Vanea
+Written by: Vanea
 """
 
-import yaml
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import Dict, List
+
 import vars
+import yaml
+
 
 @dataclass
 class VMAI_YamlTrainingParsedData:
-    label_list:      List[str]
-    templates:       List[str]
-    tasks:           List[str]
-    durations:       List[str]
-    deadlines:       List[str]
-    locations:       List[str] = field(default_factory=list)
-    dates:           List[str] = field(default_factory=list)
-    times:           List[str] = field(default_factory=list)
-    priorities:      List[str] = field(default_factory=list)
-    difficulties:    List[str] = field(default_factory=list)
-    categories:      List[str] = field(default_factory=list)
-    fixed_starts:    List[str] = field(default_factory=list)
+    label_list: List[str]
+    templates: List[str]
+    tasks: List[str]
+    durations: List[str]
+    deadlines: List[str]
+    locations: List[str] = field(default_factory=list)
+    dates: List[str] = field(default_factory=list)
+    times: List[str] = field(default_factory=list)
+    priorities: List[str] = field(default_factory=list)
+    difficulties: List[str] = field(default_factory=list)
+    categories: List[str] = field(default_factory=list)
+    fixed_starts: List[str] = field(default_factory=list)
     recurrence_days: List[str] = field(default_factory=list)
 
     label2id: Dict[str, int] = field(init=False)
@@ -32,16 +34,16 @@ class VMAI_YamlTrainingParsedData:
 
     def get_placeholder_map(self) -> Dict[str, List[str]]:
         mapping = {
-            "TASK":           self.tasks,
-            "DURATION":       self.durations,
-            "DEADLINE":       self.deadlines,
-            "LOCATION":       self.locations,
-            "DATE":           self.dates,
-            "TIME":           self.times,
-            "PRIORITY":       self.priorities,
-            "DIFFICULTY":     self.difficulties,
-            "CATEGORY":       self.categories,
-            "FIXED_START":    self.fixed_starts,
+            "TASK": self.tasks,
+            "DURATION": self.durations,
+            "DEADLINE": self.deadlines,
+            "LOCATION": self.locations,
+            "DATE": self.dates,
+            "TIME": self.times,
+            "PRIORITY": self.priorities,
+            "DIFFICULTY": self.difficulties,
+            "CATEGORY": self.categories,
+            "FIXED_START": self.fixed_starts,
             "RECURRENCE_DAY": self.recurrence_days,
         }
         return {k: v for k, v in mapping.items() if v}
@@ -56,9 +58,18 @@ class VMAI_YamlTrainingParsedData:
         print("=" * 60)
 
         fields_to_print = [
-            "templates", "tasks", "durations", "deadlines",
-            "locations", "dates", "times", "priorities",
-            "difficulties", "categories", "fixed_starts", "recurrence_days"
+            "templates",
+            "tasks",
+            "durations",
+            "deadlines",
+            "locations",
+            "dates",
+            "times",
+            "priorities",
+            "difficulties",
+            "categories",
+            "fixed_starts",
+            "recurrence_days",
         ]
 
         for field_name in fields_to_print:
@@ -86,19 +97,19 @@ class VMAI_YamlParser:
             raise ValueError("YAML data not loaded")
 
         return VMAI_YamlTrainingParsedData(
-            label_list=      self.data.get("labels", []),
-            templates=       self.data.get("templates", []),
-            tasks=           self.data.get("tasks", []),
-            durations=       self.data.get("durations", []),
-            deadlines=       self.data.get("deadlines", []),
-            locations=       self.data.get("locations", []),
-            dates=           self.data.get("dates", []),
-            times=           self.data.get("times", []),
-            priorities=      self.data.get("priorities", []),
-            difficulties=    self.data.get("difficulties", []),
-            categories=      self.data.get("categories", []),
-            fixed_starts=    self.data.get("fixed_starts", []),
-            recurrence_days= self.data.get("recurrence_days", []),
+            label_list=self.data.get("labels", []),
+            templates=self.data.get("templates", []),
+            tasks=self.data.get("tasks", []),
+            durations=self.data.get("durations", []),
+            deadlines=self.data.get("deadlines", []),
+            locations=self.data.get("locations", []),
+            dates=self.data.get("dates", []),
+            times=self.data.get("times", []),
+            priorities=self.data.get("priorities", []),
+            difficulties=self.data.get("difficulties", []),
+            categories=self.data.get("categories", []),
+            fixed_starts=self.data.get("fixed_starts", []),
+            recurrence_days=self.data.get("recurrence_days", []),
         )
 
 

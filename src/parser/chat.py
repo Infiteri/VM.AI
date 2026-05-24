@@ -1,29 +1,30 @@
 """
-    VM-AI - Chat Testing Interface
-    Tests add and modify modes with EXP/PRD tag format.
-    Run: python src/parser/chat.py
+VM-AI - Chat Testing Interface
+Tests add and modify modes with EXP/PRD tag format.
+Run: python src/parser/chat.py
 
-    Written by: Vanea
+Written by: Vanea
 """
 
-import torch
-from cfg import Config
 import json
-import re
 import os
-import yaml
+import re
 from datetime import datetime
-from transformers import AutoTokenizer, T5ForConditionalGeneration
 from typing import Dict
-from schemas import (
-    pipe_to_schema,
-    schema_to_pipe,
-    normalize_time,
-    detect_explicit_fields,
-    ALWAYS_EXPLICIT,
-)
+
+import torch
+import yaml
+from cfg import Config
 from rule_based_add import parse_add as rule_based_parse
 from rule_based_modify import parse_modify_rule_based
+from schemas import (
+    ALWAYS_EXPLICIT,
+    detect_explicit_fields,
+    normalize_time,
+    pipe_to_schema,
+    schema_to_pipe,
+)
+from transformers import AutoTokenizer, T5ForConditionalGeneration
 
 LOG_FILE = "performance_log.yaml"
 

@@ -1,8 +1,8 @@
 """
-    VM.AI - Colab Package Generator
-    Creates a zip with src/parser, data, models/finetuned_parser, and config.yaml
-    for easy Colab training setup.
-    Run: python src/parser/package_colab.py
+VM.AI - Colab Package Generator
+Creates a zip with src/parser, data, models/finetuned_parser, and config.yaml
+for easy Colab training setup.
+Run: python src/parser/package_colab.py
 """
 
 import os
@@ -53,7 +53,9 @@ def main():
                 continue
 
             for root_dir, dirs, files in os.walk(full_path):
-                dirs[:] = [d for d in dirs if not should_skip(os.path.join(root_dir, d))]
+                dirs[:] = [
+                    d for d in dirs if not should_skip(os.path.join(root_dir, d))
+                ]
                 for f in files:
                     if should_skip(f):
                         continue
