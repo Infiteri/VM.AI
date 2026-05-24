@@ -28,41 +28,23 @@ MIN_SIZE = 180
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tiff"}
 
 CONFIG = {
-    "basketball": {
-        "sources": [
-            {
-                "type": "pixabay",
-                "keywords": [
-                    "basketball team", "basketball hoop", "basketball match",
-                    "basketball dribbling",
-                ],
-                "target": 500,
-            },
-        ],
-    },
-    "computer_work": {
-        "sources": [
-            {
-                "type": "pixabay",
-                "keywords": [
-                    "person working laptop", "woman typing computer",
-                    "working from home desk", "person computer screen office",
-                    "typing keyboard computer",
-                ],
-                "target": 700,
-            },
-        ],
-    },
     "cleaning": {
         "sources": [
             {
                 "type": "pixabay",
                 "keywords": [
-                    "vacuum cleaner", "garbage bags", "washing dishes",
-                    "cleaning bathroom", "person cleaning dirty floor",
-                    "sweep", "microfiber",
+                    "woman mopping floor",
+                    "person vacuuming carpet",
+                    "washing dishes kitchen sink",
+                    "scrubbing bathroom tiles",
+                    "person cleaning windows",
+                    "doing laundry washing machine",
+                    "wiping kitchen counter",
+                    "person sweeping floor broom",
+                    "cleaning toilet bathroom",
+                    "dusting furniture home"
                 ],
-                "target": 1400,
+                "target": 1000,
             },
         ],
     },
@@ -71,31 +53,18 @@ CONFIG = {
             {
                 "type": "pixabay",
                 "keywords": [
-                    "kitchen", "cooking", "cookware", "kitchenware",
-                    "chef stove", "person cooking kitchen stove",
-                    "chef preparing food", "woman chopping vegetables",
-                    "man frying pan kitchen", "cooking ingredients preparation",
+                    "person cooking kitchen stove",
+                    "woman chopping vegetables",
+                    "man frying pan kitchen",
+                    "chef preparing ingredients",
+                    "person stirring pot stove",
+                    "baking bread oven kitchen",
+                    "person rolling dough kitchen",
+                    "grilling meat barbecue",
+                    "person mixing bowl cooking",
+                    "cutting meat kitchen board"
                 ],
-                "target": 700,
-            },
-        ],
-    },
-    "office": {
-        "sources": [
-            {
-                "type": "kaggle_subfolder",
-                "dataset": "sordi-ai/office-dataset",
-                "subfolder": "images",
-                "target": 200,
-            },
-            {
-                "type": "pixabay",
-                "keywords": [
-                    "business meeting conference room", "office worker desk",
-                    "colleagues working office", "professional business workplace",
-                    "office team discussion",
-                ],
-                "target": 300,
+                "target": 1000,
             },
         ],
     },
@@ -104,9 +73,16 @@ CONFIG = {
             {
                 "type": "pixabay",
                 "keywords": [
-                    "person shopping mall", "woman buying groceries supermarket",
-                    "shopping cart supermarket", "people shopping store",
                     "woman choosing clothes shop",
+                    "person shopping mall",
+                    "buying groceries supermarket",
+                    "shopping cart supermarket aisle",
+                    "person trying clothes fitting room",
+                    "woman browsing store shelves",
+                    "man buying electronics store",
+                    "people shopping market",
+                    "checkout cashier supermarket",
+                    "woman shopping bags street"
                 ],
                 "target": 1200,
             },
