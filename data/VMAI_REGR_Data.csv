@@ -820,3 +820,33 @@ its both extremely difficult and absolutely vital,0.95,0.98
 this task is incredibly complex and the stakes could not be higher,0.92,0.95
 i need to do something extremely difficult and time sensitive,0.9,0.92
 this is the hardest and most important thing i have ever worked on,0.95,0.98
+deep cleaning the garage this weekend,0.75,0.2
+manually sorting through 10 years of old emails,0.7,0.15
+organizing my entire book collection by author,0.6,0.1
+rewriting that function just to make it cleaner,0.6,0.15
+figuring out why the printer keeps jamming,0.65,0.2
+learning a new tool because the old one got deprecated,0.7,0.25
+painting the fence that nobody sees,0.6,0.1
+color coding my entire calendar for the next six months,0.5,0.1
+cataloging every single file in the shared drive,0.65,0.1
+perfecting the margins on a document i already submitted,0.4,0.05
+sorting a pile of receipts from three years ago,0.5,0.1
+deep cleaning behind the fridge because i noticed dust,0.7,0.1
+manually tagging all my photos from the last five years,0.65,0.15
+organizing my bookmarks into 47 different folders,0.4,0.05
+rewriting a perfectly working script just to make it cleaner,0.55,0.1
+approving the expense report unblocks payroll,0.05,0.95
+sending the green light on the go-ahead,0.05,0.9
+clicking approve on the final deliverable,0.05,0.92
+just need to sign the one document to close the deal,0.05,0.95
+flipping the switch to deploy to production,0.1,0.9
+this could go either way medium effort medium stakes,0.5,0.5
+not really sure how hard this will be could be anything,0.45,0.4
+handle it,0.3,0.5
+look into it,0.3,0.4
+fix the thing,0.5,0.6
+deal with that later,0.3,0.25
+check on it tomorrow,0.2,0.35
+leave it for now,0.15,0.15
+get it done asap,0.4,0.85
+sort it out somehow,0.4,0.5
