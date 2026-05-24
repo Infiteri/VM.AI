@@ -7,8 +7,10 @@ Phase 2: Validate: remove corrupted, convert to JPG, remove too-small, deduplica
 """
 
 import hashlib
+import json
 import shutil
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 
 from PIL import Image
@@ -18,6 +20,14 @@ RAW = DATA_ROOT / "raw"
 SELECTED = DATA_ROOT / "selected"
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tiff"}
 MIN_SIZE = 180
+
+REPORT: dict = {
+    "date": str(date.today()),
+    "min_size": MIN_SIZE,
+    "phase_0": {},
+    "phase_1": {},
+    "phase_2": {},
+}
 
 
 def _is_image(file: Path) -> bool:
@@ -44,16 +54,20 @@ def phase_0_prepare():
 
     SELECTED.mkdir(parents=True, exist_ok=True)
 
-    copied = 0
+    copied_categories = []
     for cat_dir in sorted(RAW.iterdir()):
         if not cat_dir.is_dir():
             continue
         dest = SELECTED / cat_dir.name
         shutil.copytree(cat_dir, dest)
         print(f"  {cat_dir.name}: copied")
-        copied += 1
+        copied_categories.append(cat_dir.name)
 
-    print(f"  Total categories copied: {copied}")
+    REPORT["phase_0"] = {
+        "total_categories": len(copied_categories),
+        "categories": copied_categories,
+    }
+    print(f"  Total categories copied: {len(copied_categories)}")
     print()
 
 
@@ -62,6 +76,7 @@ def phase_1_flatten():
     print("Phase 1: Flatten source subdirs")
     print("=" * 60)
 
+    per_category = {}
     for cat_dir in sorted(SELECTED.iterdir()):
         if not cat_dir.is_dir():
             continue
@@ -88,8 +103,10 @@ def phase_1_flatten():
 
             shutil.rmtree(src_dir, ignore_errors=True)
 
+        per_category[category] = moved
         print(f"  {category}: {moved} images flattened")
 
+    REPORT["phase_1"] = {"per_category_after_flatten": per_category}
     print()
 
 
@@ -179,23 +196,30 @@ def phase_2_validate():
             stats[dup_cat]["dedup_conflicts"][keep_cat] += 1
 
     grand_total_remaining = 0
+    per_category_report = {}
     for cat in cat_order:
         cat_dir = SELECTED / cat
         s = stats[cat]
         remaining = len([f for f in cat_dir.iterdir() if f.is_file() and _is_image(f)])
         total_removed = s["corrupted"] + s["too_small"] + s["dedup_total"]
 
-        print(f"\n{cat}:")
-        print(f"  corrupted:       {s['corrupted']}")
-        print(f"  converted:       {s['converted']}")
-        print(f"  too_small:       {s['too_small']}")
-        print(f"  duplicates_removed: {s['dedup_total']}")
-        if s["dedup_conflicts"]:
-            for other_cat, count in sorted(s["dedup_conflicts"].items()):
-                print(f"    with {other_cat}: {count}")
-        print(f"  total_removed:   {total_removed}")
-        print(f"  remaining:       {remaining}")
+        per_category_report[cat] = {
+            "initial": s["initial"],
+            "corrupted": s["corrupted"],
+            "converted": s["converted"],
+            "too_small": s["too_small"],
+            "dedup_total": s["dedup_total"],
+            "dedup_conflicts": dict(s["dedup_conflicts"]),
+            "remaining": remaining,
+        }
+
+        print(f"  {cat}: {s['initial']} → {remaining} (-{total_removed})")
         grand_total_remaining += remaining
+
+    REPORT["phase_2"] = {
+        "per_category": per_category_report,
+        "grand_total_remaining": grand_total_remaining,
+    }
 
     print(f"\n{'='*60}")
     print(f"Total remaining across all categories: {grand_total_remaining}")
@@ -205,7 +229,12 @@ def main():
     phase_0_prepare()
     phase_1_flatten()
     phase_2_validate()
-    print("\nDone.")
+
+    report_path = DATA_ROOT / "prepare_report.json"
+    with open(report_path, "w") as f:
+        json.dump(REPORT, f, indent=2)
+    print(f"\nReport written to {report_path}")
+    print("Done.")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # VM.AI — Image-to-Prompt Data Collection
 
-Downloads and prepares training images for the image-to-prompt classifier (15 activity categories, ~1000 images each).
+Downloads and prepares training images for the image-to-prompt classifier (14 activity categories, ~1000 images each).
 
 ## Pipeline Overview
 
@@ -28,25 +28,24 @@ Four sub-handlers:
 ### Pixabay API (`requests`)
 Searches Pixabay (CC0 license, ML-safe) with category-specific keywords. `per_page=200`, paginated up to 500 images per keyword. Always downloads `largeImageURL` (1280px) with fallback to 960px. Rate-limit handled via `X-RateLimit-Remaining` header (pauses 60s if < 5 remaining).
 
-## The 15 Categories
+## The 14 Categories
 
-| # | Category | OpenImages | Kaggle | Pixabay Keywords |
-|---|----------|-----------|--------|-----------------|
-| 1 | running | — | meetnagadia/har (800) + lumierebatalong/har (840) | person running |
-| 2 | cycling | — | meetnagadia/har (800) + lumierebatalong/har (840) | cycling bicycle |
-| 3 | cooking | Gas stove, Frying pan, Cutting board, Wok, Cooking spray, Kitchen utensil, Kitchenware, Slow cooker, Pressure cooker, Mixing bowl | dataclusterlabs/kitchen (400) | kitchen, cooking, cookware, kitchenware, chef stove |
-| 4 | restaurant | Fast food, Kitchen & dining room table, Tableware, Coffee, Wine | kmader/food41 (900) | restaurant, cafe, restaurant inside |
-| 5 | shopping | Convenience store, Cart, Plastic bag, Handbag | humansintheloop/supermarket (45) | grocery store, mall, clothes store |
-| 6 | office | Office building, Office supplies, Computer monitor, Whiteboard, Filing cabinet, Printer | sordi-ai/office (500) | office, office room, office desk |
-| 7 | football | Football | ligtfeather/football-vs-rugby (900) | football |
-| 8 | entertainment | Television, Microphone, Musical instrument, Poster | — | concert, cinema audience, TV, headphones |
-| 9 | cleaning | Washing machine, Sink, Soap dispenser | — | cleaning, person cleaning house, mopping floor, washing dishes |
-| 10 | driving | Car, Seat belt, Land vehicle, Taxi | rightway11/state-farm-distracted (600) | person driving car, car |
-| 11 | reading | Book, Bookcase | — | person reading book, reading, reading on the sofa, reading library, book |
-| 12 | computer work | Computer monitor, Computer keyboard, Laptop, Computer mouse | — | person and laptop, developer coding, work in laptop |
-| 13 | basketball | — | rishikeshkonapure/sports (486) + gpiosenka/sports (169) + ponrajsubramaniian/sport (495) + mmoreaux/caltech256 (90) + sheikhzaib/sports (486) | basketball, basketball field |
-| 14 | pet care | Dog, Cat, Dog bed, Cat furniture | tongpython/cat-and-dog (700) | pet, person walking dog |
-| 15 | gym | Dumbbell, Treadmill, Indoor rower, Stationary bicycle, Training bench, Punching bag, Horizontal bar | hasyimabdillah/workoutexercises (700) | gym workout |
+| # | Category | OpenImages | Kaggle | Pixabay Keywords | Pixabay Target |
+|:--|:---------|:-----------|:------|:-----------------|:---------------|
+| 1 | running | — | meetnagadia/har (800) + lumierebatalong/har (840) | person running | 400 |
+| 2 | cycling | — | meetnagadia/har (800) + lumierebatalong/har (840) | cycling bicycle | 400 |
+| 3 | cooking | Gas stove, Frying pan, Cutting board, Wok, Cooking spray, Kitchen utensil, Kitchenware, Slow cooker, Pressure cooker, Mixing bowl | dataclusterlabs/kitchen (400) | kitchen, cooking, cookware, kitchenware, chef stove | 500 |
+| 4 | restaurant | Fast food, Kitchen & dining room table, Tableware, Coffee, Wine | kmader/food41 (900) | restaurant, cafe, restaurant inside | 300 |
+| 5 | shopping | Convenience store, Cart, Plastic bag, Handbag | humansintheloop/supermarket (45) | grocery store, mall, clothes store | 1100 |
+| 6 | office | Office building, Office supplies, Computer monitor, Whiteboard, Filing cabinet, Printer | sordi-ai/office (500) | office, office room, office desk | 500 |
+| 7 | football | Football | ligtfeather/football-vs-rugby (900) | football | 300 |
+| 8 | cleaning | Washing machine, Sink, Soap dispenser | — | cleaning, person cleaning house, mopping floor, washing dishes | 1000 |
+| 9 | driving | Car, Seat belt, Land vehicle, Taxi | rightway11/state-farm-distracted (600) | person driving car, car | 200 |
+| 10 | reading | Book, Bookcase | — | person reading book, reading, reading on the sofa, reading library, book, library | 2000 |
+| 11 | computer work | Computer monitor, Computer keyboard, Laptop, Computer mouse | — | person and laptop, developer coding, work in laptop | 1200 |
+| 12 | basketball | — | rishikeshkonapure/sports (486) + gpiosenka/sports (169) + ponrajsubramaniian/sport (495) + mmoreaux/caltech256 (90) + sheikhzaib/sports (486) | basketball, basketball field, basketball player | 1000 |
+| 13 | pet care | Dog, Cat, Dog bed, Cat furniture | tongpython/cat-and-dog (700) | pet, person walking dog | 200 |
+| 14 | gym | Dumbbell, Treadmill, Indoor rower, Stationary bicycle, Training bench, Punching bag, Horizontal bar | hasyimabdillah/workoutexercises (700) | gym workout | 200 |
 
 ## Usage
 

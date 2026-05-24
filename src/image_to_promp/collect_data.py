@@ -168,7 +168,7 @@ CATEGORIES = {
             {
                 "type": "pixabay",
                 "keywords": ["office", "office room", "office desk"],
-                "target": 200,
+                "target": 500,
             },
         ],
     },
@@ -188,21 +188,7 @@ CATEGORIES = {
             {
                 "type": "pixabay",
                 "keywords": ["football"],
-                "target": 200,
-            },
-        ],
-    },
-    "entertainment": {
-        "sources": [
-            {
-                "type": "openimages",
-                "labels": ["Television", "Microphone", "Musical instrument", "Poster"],
                 "target": 300,
-            },
-            {
-                "type": "pixabay",
-                "keywords": ["concert", "cinema audience", "TV", "headphones"],
-                "target": 700,
             },
         ],
     },
@@ -249,8 +235,8 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["person reading book", "reading", "reading on the sofa", "reading library", "book"],
-                "target": 1200,
+                "keywords": ["person reading book", "reading", "reading on the sofa", "reading library", "book", "library"],
+                "target": 2000,
             },
         ],
     },
@@ -302,8 +288,8 @@ CATEGORIES = {
             },
             {
                 "type": "pixabay",
-                "keywords": ["basketball", "basketball field"],
-                "target": 500,
+                "keywords": ["basketball", "basketball field", "basketball player"],
+                "target": 1000,
             },
         ],
     },
