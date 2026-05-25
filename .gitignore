@@ -3,7 +3,7 @@ logs/
 __pycache__/
 *.py[cod]
 .*
-!src/image_to_promp/.env.example
+!src/image_to_prompt/.env.example
 .venv/
 *.egg-info/
 dist/
@@ -44,5 +44,5 @@ dist-ssr
 *.sw?
 
 /data/image_to_prompt/*
-!/data/image_to_prompt/.gitkeep
+!data/image_to_prompt/.gitkeep
 evaulation_contest/
