@@ -15,6 +15,7 @@ from typing import Dict
 import torch
 import yaml
 from cfg import Config
+from regressor import RegressorPredictor
 from rule_based_add import parse_add as rule_based_parse
 from rule_based_modify import parse_modify_rule_based
 from schemas import (
@@ -59,7 +60,11 @@ class TaskPlannerPredictor:
         self.model.to(self.device)
         self.model.eval()
         self._last_raw_output = ""
-        print(f"OK Model ready ({self.device})")
+        print(f"OK T5 model ready ({self.device})")
+
+        print("Loading regressor...")
+        self.regressor = RegressorPredictor()
+        print("OK Regressor ready")
 
     _TIME_RE = re.compile(
         r"\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b", re.IGNORECASE
@@ -107,7 +112,6 @@ class TaskPlannerPredictor:
 
         gen_kwargs = {
             "max_new_tokens": 256,
-            "max_length": 256,
             "no_repeat_ngram_size": 3,
             "repetition_penalty": 1.1,
             "use_cache": True,
@@ -130,31 +134,32 @@ class TaskPlannerPredictor:
         return raw
 
     def predict_add(self, sentence: str) -> Dict:
-        """Add mode: use rule-based parser (MVP).
-
-        The model struggles with add mode due to T5 token leakage.
-        Rule-based extraction gives 100% accuracy on basic fields.
-        """
-        result = rule_based_parse(sentence)
-        log_entry("add", sentence, "(rule-based)", result)
+        """Add mode: T5 for structure + ML regressor for diff/imp."""
+        output = self._run_model(f"add: {sentence}", start_token="name=")
+        result = pipe_to_schema(output, input_text=sentence)
+        if "error" in result:
+            result = rule_based_parse(sentence)
+        diff, imp = self.regressor.predict(sentence)
+        result["difficulty"] = {"value": f"{diff:.3f}", "predicted": True}
+        result["importance"] = {"value": f"{imp:.3f}", "predicted": True}
+        log_entry("add", sentence, self._last_raw_output, result)
         return result
 
     def predict_modify(self, existing_task: Dict, change_prompt: str) -> Dict:
         """Apply changes to existing task.
 
-        Uses rule-based parser for importance/difficulty (reliable).
-        Uses ML model for other fields (deadline, time, location, etc).
+        Uses ML regressor for importance/difficulty.
+        Uses T5 model for other fields (deadline, time, location, etc).
         """
-        rule_based = parse_modify_rule_based(change_prompt, existing_task)
+        diff, imp = self.regressor.predict(change_prompt)
+        changed = {
+            "difficulty": {"value": f"{diff:.3f}", "predicted": True},
+            "importance": {"value": f"{imp:.3f}", "predicted": True},
+        }
 
+        rule_based = parse_modify_rule_based(change_prompt, existing_task)
         output = self._run_model(change_prompt.lower(), start_token="")
         new_fields = pipe_to_schema(output, input_text=change_prompt)
-
-        changed = {}
-
-        for field in ["importance", "difficulty"]:
-            if field in rule_based:
-                changed[field] = rule_based[field]
 
         if "error" not in new_fields:
             for field, entry in new_fields.items():

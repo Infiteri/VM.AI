@@ -1,2025 +1,442 @@
-- timestamp: '2026-05-04T18:11:23.283096'
+- timestamp: "2026-05-24T20:33:24.905942"
   mode: add
-  input: gym at 6am
-  raw_output: (rule-based)
+  input: go homne
+  raw_output: (rule-based + regressor)
   parsed:
-    name: gym
+    name: go homne
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: true
-    fixed_start: 06:00
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.285099'
-  mode: add
-  input: pay the rent
-  raw_output: (rule-based)
-  parsed:
-    name: pay the rent
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.305646'
-  mode: add
-  input: file the taxes
-  raw_output: (rule-based)
-  parsed:
-    name: file the taxes
-    start: null
-    deadline: null
-    difficulty: '0.7'
-    duration: '30'
-    category: finance
-    location: null
-    importance: '0.85'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.306660'
-  mode: add
-  input: grocery shopping
-  raw_output: (rule-based)
-  parsed:
-    name: grocery shopping
-    start: null
-    deadline: null
-    difficulty: '0.2'
-    duration: '45'
-    category: shopping
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.308650'
-  mode: add
-  input: hard workout session
-  raw_output: (rule-based)
-  parsed:
-    name: workout session
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.309659'
-  mode: add
-  input: easy 15 minute stretch
-  raw_output: (rule-based)
-  parsed:
-    name: 15 minute stretch
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '15'
+    difficulty: "0.427"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.484"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-04T18:11:23.310658'
-  mode: add
-  input: urgent client call
-  raw_output: (rule-based)
-  parsed:
-    name: client call
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: work
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.311659'
-  mode: add
-  input: critical system crash fix
-  raw_output: (rule-based)
-  parsed:
-    name: system crash fix
-    start: null
-    deadline: null
-    difficulty: '0.8'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.312659'
-  mode: add
-  input: low priority cleanup
-  raw_output: (rule-based)
-  parsed:
-    name: low priority cleanup
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: home
-    location: null
-    importance: '0.15'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.313659'
-  mode: add
-  input: moderate difficulty task
-  raw_output: (rule-based)
-  parsed:
-    name: difficulty task
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.314659'
-  mode: add
-  input: team meeting at 3pm
-  raw_output: (rule-based)
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: work
-    location: null
-    importance: '0.6'
-    fixed_time: true
-    fixed_start: '15:00'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:23.316184'
-  mode: add
-  input: meditate every morning
-  raw_output: (rule-based)
-  parsed:
-    name: meditate
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: health
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:11:39.058638'
-  mode: modify
-  input: move to 7am
-  raw_output: fixed_time=true[EXP] | fixed_start=7:00[PRD]
-  parsed:
-    fixed_start: '7:00'
-  error: null
-
-- timestamp: '2026-05-04T18:11:47.761786'
-  mode: modify
-  input: make it harder
-  raw_output: difficulty=0.43[PRD]
-  parsed:
-    difficulty: '0.85'
-  error: null
-
-- timestamp: '2026-05-04T18:11:56.854693'
-  mode: modify
-  input: make it urgent
-  raw_output: importance=0.43[PRD]
-  parsed:
-    importance: '0.95'
-  error: null
-
-- timestamp: '2026-05-04T18:12:06.395735'
-  mode: modify
-  input: categorize it as fitness
-  raw_output: category=fitness[EXP]
-  parsed:
-    category: fitness
-  error: null
-
-- timestamp: '2026-05-04T18:12:15.469497'
-  mode: modify
-  input: make it 1 hour
-  raw_output: duration=1[EXP]
-  parsed:
-    duration: '1'
-    fixed_time: false
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.323455'
-  mode: add
-  input: gym at 6am
-  raw_output: (rule-based)
-  parsed:
-    name: gym
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: true
-    fixed_start: 06:00
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.325457'
-  mode: add
-  input: pay the rent
-  raw_output: (rule-based)
-  parsed:
-    name: pay the rent
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.326459'
-  mode: add
-  input: file the taxes
-  raw_output: (rule-based)
-  parsed:
-    name: file the taxes
-    start: null
-    deadline: null
-    difficulty: '0.7'
-    duration: '30'
-    category: finance
-    location: null
-    importance: '0.85'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.328458'
-  mode: add
-  input: meditate
-  raw_output: (rule-based)
-  parsed:
-    name: meditate
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: health
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.329459'
-  mode: add
-  input: go to the doctor
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: health
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.330460'
-  mode: add
-  input: study for the exam
-  raw_output: (rule-based)
-  parsed:
-    name: study
-    start: null
-    deadline: null
-    difficulty: '0.7'
-    duration: '60'
-    category: study
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.332458'
-  mode: add
-  input: grocery shopping
-  raw_output: (rule-based)
-  parsed:
-    name: grocery shopping
-    start: null
-    deadline: null
-    difficulty: '0.2'
-    duration: '45'
-    category: shopping
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.333458'
-  mode: add
-  input: write blog post
-  raw_output: (rule-based)
-  parsed:
-    name: write blog post
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: creative
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.334459'
-  mode: add
-  input: book flight to Paris
-  raw_output: (rule-based)
-  parsed:
-    name: book flight
-    start: null
-    deadline: null
-    difficulty: '0.2'
-    duration: '30'
-    category: travel
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.335461'
-  mode: add
-  input: team meeting
-  raw_output: (rule-based)
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: work
-    location: null
-    importance: '0.6'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.337460'
-  mode: add
-  input: practice guitar
-  raw_output: (rule-based)
-  parsed:
-    name: practice guitar
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: creative
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.338460'
-  mode: add
-  input: pick up kids
-  raw_output: (rule-based)
-  parsed:
-    name: pick up kids
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: family
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.339460'
-  mode: add
-  input: call mom
-  raw_output: (rule-based)
-  parsed:
-    name: call mom
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.340460'
-  mode: add
-  input: hard workout
-  raw_output: (rule-based)
-  parsed:
-    name: workout
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.341462'
-  mode: add
-  input: easy stretch
-  raw_output: (rule-based)
-  parsed:
-    name: stretch
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '15'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.343462'
-  mode: add
-  input: challenging coding
-  raw_output: (rule-based)
-  parsed:
-    name: coding
-    start: null
-    deadline: null
-    difficulty: '0.8'
-    duration: '60'
-    category: work
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.344462'
-  mode: add
-  input: moderate task
-  raw_output: (rule-based)
-  parsed:
-    name: task
-    start: null
-    deadline: null
-    difficulty: '0.45'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.345464'
-  mode: add
-  input: pay the rent
-  raw_output: (rule-based)
-  parsed:
-    name: pay the rent
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.347465'
-  mode: add
-  input: file the taxes
-  raw_output: (rule-based)
-  parsed:
-    name: file the taxes
-    start: null
-    deadline: null
-    difficulty: '0.7'
-    duration: '30'
-    category: finance
-    location: null
-    importance: '0.85'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.348463'
-  mode: add
-  input: urgent client call
-  raw_output: (rule-based)
-  parsed:
-    name: client call
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: work
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.350463'
-  mode: add
-  input: critical crash fix
-  raw_output: (rule-based)
-  parsed:
-    name: crash fix
-    start: null
-    deadline: null
-    difficulty: '0.8'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.351464'
-  mode: add
-  input: low priority cleanup
-  raw_output: (rule-based)
-  parsed:
-    name: low priority cleanup
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: home
-    location: null
-    importance: '0.15'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.352463'
-  mode: add
-  input: urgent client call
-  raw_output: (rule-based)
-  parsed:
-    name: client call
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: work
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.353463'
-  mode: add
-  input: critical crash fix
-  raw_output: (rule-based)
-  parsed:
-    name: crash fix
-    start: null
-    deadline: null
-    difficulty: '0.8'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.355464'
-  mode: add
-  input: low priority cleanup
-  raw_output: (rule-based)
-  parsed:
-    name: low priority cleanup
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: home
-    location: null
-    importance: '0.15'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.356464'
-  mode: add
-  input: very important
-  raw_output: (rule-based)
-  parsed:
-    name: very important
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.357464'
-  mode: add
-  input: pay the rent
-  raw_output: (rule-based)
-  parsed:
-    name: pay the rent
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.359466'
-  mode: add
-  input: file the taxes
-  raw_output: (rule-based)
-  parsed:
-    name: file the taxes
-    start: null
-    deadline: null
-    difficulty: '0.7'
-    duration: '30'
-    category: finance
-    location: null
-    importance: '0.85'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.360465'
-  mode: add
-  input: optional task
-  raw_output: (rule-based)
-  parsed:
-    name: task
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.2'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.361466'
-  mode: add
-  input: asap fix needed
-  raw_output: (rule-based)
-  parsed:
-    name: asap fix needed
-    start: null
-    deadline: null
-    difficulty: '0.6'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.363467'
-  mode: add
-  input: not urgent reading
-  raw_output: (rule-based)
-  parsed:
-    name: not urgent reading
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.364467'
-  mode: add
-  input: quick 5 minute
-  raw_output: (rule-based)
-  parsed:
-    name: 5 minute
-    start: null
-    deadline: null
-    difficulty: '0.2'
-    duration: '5'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.365467'
-  mode: add
-  input: 15 minute meditation
-  raw_output: (rule-based)
-  parsed:
-    name: meditation
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: health
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.367467'
-  mode: add
-  input: 2 hour study session
-  raw_output: (rule-based)
-  parsed:
-    name: study session
-    start: null
-    deadline: null
-    difficulty: '0.6'
-    duration: '120'
-    category: study
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.368468'
-  mode: add
-  input: pay the rent
-  raw_output: (rule-based)
-  parsed:
-    name: pay the rent
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.369468'
-  mode: add
-  input: team meeting
-  raw_output: (rule-based)
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: work
-    location: null
-    importance: '0.6'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.370467'
-  mode: add
-  input: go to the doctor
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: health
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.387453'
-  mode: add
-  input: critical crash
-  raw_output: (rule-based)
-  parsed:
-    name: crash
-    start: null
-    deadline: null
-    difficulty: '0.8'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.95'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.388454'
-  mode: add
-  input: workout session
-  raw_output: (rule-based)
-  parsed:
-    name: workout session
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.389455'
-  mode: add
-  input: go for a run
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.391456'
-  mode: add
-  input: cook dinner
-  raw_output: (rule-based)
-  parsed:
-    name: cook dinner
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.392455'
-  mode: add
-  input: gym at 6am
-  raw_output: (rule-based)
-  parsed:
-    name: gym
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: true
-    fixed_start: 06:00
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.394455'
-  mode: add
-  input: team meeting at 3pm
-  raw_output: (rule-based)
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: work
-    location: null
-    importance: '0.6'
-    fixed_time: true
-    fixed_start: '15:00'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.395456'
-  mode: add
-  input: doctor at 10:30am
-  raw_output: (rule-based)
-  parsed:
-    name: doctor
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: health
-    location: null
-    importance: '0.8'
-    fixed_time: true
-    fixed_start: '10:30'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.397457'
-  mode: add
-  input: dinner at 7pm
-  raw_output: (rule-based)
-  parsed:
-    name: dinner
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: true
-    fixed_start: '19:00'
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.398456'
-  mode: add
-  input: meditate every morning
-  raw_output: (rule-based)
-  parsed:
-    name: meditate
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: health
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.400456'
-  mode: add
-  input: daily standup every weekday
-  raw_output: (rule-based)
-  parsed:
-    name: daily standup
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '15'
-    category: work
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: Monday,Tuesday,Wednesday,Thursday,Friday
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.401456'
-  mode: add
-  input: gym every Monday and Wednesday
-  raw_output: (rule-based)
-  parsed:
-    name: gym
-    start: null
-    deadline: Wednesday
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: true
-    recurrence_days: Monday,Wednesday
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.402457'
-  mode: add
-  input: study at the library
-  raw_output: (rule-based)
-  parsed:
-    name: study
-    start: null
-    deadline: null
-    difficulty: '0.6'
-    duration: '60'
-    category: study
-    location: library
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.403459'
-  mode: add
-  input: meet at the coffee shop
-  raw_output: (rule-based)
-  parsed:
-    name: meet
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: coffee shop
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.405457'
-  mode: add
-  input: buy groceries at the supermarket
-  raw_output: (rule-based)
-  parsed:
-    name: buy groceries
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: shopping
-    location: supermarket
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.406458'
-  mode: add
-  input: work from home
-  raw_output: (rule-based)
-  parsed:
-    name: work
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: home
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.407460'
-  mode: add
-  input: team meeting at the office
-  raw_output: (rule-based)
-  parsed:
-    name: team meeting
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: work
-    location: office
-    importance: '0.6'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.409459'
-  mode: add
-  input: gym at 6am
-  raw_output: (rule-based)
-  parsed:
-    name: gym
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: true
-    fixed_start: 06:00
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.410460'
-  mode: add
-  input: pay the utility bill
-  raw_output: (rule-based)
-  parsed:
-    name: pay the utility bill
-    start: null
-    deadline: null
-    difficulty: '0.3'
-    duration: '10'
-    category: finance
-    location: null
-    importance: '0.8'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.412459'
-  mode: add
-  input: book a flight to Paris
-  raw_output: (rule-based)
-  parsed:
-    name: book a flight
-    start: null
-    deadline: null
-    difficulty: '0.2'
-    duration: '30'
-    category: travel
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-04T18:13:30.413459'
-  mode: add
-  input: write a blog post about AI
-  raw_output: (rule-based)
-  parsed:
-    name: write a blog post about ai
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: creative
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:16:44.913749'
-  mode: add
-  input: go to schopol
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:16:46.408888'
-  mode: add
-  input: go to school
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:16:54.599124'
-  mode: add
-  input: go to school 90 minutes
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '90'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:17:06.127529'
-  mode: add
-  input: go to school 90 minutes very important
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '90'
-    category: personal
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:17:09.104025'
-  mode: add
-  input: go to school 90 minutes very important very hard
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '90'
-    category: personal
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:17:11.243118'
-  mode: add
-  input: go to school 90 minutes very important very easy
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '90'
-    category: personal
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:17:15.266840'
+- timestamp: "2026-05-24T20:33:27.892710"
   mode: add
   input: go home
-  raw_output: (rule-based)
+  raw_output: (rule-based + regressor)
   parsed:
     name: go home
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.334"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.500"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:17:17.936188'
+- timestamp: "2026-05-24T20:33:30.023621"
   mode: add
-  input: go school
-  raw_output: (rule-based)
+  input: go home not easy
+  raw_output: (rule-based + regressor)
   parsed:
-    name: go school
+    name: go home not easy
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.304"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.630"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:17:20.613549'
+- timestamp: "2026-05-24T20:33:34.572859"
   mode: add
-  input: go to home
-  raw_output: (rule-based)
+  input: go home not hard
+  raw_output: (rule-based + regressor)
   parsed:
-    name: go
+    name: go home not hard
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.481"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.573"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:17:22.490607'
+- timestamp: "2026-05-24T20:33:37.390809"
   mode: add
-  input: go to school
-  raw_output: (rule-based)
+  input: go home hard
+  raw_output: (rule-based + regressor)
   parsed:
-    name: go
+    name: go home hard
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.654"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.644"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:17:26.904413'
+- timestamp: "2026-05-24T20:33:39.972919"
   mode: add
-  input: go school from 6 pm
-  raw_output: (rule-based)
+  input: go home extreme
+  raw_output: (rule-based + regressor)
   parsed:
-    name: go school
+    name: go home extreme
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.601"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.631"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:17:30.094857'
+- timestamp: "2026-05-24T20:33:46.026739"
   mode: add
-  input: go school from 6 pm to 7 am
-  raw_output: (rule-based)
+  input: go home very important
+  raw_output: (rule-based + regressor)
   parsed:
-    name: go school
+    name: go home very important
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.400"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.838"
     fixed_time: false
     fixed_start: null
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:18:43.313649'
+- timestamp: "2026-05-24T20:33:50.225327"
   mode: add
-  input: start at 6 pm
-  raw_output: (rule-based)
+  input: go home very not important
+  raw_output: (rule-based + regressor)
   parsed:
-    name: start
+    name: go home very not important
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
+    difficulty: "0.248"
+    duration: "30"
     category: personal
     location: null
-    importance: '0.5'
+    importance: "0.561"
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: "2026-05-24T20:33:54.282255"
+  mode: add
+  input: go home not very important
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not very important
+    start: null
+    deadline: null
+    difficulty: "0.266"
+    duration: "30"
+    category: personal
+    location: null
+    importance: "0.596"
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: "2026-05-24T20:33:58.272539"
+  mode: add
+  input: go home not very important but very hard
+  raw_output: (rule-based + regressor)
+  parsed:
+    name: go home not very important but very hard
+    start: null
+    deadline: null
+    difficulty: "0.549"
+    duration: "30"
+    category: personal
+    location: null
+    importance: "0.800"
+    fixed_time: false
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+- timestamp: '2026-05-24T21:14:07.177603'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_59> | importance=0.52<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.331'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.521'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T21:14:12.905510'
+  mode: add
+  input: go home at 6 pm
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.294'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.588'
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T21:14:20.008329'
+  mode: add
+  input: go home at 6pm
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.42<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.300'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.604'
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T21:14:24.261152'
+  mode: add
+  input: go home at 10 pm
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=22:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.247'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.555'
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T21:14:43.307973'
+  mode: add
+  input: go home at 10 pm for 30 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=30<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=22:00<extra_id_53> | recurrent=false<extra_id_96>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.242'
+    duration: '30'
+    category: home
+    location: null
+    importance: '0.578'
+    fixed_time: true
+    fixed_start: null
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-24T21:17:23.017522'
+  mode: add
+  input: go home at 6 pm
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.294'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.588'
     fixed_time: true
     fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:19:09.582895'
+- timestamp: '2026-05-24T21:17:28.637331'
   mode: add
-  input: 'modify: at 6 pm'
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard
+  raw_output: name=go home[EXP] | difficulty=0.8[PRD] | duration=60<extra_id_51> |
+    category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
   parsed:
-    name: 'modify:'
+    name: go home
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
+    difficulty: '0.213'
+    duration: '60'
+    category: home
     location: null
-    importance: '0.5'
+    importance: '0.641'
     fixed_time: true
     fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:19:19.983999'
-  mode: modify
-  input: at 6 pm
-  raw_output: fixed_time=true[EXP] | fixed_start=18:00[PRD]
-  parsed:
-    fixed_time: true
-    fixed_start: '18:00'
-  error: null
-
-- timestamp: '2026-05-20T14:19:36.474144'
+- timestamp: '2026-05-24T21:17:35.528982'
   mode: add
-  input: home by 6 pm
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard but will take 90 minutes
+  raw_output: name=go home[EXP] | difficulty=0.43[PRD] | duration=90<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
   parsed:
-    name: home
+    name: go home
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
+    difficulty: '0.215'
+    duration: '90'
+    category: home
     location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:20:07.165741'
-  mode: add
-  input: go home tomorrow
-  raw_output: (rule-based)
-  parsed:
-    name: go home tomorrow
-    start: null
-    deadline: tomorrow
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:20:10.403372'
-  mode: add
-  input: go home tomorrow from today
-  raw_output: (rule-based)
-  parsed:
-    name: go home tomorrow
-    start: null
-    deadline: tomorrow
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:20:13.604728'
-  mode: add
-  input: go home tomorrow frow
-  raw_output: (rule-based)
-  parsed:
-    name: go home tomorrow frow
-    start: null
-    deadline: tomorrow
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:20:16.790732'
-  mode: add
-  input: go home tomorrow
-  raw_output: (rule-based)
-  parsed:
-    name: go home tomorrow
-    start: null
-    deadline: tomorrow
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T14:20:24.039826'
-  mode: add
-  input: go home tomorrow at 6 pm
-  raw_output: (rule-based)
-  parsed:
-    name: go home tomorrow
-    start: null
-    deadline: tomorrow
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
-    location: null
-    importance: '0.5'
+    importance: '0.598'
     fixed_time: true
     fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T14:20:48.886840'
+- timestamp: '2026-05-24T21:17:42.405044'
   mode: add
-  input: start home on monday
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard but will take 90 minutes and its very important
+  raw_output: name=go home[EXP] | difficulty=0.8[PRD] | duration=90<extra_id_51> |
+    category=home<extra_id_47> | importance=0.9<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
   parsed:
-    name: start home on monday
+    name: go home
     start: null
-    deadline: Monday
-    difficulty: '0.5'
-    duration: '30'
-    category: personal
+    deadline: null
+    difficulty: '0.250'
+    duration: '90'
+    category: home
     location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
+    importance: '0.873'
+    fixed_time: true
+    fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T21:13:36.940742'
+- timestamp: '2026-05-24T21:17:49.845725'
   mode: add
-  input: go to gym, very hard
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard but will take 90 minutes and its not very important
+  raw_output: name=go home[EXP] | difficulty=0.8[PRD] | duration=90<extra_id_51> |
+    category=home<extra_id_47> | importance=0.9<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
   parsed:
-    name: go
+    name: go home
     start: null
     deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
+    difficulty: '0.197'
+    duration: '90'
+    category: home
     location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
+    importance: '0.405'
+    fixed_time: true
+    fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T21:13:39.855540'
+- timestamp: '2026-05-24T21:17:56.469756'
   mode: add
-  input: go to gym, very very hard
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard but will take 90 minutes and its not very important
+    EXTREME IMPORTANCE
+  raw_output: name=go home[EXP] | difficulty=0.8[PRD] | duration=90<extra_id_51> |
+    category=home<extra_id_47> | importance=0.9<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
   parsed:
-    name: go
+    name: go home
     start: null
     deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
+    difficulty: '0.510'
+    duration: '90'
+    category: home
     location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
+    importance: '1.000'
+    fixed_time: true
+    fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null
 
-- timestamp: '2026-05-20T21:13:44.371249'
+- timestamp: '2026-05-24T21:18:03.172504'
   mode: add
-  input: go to gym, extreme
-  raw_output: (rule-based)
+  input: go home at 6 pm not very hard but will take 90 minutes and its not very important
+    EXTREME HARD
+  raw_output: name=go home[EXP] | difficulty=0.8[PRD] | duration=90<extra_id_51> |
+    category=home<extra_id_47> | importance=0.9<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
   parsed:
-    name: go
+    name: go home
     start: null
     deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
+    difficulty: '0.727'
+    duration: '90'
+    category: home
     location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:13:48.695278'
-  mode: add
-  input: go to gym, extremely
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.5'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:13:50.764444'
-  mode: add
-  input: go to gym, extremely difficult
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:13:53.034077'
-  mode: add
-  input: go to gym, difficult
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:13:54.832428'
-  mode: add
-  input: go to gym, not difficult
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:14:00.721412'
-  mode: add
-  input: go to gym, easy
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:14:37.640494'
-  mode: add
-  input: go to gym, not easy
-  raw_output: (rule-based)
-  parsed:
-    name: go
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:17:32.646526'
-  mode: add
-  input: hard homework
-  raw_output: (rule-based)
-  parsed:
-    name: homework
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: study
-    location: null
-    importance: '0.7'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:17:42.098471'
-  mode: add
-  input: hard gym session
-  raw_output: (rule-based)
-  parsed:
-    name: gym session
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:18:12.613499'
-  mode: add
-  input: hard gym session
-  raw_output: (rule-based)
-  parsed:
-    name: gym session
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.5'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:18:17.546331'
-  mode: add
-  input: hard gym session, very important
-  raw_output: (rule-based)
-  parsed:
-    name: gym session, very important
-    start: null
-    deadline: null
-    difficulty: '0.85'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
-    recurrent: false
-    recurrence_days: null
-  error: null
-
-- timestamp: '2026-05-20T21:18:23.305077'
-  mode: add
-  input: easy gym session, very important
-  raw_output: (rule-based)
-  parsed:
-    name: gym session, very important
-    start: null
-    deadline: null
-    difficulty: '0.15'
-    duration: '45'
-    category: fitness
-    location: null
-    importance: '0.9'
-    fixed_time: false
-    fixed_start: null
+    importance: '0.957'
+    fixed_time: true
+    fixed_start: '18:00'
     recurrent: false
     recurrence_days: null
   error: null

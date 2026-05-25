@@ -283,6 +283,7 @@ def pipe_to_schema(flat: str, input_text: str = "") -> dict:
         if "=" not in part:
             continue
         k, _, rest = part.partition("=")
+        k = k.replace("-", "_")
         k = k.strip()
 
         tag = None

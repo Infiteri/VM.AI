@@ -8,6 +8,23 @@ Written by: Vanea
 import re
 from typing import Dict, Optional
 
+NEGATION_WORDS = {"not", "no", "never", "without"}
+
+def _is_negated(s: str, keyword: str) -> bool:
+    """Check if keyword in s is preceded by a negation word within 3 tokens."""
+    idx = s.find(keyword)
+    if idx < 0:
+        return False
+    before = s[:idx].strip()
+    if not before:
+        return False
+    tokens = before.split()
+    lookback = tokens[-3:]
+    for token in lookback:
+        if token in NEGATION_WORDS or token.endswith("n't"):
+            return True
+    return False
+
 
 def parse_modify_rule_based(
     change_prompt: str, existing_task: Optional[Dict] = None
@@ -59,7 +76,7 @@ def parse_modify_rule_based(
     }
 
     for keyword in sorted(importance_map.keys(), key=len, reverse=True):
-        if keyword in s:
+        if keyword in s and not _is_negated(s, keyword):
             result["importance"] = {
                 "value": str(importance_map[keyword]),
                 "predicted": False,
@@ -67,7 +84,7 @@ def parse_modify_rule_based(
             break
 
     for keyword in sorted(difficulty_map.keys(), key=len, reverse=True):
-        if keyword in s:
+        if keyword in s and not _is_negated(s, keyword):
             result["difficulty"] = {
                 "value": str(difficulty_map[keyword]),
                 "predicted": False,
@@ -83,7 +100,7 @@ def parse_modify_rule_based(
             result["recurrence_days"] = {"value": None, "predicted": False}
 
     time_match = re.search(r"at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
-    if time_match:
+    if time_match and not _is_negated(s, "at"):
         from rule_based_add import normalize_time
 
         normalized = normalize_time(time_match.group(1))
@@ -98,18 +115,18 @@ def parse_modify_rule_based(
         deadline_match = re.search(r"deadline\s+(?:to|is)\s+(\w+)", s)
     if not deadline_match:
         deadline_match = re.search(r"due\s+(?:by\s+)?(\w+)", s)
-    if deadline_match:
+    if deadline_match and not _is_negated(s, deadline_match.group(0)):
         result["deadline"] = {
             "value": deadline_match.group(1).title(),
             "predicted": False,
         }
 
     start_match = re.search(r"(?:start|begin|kick off)\s+(?:on\s+)?(\w+)", s)
-    if start_match:
+    if start_match and not _is_negated(s, start_match.group(0)):
         result["start"] = {"value": start_match.group(1).title(), "predicted": False}
 
     duration_match = re.search(r"(\d+)\s*(?:minute|min|hour|hr)s?", s)
-    if duration_match:
+    if duration_match and not _is_negated(s, duration_match.group(0)):
         v = int(duration_match.group(1))
         if "hour" in s:
             v *= 60
@@ -141,7 +158,7 @@ def parse_modify_rule_based(
         "personal": "personal",
     }
     for keyword, cat in category_map.items():
-        if keyword in s:
+        if keyword in s and not _is_negated(s, keyword):
             result["category"] = {"value": cat, "predicted": True}
             break
 
@@ -161,7 +178,7 @@ def parse_modify_rule_based(
         "grocery": "supermarket",
     }
     for keyword, loc in location_map.items():
-        if keyword in s:
+        if keyword in s and not _is_negated(s, keyword):
             result["location"] = {"value": loc, "predicted": False}
             break
 

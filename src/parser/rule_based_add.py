@@ -77,15 +77,27 @@ def parse_add(sentence: str) -> dict:
             " to ",
             " - ",
             " — ",
+            " not ",
+            " never ",
         ]:
             idx = name.find(kw)
             if idx > 0:
                 name = name[:idx]
+                break
+        if "n't " in name:
+            idx = name.find("n't ")
+            if idx > 0:
+                name = name[:idx]
+                # find the word boundary before the contraction
+                prev_space = name.rfind(" ", 0, idx - 1)
+                if prev_space > 0:
+                    name = name[:prev_space]
     name = re.sub(r"^\d+\s*(minute|min|hour|hr)s?\s*", "", name)
     name = re.sub(
         r"^(hard|difficult|easy|simple|quick|moderate|light|challenging)\s+", "", name
     )
     name = re.sub(r"^(urgent|important|critical|optional)\s+", "", name)
+    name = re.sub(r"^(not|no|never)\s+", "", name)
     schema["name"]["value"] = name.strip()
 
     tm = re.search(r"at\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm))", s)
