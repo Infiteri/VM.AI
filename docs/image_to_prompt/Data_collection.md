@@ -58,18 +58,18 @@ PIXABAY_API_KEY="your_key_here"
 PIXABAY_BASE_URL="https://pixabay.com/api/"
 ```
 
-Copy this to `src/image_to_promp/.env` or set the environment variable directly. The script loads `.env` automatically via `dotenv`.
+Copy this to `src/image_to_prompt/.env` or set the environment variable directly. The script loads `.env` automatically via `dotenv`.
 
 ### 2. Collect Raw Data
 
 ```bash
-uv run python src/image_to_promp/collect_data.py
+uv run python src/image_to_prompt/data_collection/collect_data.py
 ```
 
 Runs all 15 categories. To run specific categories only:
 
 ```bash
-uv run python src/image_to_promp/collect_data.py basketball computer_work
+uv run python src/image_to_prompt/data_collection/collect_data.py basketball computer_work
 ```
 
 Each category downloads into `data/image_to_prompt/raw/<category>/<source>/` and writes a `metadata.json`.
@@ -77,7 +77,7 @@ Each category downloads into `data/image_to_prompt/raw/<category>/<source>/` and
 ### 3. Prepare & Validate
 
 ```bash
-uv run python src/image_to_promp/prepare_data.py
+uv run python src/image_to_prompt/data_collection/prepare_data.py
 ```
 
 Three phases:
@@ -110,8 +110,8 @@ data/image_to_prompt/
 
 | File | Purpose |
 |------|---------|
-| `src/image_to_promp/collect_data.py` | Download from all sources (5 handler types) |
-| `src/image_to_promp/prepare_data.py` | Copy, flatten, validate, deduplicate |
-| `src/image_to_promp/.env` | Pixabay API credentials (gitignored) |
-| `src/image_to_promp/.env.example` | Template for `.env` |
+| `src/image_to_prompt/data_collection/collect_data.py` | Download from all sources (5 handler types) |
+| `src/image_to_prompt/data_collection/prepare_data.py` | Copy, flatten, validate, deduplicate |
+| `src/image_to_prompt/.env` | Pixabay API credentials (gitignored) |
+| `src/image_to_prompt/.env.example` | Template for `.env` |
 | `src/backend/logs/notes.log` | Source-of-truth for per-category config (15 entries) |

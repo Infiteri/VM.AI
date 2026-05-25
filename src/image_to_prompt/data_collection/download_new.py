@@ -33,38 +33,11 @@ CONFIG = {
             {
                 "type": "pixabay",
                 "keywords": [
-                    "woman mopping floor",
-                    "person vacuuming carpet",
-                    "washing dishes kitchen sink",
-                    "scrubbing bathroom tiles",
-                    "person cleaning windows",
-                    "doing laundry washing machine",
-                    "wiping kitchen counter",
-                    "person sweeping floor broom",
-                    "cleaning toilet bathroom",
-                    "dusting furniture home"
+                    "laundry detergent",
+                    "dirty clothes",
+                    "cleaning gloves",
                 ],
-                "target": 1000,
-            },
-        ],
-    },
-    "cooking": {
-        "sources": [
-            {
-                "type": "pixabay",
-                "keywords": [
-                    "person cooking kitchen stove",
-                    "woman chopping vegetables",
-                    "man frying pan kitchen",
-                    "chef preparing ingredients",
-                    "person stirring pot stove",
-                    "baking bread oven kitchen",
-                    "person rolling dough kitchen",
-                    "grilling meat barbecue",
-                    "person mixing bowl cooking",
-                    "cutting meat kitchen board"
-                ],
-                "target": 1000,
+                "target": 200,
             },
         ],
     },
@@ -73,18 +46,10 @@ CONFIG = {
             {
                 "type": "pixabay",
                 "keywords": [
-                    "woman choosing clothes shop",
-                    "person shopping mall",
-                    "buying groceries supermarket",
-                    "shopping cart supermarket aisle",
-                    "person trying clothes fitting room",
-                    "woman browsing store shelves",
-                    "man buying electronics store",
-                    "people shopping market",
-                    "checkout cashier supermarket",
-                    "woman shopping bags street"
+                    "supermarket",
+                    "wallet",
                 ],
-                "target": 1200,
+                "target": 200,
             },
         ],
     },
