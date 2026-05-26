@@ -76,14 +76,14 @@ def main():
                     dest = split_dir / f"{stem}_{counter}{img_path.suffix}"
                     counter += 1
                 shutil.copy2(img_path, dest)
-                csv_rows[split_name].append(f"{split_name}/{cat}/{dest.name},{cat}")
+                csv_rows[split_name].append(f'"{split_name}/{cat}/{dest.name}","{cat}"')
 
         print(f"  {cat}: {len(splits['train'])} train / {len(splits['val'])} val / {len(splits['test'])} test")
 
     for split_name, rows in csv_rows.items():
         csv_path = FINAL / f"{split_name}.csv"
         with open(csv_path, "w") as f:
-            f.write("path,label\n")
+            f.write('"path","label"\n')
             for row in rows:
                 f.write(row + "\n")
         print(f"\n  {split_name}.csv: {len(rows)} rows")

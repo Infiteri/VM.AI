@@ -2,12 +2,12 @@
 VM.AI — Push the final/ dataset to Hugging Face Hub.
 
 Walks final/{train,val,test}/{cat}/ directories, builds a DatasetDict,
-and pushes to the configured HF repo.
+and pushes to the configured HF dataset repo.
 
 Environment variables (from src/image_to_prompt/.env):
-  HF_TOKEN          — Hugging Face API token
-  HF_REPO_ID        — Repository ID (e.g. username/vmai-image-classifier)
-  HF_REPO_PRIVATE   — Set to "false" for public repo (default: "true")
+  HF_TOKEN                — Hugging Face API token
+  HF_DATASET_REPO_ID      — Dataset repository ID
+  HF_DATASET_REPO_PRIVATE — Set to "false" for public repo (default: "true")
 """
 
 import os
@@ -19,8 +19,8 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
 HF_TOKEN = os.environ["HF_TOKEN"]
-HF_REPO_ID = os.environ["HF_REPO_ID"]
-HF_REPO_PRIVATE = os.environ.get("HF_REPO_PRIVATE", "true").lower() == "true"
+HF_DATASET_REPO_ID = os.environ["HF_DATASET_REPO_ID"]
+HF_DATASET_REPO_PRIVATE = os.environ.get("HF_DATASET_REPO_PRIVATE", "true").lower() == "true"
 
 FINAL = Path("data/image_to_prompt/final")
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
@@ -70,11 +70,11 @@ def main():
     print(f"  Val:   {len(val_ds)}")
     print(f"  Test:  {len(test_ds)}")
 
-    print(f"\nPushing to {HF_REPO_ID} (private={HF_REPO_PRIVATE}) ...")
+    print(f"\nPushing to {HF_DATASET_REPO_ID} (private={HF_DATASET_REPO_PRIVATE}) ...")
     dataset.push_to_hub(
-        HF_REPO_ID,
+        HF_DATASET_REPO_ID,
         token=HF_TOKEN,
-        private=HF_REPO_PRIVATE,
+        private=HF_DATASET_REPO_PRIVATE,
     )
     print("Done.")
 
