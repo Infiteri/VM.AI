@@ -24,7 +24,6 @@ import numpy as np
 import seaborn as sns
 import torch
 from sklearn.metrics import (
-    accuracy_score,
     classification_report,
     confusion_matrix,
     f1_score,
@@ -200,8 +199,8 @@ def main():
 
     # Predictions
     y_true, y_pred, y_scores = get_all_predictions(model, test_loader, device, NUM_CLASSES)
-    top1 = accuracy_score(y_true, y_pred)
     topk_accs = compute_topk_accuracy(y_scores, y_true, max_k=14)
+    top1 = topk_accs[0]
     print(f"Top-1 accuracy: {top1:.3f}")
     print(f"Top-3 accuracy: {topk_accs[2]:.3f}")
     print()
@@ -217,13 +216,13 @@ def main():
         per_class[cn] = {
             "precision": round(m["precision"], 4),
             "recall": round(m["recall"], 4),
-            "f1": round(m["f1"], 4),
+            "f1": round(m["f1-score"], 4),
             "support": int(m["support"]),
         }
         print(f"{cn:<20} {per_class[cn]['precision']:>10.4f} {per_class[cn]['recall']:>10.4f} {per_class[cn]['f1']:>8.4f} {per_class[cn]['support']:>8}")
 
-    macro_f1 = round(report_dict["macro avg"]["f1_score"], 4)
-    weighted_f1 = round(report_dict["weighted avg"]["f1_score"], 4)
+    macro_f1 = round(report_dict["macro avg"]["f1-score"], 4)
+    weighted_f1 = round(report_dict["weighted avg"]["f1-score"], 4)
     print("-" * 70)
     print(f"{'Macro avg':<20} {report_dict['macro avg']['precision']:>10.4f} {report_dict['macro avg']['recall']:>10.4f} {macro_f1:>8.4f} {int(report_dict['macro avg']['support']):>8}")
     print(f"{'Weighted avg':<20} {report_dict['weighted avg']['precision']:>10.4f} {report_dict['weighted avg']['recall']:>10.4f} {weighted_f1:>8.4f} {int(report_dict['weighted avg']['support']):>8}")
