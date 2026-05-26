@@ -32,7 +32,7 @@ DEFAULT_SAVE_PATH = str(SAVE_DIR / "efficientnet_b4_classifier.pth")
 CONFIG = {
     "num_classes": 14,
     "image_size": 380,
-    "batch_size": 32,
+    "batch_size": 128,
     "epochs_frozen": 5,
     "epochs_unfrozen": 20,
     "lr_head": 1e-3,
