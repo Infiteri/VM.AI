@@ -850,3 +850,170 @@ check on it tomorrow,0.2,0.35
 leave it for now,0.15,0.15
 get it done asap,0.4,0.85
 sort it out somehow,0.4,0.5
+difficult task but nobody really needs it done,0.85,0.1
+hard work that ultimately doesnt matter much,0.8,0.15
+complex process with very little payoff,0.75,0.1
+challenging project that nobody asked for,0.85,0.1
+tough assignment that will go unnoticed,0.8,0.15
+heavy workload but the impact is minimal,0.75,0.1
+strenuous effort for negligible results,0.85,0.1
+labor intensive task with almost no benefit,0.8,0.1
+painstaking work that could have been an email,0.75,0.15
+meticulous research for a report nobody reads,0.8,0.1
+backbreaking labor for something trivial,0.9,0.1
+endless debugging of a rarely used feature,0.8,0.1
+spent all night on a feature nobody uses,0.85,0.1
+exhausting meeting that could have been an email,0.7,0.15
+painfully slow process for minimal gain,0.75,0.1
+extremely tedious data entry with no oversight,0.7,0.1
+hours of manual work that should be automated but i cant,0.8,0.1
+completely draining task with zero recognition,0.85,0.15
+this is so much effort for nothing at all,0.9,0.1
+i hate doing this it takes forever and nobody cares,0.85,0.1
+grueling paperwork for a minor procedural issue,0.75,0.1
+physically demanding task for no good reason,0.85,0.15
+complicated system migration that nobody will notice,0.85,0.1
+meticulous quality check on a product nobody uses,0.75,0.1
+hard to even care about this pointless project,0.8,0.05
+so much time wasted on something so trivial,0.85,0.05
+massive effort tiny tiny impact,0.9,0.1
+soul crushing admin work that doesnt matter,0.75,0.1
+this project is a tremendous amount of work for very little return,0.85,0.15
+hard tedious boring and completely unimportant,0.8,0.1
+completely exhausting work with no upside,0.85,0.1
+im spending my whole weekend on something useless,0.85,0.05
+overengineered solution nobody wanted,0.8,0.1
+this takes forever and i am the only one who cares,0.75,0.15
+pointless optimization of something fast enough,0.7,0.1
+building a feature that got descoped halfway through,0.8,0.1
+rewriting perfectly fine legacy code for no reason,0.75,0.1
+micro optimizing a function called once a day,0.7,0.05
+refactoring code that works fine already,0.7,0.1
+manually testing edge cases that never happen,0.75,0.1
+creating reports that nobody opens,0.6,0.1
+meticulous log analysis for a non critical system,0.7,0.1
+fine tuning a model for a dataset of ten samples,0.85,0.1
+setting up monitoring for a service that never fails,0.65,0.1
+building a dashboard for metrics nobody tracks,0.7,0.1
+writing tests for deprecated code paths,0.6,0.05
+documenting an api that is getting replaced,0.6,0.1
+migrating data formats nobody uses anymore,0.65,0.1
+carefully crafting error messages for unreachable code,0.7,0.05
+this is such a waste of my talents honestly,0.75,0.1
+i cant believe i have to do this its so pointless,0.8,0.1
+spent days on a tool that only i will ever use,0.8,0.1
+hard work but the stakeholders already changed their minds,0.85,0.1
+everything about this is difficult and nothing about it matters,0.85,0.05
+absolutely brutal schedule for a project nobody believes in,0.9,0.1
+technical challenge that solves a non existent problem,0.8,0.1
+deep dive into a topic that became irrelevant,0.7,0.1
+exhaustive analysis that nobody will reference,0.75,0.1
+i put in so much effort and then they cancelled the project,0.85,0.1
+this is really hard and honestly who even needs it,0.8,0.05
+complicated setup for a one time demo,0.7,0.1
+painful integration with a dying platform,0.8,0.1
+manually reformatting data that the next person will undo,0.7,0.1
+building elaborate docs for a two function library,0.6,0.1
+extremely difficult debugging session for a minor cosmetic bug,0.85,0.1
+demanding physical labor for a temporary setup,0.85,0.15
+hard compilation error that only appears on one machine,0.8,0.1
+i worked overtime on something that got scrapped anyway,0.9,0.1
+this is way too much effort for something so stupid,0.85,0.05
+complex legal review for a contract that is a formality,0.75,0.15
+grueling rehearsal for a presentation that got cancelled,0.8,0.1
+endless back and forth for a trivial approval,0.7,0.1
+i spent a whole day on a typo in a footnote,0.65,0.05
+painstaking proofreading of a draft that changed anyway,0.7,0.1
+difficult conversation about something that doesnt matter,0.6,0.1
+hard decision between two equally meaningless options,0.6,0.1
+meticulous formatting of a spreadsheet template,0.55,0.1
+time consuming manual categorization of data,0.6,0.1
+extensive research for a question nobody asked,0.75,0.1
+building a prototype for a feature no one requested,0.8,0.1
+hours of work for a single line change,0.7,0.15
+tuning parameters for a model that will never ship,0.75,0.1
+setting up ci for a repo with one commit,0.6,0.05
+hard thing but the result is inconsequential,0.85,0.05
+completely overthought solution to a trivial problem,0.8,0.1
+extensive refactoring of a dead code path,0.7,0.1
+complex orchestration for a one off task,0.75,0.15
+this is an incredible amount of effort for almost no gain,0.9,0.1
+hours spent on something nobody will ever notice,0.85,0.1
+this is stupidly difficult and stupidly pointless,0.85,0.05
+i have to jump through so many hoops for nothing,0.8,0.1
+ridiculously hard process for a minor update,0.8,0.1
+absurd amount of work for a negligible improvement,0.85,0.1
+draining emotional labor for a person who does not appreciate it,0.7,0.1
+physically grueling task for a zero impact outcome,0.9,0.1
+intellectually demanding but completely useless,0.85,0.05
+this requires a phd level understanding for a checkbox feature,0.85,0.1
+i built an entire framework for a weekend project nobody saw,0.85,0.1
+the amount of effort here is absurd and the payoff is zero,0.9,0.1
+brutal workout routine for a competition that got cancelled,0.85,0.1
+painful administrative gauntlet for a minor permit,0.75,0.1
+hard fought battle for something i didnt even want,0.8,0.1
+complex problem that solves an imaginary edge case,0.8,0.05
+months of development for a feature nobody adopted,0.85,0.1
+intense preparation for an interview that fell through,0.8,0.15
+hard compromise that pleases nobody,0.7,0.15
+extensive negotiations over something trivial,0.7,0.1
+challenging certification for a skill i never use,0.75,0.15
+minor task but takes forever because of bureaucracy,0.65,0.2
+quick and easy no big deal,0.1,0.15
+simple straightforward nothing to worry about,0.15,0.2
+trivial task barely takes any effort,0.05,0.15
+easy peasy lemon squeezy,0.05,0.15
+just a small thing dont overthink it,0.15,0.2
+barely qualifies as work honestly,0.05,0.15
+not demanding at all very casual,0.15,0.2
+low effort low stakes just get it done,0.15,0.15
+super quick nothing to see here,0.1,0.15
+effortless just a formality,0.05,0.15
+no brainer easy call,0.1,0.2
+minimal effort minimal impact all good,0.15,0.15
+easy mundane simple no pressure,0.15,0.2
+nobody cares about this one way or the other,0.15,0.1
+total non event just do it,0.1,0.15
+zero challenge whatsoever,0.05,0.1
+no sweat no stress,0.1,0.15
+negligible effort required here,0.05,0.15
+easy task nothing special about it,0.1,0.15
+quick simple task not much to say,0.15,0.2
+not a big deal at all very minor,0.1,0.15
+light work very straightforward,0.15,0.2
+minimal effort required here seriously,0.05,0.15
+this is extremely casual and low effort,0.15,0.2
+no complexity whatsoever very plain,0.1,0.15
+simple basic easy no complications,0.15,0.2
+barely a task just a tiny thing,0.05,0.15
+low difficulty low impact all around,0.15,0.15
+this is easy and unimportant just do it,0.15,0.15
+simple task low difficulty low importance,0.15,0.15
+easy quick and nobody really minds,0.1,0.15
+low effort low priority simple enough,0.15,0.15
+very easy very casual no pressure,0.1,0.15
+easy routine boring but quick,0.15,0.2
+nothing difficult about this at all,0.05,0.2
+brain dead simple and inconsequential,0.1,0.15
+this task is simple easy and low stakes,0.1,0.15
+quick little thing nobody is watching,0.1,0.15
+hard complex thing that is completely unnecessary,0.85,0.1
+time consuming and physically draining with no upside,0.85,0.1
+this is way too difficult for such a trivial outcome,0.8,0.05
+spending way too much effort on a non critical thing,0.75,0.1
+the amount of effort here is absurdly disproportionate,0.85,0.1
+this is brutal and nobody is going to notice it anyway,0.85,0.1
+extremely challenging and completely thankless work,0.9,0.1
+i am working so hard on a project that is going nowhere,0.85,0.1
+this is an absolute slog for absolutely no reason,0.85,0.1
+backbreaking tedious and completely overlooked,0.85,0.1
+i spent weeks on something that got rejected,0.85,0.1
+months of effort for a product that got cancelled,0.9,0.1
+this is incredibly demanding with zero appreciation,0.85,0.1
+physically punishing work that adds no value,0.9,0.1
+i have been killing myself over something meaningless,0.85,0.05
+complex coding challenge for an internal prototype,0.8,0.1
+this is so hard and nobody even cares if it works,0.85,0.05
+high effort no payoff whatsoever,0.85,0.05
+tremendous amount of work for a dead end,0.9,0.1
+extremely difficult irrelevant side quest,0.85,0.05
