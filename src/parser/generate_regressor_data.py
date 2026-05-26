@@ -129,6 +129,24 @@ FRAMES = [
     ("{v} {t} decent effort important", 0.3, 0.5, 0.55, 0.75, set()),
     ("{v} {t} medium priority", 0.3, 0.5, 0.5, 0.7, set()),
 
+    # ── Mid-range / balanced (fleshes out 0.3–0.7 importance zone) ──
+    ("{v} {t} worthwhile effort", 0.3, 0.5, 0.5, 0.7, set()),
+    ("{v} {t} solid mid level task", 0.35, 0.55, 0.4, 0.6, set()),
+    ("{v} {t} fair amount of work", 0.35, 0.55, 0.35, 0.55, set()),
+    ("{v} {t} needs reasonable effort", 0.3, 0.5, 0.35, 0.55, set()),
+    ("{v} {t} moderately important", 0.25, 0.45, 0.5, 0.7, set()),
+    ("{v} {t} somewhat challenging", 0.4, 0.6, 0.35, 0.55, set()),
+    ("{v} {t} decent priority", 0.3, 0.5, 0.5, 0.7, set()),
+    ("{v} {t} takes some effort", 0.35, 0.55, 0.3, 0.5, set()),
+    ("{v} {t} worth the time", 0.3, 0.5, 0.55, 0.75, set()),
+    ("{v} {t} should prioritize", 0.3, 0.5, 0.55, 0.75, set()),
+    ("{v} {t} requires focus", 0.35, 0.55, 0.5, 0.7, set()),
+    ("{v} {t} needs attention", 0.3, 0.5, 0.55, 0.75, set()),
+    ("{v} {t} considerable effort", 0.45, 0.6, 0.35, 0.55, set()),
+    ("{v} {t} quite demanding", 0.5, 0.7, 0.4, 0.6, set()),
+    ("{v} {t} fairly important", 0.25, 0.45, 0.5, 0.7, set()),
+    ("{v} {t} non trivial", 0.45, 0.6, 0.3, 0.5, set()),
+
     # ── Hard / moderate-high importance ──
     ("{v} {t} hard hard", 0.55, 0.75, 0.5, 0.7, set()),
     ("{v} {t} hard needs focus", 0.55, 0.75, 0.55, 0.75, set()),
