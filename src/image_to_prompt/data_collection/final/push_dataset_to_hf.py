@@ -1,7 +1,7 @@
 """
 VM.AI — Push the final/ dataset to Hugging Face Hub.
 
-Reads train/val/test CSVs, loads images, builds a DatasetDict,
+Walks final/{train,val,test}/{cat}/ directories, builds a DatasetDict,
 and pushes to the configured HF repo.
 
 Environment variables (from src/image_to_prompt/.env):
@@ -13,9 +13,8 @@ Environment variables (from src/image_to_prompt/.env):
 import os
 from pathlib import Path
 
-from datasets import ClassLabel, Dataset, DatasetDict, Image, Split
+from datasets import ClassLabel, Dataset, DatasetDict, Image
 from dotenv import load_dotenv
-from PIL import Image as PILImage
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 
@@ -24,28 +23,25 @@ HF_REPO_ID = os.environ["HF_REPO_ID"]
 HF_REPO_PRIVATE = os.environ.get("HF_REPO_PRIVATE", "true").lower() == "true"
 
 FINAL = Path("data/image_to_prompt/final")
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 
 
 def _load_split(split_name: str) -> Dataset:
-    csv_path = FINAL / f"{split_name}.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Missing {csv_path}")
+    split_dir = FINAL / split_name
+    if not split_dir.is_dir():
+        raise FileNotFoundError(f"Missing {split_dir}")
 
     images = []
     labels = []
-    with open(csv_path) as f:
-        next(f)  # skip header
-        for line in f:
-            line = line.strip()
-            if not line:
+    for cat_dir in sorted(split_dir.iterdir()):
+        if not cat_dir.is_dir():
+            continue
+        cat = cat_dir.name
+        for f in sorted(cat_dir.iterdir()):
+            if not f.is_file() or f.suffix.lower() not in IMAGE_EXTENSIONS:
                 continue
-            path_str, label = line.split(",", 1)
-            img_path = FINAL / path_str
-            if not img_path.exists():
-                continue
-            pil_img = PILImage.open(img_path).convert("RGB")
-            images.append(pil_img)
-            labels.append(label.strip())
+            images.append(str(f))
+            labels.append(cat)
 
     class_names = sorted(set(labels))
     label_to_id = {n: i for i, n in enumerate(class_names)}
@@ -65,9 +61,9 @@ def main():
     test_ds = _load_split("test")
 
     dataset = DatasetDict({
-        Split.TRAIN: train_ds,
-        Split.VALIDATION: val_ds,
-        Split.TEST: test_ds,
+        "train": train_ds,
+        "val": val_ds,
+        "test": test_ds,
     })
 
     print(f"  Train: {len(train_ds)}")

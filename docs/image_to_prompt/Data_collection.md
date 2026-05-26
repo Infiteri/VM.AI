@@ -5,12 +5,16 @@ Downloads and prepares training images for the image-to-prompt classifier (14 ac
 ## Pipeline Overview
 
 ```
-collect_data.py   →   raw/<category>/<source>/...
-                         ↓  (copy)
-prepare_data.py   →   selected/<category>/<source>/...
-      Phase 0     →     creates selected/, copies raw/ → selected/
-      Phase 1     →     flattens: selected/<cat>/<source>/... → selected/<cat>/<prefix>_<name>.jpg
-      Phase 2     →     validates: remove corrupted → convert to JPG → filter <180px → deduplicate across categories
+collect_data.py           →   raw/<category>/<source>/...
+                               ↓  (copy, flatten, validate, dedup)
+prepare_data.py           →   selected/<category>/<prefix>_<name>.jpg
+download_new.py + unpack_new.py  →   selected/<category>/new_<name>.jpg  (additional Pixabay images)
+dedup_selected.py         →   removes perceptual duplicates from selected/
+convert_selected_jpg.py   →   ensures all selected/ images are JPEG
+split_dataset.py          →   final/{train,val,test}/<category>/ + CSV
+resize_final.py           →   final/ images centre-cropped + resized to 380×380
+analyze_dataset.py        →   analysis report + outlier images copied to outliers/
+push_dataset_to_hf.py     →   push final/ to Hugging Face Hub
 ```
 
 ## Source Types
@@ -36,29 +40,27 @@ Searches Pixabay (CC0 license, ML-safe) with category-specific keywords. `per_pa
 | 2 | cycling | — | meetnagadia/har (800) + lumierebatalong/har (840) | cycling bicycle | 400 |
 | 3 | cooking | Gas stove, Frying pan, Cutting board, Wok, Cooking spray, Kitchen utensil, Kitchenware, Slow cooker, Pressure cooker, Mixing bowl | dataclusterlabs/kitchen (400) | kitchen, cooking, cookware, kitchenware, chef stove | 500 |
 | 4 | restaurant | Fast food, Kitchen & dining room table, Tableware, Coffee, Wine | kmader/food41 (900) | restaurant, cafe, restaurant inside | 300 |
-| 5 | shopping | Convenience store, Cart, Plastic bag, Handbag | humansintheloop/supermarket (45) | grocery store, mall, clothes store | 1100 |
+| 5 | shopping | Convenience store, Cart, Plastic bag, Handbag | humansintheloop/supermarket (45) | grocery store, mall, clothes store | 1200 |
 | 6 | office | Office building, Office supplies, Computer monitor, Whiteboard, Filing cabinet, Printer | sordi-ai/office (500) | office, office room, office desk | 500 |
 | 7 | football | Football | ligtfeather/football-vs-rugby (900) | football | 300 |
 | 8 | cleaning | Washing machine, Sink, Soap dispenser | — | cleaning, person cleaning house, mopping floor, washing dishes | 1000 |
 | 9 | driving | Car, Seat belt, Land vehicle, Taxi | rightway11/state-farm-distracted (600) | person driving car, car | 200 |
 | 10 | reading | Book, Bookcase | — | person reading book, reading, reading on the sofa, reading library, book, library | 2000 |
-| 11 | computer work | Computer monitor, Computer keyboard, Laptop, Computer mouse | — | person and laptop, developer coding, work in laptop | 1200 |
+| 11 | computer_work | Computer monitor, Computer keyboard, Laptop, Computer mouse | — | person and laptop, developer coding, work in laptop | 1200 |
 | 12 | basketball | — | rishikeshkonapure/sports (486) + gpiosenka/sports (169) + ponrajsubramaniian/sport (495) + mmoreaux/caltech256 (90) + sheikhzaib/sports (486) | basketball, basketball field, basketball player | 1000 |
-| 13 | pet care | Dog, Cat, Dog bed, Cat furniture | tongpython/cat-and-dog (700) | pet, person walking dog | 200 |
+| 13 | pet_care | Dog, Cat, Dog bed, Cat furniture | tongpython/cat-and-dog (700) | pet, person walking dog | 200 |
 | 14 | gym | Dumbbell, Treadmill, Indoor rower, Stationary bicycle, Training bench, Punching bag, Horizontal bar | hasyimabdillah/workoutexercises (700) | gym workout | 200 |
 
 ## Usage
 
 ### 1. Setup
 
-Ensure the Pixabay API key is set:
+Ensure the Pixabay API key is set in `src/image_to_prompt/.env`:
 
 ```
 PIXABAY_API_KEY="your_key_here"
 PIXABAY_BASE_URL="https://pixabay.com/api/"
 ```
-
-Copy this to `src/image_to_prompt/.env` or set the environment variable directly. The script loads `.env` automatically via `dotenv`.
 
 ### 2. Collect Raw Data
 
@@ -66,7 +68,7 @@ Copy this to `src/image_to_prompt/.env` or set the environment variable directly
 uv run python src/image_to_prompt/data_collection/collect_data.py
 ```
 
-Runs all 15 categories. To run specific categories only:
+Runs all 14 categories. To run specific categories only:
 
 ```bash
 uv run python src/image_to_prompt/data_collection/collect_data.py basketball computer_work
@@ -85,24 +87,110 @@ Three phases:
 - **Phase 1** — Flattens `selected/<category>/<source>/filename.ext` → `selected/<category>/<source>_filename.ext`, removes source subdirs
 - **Phase 2** — Per-image validation: opens & verifies, converts non-JPG to JPG, removes images < 180×180, deduplicates across all categories (keeps first occurrence)
 
+### 4. Additional Downloads (Optional)
+
+```bash
+uv run python src/image_to_prompt/data_collection/download_new.py
+uv run python src/image_to_prompt/data_collection/unpack_new.py
+```
+
+Downloads additional Pixabay images into `selected/<category>/new/` with per-image validation, then moves them to the parent folder with a `new_` prefix.
+
+### 5. Deduplicate Selected
+
+```bash
+uv run python src/image_to_prompt/data_collection/selected/dedup_selected.py
+```
+
+Removes near-duplicate images within each category using perceptual hashing (`imagehash.phash`). Keeps one image per hash group, deletes the rest.
+
+### 6. Convert to JPEG
+
+```bash
+uv run python src/image_to_prompt/data_collection/selected/convert_selected_jpg.py
+```
+
+Ensures every image in `selected/` is a valid JPEG. Already-JPEG files are skipped.
+
+### 7. Split into Train/Val/Test
+
+```bash
+uv run python src/image_to_prompt/data_collection/split_dataset.py
+```
+
+Shuffles (seed=42), caps at 1100 per category, splits 70/15/15, copies into `final/{train,val,test}/`, writes CSVs.
+
+### 8. Resize to 380×380
+
+```bash
+uv run python src/image_to_prompt/data_collection/resize_final.py
+```
+
+Centre-crops every image in `final/` to a square, then resizes to 380×380 with Lanczos. Overwrites in place.
+
+### 9. Analyze Dataset
+
+```bash
+uv run python src/image_to_prompt/data_collection/analyze_dataset.py
+```
+
+Runs 4 checks: class balance (chart), perceptual duplicates, ResNet18 outliers (copied to `outliers/`), and brightness distribution. Writes `analysis_report.json`.
+
+Optionally, detect outliers in `selected/`:
+
+```bash
+uv run python src/image_to_prompt/data_collection/selected/outliers_selected.py
+```
+
+Copies flagged outliers to `selected/outliers/<category>/` (ResNet18 + IsolationForest, 5% contamination).
+
+### 10. Push to Hugging Face Hub
+
+```bash
+uv run python src/image_to_prompt/data_collection/final/push_dataset_to_hf.py
+```
+
+Requires `HF_TOKEN`, `HF_REPO_ID`, and optionally `HF_REPO_PRIVATE` in `src/image_to_prompt/.env`. Pushes the complete dataset as a `DatasetDict` with `Image` and `ClassLabel` features.
+
 ## Folder Structure
 
-After collection:
+After the full pipeline:
 
 ```
 data/image_to_prompt/
   raw/
     running/
-      openimages/   (if applicable)
-      kaggle/       (if applicable)
-      pixabay/      (if applicable)
+      kaggle/
+      pixabay/
       metadata.json
     ...
-  selected/         (created by prepare_data.py)
+  selected/
     running/
-      openimages_0000.jpg
       kaggle_0000.jpg
       pixabay_0000.jpg
+      ...
+    outliers/
+      running/
+        kaggle_0012.jpg
+        ...
+    ...
+  final/
+    train/
+      running/
+        kaggle_0000.jpg
+        ...
+      ...
+    val/
+      running/
+        ...
+    test/
+      running/
+        ...
+    train.csv
+    val.csv
+    test.csv
+  outliers/
+    train_running_kaggle_0000.jpg
     ...
 ```
 
@@ -112,6 +200,15 @@ data/image_to_prompt/
 |------|---------|
 | `src/image_to_prompt/data_collection/collect_data.py` | Download from all sources (5 handler types) |
 | `src/image_to_prompt/data_collection/prepare_data.py` | Copy, flatten, validate, deduplicate |
-| `src/image_to_prompt/.env` | Pixabay API credentials (gitignored) |
+| `src/image_to_prompt/data_collection/download_new.py` | Download additional Pixabay images |
+| `src/image_to_prompt/data_collection/unpack_new.py` | Flatten new/ downloads into parent folder |
+| `src/image_to_prompt/data_collection/selected/dedup_selected.py` | Remove within-category perceptual duplicates from selected/ |
+| `src/image_to_prompt/data_collection/selected/convert_selected_jpg.py` | Convert all selected/ images to JPEG |
+| `src/image_to_prompt/data_collection/selected/outliers_selected.py` | Detect and copy outliers from selected/ |
+| `src/image_to_prompt/data_collection/split_dataset.py` | Split selected/ into train/val/test |
+| `src/image_to_prompt/data_collection/resize_final.py` | Resize final/ images to 380×380 |
+| `src/image_to_prompt/data_collection/analyze_dataset.py` | Dataset analysis (balance, duplicates, outliers, brightness) |
+| `src/image_to_prompt/data_collection/final/push_dataset_to_hf.py` | Push final/ dataset to Hugging Face Hub |
+| `src/image_to_prompt/.env` | API keys and config (gitignored) |
 | `src/image_to_prompt/.env.example` | Template for `.env` |
-| `src/backend/logs/notes.log` | Source-of-truth for per-category config (15 entries) |
+| `src/backend/logs/notes.log` | Source-of-truth for per-category config (14 entries) |
