@@ -111,7 +111,7 @@ class TaskPlannerPredictor:
             decoder_input = None
 
         gen_kwargs = {
-            "max_new_tokens": 256,
+            "max_length": 256,
             "no_repeat_ngram_size": 3,
             "repetition_penalty": 1.1,
             "use_cache": True,

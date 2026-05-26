@@ -441,3 +441,691 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-05-26T18:58:05.406677'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_59> | importance=0.52<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.331'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.521'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:14.612227'
+  mode: add
+  input: go home at 6 pm
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.294'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.588'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:24.561344'
+  mode: add
+  input: go home  for 30 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=30<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.225'
+    duration: '30'
+    category: home
+    location: null
+    importance: '0.585'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:28.050799'
+  mode: add
+  input: go home  for 90 mins
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=90<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.251'
+    duration: '90'
+    category: home
+    location: null
+    importance: '0.628'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:32.541572'
+  mode: add
+  input: go home  for 0.5h
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.314'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.560'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:40.187423'
+  mode: add
+  input: go home 30 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=30<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.182'
+    duration: '30'
+    category: home
+    location: null
+    importance: '0.605'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:42.959116'
+  mode: add
+  input: go home 12 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.190'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.568'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:46.923823'
+  mode: add
+  input: go home for 12 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.239'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.615'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:50.608350'
+  mode: add
+  input: go home for 12 hours
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.369'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.672'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:54.795112'
+  mode: add
+  input: go home for 1 hour
+  raw_output: name=go home[EXP] | difficulty=0.48[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.56<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.252'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.650'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:58:59.300526'
+  mode: add
+  input: go home for 12 minutes
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.47<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.239'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.615'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:59:04.129183'
+  mode: add
+  input: go home for 12 minutes very hard
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.54<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.672'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.631'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:59:08.077165'
+  mode: add
+  input: go home for 12 minutes very hard but still doable
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=12<extra_id_51>
+    | category=home<extra_id_47> | importance=0.44<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.645'
+    duration: '12'
+    category: home
+    location: null
+    importance: '0.698'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:59:14.857114'
+  mode: add
+  input: go home for 12 minutes very hard but not important at all
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=12<extra_id_51>
+    | category=home<extra_id_47> | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.639'
+    duration: '12'
+    category: home
+    location: null
+    importance: '0.434'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T18:59:31.127218'
+  mode: add
+  input: go home for 12 minutes very hard but not important
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=12<extra_id_51>
+    | category=home<extra_id_47> | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.617'
+    duration: '12'
+    category: home
+    location: null
+    importance: '0.410'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:00:16.455388'
+  mode: add
+  input: go home for 12 minutes very hard but not important
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=12<extra_id_51>
+    | category=home<extra_id_47> | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.617'
+    duration: '12'
+    category: home
+    location: null
+    importance: '0.410'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:00:20.948314'
+  mode: add
+  input: very hard task
+  raw_output: name=hard task[EXP] | difficulty=0.8[PRD] | duration=45<extra_id_51>
+    | category=work<extra_id_47> | importance=0.54<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: hard task
+    start: null
+    deadline: null
+    difficulty: '0.697'
+    duration: '45'
+    category: work
+    location: null
+    importance: '0.623'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:00:30.742891'
+  mode: add
+  input: very easy task
+  raw_output: name=easy task[EXP] | difficulty=0.1[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.55<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: easy task
+    start: null
+    deadline: null
+    difficulty: '0.070'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.324'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:00:37.973131'
+  mode: add
+  input: very very hard task
+  raw_output: name=hard task[EXP] | difficulty=0.8[PRD] | duration=60<extra_id_47>
+    | category=work<extra_id_51> | importance=0.54<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: hard task
+    start: null
+    deadline: null
+    difficulty: '0.692'
+    duration: '60'
+    category: work
+    location: null
+    importance: '0.631'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:00:42.349620'
+  mode: add
+  input: extreme task
+  raw_output: name=task[EXP] | difficulty=0.38[PRD] | duration=60<extra_id_51> | category=work<extra_id_47>
+    | importance=0.56<extra_id_31> | fixed_time=false<extra_id_59> | recurrent=fale<extra_id_53>
+  parsed:
+    name: task
+    start: null
+    deadline: null
+    difficulty: '0.654'
+    duration: '60'
+    category: work
+    location: null
+    importance: '0.591'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:01:08.691525'
+  mode: add
+  input: easy
+  raw_output: name=easy[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51> | category=home<extra_id_47>
+    | importance=0.56<extra_id_31> | fixed_time=false<extra_id_59> | recurrent=fale<extra_id_53>
+  parsed:
+    name: easy
+    start: null
+    deadline: null
+    difficulty: '0.091'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.276'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:01:14.584885'
+  mode: add
+  input: easy and important
+  raw_output: name=easy[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51> | category=home<extra_id_47>
+    | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59> | recurrent=fale<extra_id_53>
+  parsed:
+    name: easy
+    start: null
+    deadline: null
+    difficulty: '0.254'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.664'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:01:33.328094'
+  mode: add
+  input: easy and important
+  raw_output: name=easy[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51> | category=home<extra_id_47>
+    | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59> | recurrent=fale<extra_id_53>
+  parsed:
+    name: easy
+    start: null
+    deadline: null
+    difficulty: '0.254'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.664'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:01:36.524160'
+  mode: add
+  input: D:\Users\user\Desktop\VM.AI\src\parser\chat.pyery easy and important
+  raw_output: name=parser[EXP] | difficulty=0.15[PRD] | duration=60<extra_id_47> |
+    category=home<extra_id_51> | importance=0.78<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: parser
+    start: null
+    deadline: null
+    difficulty: '0.474'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.873'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:01:39.716568'
+  mode: add
+  input: very easy
+  raw_output: name=easy[EXP] | difficulty=0.1[PRD] | duration=45<extra_id_51> | category=home<extra_id_47>
+    | importance=0.58<extra_id_31> | fixed_time=false<extra_id_59> | recurrent=fale<extra_id_53>
+  parsed:
+    name: easy
+    start: null
+    deadline: null
+    difficulty: '0.086'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.360'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:53:27.313790'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_59> | importance=0.52<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.393'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.216'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:53:33.344855'
+  mode: add
+  input: go home very important
+  raw_output: name=go home[EXP] | difficulty=0.58[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.74<extra_id_86> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.321'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.655'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:53:37.679012'
+  mode: add
+  input: go home very important extreme
+  raw_output: name=go home[EXP] | difficulty=0.48[PRD] | duration=45<extra_id_47>
+    | category=home<extra_id_51> | importance=0.75<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.735'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.744'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:53:44.772031'
+  mode: add
+  input: go home very important extreme difficulty
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.74<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.540'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.853'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:53:49.599838'
+  mode: add
+  input: go home very important extemly hard
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.98<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.681'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.493'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:54:01.981912'
+  mode: add
+  input: go home very easy
+  raw_output: name=go home[EXP] | difficulty=0.1[PRD] | duration=45<extra_id_51> |
+    category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.031'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.139'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:54:39.730785'
+  mode: add
+  input: finish a very important report
+  raw_output: name=finish a report[EXP] | difficulty=0.58[PRD] | duration=30<extra_id_47>
+    | category=work<extra_id_51> | importance=0.77<extra_id_86> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: finish a report
+    start: null
+    deadline: null
+    difficulty: '0.385'
+    duration: '30'
+    category: work
+    location: null
+    importance: '0.817'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T19:54:50.184936'
+  mode: add
+  input: finish a very important report but its not hard
+  raw_output: name=finish a report[EXP] | difficulty=0.85[PRD] | duration=45<extra_id_47>
+    | category=work<extra_id_51> | importance=0.93<extra_id_31> | fixed_time=false<extra_id_59>
+    | recurrent=fale<extra_id_53>
+  parsed:
+    name: finish a report
+    start: null
+    deadline: null
+    difficulty: '0.088'
+    duration: '45'
+    category: work
+    location: null
+    importance: '0.649'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
