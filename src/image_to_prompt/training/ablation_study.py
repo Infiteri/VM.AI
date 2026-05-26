@@ -80,7 +80,7 @@ EXPERIMENTS = {
 
 BASE_CONFIG = {
     "num_classes": 14,
-    "batch_size": 128,
+    "batch_size": 32,
     "lr_head": 1e-3,
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,

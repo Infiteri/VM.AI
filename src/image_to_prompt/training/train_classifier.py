@@ -32,7 +32,7 @@ DEFAULT_SAVE_PATH = str(SAVE_DIR / "efficientnet_b4_classifier.pth")
 CONFIG = {
     "num_classes": 14,
     "image_size": 380,
-    "batch_size": 128,
+    "batch_size": 32,
     "epochs_frozen": 5,
     "epochs_unfrozen": 20,
     "lr_head": 1e-3,
@@ -187,7 +187,7 @@ def main():
     val_dataset = ImageDataset(val_csv, transform=val_transforms)
     test_dataset = ImageDataset(test_csv, transform=val_transforms)
 
-    num_workers = 0
+    num_workers = 2
     train_loader = DataLoader(
         train_dataset, batch_size=CONFIG["batch_size"], shuffle=True,
         num_workers=num_workers, pin_memory=(device.type == "cuda"),
