@@ -8,7 +8,7 @@ Trains on data/image_to_prompt/final/ using two-phase strategy:
 Usage:
   uv run python src/image_to_prompt/training/train_classifier.py
   uv run python src/image_to_prompt/training/train_classifier.py --epochs_frozen 3 --epochs_unfrozen 15
-  uv run python src/image_to_prompt/training/train_classifier.py --resume models/checkpoint_epoch_10.pth
+   uv run python src/image_to_prompt/training/train_classifier.py --resume models/efficientnet_b4_classifier/checkpoint_epoch_10.pth
 """
 
 import argparse
@@ -26,7 +26,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
 DATA_ROOT = Path("data/image_to_prompt/final")
-SAVE_DIR = Path("models")
+SAVE_DIR = Path("models") / "efficientnet_b4_classifier"
 DEFAULT_SAVE_PATH = str(SAVE_DIR / "efficientnet_b4_classifier.pth")
 
 CONFIG = {
@@ -66,7 +66,7 @@ val_transforms = transforms.Compose([
 
 class ImageDataset(Dataset):
     def __init__(self, csv_path: str, transform=None):
-        self.df = pd.read_csv(csv_path)
+        self.df = pd.read_csv(csv_path, quoting=1)
         self.transform = transform
         self.classes = sorted(self.df["label"].unique())
         self.class_to_idx = {c: i for i, c in enumerate(self.classes)}
