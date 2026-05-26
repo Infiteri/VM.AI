@@ -15,6 +15,8 @@ split_dataset.py          →   final/{train,val,test}/<category>/ + CSV
 resize_final.py           →   final/ images centre-cropped + resized to 380×380
 analyze_dataset.py        →   analysis report + outlier images copied to outliers/
 push_dataset_to_hf.py     →   push final/ to Hugging Face Hub
+pull_dataset_hf.py        →   download final/ from Hugging Face Hub
+pull_model_hf.py          →   download model from Hugging Face Hub
 ```
 
 ## Source Types
@@ -150,7 +152,21 @@ Copies flagged outliers to `selected/outliers/<category>/` (ResNet18 + Isolation
 uv run python src/image_to_prompt/data_collection/final/push_dataset_to_hf.py
 ```
 
-Requires `HF_TOKEN`, `HF_REPO_ID`, and optionally `HF_REPO_PRIVATE` in `src/image_to_prompt/.env`. Pushes the complete dataset as a `DatasetDict` with `Image` and `ClassLabel` features.
+Requires `HF_TOKEN`, `HF_DATASET_REPO_ID`, and optionally `HF_DATASET_REPO_PRIVATE` in `src/image_to_prompt/.env`. Pushes the complete dataset as a `DatasetDict` with `Image` and `ClassLabel` features.
+
+### 11. Pull from Hugging Face Hub
+
+```bash
+uv run python src/image_to_prompt/pull_dataset_hf.py
+```
+
+Downloads the dataset from Hugging Face Hub into `data/image_to_prompt/final/`. Deletes the existing `final/` first, then reconstructs `{train,val,test}/{label}/{filename}.jpg` and regenerates the CSV files. `HF_TOKEN` is optional for public repos.
+
+```bash
+uv run python src/image_to_prompt/pull_model_hf.py
+```
+
+Downloads the trained model and evaluation artifacts into `models/efficientnet_b4_classifier/`. Deletes the existing directory first, then downloads the full repo contents via `snapshot_download`. `HF_TOKEN` is optional for public repos.
 
 ## Folder Structure
 
@@ -192,6 +208,21 @@ data/image_to_prompt/
   outliers/
     train_running_kaggle_0000.jpg
     ...
+
+models/
+  efficientnet_b4_classifier/
+    efficientnet_b4_classifier.pth
+    training_history.json
+    evaluation_report.json
+    confusion_matrix.png
+    per_class_metrics.png
+    topk_accuracy.png
+
+assets/
+  image_classifier/
+    confusion_matrix.png
+    per_class_metrics.png
+    topk_accuracy.png
 ```
 
 ## Source Files
@@ -209,6 +240,8 @@ data/image_to_prompt/
 | `src/image_to_prompt/data_collection/resize_final.py` | Resize final/ images to 380×380 |
 | `src/image_to_prompt/data_collection/analyze_dataset.py` | Dataset analysis (balance, duplicates, outliers, brightness) |
 | `src/image_to_prompt/data_collection/final/push_dataset_to_hf.py` | Push final/ dataset to Hugging Face Hub |
+| `src/image_to_prompt/pull_dataset_hf.py` | Pull dataset from Hugging Face Hub |
+| `src/image_to_prompt/pull_model_hf.py` | Pull model and evaluation artifacts from Hugging Face Hub |
 | `src/image_to_prompt/.env` | API keys and config (gitignored) |
 | `src/image_to_prompt/.env.example` | Template for `.env` |
 | `src/backend/logs/notes.log` | Source-of-truth for per-category config (14 entries) |

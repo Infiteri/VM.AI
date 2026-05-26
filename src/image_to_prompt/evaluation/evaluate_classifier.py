@@ -143,18 +143,32 @@ def plot_per_class_metrics(metrics_dict, class_names, save_path):
 def plot_topk_curve(accuracies, save_path):
     fig, ax = plt.subplots(figsize=(8, 5))
     ks = list(range(1, len(accuracies) + 1))
+    
     ax.plot(ks, accuracies, marker="o", color="steelblue", linewidth=2)
+    ax.fill_between(ks, min(accuracies) - 0.02, accuracies, alpha=0.2, color="steelblue")
+    
+    for k, acc in enumerate(accuracies):
+        ax.annotate(f"{acc:.3f}",
+                    xy=(k+1, acc),
+                    xytext=(0, 8),
+                    textcoords="offset points",
+                    ha="center",
+                    fontsize=8,
+                    color="#c9d1d9")
+    
+    y_min = min(accuracies) - 0.02
+    ax.set_ylim(y_min, 1.02)
+    
     ax.set_xlabel("K")
     ax.set_ylabel("Accuracy")
     ax.set_title("Top-K Accuracy")
     ax.set_xticks(ks)
-    ax.set_ylim(0, 1.05)
-    ax.axhline(y=accuracies[0], color="#8b949e", linestyle="--", alpha=0.5, label=f"Top-1: {accuracies[0]:.3f}")
+    ax.axhline(y=accuracies[0], color="#8b949e", linestyle="--", 
+               alpha=0.5, label=f"Top-1: {accuracies[0]:.3f}")
     ax.legend()
     fig.tight_layout()
     fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"  Top-K curve saved to {save_path}")
 
 
 def main():

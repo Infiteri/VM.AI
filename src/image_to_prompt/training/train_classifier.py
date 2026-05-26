@@ -39,6 +39,8 @@ CONFIG = {
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,
     "label_smoothing": 0.1,
+    "early_stopping_patience": 5,
+    "early_stopping_min_delta": 0.001,
     "data_root": str(DATA_ROOT),
     "save_path": DEFAULT_SAVE_PATH,
     "device": "cuda" if torch.cuda.is_available() else "cpu",
@@ -128,6 +130,26 @@ def val_epoch(model, loader, criterion, device):
             correct += (outputs.argmax(1) == labels).sum().item()
             total += labels.size(0)
     return total_loss / len(loader), correct / total
+
+
+class EarlyStopping:
+    def __init__(self, patience: int = 5, min_delta: float = 0.001):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.best_acc = 0.0
+        self.should_stop = False
+
+    def step(self, val_acc: float) -> bool:
+        if val_acc > self.best_acc + self.min_delta:
+            self.best_acc = val_acc
+            self.counter = 0
+        else:
+            self.counter += 1
+            print(f"  Early stopping counter: {self.counter}/{self.patience}")
+            if self.counter >= self.patience:
+                self.should_stop = True
+        return self.should_stop
 
 
 def main():
@@ -242,6 +264,10 @@ def main():
             print(f"  * Best model saved (val_acc={va:.3f})")
 
     # ── Phase B: Partial unfreeze ──
+    early_stopping = EarlyStopping(
+        patience=CONFIG["early_stopping_patience"],
+        min_delta=CONFIG["early_stopping_min_delta"],
+    )
     print()
     print("=" * 60)
     print("Phase B: Partial unfreeze")
@@ -293,6 +319,14 @@ def main():
                 "history": history,
             }, CONFIG["save_path"])
             print(f"  * Best model saved (val_acc={va:.3f})")
+
+        if early_stopping.step(va):
+            print(f"\n  Early stopping triggered at epoch {epoch_num}")
+            print(f"  No improvement for {CONFIG['early_stopping_patience']} epochs")
+            break
+
+    history["stopped_epoch"] = epoch_num
+    history["early_stopping_triggered"] = early_stopping.should_stop
 
     print()
     print(f"Best val accuracy: {best_val_acc:.3f}")
