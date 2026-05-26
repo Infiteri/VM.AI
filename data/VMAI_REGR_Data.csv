@@ -1,4 +1,5 @@
 text,difficulty,importance
+<<<<<<< HEAD
 have networking event easy simple,0.083,0.113
 ship unit testing simple urgent need,0.148,0.934
 lead networking event hard zero payoff,0.606,0.027
@@ -3024,3 +3025,1023 @@ barely registers as a task,0.01,0.02
 i automated a process that ran fine manually,0.7,0.1
 debugging a race condition that never happens,0.75,0.1
 this is the easiest thing i will do all day,0.02,0.15
+=======
+extreme,0.95,0.8
+urgent,0.6,0.95
+critical,0.8,0.98
+easy,0.1,0.2
+simple,0.15,0.25
+routine,0.2,0.3
+moderate,0.45,0.5
+intense,0.9,0.75
+challenging,0.75,0.7
+minor,0.1,0.15
+easy stretch,0.15,0.3
+hard workout,0.8,0.65
+quick email,0.1,0.4
+urgent fix,0.5,0.9
+simple cleanup,0.1,0.2
+complex analysis,0.85,0.8
+light jog,0.2,0.35
+heavy lifting,0.85,0.6
+tough deadline,0.7,0.9
+basic review,0.2,0.4
+not that difficult,0.2,0.4
+not urgent at all,0.3,0.1
+not important right now,0.2,0.1
+doesnt need much effort,0.15,0.25
+no rush on this,0.2,0.15
+not a priority,0.25,0.1
+nothing too complicated,0.2,0.3
+not really hard,0.25,0.35
+wont take much time,0.15,0.3
+not critical but should do,0.3,0.4
+urgent but pretty simple fix,0.2,0.9
+hard but not really important,0.75,0.25
+easy task but super important,0.15,0.9
+complex but low priority,0.8,0.2
+simple but time sensitive,0.15,0.85
+tough workout but optional,0.8,0.3
+quick task but really matters,0.1,0.85
+intense but not necessary,0.85,0.2
+light effort but high stakes,0.2,0.9
+moderate difficulty but critical deadline,0.5,0.95
+hard homework assignment,0.6,0.75
+hard gym workout,0.85,0.6
+hard conversation with boss,0.7,0.85
+hard math problem,0.8,0.7
+hard deadline to meet,0.5,0.9
+easy walk in park,0.1,0.2
+easy email to send,0.05,0.3
+easy stretch routine,0.15,0.35
+easy recipe to follow,0.2,0.25
+easy fix for bug,0.15,0.6
+need to finish the quarterly report by friday,0.7,0.85
+just a quick water break,0.05,0.3
+prepare a detailed presentation for the board meeting,0.8,0.95
+organize my desk a bit,0.15,0.2
+debug the production server issue ASAP,0.75,0.98
+take a short walk to clear my head,0.1,0.4
+study for the final exam next week,0.7,0.9
+reply to that one slack message,0.05,0.25
+plan the entire vacation itinerary,0.6,0.7
+do a quick stretch before bed,0.1,0.35
+intense workout session,0.9,0.7
+grueling marathon training,0.95,0.65
+demanding project deadline,0.8,0.85
+strenuous physical task,0.85,0.5
+arduous research paper,0.8,0.75
+quick email reply,0.1,0.3
+simple file organization,0.15,0.2
+breeze of a task,0.05,0.15
+straightforward data entry,0.2,0.3
+effortless morning routine,0.1,0.25
+moderate study session,0.5,0.6
+average complexity task,0.45,0.5
+standard weekly review,0.4,0.55
+decent amount of work,0.5,0.5
+fairly regular assignment,0.45,0.45
+critical system backup,0.4,0.95
+minor cleanup task,0.1,0.15
+nice to have feature,0.3,0.25
+must do today or else,0.6,0.98
+can wait till next week,0.3,0.15
+life or death situation,0.7,1
+would be good to tackle,0.4,0.5
+absolutely cannot skip this,0.5,0.95
+low priority housework,0.2,0.2
+top of the list,0.55,0.9
+super easy stuff,0.1,0.2
+pretty tough one,0.7,0.65
+kinda important,0.4,0.6
+meh not a big deal,0.15,0.1
+gotta get this done now,0.5,0.9
+no biggie just a quick thing,0.1,0.15
+this ones a beast,0.9,0.7
+piece of cake,0.05,0.2
+pretty mid level effort,0.45,0.5
+kinda urgent ngl,0.4,0.8
+I really need to finish this report before the meeting tomorrow,0.65,0.9
+just going to take a quick five minute walk outside,0.05,0.3
+this project is going to take a lot of focus and energy,0.85,0.8
+need to send a quick thank you email to the team,0.05,0.4
+have to study for three hours before the exam on monday,0.7,0.95
+just organizing my files nothing too serious,0.15,0.2
+this is the most important thing on my plate right now,0.6,0.98
+going to do some light stretching before going to bed,0.1,0.35
+need to figure out why the server keeps crashing,0.8,0.9
+was thinking of doing a quick grocery run later,0.15,0.5
+this assignment is going to require a lot of research and writing,0.8,0.75
+just need to water the plants real quick,0.05,0.2
+I should probably start preparing for the presentation next week,0.6,0.8
+going to do a quick meditation session to clear my head,0.05,0.45
+need to completely restructure the database schema,0.9,0.85
+just folding some laundry while watching tv,0.1,0.15
+this is a really complex problem that needs careful thought,0.85,0.75
+should probably reply to that message from my boss,0.15,0.7
+going to spend the afternoon building a new feature from scratch,0.75,0.7
+just a quick tidy up of the living room,0.15,0.25
+I have to prepare a full budget proposal by end of week,0.75,0.9
+going to take a slow easy bike ride around the neighborhood,0.2,0.3
+this is a pretty straightforward task shouldnt take long,0.2,0.4
+need to have a difficult conversation with my manager about workload,0.7,0.85
+just going to review some notes before the quiz,0.25,0.6
+this workout is going to push me to my limits,0.95,0.65
+I should probably schedule that dentist appointment soon,0.1,0.65
+need to write a detailed technical document for the new api,0.7,0.8
+just going to make a quick cup of tea and relax,0.05,0.2
+this is going to be a long and exhausting day of work,0.8,0.85
+I really should start meal prepping for the week,0.4,0.6
+need to completely redesign the landing page from scratch,0.75,0.8
+just going to do a quick ten minute yoga flow,0.15,0.35
+this is absolutely critical and needs to be done today no matter what,0.6,1
+was planning to just read a bit before sleeping,0.05,0.2
+need to debug a really tricky race condition in the codebase,0.9,0.85
+going to take out the trash and do a quick sweep of the kitchen,0.15,0.3
+this presentation needs to be perfect for the investors,0.7,0.95
+just going to jot down some ideas in my notebook,0.1,0.25
+I have to prepare a full legal contract by tomorrow morning,0.85,0.95
+going to do a light warmup before the actual training session,0.2,0.4
+this is not that hard but I should still get it done soon,0.3,0.6
+need to completely overhaul the authentication system,0.9,0.9
+just going to check my emails and respond to anything urgent,0.15,0.5
+this is going to be a really intense coding session,0.8,0.75
+I should probably start packing for the trip this weekend,0.25,0.6
+need to write a comprehensive test suite for the new module,0.65,0.8
+just going to do some light reading while having coffee,0.05,0.15
+this is a massive undertaking and I dont know where to start,0.95,0.8
+going to quickly update the dependencies and run the tests,0.2,0.5
+emergency server migration that must happen tonight,0.95,0.98
+prepare for the final exam that determines my entire grade,0.85,0.95
+perform emergency surgery on a critical patient,0.98,1
+negotiate a multi million dollar contract with a hostile client,0.9,0.95
+fix a security breach that exposed user data,0.9,0.98
+climb the most difficult route on the mountain before sunset,0.95,0.85
+defend my thesis in front of a panel of experts,0.85,0.9
+handle a PR crisis that is going viral on social media,0.8,0.95
+complete an ironman triathlon with an injury,0.98,0.8
+rebuild the entire payment system before the holiday sale,0.9,0.95
+perform a complex dental surgery on a nervous patient,0.9,0.9
+lead a high stakes hostage negotiation,0.95,1
+write and defend a patent application against legal challenges,0.85,0.9
+complete a dangerous rescue mission in a storm,0.95,0.95
+migrate the entire company infrastructure to a new cloud provider in one weekend,0.9,0.9
+pass the bar exam after failing twice before,0.85,0.95
+perform live brain surgery on a high profile patient,1,1
+launch a product that the entire company depends on,0.8,0.95
+run an ultramarathon in extreme heat conditions,0.95,0.75
+audit the entire financial system before the regulatory deadline,0.85,0.9
+handle a major data breach while the press is waiting outside,0.85,0.98
+complete a black belt exam after years of training,0.9,0.85
+deliver a keynote speech to thousands of people in a second language,0.8,0.9
+fix a critical bug in production that is costing thousands per minute,0.85,0.95
+complete a grueling special forces selection course,0.98,0.9
+write the weekly status report,0.2,0.5
+fix the critical server crash immediately,0.95,0.99
+reply to the internal slack message,0.1,0.2
+prepare the quarterly presentation,0.75,0.85
+attend the daily standup meeting,0.1,0.6
+debug the login page issue,0.6,0.75
+send the invoice to the client,0.2,0.85
+update the project documentation,0.35,0.5
+review the pull request,0.5,0.7
+plan the sprint for next week,0.6,0.8
+pay the rent,0.1,0.95
+review the investment portfolio,0.6,0.8
+cancel the unused subscription,0.2,0.4
+file the annual taxes,0.8,0.95
+pay the electricity bill,0.1,0.85
+transfer money to savings,0.1,0.7
+check the credit card balance,0.1,0.45
+take daily vitamins,0.05,0.5
+schedule the dentist appointment,0.2,0.7
+do a intense HIIT workout,0.85,0.6
+meditate for ten minutes,0.15,0.4
+pick up the prescription,0.1,0.85
+go for a light jog,0.3,0.4
+do a heavy leg day at the gym,0.9,0.5
+stretch after working out,0.1,0.3
+study for the final exam,0.85,0.95
+read the textbook chapter,0.5,0.6
+review flashcards for spanish,0.2,0.4
+write the thesis proposal,0.9,0.9
+submit the assignment,0.4,0.85
+practice the piano for an hour,0.4,0.35
+cook dinner,0.4,0.6
+clean the bathroom,0.5,0.5
+water the indoor plants,0.05,0.3
+do the laundry,0.2,0.6
+take out the trash,0.05,0.5
+fix the leaking kitchen tap,0.55,0.75
+write a blog post,0.5,0.4
+paint a landscape,0.4,0.3
+edit the youtube video,0.7,0.6
+record a podcast episode,0.55,0.5
+sketch a quick design,0.3,0.35
+call mom,0.1,0.6
+meet friends for coffee,0.1,0.4
+plan the family vacation,0.4,0.7
+pick up kids from school,0.1,0.9
+go for a walk in the park,0.1,0.3
+read a novel for pleasure,0.15,0.25
+buy groceries at the supermarket,0.15,0.6
+send the package via post office,0.15,0.5
+return the shoes to the store,0.2,0.4
+backup the hard drive to the cloud,0.3,0.6
+organize the email inbox,0.25,0.35
+book a flight to paris,0.3,0.7
+team meeting at 3pm,0.1,0.75
+gym session at 6am,0.6,0.5
+dentist at 10:30am,0.2,0.85
+lunch with the team at noon,0.1,0.4
+take medication every morning,0.05,0.95
+daily standup every weekday,0.1,0.7
+go to the gym every monday and thursday,0.6,0.5
+make it harder,0.85,0.6
+make it easier,0.2,0.6
+its actually very complex,0.9,0.6
+just a quick reply,0.1,0.6
+make it urgent,0.4,0.95
+low priority,0.4,0.2
+critical for the project,0.4,0.99
+"not urgent, can wait",0.4,0.3
+make it 1 hour,0.4,0.6
+shorten to 30 minutes,0.4,0.6
+make it 2 hours,0.4,0.6
+just 5 minutes,0.4,0.6
+categorize it as fitness,0.4,0.6
+actually its finance,0.4,0.6
+make it a health task,0.4,0.6
+this is a work task,0.4,0.6
+move to 7am,0.4,0.6
+move to 3pm,0.4,0.6
+reschedule to 2pm,0.4,0.6
+move to 9:30am,0.4,0.6
+change to 7pm,0.4,0.6
+cancel fixed time,0.4,0.6
+make it flexible,0.4,0.6
+push deadline to next monday,0.4,0.6
+extend to next week,0.4,0.6
+do it at the library instead,0.4,0.6
+working from home today,0.4,0.6
+meeting at the coffee shop instead,0.4,0.6
+do it at home,0.4,0.6
+do it at the restaurant on main street,0.4,0.6
+take it remotely,0.4,0.6
+change it to the park,0.4,0.6
+its urgent and will take 3 hours,0.4,0.95
+do it at the library for 2 hours,0.4,0.6
+light 30 min session at home,0.2,0.6
+"very important, due tomorrow",0.4,0.95
+move to 2pm and cut to 30 min,0.4,0.6
+30 minutes and its very important today,0.4,0.82
+"actually this is a hard competition prep session, very important",0.9,0.85
+backup all files to the cloud,0.3,0.7
+configure the email settings,0.25,0.4
+update all software on the computer,0.2,0.5
+clean up and organize the files,0.35,0.35
+change the password for security,0.1,0.7
+set up the VPN for remote access,0.4,0.6
+book a flight to tokyo,0.35,0.6
+reserve a hotel room,0.25,0.5
+renew the passport,0.3,0.7
+apply for the tourist visa,0.5,0.8
+pack for the business trip,0.15,0.6
+arrange airport pickup,0.2,0.5
+pick up the kids from soccer practice,0.1,0.9
+have dinner with family,0.1,0.6
+attend the parent-teacher conference,0.3,0.8
+help with homework,0.4,0.7
+schedule family doctor checkup,0.2,0.7
+learn spanish vocabulary,0.5,0.4
+take an online course,0.6,0.5
+practice the piano,0.45,0.4
+read the programming tutorial,0.4,0.5
+start the project on monday,0.5,0.6
+begin the task tomorrow,0.4,0.5
+kick off the meeting next week,0.3,0.6
+plan to start the diet on monday,0.6,0.7
+commencing the training on friday,0.5,0.5
+study at the library,0.5,0.6
+work from home today,0.3,0.5
+meet at the coffee shop,0.1,0.4
+run in the park,0.4,0.4
+shop at the supermarket,0.2,0.5
+swim at the community pool,0.5,0.4
+rename it to monthly report review,0.4,0.6
+change the name to sprint planning,0.4,0.6
+rename this to client call,0.4,0.6
+also add a location at the office,0.4,0.6
+set location to home,0.4,0.6
+start it on wednesday instead,0.4,0.6
+move start to next monday,0.4,0.6
+begin from tomorrow,0.4,0.6
+also make it urgent,0.4,0.9
+add priority to this,0.4,0.7
+remove the deadline,0.4,0.6
+cancel the deadline,0.4,0.6
+clear the start date,0.4,0.6
+make it longer by 30 minutes,0.4,0.6
+extend by an hour,0.4,0.6
+shorten by 15 minutes,0.4,0.6
+make it 30 min longer,0.4,0.6
+not a priority,0.4,0.15
+this is not hard,0.2,0.6
+its not difficult,0.15,0.6
+not that important,0.4,0.3
+not critical at all,0.4,0.1
+finish this in 2 hours,0.4,0.6
+do it in 30 minutes,0.4,0.6
+within an hour,0.4,0.6
+needs to be done in 3 hours,0.4,0.6
+by noon today,0.4,0.6
+by midnight,0.4,0.6
+morning standup at 9am from home,0.1,0.6
+important doctor appointment tomorrow at 2pm,0.2,0.9
+hard coding session at the office by friday,0.85,0.7
+easy yoga every morning at 7am,0.15,0.4
+change category to fitness,0.4,0.6
+mark as personal task,0.4,0.6
+categorize as study,0.4,0.6
+make it creative work,0.4,0.6
+set to home category,0.4,0.6
+change to finance related,0.4,0.6
+add location at gym,0.4,0.6
+set the place to library,0.4,0.6
+move to coffee shop location,0.4,0.6
+also schedule it for 4pm,0.4,0.6
+change to evening at 6pm,0.4,0.6
+make it morning at 8am,0.4,0.6
+add recurrence on monday,0.4,0.6
+repeat on wednesday and friday,0.4,0.6
+add daily recurrence,0.4,0.6
+gym at 6am,0.5,0.5
+dinner at 7pm,0.1,0.5
+call client at 10:30am,0.3,0.7
+yoga at 8am,0.3,0.4
+standup at 9am,0.1,0.6
+lunch at noon,0.1,0.4
+movie at 8pm,0.1,0.3
+30 minute stretch,0.2,0.3
+2 hour study session,0.6,0.7
+15 minute meditation,0.1,0.4
+45 minute workout,0.6,0.5
+10 minute call,0.2,0.5
+90 minute coding session,0.7,0.7
+hard workout,0.85,0.5
+easy task,0.15,0.3
+challenging project,0.8,0.6
+simple email reply,0.1,0.3
+tough exam preparation,0.9,0.8
+moderate reading,0.4,0.3
+complex data analysis,0.85,0.7
+urgent fix,0.5,0.95
+critical bug,0.7,0.95
+low priority reading,0.2,0.15
+very important presentation,0.6,0.9
+asap fix,0.6,0.95
+optional cleanup,0.2,0.2
+gym every monday,0.5,0.5
+yoga every tuesday and thursday,0.3,0.4
+meeting every monday wednesday friday,0.3,0.6
+weekly review every friday,0.3,0.5
+meditate,0.1,0.4
+grocery shopping,0.2,0.5
+file the taxes,0.7,0.85
+write blog post,0.5,0.4
+book flight to paris,0.3,0.5
+pick up kids,0.2,0.8
+practice guitar,0.3,0.4
+work from home,0.5,0.6
+team meeting at the office,0.3,0.6
+workout at the gym,0.5,0.5
+finish report by friday,0.5,0.6
+pay bill tomorrow,0.2,0.7
+submit by next week,0.4,0.5
+project starting monday,0.6,0.6
+begin next week,0.4,0.5
+urgent 30 min gym at 7am tomorrow,0.7,0.9
+easy 15 min meditation every morning at home,0.15,0.3
+hard 2 hour coding session at office by friday,0.85,0.7
+weekly yoga every monday at 6pm for 45 minutes,0.3,0.4
+quick 10 min call at the coffee shop,0.2,0.4
+finish the quarterly report by next week really hard and very important 3 hours,0.9,0.9
+every morning meditate for 20 minutes at home easy and not urgent,0.15,0.25
+team standup at office every monday wednesday friday at 9am for 30 minutes,0.2,0.6
+gym,0.5,0.5
+study,0.5,0.5
+pay rent,0.2,0.8
+i need to go to the gym tomorrow morning at 7am it should be an hour long medium difficulty and important for health,0.5,0.7
+schedule a quick 15 minute standup meeting every monday at 9am with the team at the office,0.1,0.6
+its urgent that i finish this really hard coding project by next week should take about 4 hours working from home,0.9,0.95
+push deadline to friday,0.4,0.6
+move deadline to next week,0.4,0.6
+due tomorrow now,0.4,0.6
+change deadline to next month,0.4,0.6
+start on monday,0.4,0.6
+kick off this weekend,0.4,0.6
+move start to tomorrow,0.4,0.6
+set it for 3pm,0.4,0.6
+at 10:30am instead,0.4,0.6
+schedule for 18:00,0.4,0.6
+remove the time,0.4,0.6
+make it 90 minutes,0.4,0.6
+change to 2 hours,0.4,0.6
+shorten to 15 minutes,0.4,0.6
+make it 30 minutes,0.4,0.6
+make it more challenging,0.8,0.6
+make it very easy,0.1,0.6
+make it very important,0.4,0.9
+make it low priority,0.4,0.15
+make it critical,0.4,0.98
+change to work,0.4,0.6
+do it at home instead,0.4,0.6
+move to the library,0.4,0.6
+at the office,0.4,0.6
+do it at the coffee shop,0.4,0.6
+do it at the gym,0.4,0.6
+make it repeat every monday,0.4,0.6
+repeat on monday wednesday and friday,0.4,0.6
+cancel recurrence,0.4,0.6
+make it one-time,0.4,0.6
+set it for 9am and make it 60 minutes,0.4,0.6
+change deadline to friday and categorize as work,0.4,0.6
+make it harder and change location to gym,0.85,0.6
+push deadline to next week and make it 90 minutes,0.4,0.6
+start on monday and make it repeat every wednesday,0.4,0.6
+make it at 3pm 45 minutes and urgent,0.4,0.95
+mark it as urgent,0.4,0.95
+mark it as critical,0.4,0.98
+mark it as high priority,0.4,0.85
+mark it as low priority,0.4,0.15
+mark it as hard,0.85,0.6
+mark it as easy,0.15,0.6
+make it moderate,0.45,0.6
+make it optional,0.4,0.15
+30 minute meditation session,0.1,0.4
+hard workout at the gym,0.85,0.5
+2 hour study session for the exam,0.7,0.8
+easy 15 min coffee break,0.1,0.2
+make it urgent and change to work category,0.4,0.95
+make it harder and extend to 2 hours,0.85,0.6
+make it high priority and move to tomorrow,0.4,0.85
+make it easy and set at 9am,0.15,0.6
+"not urgent, can wait a while",0.3,0.15
+this is not a priority,0.3,0.1
+not that important really,0.3,0.2
+its not difficult at all,0.1,0.3
+not super important,0.3,0.25
+not urgent matter,0.3,0.15
+make it harder and move deadline to friday,0.85,0.6
+change location to home and make it urgent,0.4,0.9
+set time to 3pm and extend to 90 minutes,0.4,0.6
+categorize as fitness and make it easy,0.15,0.6
+make it high priority and set at 8am,0.4,0.9
+add location and change duration to 45,0.4,0.6
+make it important and add deadline today,0.4,0.85
+set category to work and make it 2 hours,0.4,0.6
+make it 30 minutes longer,0.4,0.6
+add an hour to this,0.4,0.6
+extend by 45 minutes,0.4,0.6
+shorten this by 15 minutes,0.4,0.6
+make it take longer,0.6,0.6
+starts monday at 10am,0.3,0.5
+begins tomorrow morning,0.3,0.5
+starting next week at the office,0.4,0.6
+start on monday and due friday,0.5,0.6
+begin tomorrow and complete by end of week,0.4,0.6
+morning yoga session,0.3,0.4
+afternoon study time,0.5,0.5
+evening meditation,0.1,0.4
+remove the start date,0.4,0.6
+clear the location,0.4,0.6
+cancel the location,0.4,0.6
+make it not recurring,0.4,0.6
+remove the recurrence,0.4,0.6
+add a start date of wednesday,0.4,0.6
+add a deadline of next week,0.4,0.6
+"um, i need to do this by friday",0.3,0.5
+"oh right, also gotta do this tomorrow",0.3,0.5
+yeah so basically need this done by monday,0.3,0.5
+important work task due friday morning,0.5,0.85
+easy fitness activity in the evening,0.15,0.3
+urgent finance matter needs attention today,0.5,0.95
+hard learning session this weekend,0.85,0.6
+creative hobby time on saturday,0.3,0.4
+need to finish the quarterly report by next week its really complex,0.85,0.9
+just going to spend five minutes tidying up my desk,0.05,0.15
+this is going to be a massive undertaking not sure anyone even cares,0.9,0.15
+i have to prepare a detailed budget forecast for the board meeting tomorrow,0.75,0.95
+water the plants before they die,0.05,0.6
+been putting off this difficult conversation with my landlord for weeks,0.7,0.5
+totally pointless busywork that takes forever,0.85,0.1
+urgent security patch needs to go live tonight,0.7,0.98
+spent three hours on something nobody will ever look at,0.8,0.1
+need to refactor the entire codebase before the new dev starts monday,0.9,0.85
+just a quick sweep of the kitchen floor,0.05,0.2
+this is the most critical deliverable for the entire quarter,0.7,0.99
+grinding through paperwork that will just get filed and forgotten,0.75,0.1
+i need to prepare my slides for the keynote presentation,0.6,0.9
+takes forever but its completely optional,0.8,0.1
+the database migration is incredibly complex and absolutely critical,0.95,0.95
+checking and responding to some emails,0.1,0.4
+this project has the highest stakes of anything i have ever worked on,0.85,0.98
+spent hours polishing a document that only one person will glance at,0.7,0.15
+routine system health check nothing special,0.15,0.3
+completely rearchitecting the authentication flow from scratch,0.9,0.9
+just grabbing a coffee and taking a break,0.05,0.15
+this one is incredibly demanding but also completely meaningless,0.9,0.1
+finalizing the contract that determines the future of the company,0.85,0.98
+organizing my bookshelf alphabetically by author,0.3,0.1
+i have been dreading this performance review all week,0.75,0.85
+fine tuning a dashboard that nobody in the team actually uses,0.6,0.1
+critical infrastructure upgrade cannot fail must be done by midnight,0.95,0.99
+boring administrative task that could have been an email,0.2,0.15
+debugging a race condition that only happens in production,0.9,0.85
+rearranging furniture in my room just because i feel like it,0.4,0.05
+the CEO needs this analysis before the investor call,0.7,0.95
+creating an overly complicated excel spreadsheet for fun,0.6,0.1
+emergency escalation needs immediate attention from the whole team,0.8,0.98
+making decorative labels for my spice rack,0.2,0.05
+this is going to be an absolutely brutal week of back to back deadlines,0.9,0.9
+sorting my sock drawer by color and pattern,0.15,0.05
+the server is on fire and clients are screaming,0.85,0.99
+adding an unnecessary feature just because i can,0.65,0.1
+i really need to study for the certification exam or i will lose my job,0.8,0.95
+counting inventory of office supplies nobody uses,0.2,0.05
+complex legal review that has massive compliance implications,0.85,0.9
+overengineering a solution for a problem that does not exist yet,0.75,0.1
+the entire revenue depends on this launch going smoothly,0.8,0.98
+making a detailed itinerary for a trip that probably is not happening,0.5,0.1
+patching a critical zero day vulnerability under active exploit,0.9,0.99
+cataloging my entire music collection by genre and release year,0.6,0.1
+life depends on this surgery going well,0.95,1
+perfecting my coffee brewing technique nobody asked for,0.4,0.05
+i just need to click the deploy button to push the fix live,0.1,0.95
+signing the contract is a formality but everything depends on it,0.15,0.9
+just need to press send on the email that closes the deal,0.05,0.95
+one quick approval and the whole project can move forward,0.1,0.9
+all i have to do is show up and accept the award,0.1,0.85
+just need to reply yes to confirm the job offer,0.05,0.9
+one text message to let them know the deal is done,0.05,0.85
+just forwarding this document to the right person,0.1,0.8
+a single signature on the consent form unlocks everything,0.1,0.9
+i just need to flip the switch to enable the feature,0.15,0.85
+one quick call to confirm and the whole trip is booked,0.1,0.8
+just submitting the final grade takes five seconds but its the whole semester,0.1,0.9
+all i need to do is give the final sign off,0.05,0.85
+just logging into the portal and clicking accept,0.1,0.8
+one short conversation to clear up the misunderstanding,0.15,0.85
+just need to upload the file and its done,0.1,0.75
+a quick ping to remind them about the deadline,0.05,0.7
+all i have to do is send the go ahead signal,0.1,0.85
+just ticking a box on the form but its mandatory,0.1,0.75
+one small tweak to the config and the whole system works,0.15,0.85
+spent the entire weekend building a feature nobody requested,0.85,0.1
+i have been optimizing this code for days but it makes no difference,0.8,0.1
+writing exhaustive documentation that no one will ever read,0.7,0.1
+manually reformatting hundreds of entries to match the new schema,0.75,0.15
+spent three hours polishing a presentation for a meeting that got cancelled,0.7,0.1
+refactoring perfectly working code just because i dont like the variable names,0.65,0.05
+i built an entire dashboard that the client never even opened,0.8,0.1
+hours of data entry for a report that goes straight to the archive,0.7,0.1
+perfecting the pixel alignment on a page nobody visits,0.6,0.05
+writing unit tests for a module we are about to deprecate,0.65,0.1
+i completely redesigned the login flow but the old one was fine,0.75,0.1
+spent an entire afternoon organizing shared drive files for a team of two,0.6,0.1
+i automated a process that ran perfectly fine manually,0.7,0.1
+creating detailed diagrams for a system architecture that is changing next week,0.65,0.1
+i debugged a rare edge case that has never happened in production,0.8,0.1
+meticulously formatting a spreadsheet that will be imported once and forgotten,0.6,0.1
+spent weeks building a tool and then nobody used it,0.85,0.1
+running complex analyses on data that was collected incorrectly,0.75,0.15
+i optimized the database queries for a table with ten rows,0.6,0.1
+building out a full ci pipeline for a side project that died last month,0.7,0.1
+one click to approve the payment that unblocks the entire project,0.05,0.9
+just need to share the calendar invite link for the mandatory meeting,0.1,0.75
+i literally just have to say yes to the proposal and everything moves forward,0.05,0.85
+forwarding this compliance document is trivial but the audit depends on it,0.1,0.8
+a quick reply to confirm the delivery date keeps the whole supply chain moving,0.1,0.85
+i wrote a whole custom parser when a regex would have worked fine,0.7,0.1
+migrating all the legacy data by hand because the script kept failing,0.8,0.15
+i spent a week tuning a model that never made it to production,0.85,0.1
+meticulously crafting error messages in a language nobody on the team speaks,0.65,0.05
+building a full test environment that matched production then never ran a single test,0.75,0.1
+i spent two weeks building a feature that got cut the day i finished,0.8,0.1
+writing a detailed migration plan for a system getting replaced anyway,0.75,0.1
+reverse engineered the whole legacy codebase just for a one line fix,0.85,0.15
+manually verifying thousands of records because the validation script has a bug,0.8,0.1
+building a full reporting dashboard for metrics nobody ever looks at,0.7,0.1
+spent hours configuring a ci pipeline for a project dead for months,0.65,0.1
+i learned an entire new framework just to contribute a single pr,0.85,0.15
+creating detailed docs for an internal tool with three users,0.6,0.1
+setting up complex infrastructure that only runs once a quarter,0.75,0.15
+debugging an intermittent failure that nobody can reproduce,0.8,0.1
+i manually refactored every file to match the new style guide,0.75,0.1
+spent a week building a chatbot that everyone on the team ignores,0.8,0.1
+implementing a feature the client asked for then never used,0.7,0.1
+i created an entire design system from scratch for a side project,0.85,0.1
+meticulously testing edge cases for a barely noticeable feature,0.75,0.1
+building an elaborate deployment pipeline for a static site,0.6,0.1
+spent months on a mobile app version that nobody downloaded,0.9,0.1
+i rewrote the auth module for the third time this year,0.8,0.15
+integrating with a poorly documented third party api,0.75,0.15
+building custom analytics when google analytics would have been fine,0.7,0.1
+i set up a full kubernetes cluster for a single microservice,0.85,0.1
+spent a day debugging a merge conflict that should have taken ten minutes,0.7,0.1
+writing api docs for an endpoint that is getting deprecated,0.6,0.1
+i built a recommendation engine for twenty products,0.8,0.1
+creating an elaborate test suite for code about to be rewritten,0.65,0.1
+just need to delete that old email from my inbox,0.05,0.15
+turning off the light in the room i just left,0.05,0.1
+quickly checking what the weather is like tomorrow,0.05,0.15
+changing my desktop wallpaper to something nicer,0.05,0.1
+clearing the notification badges on my phone,0.05,0.1
+adjusting the thermostat before leaving the house,0.05,0.2
+just going to update my slack status,0.05,0.15
+filling up my water bottle before heading out,0.05,0.15
+plugging in my laptop before the battery dies,0.05,0.2
+just going to mute this channel the notifications are annoying,0.05,0.1
+grabbing a quick snack from the kitchen,0.05,0.1
+changing my profile picture on teams,0.05,0.1
+just need to turn off my alarm since tomorrow is a holiday,0.05,0.15
+brushing my teeth before leaving the house,0.05,0.15
+closing all those browser tabs i have open right now,0.05,0.1
+putting my phone on silent before the movie starts,0.05,0.15
+just going to charge my headphones real quick,0.05,0.1
+wiping down the kitchen counter after breakfast,0.05,0.15
+locking the front door before going to bed,0.05,0.15
+unpacking my gym bag from this morning,0.05,0.1
+just need to press the publish button for the announcement everyone is waiting for,0.1,0.9
+a quick signature on the final papers and its all official,0.15,0.95
+just confirming the reservation for the wedding venue,0.1,0.85
+sending a single text to let them know i arrived safely,0.05,0.85
+all i need to do is upload the passport scan for the visa,0.1,0.85
+just need to mark attendance for the final exam,0.1,0.8
+ticking the consent box on the medical form,0.05,0.85
+flipping the main breaker back on after the outage,0.1,0.8
+just pressing the emergency stop button,0.05,0.95
+a single click to activate the backup generator,0.1,0.85
+just need to show my id at the security checkpoint,0.05,0.75
+a quick thumbs up to the proposal and the deal goes through,0.05,0.8
+just giving the final verbal approval to the deal,0.05,0.8
+one click to approve the expense report that unblocks payroll,0.1,0.85
+just need to unlock the door for the fire inspector,0.05,0.75
+i just have to shake his hand and the partnership is official,0.1,0.85
+my one time password is all that stands between the hackers and the data,0.05,0.95
+just need to flip the sign from closed to open,0.05,0.65
+all i have to do is say i do,0.1,0.95
+just sending the green light on the group chat starts the whole operation,0.05,0.8
+fighting the board to get the budget approved for the project that saves the company,0.9,0.95
+coordinating the emergency response team after the factory explosion,0.95,0.98
+leading the negotiation for the contract that determines whether we keep the account,0.85,0.95
+managing the outbreak containment before it spreads to the whole city,0.95,0.98
+architecting the payment system that needs to handle millions in transactions daily,0.9,0.95
+conducting the safety inspection that could shut down the entire plant,0.85,0.95
+developing the treatment protocol for the patient with the mysterious illness,0.9,0.9
+writing the appeal that could overturn the wrongful conviction,0.85,0.95
+designing the evacuation plan for the building with structural damage,0.85,0.9
+i have to mediate the dispute between the two departments before the project collapses,0.8,0.9
+this is going to be very hard to finish on time,0.85,0.55
+this should be very easy to knock out quickly,0.08,0.25
+this is very urgent and needs immediate attention,0.45,0.95
+this is very important for the project,0.4,0.92
+this is very difficult and i am not sure how to approach it,0.85,0.5
+this problem is very complex and requires deep thought,0.85,0.55
+the solution is very simple once you know how,0.08,0.25
+this workout is very intense and pushes me to my limits,0.9,0.65
+this task is very tiring and drains all my energy,0.8,0.3
+this assignment is extremely hard and mentally exhausting,0.92,0.5
+this is extremely easy i could do it in my sleep,0.05,0.2
+the problem is extremely difficult and nobody knows the answer,0.92,0.55
+this meeting is extremely important for my career,0.4,0.95
+this is extremely urgent and cannot wait another minute,0.5,0.98
+the architecture is extremely complex with many moving parts,0.9,0.6
+this challenge is extremely demanding both mentally and physically,0.9,0.55
+this training session is extremely intense and not for beginners,0.95,0.65
+the fix is extremely simple just a single line change,0.05,0.2
+i am finding this really hard to concentrate on,0.85,0.5
+this puzzle is really difficult to figure out,0.82,0.5
+this errand is really easy and will take five minutes,0.08,0.25
+this decision is really important for the whole team,0.35,0.88
+the procedure is really simple just follow the instructions,0.08,0.2
+this exercise is really intense and gets my heart pumping,0.85,0.6
+this project is super hard and i have no idea where to start,0.88,0.5
+this fix is super easy barely an inconvenience,0.05,0.2
+the exam is super difficult and i have been studying for weeks,0.88,0.5
+this presentation is super important for landing the client,0.35,0.92
+this session is super intense and leaves me exhausted,0.88,0.6
+i find this incredibly hard to wrap my head around,0.9,0.5
+this math problem is incredibly difficult and takes hours to solve,0.9,0.55
+this task is incredibly easy and barely takes any effort,0.05,0.2
+this discovery is incredibly important for scientific progress,0.35,0.95
+this system is incredibly complex and took years to build,0.92,0.55
+this mission is incredibly challenging and requires peak performance,0.92,0.55
+this assignment is totally easy and i can finish it in minutes,0.08,0.2
+this course is totally hard and has a very low pass rate,0.85,0.5
+this situation is absolutely critical and demands immediate action,0.5,0.98
+having the right tools is absolutely essential for this job,0.45,0.95
+this information is absolutely vital for the investigation,0.4,0.95
+the punishment is absolutely brutal and grueling,0.9,0.5
+the issue is completely trivial and not worth worrying about,0.05,0.15
+this exercise is completely pointless and achieves nothing,0.45,0.1
+this task is fairly easy and should not take long,0.15,0.3
+this hike is fairly hard but the views are worth it,0.65,0.5
+the process is fairly simple once you understand the basics,0.12,0.25
+this concept is fairly complex and takes time to grasp,0.65,0.5
+the instructions are reasonably straightforward and easy to follow,0.25,0.4
+this course is reasonably challenging and keeps me engaged,0.6,0.5
+i find this task somewhat difficult but manageable,0.55,0.45
+this job is somewhat easy but very tedious,0.2,0.3
+this feedback is somewhat important for improvement,0.3,0.55
+this matter is somewhat urgent but can wait until tomorrow,0.3,0.6
+this exam is quite hard and i am nervous about it,0.75,0.5
+the situation is quite difficult and hard to navigate,0.75,0.5
+this assignment is quite easy and i enjoy working on it,0.1,0.25
+the recipe is quite simple and takes no time at all,0.1,0.25
+this problem is quite complex and requires careful analysis,0.75,0.5
+this workout is quite intense and leaves me breathless,0.8,0.55
+this matter is quite important and should be prioritized,0.35,0.75
+this exam is pretty hard and i am worried about passing,0.75,0.5
+this decision is pretty difficult with no clear right answer,0.75,0.5
+this chore is pretty easy and i can get it done fast,0.12,0.25
+this argument is pretty intense and emotions are running high,0.8,0.55
+this announcement is pretty important and should not be missed,0.35,0.7
+this task is not hard at all and i can finish it quickly,0.1,0.3
+this is not easy at all it requires serious effort,0.65,0.45
+this problem is not difficult at all its quite straightforward,0.1,0.3
+this matter is not important at all feel free to deprioritize it,0.3,0.08
+this is not urgent at all it can wait until next week,0.3,0.08
+this concept is not complex at all once you understand the basics,0.1,0.25
+this workout is not intense at all its very relaxed,0.1,0.2
+this hike is not challenging at all its suitable for beginners,0.1,0.25
+this task is not simple but not impossible either,0.5,0.45
+this is not easy but it is doable with enough time,0.55,0.5
+its not hard but not trivial either somewhere in the middle,0.4,0.45
+this is not difficult but it does require some focus,0.35,0.5
+this is not urgent but should not be ignored completely,0.3,0.4
+this is not important but it needs doing eventually,0.3,0.25
+this is not complicated just tedious and time consuming,0.35,0.3
+this is not too bad actually i can manage it,0.3,0.35
+this is not as hard as i thought it would be,0.35,0.4
+this is not as easy as it looks there are hidden complications,0.55,0.4
+this is not exactly rocket science anyone can do it,0.2,0.25
+this is not exactly a walk in the park but i can handle it,0.65,0.4
+this is not the end of the world if it gets delayed,0.3,0.2
+this is not something i look forward to doing at all,0.6,0.4
+this task is not particularly difficult just a bit time consuming,0.3,0.4
+this is not particularly important in the grand scheme,0.3,0.15
+this matter is not particularly urgent take your time,0.3,0.15
+this is not what i would call easy but i will manage,0.55,0.35
+this is by no means hard it is fairly manageable actually,0.2,0.3
+this task is by no means easy it requires real effort,0.6,0.4
+the process is by no means simple there are many steps involved,0.6,0.4
+this problem is far from easy it requires deep thinking,0.65,0.4
+this assignment is far from hard actually quite manageable,0.15,0.3
+this issue is far from trivial there are serious implications,0.6,0.35
+this meeting is far from important honestly it is a waste of time,0.3,0.12
+this task is anything but easy i have been struggling with it,0.65,0.4
+this job is anything but hard it is actually quite relaxing,0.15,0.3
+this procedure is anything but simple it has many steps,0.6,0.35
+this announcement is anything but important just routine updates,0.35,0.12
+this task is not exactly effortless it requires some work,0.55,0.35
+this assignment is not exactly a breeze it takes real effort,0.55,0.35
+the process is not straightforward at all there are many edge cases,0.55,0.4
+this is not automatically done i have to follow up manually,0.25,0.35
+this is not requiring much effort at all its quite simple,0.15,0.25
+this is not something you can rush through it requires patience,0.6,0.4
+this is not a lot of effort needed just a few minutes,0.15,0.25
+this is not something that can wait it needs attention soon,0.4,0.7
+this is not a task you can ignore it has consequences,0.45,0.65
+this is not as straightforward as it seems there is more to it,0.55,0.4
+this is not requiring any deep thought it is straightforward,0.1,0.25
+this task is very hard and very important i cannot mess it up,0.85,0.9
+this project is very difficult and very important for the company,0.85,0.9
+this problem is very complex and extremely urgent to resolve,0.9,0.95
+this mission is extremely hard and extremely important for everyone,0.92,0.95
+this operation is extremely difficult and absolutely critical to success,0.95,0.98
+this assignment is incredibly hard and incredibly important overall,0.9,0.95
+this endeavor is incredibly challenging and vitally important to complete,0.92,0.95
+this exam is super difficult and super important for my future,0.88,0.92
+this situation is super hard and super urgent we need to act fast,0.88,0.95
+this project is really hard and really important for the business,0.85,0.88
+this issue is really difficult and really urgent to resolve quickly,0.85,0.9
+this training is absolutely brutal and absolutely essential for survival,0.92,0.95
+this task is pretty tough and pretty important for the next milestone,0.75,0.78
+this challenge is quite challenging and quite important to overcome,0.7,0.75
+this deadline is extremely demanding and extremely time sensitive today,0.9,0.95
+this project is incredibly taxing and incredibly high stakes for us,0.92,0.95
+this situation is very intense and very urgent need to act immediately,0.85,0.9
+this timeline is super challenging and super time sensitive right now,0.88,0.92
+this problem is really complex and really high priority for the team,0.85,0.88
+this is a very hard and extremely important deadline i cannot miss,0.85,0.95
+this task is incredibly difficult and absolutely cannot miss it today,0.95,0.98
+this is super tough and super critical for the project success,0.88,0.95
+this assignment is quite demanding and quite urgent unfortunately,0.7,0.78
+this work is very strenuous and very high priority for the week,0.85,0.88
+this protocol is extremely rigorous and extremely important for safety,0.92,0.95
+not just hard but also extremely important,0.85,0.9
+not only difficult but also time critical,0.85,0.92
+this is both very hard and very important,0.85,0.9
+its both extremely difficult and absolutely vital,0.95,0.98
+this task is incredibly complex and the stakes could not be higher,0.92,0.95
+i need to do something extremely difficult and time sensitive,0.9,0.92
+this is the hardest and most important thing i have ever worked on,0.95,0.98
+deep cleaning the garage this weekend,0.75,0.2
+manually sorting through 10 years of old emails,0.7,0.15
+organizing my entire book collection by author,0.6,0.1
+rewriting that function just to make it cleaner,0.6,0.15
+figuring out why the printer keeps jamming,0.65,0.2
+learning a new tool because the old one got deprecated,0.7,0.25
+painting the fence that nobody sees,0.6,0.1
+color coding my entire calendar for the next six months,0.5,0.1
+cataloging every single file in the shared drive,0.65,0.1
+perfecting the margins on a document i already submitted,0.4,0.05
+sorting a pile of receipts from three years ago,0.5,0.1
+deep cleaning behind the fridge because i noticed dust,0.7,0.1
+manually tagging all my photos from the last five years,0.65,0.15
+organizing my bookmarks into 47 different folders,0.4,0.05
+rewriting a perfectly working script just to make it cleaner,0.55,0.1
+approving the expense report unblocks payroll,0.05,0.95
+sending the green light on the go-ahead,0.05,0.9
+clicking approve on the final deliverable,0.05,0.92
+just need to sign the one document to close the deal,0.05,0.95
+flipping the switch to deploy to production,0.1,0.9
+this could go either way medium effort medium stakes,0.5,0.5
+not really sure how hard this will be could be anything,0.45,0.4
+handle it,0.3,0.5
+look into it,0.3,0.4
+fix the thing,0.5,0.6
+deal with that later,0.3,0.25
+check on it tomorrow,0.2,0.35
+leave it for now,0.15,0.15
+get it done asap,0.4,0.85
+sort it out somehow,0.4,0.5
+difficult task but nobody really needs it done,0.85,0.1
+hard work that ultimately doesnt matter much,0.8,0.15
+complex process with very little payoff,0.75,0.1
+challenging project that nobody asked for,0.85,0.1
+tough assignment that will go unnoticed,0.8,0.15
+heavy workload but the impact is minimal,0.75,0.1
+strenuous effort for negligible results,0.85,0.1
+labor intensive task with almost no benefit,0.8,0.1
+painstaking work that could have been an email,0.75,0.15
+meticulous research for a report nobody reads,0.8,0.1
+backbreaking labor for something trivial,0.9,0.1
+endless debugging of a rarely used feature,0.8,0.1
+spent all night on a feature nobody uses,0.85,0.1
+exhausting meeting that could have been an email,0.7,0.15
+painfully slow process for minimal gain,0.75,0.1
+extremely tedious data entry with no oversight,0.7,0.1
+hours of manual work that should be automated but i cant,0.8,0.1
+completely draining task with zero recognition,0.85,0.15
+this is so much effort for nothing at all,0.9,0.1
+i hate doing this it takes forever and nobody cares,0.85,0.1
+grueling paperwork for a minor procedural issue,0.75,0.1
+physically demanding task for no good reason,0.85,0.15
+complicated system migration that nobody will notice,0.85,0.1
+meticulous quality check on a product nobody uses,0.75,0.1
+hard to even care about this pointless project,0.8,0.05
+so much time wasted on something so trivial,0.85,0.05
+massive effort tiny tiny impact,0.9,0.1
+soul crushing admin work that doesnt matter,0.75,0.1
+this project is a tremendous amount of work for very little return,0.85,0.15
+hard tedious boring and completely unimportant,0.8,0.1
+completely exhausting work with no upside,0.85,0.1
+im spending my whole weekend on something useless,0.85,0.05
+overengineered solution nobody wanted,0.8,0.1
+this takes forever and i am the only one who cares,0.75,0.15
+pointless optimization of something fast enough,0.7,0.1
+building a feature that got descoped halfway through,0.8,0.1
+rewriting perfectly fine legacy code for no reason,0.75,0.1
+micro optimizing a function called once a day,0.7,0.05
+refactoring code that works fine already,0.7,0.1
+manually testing edge cases that never happen,0.75,0.1
+creating reports that nobody opens,0.6,0.1
+meticulous log analysis for a non critical system,0.7,0.1
+fine tuning a model for a dataset of ten samples,0.85,0.1
+setting up monitoring for a service that never fails,0.65,0.1
+building a dashboard for metrics nobody tracks,0.7,0.1
+writing tests for deprecated code paths,0.6,0.05
+documenting an api that is getting replaced,0.6,0.1
+migrating data formats nobody uses anymore,0.65,0.1
+carefully crafting error messages for unreachable code,0.7,0.05
+this is such a waste of my talents honestly,0.75,0.1
+i cant believe i have to do this its so pointless,0.8,0.1
+spent days on a tool that only i will ever use,0.8,0.1
+hard work but the stakeholders already changed their minds,0.85,0.1
+everything about this is difficult and nothing about it matters,0.85,0.05
+absolutely brutal schedule for a project nobody believes in,0.9,0.1
+technical challenge that solves a non existent problem,0.8,0.1
+deep dive into a topic that became irrelevant,0.7,0.1
+exhaustive analysis that nobody will reference,0.75,0.1
+i put in so much effort and then they cancelled the project,0.85,0.1
+this is really hard and honestly who even needs it,0.8,0.05
+complicated setup for a one time demo,0.7,0.1
+painful integration with a dying platform,0.8,0.1
+manually reformatting data that the next person will undo,0.7,0.1
+building elaborate docs for a two function library,0.6,0.1
+extremely difficult debugging session for a minor cosmetic bug,0.85,0.1
+demanding physical labor for a temporary setup,0.85,0.15
+hard compilation error that only appears on one machine,0.8,0.1
+i worked overtime on something that got scrapped anyway,0.9,0.1
+this is way too much effort for something so stupid,0.85,0.05
+complex legal review for a contract that is a formality,0.75,0.15
+grueling rehearsal for a presentation that got cancelled,0.8,0.1
+endless back and forth for a trivial approval,0.7,0.1
+i spent a whole day on a typo in a footnote,0.65,0.05
+painstaking proofreading of a draft that changed anyway,0.7,0.1
+difficult conversation about something that doesnt matter,0.6,0.1
+hard decision between two equally meaningless options,0.6,0.1
+meticulous formatting of a spreadsheet template,0.55,0.1
+time consuming manual categorization of data,0.6,0.1
+extensive research for a question nobody asked,0.75,0.1
+building a prototype for a feature no one requested,0.8,0.1
+hours of work for a single line change,0.7,0.15
+tuning parameters for a model that will never ship,0.75,0.1
+setting up ci for a repo with one commit,0.6,0.05
+hard thing but the result is inconsequential,0.85,0.05
+completely overthought solution to a trivial problem,0.8,0.1
+extensive refactoring of a dead code path,0.7,0.1
+complex orchestration for a one off task,0.75,0.15
+this is an incredible amount of effort for almost no gain,0.9,0.1
+hours spent on something nobody will ever notice,0.85,0.1
+this is stupidly difficult and stupidly pointless,0.85,0.05
+i have to jump through so many hoops for nothing,0.8,0.1
+ridiculously hard process for a minor update,0.8,0.1
+absurd amount of work for a negligible improvement,0.85,0.1
+draining emotional labor for a person who does not appreciate it,0.7,0.1
+physically grueling task for a zero impact outcome,0.9,0.1
+intellectually demanding but completely useless,0.85,0.05
+this requires a phd level understanding for a checkbox feature,0.85,0.1
+i built an entire framework for a weekend project nobody saw,0.85,0.1
+the amount of effort here is absurd and the payoff is zero,0.9,0.1
+brutal workout routine for a competition that got cancelled,0.85,0.1
+painful administrative gauntlet for a minor permit,0.75,0.1
+hard fought battle for something i didnt even want,0.8,0.1
+complex problem that solves an imaginary edge case,0.8,0.05
+months of development for a feature nobody adopted,0.85,0.1
+intense preparation for an interview that fell through,0.8,0.15
+hard compromise that pleases nobody,0.7,0.15
+extensive negotiations over something trivial,0.7,0.1
+challenging certification for a skill i never use,0.75,0.15
+minor task but takes forever because of bureaucracy,0.65,0.2
+quick and easy no big deal,0.1,0.15
+simple straightforward nothing to worry about,0.15,0.2
+trivial task barely takes any effort,0.05,0.15
+easy peasy lemon squeezy,0.05,0.15
+just a small thing dont overthink it,0.15,0.2
+barely qualifies as work honestly,0.05,0.15
+not demanding at all very casual,0.15,0.2
+low effort low stakes just get it done,0.15,0.15
+super quick nothing to see here,0.1,0.15
+effortless just a formality,0.05,0.15
+no brainer easy call,0.1,0.2
+minimal effort minimal impact all good,0.15,0.15
+easy mundane simple no pressure,0.15,0.2
+nobody cares about this one way or the other,0.15,0.1
+total non event just do it,0.1,0.15
+zero challenge whatsoever,0.05,0.1
+no sweat no stress,0.1,0.15
+negligible effort required here,0.05,0.15
+easy task nothing special about it,0.1,0.15
+quick simple task not much to say,0.15,0.2
+not a big deal at all very minor,0.1,0.15
+light work very straightforward,0.15,0.2
+minimal effort required here seriously,0.05,0.15
+this is extremely casual and low effort,0.15,0.2
+no complexity whatsoever very plain,0.1,0.15
+simple basic easy no complications,0.15,0.2
+barely a task just a tiny thing,0.05,0.15
+low difficulty low impact all around,0.15,0.15
+this is easy and unimportant just do it,0.15,0.15
+simple task low difficulty low importance,0.15,0.15
+easy quick and nobody really minds,0.1,0.15
+low effort low priority simple enough,0.15,0.15
+very easy very casual no pressure,0.1,0.15
+easy routine boring but quick,0.15,0.2
+nothing difficult about this at all,0.05,0.2
+brain dead simple and inconsequential,0.1,0.15
+this task is simple easy and low stakes,0.1,0.15
+quick little thing nobody is watching,0.1,0.15
+hard complex thing that is completely unnecessary,0.85,0.1
+time consuming and physically draining with no upside,0.85,0.1
+this is way too difficult for such a trivial outcome,0.8,0.05
+spending way too much effort on a non critical thing,0.75,0.1
+the amount of effort here is absurdly disproportionate,0.85,0.1
+this is brutal and nobody is going to notice it anyway,0.85,0.1
+extremely challenging and completely thankless work,0.9,0.1
+i am working so hard on a project that is going nowhere,0.85,0.1
+this is an absolute slog for absolutely no reason,0.85,0.1
+backbreaking tedious and completely overlooked,0.85,0.1
+i spent weeks on something that got rejected,0.85,0.1
+months of effort for a product that got cancelled,0.9,0.1
+this is incredibly demanding with zero appreciation,0.85,0.1
+physically punishing work that adds no value,0.9,0.1
+i have been killing myself over something meaningless,0.85,0.05
+complex coding challenge for an internal prototype,0.8,0.1
+this is so hard and nobody even cares if it works,0.85,0.05
+high effort no payoff whatsoever,0.85,0.05
+tremendous amount of work for a dead end,0.9,0.1
+extremely difficult irrelevant side quest,0.85,0.05
+>>>>>>> 021cee48da392862552323a51ad7d526e093d2d1

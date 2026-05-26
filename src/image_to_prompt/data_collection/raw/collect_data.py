@@ -5,7 +5,7 @@ Downloads images for the image-to-prompt classifier from multiple sources.
 Sources: Open Images V7 (via fiftyone), Kaggle (via kagglehub), Pixabay (via API)
 
 Usage:
-    uv run python src/image_to_promp/collect_data.py
+    uv run python src/image_to_prompt/data_collection/collect_data.py
 """
 
 import hashlib
