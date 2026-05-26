@@ -1129,3 +1129,318 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-05-26T21:09:22.782937'
+  mode: add
+  input: go home
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_59> | importance=0.52<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.253'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.301'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:29.039560'
+  mode: add
+  input: go hom
+  raw_output: name=go hom[EXP] | difficulty=0.38[PRD] | duration=60<extra_id_51> |
+    category=home<extra_id_59> | importance=0.52<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_31>
+  parsed:
+    name: go hom
+    start: null
+    deadline: null
+    difficulty: '0.407'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.521'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:36.724267'
+  mode: add
+  input: go home at 6 pm really hard
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.53<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.712'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.738'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:42.007161'
+  mode: add
+  input: go home at 6 pm extreme
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.52<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.836'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.612'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:45.553582'
+  mode: add
+  input: go home at 6 pm not hard
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=60<extra_id_51>
+    | category=home<extra_id_47> | importance=0.53<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.131'
+    duration: '60'
+    category: home
+    location: null
+    importance: '0.230'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:49.356289'
+  mode: add
+  input: go home at 6 pm easy
+  raw_output: name=go home[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.54<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.000'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.335'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:09:59.991834'
+  mode: add
+  input: go home at 6 pm very easy
+  raw_output: name=go home[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.53<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.083'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.512'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:03.957815'
+  mode: add
+  input: go home at 6 pm easy
+  raw_output: name=go home[EXP] | difficulty=0.15[PRD] | duration=45<extra_id_51>
+    | category=home<extra_id_47> | importance=0.54<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.000'
+    duration: '45'
+    category: home
+    location: null
+    importance: '0.335'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:08.707441'
+  mode: add
+  input: go home at 6 pm efor 2 hours
+  raw_output: name=go home[EXP] | difficulty=0.55[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.48<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.389'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.232'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:15.214587'
+  mode: add
+  input: go home at 6 pm efor 2 hours generally important
+  raw_output: name=go home[EXP] | difficulty=0.43[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.98<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.497'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.566'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:20.148267'
+  mode: add
+  input: "go home at 6 pm efor 2 hours very \x17important"
+  raw_output: name=go home[EXP] | difficulty=0.43[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.75<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.495'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.582'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:24.317995'
+  mode: add
+  input: go home at 6 pm efor 2 hours very important
+  raw_output: name=go home[EXP] | difficulty=0.43[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.75<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.417'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.692'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:28.797223'
+  mode: add
+  input: go home at 6 pm efor 2 hours extremely important
+  raw_output: name=go home[EXP] | difficulty=0.38[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.75<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.379'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.747'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:34.776725'
+  mode: add
+  input: go home at 6 pm efor 2 hours extremely important but very easy
+  raw_output: name=go home[EXP] | difficulty=0.1[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.75<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_86> | recurrent=false<extra_id_53>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.382'
+    duration: '120'
+    category: home
+    location: null
+    importance: '0.933'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-26T21:10:38.706742'
+  mode: add
+  input: go home at 6 pm efor 2 hours extremely important but very hard
+  raw_output: name=go home[EXP] | difficulty=0.85[PRD] | duration=120<extra_id_51>
+    | category=home<extra_id_47> | importance=0.9<extra_id_31> | fixed_time=true<extra_id_59>
+    | fixed-start=18:00<extra_id_53> | recurrent=false<extra_id_86>
+  parsed:
+    name: go home
+    start: null
+    deadline: null
+    difficulty: '0.802'
+    duration: '120'
+    category: home
+    location: null
+    importance: '1.000'
+    fixed_time: true
+    fixed_start: '18:00'
+    recurrent: false
+    recurrence_days: null
+  error: null
+
