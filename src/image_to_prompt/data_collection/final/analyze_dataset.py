@@ -231,11 +231,12 @@ def analyze_outliers(images_by_cat: dict[str, list[Path]]) -> dict:
         per_cat_outliers[cat] = len(outlier_paths)
         total_outliers += len(outlier_paths)
 
-        cat_out_dir = OUTLIERS / cat
-        cat_out_dir.mkdir(parents=True, exist_ok=True)
+        OUTLIERS.mkdir(parents=True, exist_ok=True)
         for op in outlier_paths:
             try:
-                shutil.copy2(op, cat_out_dir / op.name)
+                split = op.relative_to(FINAL).parts[0]
+                new_name = f"{split}_{cat}_{op.name}"
+                shutil.copy2(op, OUTLIERS / new_name)
             except Exception:
                 pass
 

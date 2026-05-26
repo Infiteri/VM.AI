@@ -15,7 +15,7 @@ SELECTED = Path("data/image_to_prompt/selected")
 FINAL = Path("data/image_to_prompt/final")
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tiff"}
 RATIOS = {"train": 0.70, "val": 0.15, "test": 0.15}
-MAX_PER_CATEGORY = 1100
+MAX_PER_CATEGORY = 800
 SEED = 42
 
 
