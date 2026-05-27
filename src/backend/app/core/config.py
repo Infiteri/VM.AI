@@ -8,8 +8,7 @@ class Settings(BaseSettings):
     APP_PORT: int = 8000
     DEBUG: bool = False
 
-    NLP_MODEL_PATH: str = ""
-    MATCHER_MODEL_PATH: str = ""
+    CLASSIFIER_MODEL_PATH: str = "models/efficientnet_b4_classifier/efficientnet_b4_classifier.pth"
 
     SCHEDULER_TIMEOUT_SECONDS: int = 12
     SCHEDULER_MAX_DISPLACEMENT_LAYERS: int = 1
