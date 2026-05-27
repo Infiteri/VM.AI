@@ -39,7 +39,7 @@ CONFIG = {
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,
     "label_smoothing": 0.1,
-    "early_stopping_patience": 10,
+    "early_stopping_patience": 7,
     "early_stopping_min_delta": 0.001,
     "data_root": str(DATA_ROOT),
     "save_path": DEFAULT_SAVE_PATH,
@@ -218,7 +218,34 @@ def main():
         history = checkpoint.get("history", history)
         print(f"Resumed from epoch {start_epoch} (best val_acc={best_val_acc:.3f})")
 
-    criterion = nn.CrossEntropyLoss(label_smoothing=CONFIG["label_smoothing"])
+    # Weighted loss to compensate for cleaning's smaller class
+    class_counts = {
+        "basketball": 700,
+        "cleaning": 673,
+        "computer_work": 700,
+        "cooking": 700,
+        "cycling": 700,
+        "driving": 700,
+        "football": 700,
+        "gym": 700,
+        "office": 700,
+        "pet_care": 700,
+        "reading": 700,
+        "restaurant": 700,
+        "running": 624,
+        "shopping": 700,
+    }
+    counts = [class_counts[c] for c in sorted(class_counts.keys())]
+    total = sum(counts)
+    class_weights = torch.tensor(
+        [total / (len(counts) * c) for c in counts],
+        dtype=torch.float,
+    ).to(device)
+
+    criterion = nn.CrossEntropyLoss(
+        weight=class_weights,
+        label_smoothing=CONFIG["label_smoothing"],
+    )
     scaler = GradScaler()
 
     # ── Phase A: Frozen backbone ──

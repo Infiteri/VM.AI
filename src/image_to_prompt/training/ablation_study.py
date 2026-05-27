@@ -85,7 +85,7 @@ BASE_CONFIG = {
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,
     "label_smoothing": 0.1,
-    "early_stopping_patience": 10,
+    "early_stopping_patience": 7,
     "early_stopping_min_delta": 0.001,
 }
 
@@ -169,7 +169,35 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
     )
 
     model = build_model(BASE_CONFIG["num_classes"]).to(device)
-    criterion = nn.CrossEntropyLoss(label_smoothing=BASE_CONFIG["label_smoothing"])
+
+    # Weighted loss to compensate for cleaning's smaller class
+    class_counts = {
+        "basketball": 700,
+        "cleaning": 673,
+        "computer_work": 700,
+        "cooking": 700,
+        "cycling": 700,
+        "driving": 700,
+        "football": 700,
+        "gym": 700,
+        "office": 700,
+        "pet_care": 700,
+        "reading": 700,
+        "restaurant": 700,
+        "running": 624,
+        "shopping": 700,
+    }
+    counts = [class_counts[c] for c in sorted(class_counts.keys())]
+    total = sum(counts)
+    class_weights = torch.tensor(
+        [total / (len(counts) * c) for c in counts],
+        dtype=torch.float,
+    ).to(device)
+
+    criterion = nn.CrossEntropyLoss(
+        weight=class_weights,
+        label_smoothing=BASE_CONFIG["label_smoothing"],
+    )
     scaler = GradScaler()
     history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
     best_val_acc = 0.0
