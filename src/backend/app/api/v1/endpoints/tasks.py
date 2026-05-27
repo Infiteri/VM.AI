@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Query, status, Path, HTTPException
+import io
+
+from fastapi import APIRouter, Depends, Query, status, Path, HTTPException, UploadFile, File, Response
+from PIL import Image
 from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import UUID
@@ -29,6 +32,7 @@ from app.utils.task_saver import save_commited_task, update_commited_task
 from app.models.workflow import UnscheduledTask
 from app.services.parser import parser_service
 from app.services.stats_recorder import stats_recorder
+from app.services.img_to_prompt import img_to_prompt
 
 router = APIRouter()
 logger = setup_logging()
@@ -128,6 +132,27 @@ def parse_modify_task(
         db.rollback()
         logger.error(f"Parse modify failed: {e}")
         raise HTTPException(status_code=500, detail="Parse modify failed")
+
+
+@router.post("/parse/from-image")
+async def parse_from_image(
+    file: UploadFile = File(...),
+):
+    """
+    POST /tasks/parse/from-image
+    Upload an image → classify activity → return a task prompt string.
+    """
+    if file.content_type not in ("image/jpeg", "image/png", "image/webp"):
+        raise HTTPException(status_code=400, detail=f"Unsupported image type: {file.content_type}")
+
+    try:
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents)).convert("RGB")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid image file")
+
+    result = img_to_prompt.classify(image)
+    return Response(content=result["prompt"], media_type="text/plain")
 
 
 # ---------------------------------------------------------
