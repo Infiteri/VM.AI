@@ -52,27 +52,27 @@ EXPERIMENTS = {
         "augmentation": True,
         "frozen_phase": True,
         "epochs_frozen": 5,
-        "epochs_unfrozen": 20,
+        "epochs_unfrozen": 25,
         "description": "Full pipeline: augmentation + frozen phase",
     },
     "no_augmentation": {
         "augmentation": False,
         "frozen_phase": True,
         "epochs_frozen": 5,
-        "epochs_unfrozen": 20,
+        "epochs_unfrozen": 25,
         "description": "No augmentation: only resize + normalize",
     },
     "no_frozen_phase": {
         "augmentation": True,
         "frozen_phase": False,
-        "epochs_frozen": 0,
+        "epochs_frozen": 5,
         "epochs_unfrozen": 25,
         "description": "No frozen phase: all layers trained from epoch 1",
     },
     "no_aug_no_frozen": {
         "augmentation": False,
         "frozen_phase": False,
-        "epochs_frozen": 0,
+        "epochs_frozen": 5,
         "epochs_unfrozen": 25,
         "description": "Bare minimum: no augmentation + no frozen phase",
     },
@@ -85,7 +85,7 @@ BASE_CONFIG = {
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,
     "label_smoothing": 0.1,
-    "early_stopping_patience": 5,
+    "early_stopping_patience": 10,
     "early_stopping_min_delta": 0.001,
 }
 
@@ -121,7 +121,7 @@ def get_transforms(augmentation: bool):
 
 
 class EarlyStopping:
-    def __init__(self, patience: int = 5, min_delta: float = 0.001):
+    def __init__(self, patience: int = 10, min_delta: float = 0.001):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
