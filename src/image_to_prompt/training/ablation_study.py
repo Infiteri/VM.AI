@@ -170,7 +170,7 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
 
     model = build_model(BASE_CONFIG["num_classes"]).to(device)
 
-    # Weighted loss to compensate for cleaning's smaller class
+    # Weighted loss to compensate for smaller classes (cleaning, running)
     class_counts = {
         "basketball": 700,
         "cleaning": 673,

@@ -1,6 +1,6 @@
 # VM.AI — Image-to-Prompt Data Collection
 
-Downloads and prepares training images for the image-to-prompt classifier (14 activity categories, ~1000 images each).
+Downloads and prepares training images for the image-to-prompt classifier (14 activity categories, ~700 images each).
 
 ## Pipeline Overview
 
@@ -16,7 +16,6 @@ resize_final.py           →   final/ images centre-cropped + resized to 380×3
 analyze_dataset.py        →   analysis report + outlier images copied to outliers/
 push_dataset_to_hf.py     →   push final/ to Hugging Face Hub
 pull_dataset_hf.py        →   download final/ from Hugging Face Hub
-pull_model_hf.py          →   download model from Hugging Face Hub
 ```
 
 ## Source Types
@@ -57,23 +56,26 @@ Searches Pixabay (CC0 license, ML-safe) with category-specific keywords. `per_pa
 
 ### 1. Setup
 
-Ensure the Pixabay API key is set in `src/image_to_prompt/.env`:
+Ensure the API keys and repo IDs are set in `src/image_to_prompt/.env`:
 
 ```
 PIXABAY_API_KEY="your_key_here"
 PIXABAY_BASE_URL="https://pixabay.com/api/"
+HF_TOKEN="your_hf_token_here"
+HF_DATASET_REPO_ID="your-username/your-dataset-repo"
+HF_DATASET_REPO_PRIVATE="False"
 ```
 
 ### 2. Collect Raw Data
 
 ```bash
-uv run python src/image_to_prompt/data_collection/collect_data.py
+uv run python src/image_to_prompt/data_collection/raw/collect_data.py
 ```
 
 Runs all 14 categories. To run specific categories only:
 
 ```bash
-uv run python src/image_to_prompt/data_collection/collect_data.py basketball computer_work
+uv run python src/image_to_prompt/data_collection/raw/collect_data.py basketball computer_work
 ```
 
 Each category downloads into `data/image_to_prompt/raw/<category>/<source>/` and writes a `metadata.json`.
@@ -81,7 +83,7 @@ Each category downloads into `data/image_to_prompt/raw/<category>/<source>/` and
 ### 3. Prepare & Validate
 
 ```bash
-uv run python src/image_to_prompt/data_collection/prepare_data.py
+uv run python src/image_to_prompt/data_collection/raw/prepare_data.py
 ```
 
 Three phases:
@@ -92,8 +94,8 @@ Three phases:
 ### 4. Additional Downloads (Optional)
 
 ```bash
-uv run python src/image_to_prompt/data_collection/download_new.py
-uv run python src/image_to_prompt/data_collection/unpack_new.py
+uv run python src/image_to_prompt/data_collection/selected/download_new.py
+uv run python src/image_to_prompt/data_collection/selected/unpack_new.py
 ```
 
 Downloads additional Pixabay images into `selected/<category>/new/` with per-image validation, then moves them to the parent folder with a `new_` prefix.
@@ -117,15 +119,15 @@ Ensures every image in `selected/` is a valid JPEG. Already-JPEG files are skipp
 ### 7. Split into Train/Val/Test
 
 ```bash
-uv run python src/image_to_prompt/data_collection/split_dataset.py
+uv run python src/image_to_prompt/data_collection/final/split_dataset.py
 ```
 
-Shuffles (seed=42), caps at 1100 per category, splits 70/15/15, copies into `final/{train,val,test}/`, writes CSVs.
+Shuffles (seed=42), caps at 700 per category, splits 70/15/15, copies into `final/{train,val,test}/`, writes CSVs.
 
 ### 8. Resize to 380×380
 
 ```bash
-uv run python src/image_to_prompt/data_collection/resize_final.py
+uv run python src/image_to_prompt/data_collection/final/resize_final.py
 ```
 
 Centre-crops every image in `final/` to a square, then resizes to 380×380 with Lanczos. Overwrites in place.
@@ -133,7 +135,7 @@ Centre-crops every image in `final/` to a square, then resizes to 380×380 with 
 ### 9. Analyze Dataset
 
 ```bash
-uv run python src/image_to_prompt/data_collection/analyze_dataset.py
+uv run python src/image_to_prompt/data_collection/final/analyze_dataset.py
 ```
 
 Runs 4 checks: class balance (chart), perceptual duplicates, ResNet18 outliers (copied to `outliers/`), and brightness distribution. Writes `analysis_report.json`.
@@ -161,12 +163,6 @@ uv run python src/image_to_prompt/pull_dataset_hf.py
 ```
 
 Downloads the dataset from Hugging Face Hub into `data/image_to_prompt/final/`. Deletes the existing `final/` first, then reconstructs `{train,val,test}/{label}/{filename}.jpg` and regenerates the CSV files. `HF_TOKEN` is optional for public repos.
-
-```bash
-uv run python src/image_to_prompt/pull_model_hf.py
-```
-
-Downloads the trained model and evaluation artifacts into `models/efficientnet_b4_classifier/`. Deletes the existing directory first, then downloads the full repo contents via `snapshot_download`. `HF_TOKEN` is optional for public repos.
 
 ## Folder Structure
 
@@ -208,40 +204,23 @@ data/image_to_prompt/
   outliers/
     train_running_kaggle_0000.jpg
     ...
-
-models/
-  efficientnet_b4_classifier/
-    efficientnet_b4_classifier.pth
-    training_history.json
-    evaluation_report.json
-    confusion_matrix.png
-    per_class_metrics.png
-    topk_accuracy.png
-
-assets/
-  image_classifier/
-    confusion_matrix.png
-    per_class_metrics.png
-    topk_accuracy.png
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| `src/image_to_prompt/data_collection/collect_data.py` | Download from all sources (5 handler types) |
-| `src/image_to_prompt/data_collection/prepare_data.py` | Copy, flatten, validate, deduplicate |
-| `src/image_to_prompt/data_collection/download_new.py` | Download additional Pixabay images |
-| `src/image_to_prompt/data_collection/unpack_new.py` | Flatten new/ downloads into parent folder |
+| `src/image_to_prompt/data_collection/raw/collect_data.py` | Download from all sources (5 handler types) |
+| `src/image_to_prompt/data_collection/raw/prepare_data.py` | Copy, flatten, validate, deduplicate |
+| `src/image_to_prompt/data_collection/selected/download_new.py` | Download additional Pixabay images |
+| `src/image_to_prompt/data_collection/selected/unpack_new.py` | Flatten new/ downloads into parent folder |
 | `src/image_to_prompt/data_collection/selected/dedup_selected.py` | Remove within-category perceptual duplicates from selected/ |
 | `src/image_to_prompt/data_collection/selected/convert_selected_jpg.py` | Convert all selected/ images to JPEG |
 | `src/image_to_prompt/data_collection/selected/outliers_selected.py` | Detect and copy outliers from selected/ |
-| `src/image_to_prompt/data_collection/split_dataset.py` | Split selected/ into train/val/test |
-| `src/image_to_prompt/data_collection/resize_final.py` | Resize final/ images to 380×380 |
-| `src/image_to_prompt/data_collection/analyze_dataset.py` | Dataset analysis (balance, duplicates, outliers, brightness) |
+| `src/image_to_prompt/data_collection/final/split_dataset.py` | Split selected/ into train/val/test |
+| `src/image_to_prompt/data_collection/final/resize_final.py` | Resize final/ images to 380×380 |
+| `src/image_to_prompt/data_collection/final/analyze_dataset.py` | Dataset analysis (balance, duplicates, outliers, brightness) |
 | `src/image_to_prompt/data_collection/final/push_dataset_to_hf.py` | Push final/ dataset to Hugging Face Hub |
 | `src/image_to_prompt/pull_dataset_hf.py` | Pull dataset from Hugging Face Hub |
-| `src/image_to_prompt/pull_model_hf.py` | Pull model and evaluation artifacts from Hugging Face Hub |
 | `src/image_to_prompt/.env` | API keys and config (gitignored) |
 | `src/image_to_prompt/.env.example` | Template for `.env` |
-| `src/backend/logs/notes.log` | Source-of-truth for per-category config (14 entries) |

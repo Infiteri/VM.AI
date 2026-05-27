@@ -218,7 +218,7 @@ def main():
         history = checkpoint.get("history", history)
         print(f"Resumed from epoch {start_epoch} (best val_acc={best_val_acc:.3f})")
 
-    # Weighted loss to compensate for cleaning's smaller class
+    # Weighted loss to compensate for smaller classes (cleaning, running)
     class_counts = {
         "basketball": 700,
         "cleaning": 673,
