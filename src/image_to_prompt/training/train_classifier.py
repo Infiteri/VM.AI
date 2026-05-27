@@ -210,12 +210,27 @@ def main():
     best_val_acc = 0.0
     history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
 
+    # Create Phase B optimizer + scheduler early so resume can restore their state
+    optimizer_B = torch.optim.AdamW([
+        {"params": model.classifier.parameters(), "lr": CONFIG["lr_head"] / 10},
+        {"params": model.blocks[-2:].parameters(), "lr": CONFIG["lr_backbone"]},
+    ], weight_decay=CONFIG["weight_decay"])
+
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer_B,
+        T_max=CONFIG["epochs_unfrozen"],
+        eta_min=1e-6,
+    )
+
     if args.resume:
         checkpoint = torch.load(args.resume, map_location=device)
         model.load_state_dict(checkpoint["model_state_dict"])
         start_epoch = checkpoint.get("epoch", 0)
         best_val_acc = checkpoint.get("best_val_acc", 0.0)
         history = checkpoint.get("history", history)
+        if "scheduler_state_dict" in checkpoint:
+            optimizer_B.load_state_dict(checkpoint["optimizer_state_dict"])
+            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         print(f"Resumed from epoch {start_epoch} (best val_acc={best_val_acc:.3f})")
 
     # Weighted loss to compensate for smaller classes (cleaning, running)
@@ -302,17 +317,6 @@ def main():
 
     for param in model.blocks[-2:].parameters():
         param.requires_grad = True
-
-    optimizer_B = torch.optim.AdamW([
-        {"params": model.classifier.parameters(), "lr": CONFIG["lr_head"] / 10},
-        {"params": model.blocks[-2:].parameters(), "lr": CONFIG["lr_backbone"]},
-    ], weight_decay=CONFIG["weight_decay"])
-
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer_B,
-        T_max=CONFIG["epochs_unfrozen"],
-        eta_min=1e-6,
-    )
 
     phase_b_start = max(start_epoch - CONFIG["epochs_frozen"], 0)
     for i in range(phase_b_start, CONFIG["epochs_unfrozen"]):

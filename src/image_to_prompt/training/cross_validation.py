@@ -25,8 +25,8 @@ import torch.nn as nn
 from PIL import Image
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import StratifiedKFold
-from torch.cuda.amp import autocast, GradScaler
-from torch.utils.data import DataLoader, Dataset, Subset
+from torch.cuda.amp import GradScaler
+from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "evaluation"))
@@ -130,9 +130,8 @@ class EarlyStopping:
         return self.should_stop
 
 
-def compute_class_weights(dataset: FullImageDataset, indices: list, device: torch.device):
-    fold_labels = [dataset.labels[i] for i in indices]
-    counts = np.bincount(fold_labels, minlength=CV_CONFIG["num_classes"])
+def compute_class_weights(dataset: FullImageDataset, device: torch.device):
+    counts = np.bincount(dataset.labels, minlength=CV_CONFIG["num_classes"])
     total = counts.sum()
     weights = total / (CV_CONFIG["num_classes"] * counts.astype(float))
     return torch.tensor(weights, dtype=torch.float).to(device)
@@ -148,21 +147,19 @@ def train_fold(fold: int, train_idx: list, val_idx: list, dataset: FullImageData
     fold_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = str(fold_dir / "checkpoint.pth")
 
-    train_subset = Subset(dataset, train_idx)
-    val_subset = Subset(dataset, val_idx)
-    train_subset.dataset.transform = train_transforms
-    val_subset.dataset.transform = val_transforms
+    train_dataset = FullImageDataset(dataset.df.iloc[train_idx], transform=train_transforms)
+    val_dataset = FullImageDataset(dataset.df.iloc[val_idx], transform=val_transforms)
 
     train_loader = DataLoader(
-        train_subset, batch_size=CV_CONFIG["batch_size"],
+        train_dataset, batch_size=CV_CONFIG["batch_size"],
         shuffle=True, num_workers=2, pin_memory=True,
     )
     val_loader = DataLoader(
-        val_subset, batch_size=CV_CONFIG["batch_size"],
+        val_dataset, batch_size=CV_CONFIG["batch_size"],
         shuffle=False, num_workers=2, pin_memory=True,
     )
 
-    class_weights = compute_class_weights(dataset, train_idx, device)
+    class_weights = compute_class_weights(train_dataset, device)
     criterion = nn.CrossEntropyLoss(
         weight=class_weights,
         label_smoothing=CV_CONFIG["label_smoothing"],

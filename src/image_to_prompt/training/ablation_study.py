@@ -85,8 +85,6 @@ BASE_CONFIG = {
     "lr_backbone": 1e-5,
     "weight_decay": 1e-4,
     "label_smoothing": 0.1,
-    "early_stopping_patience": 7,
-    "early_stopping_min_delta": 0.001,
 }
 
 ABLATION_MODEL_DIR = Path("models/ablation")
@@ -118,25 +116,6 @@ def get_transforms(augmentation: bool):
     ])
 
     return train_tf, val_tf
-
-
-class EarlyStopping:
-    def __init__(self, patience: int = 10, min_delta: float = 0.001):
-        self.patience = patience
-        self.min_delta = min_delta
-        self.counter = 0
-        self.best_acc = 0.0
-        self.should_stop = False
-
-    def step(self, val_acc: float) -> bool:
-        if val_acc > self.best_acc + self.min_delta:
-            self.best_acc = val_acc
-            self.counter = 0
-        else:
-            self.counter += 1
-            if self.counter >= self.patience:
-                self.should_stop = True
-        return self.should_stop
 
 
 def run_experiment(name: str, config: dict, device: torch.device) -> dict:
@@ -201,10 +180,6 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
     scaler = GradScaler()
     history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
     best_val_acc = 0.0
-    early_stopping = EarlyStopping(
-        patience=BASE_CONFIG["early_stopping_patience"],
-        min_delta=BASE_CONFIG["early_stopping_min_delta"],
-    )
 
     # ── Phase A: Frozen backbone ──
     if config["frozen_phase"] and config["epochs_frozen"] > 0:
@@ -245,11 +220,10 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
     if not config["frozen_phase"]:
         for param in model.parameters():
             param.requires_grad = True
-        optimizer_B = torch.optim.AdamW(
-            model.parameters(),
-            lr=BASE_CONFIG["lr_head"],
-            weight_decay=BASE_CONFIG["weight_decay"],
-        )
+        optimizer_B = torch.optim.AdamW([
+            {"params": model.classifier.parameters(), "lr": BASE_CONFIG["lr_head"] / 10},
+            {"params": model.blocks.parameters(), "lr": BASE_CONFIG["lr_backbone"]},
+        ], weight_decay=BASE_CONFIG["weight_decay"])
     else:
         for param in model.blocks[-2:].parameters():
             param.requires_grad = True
@@ -262,7 +236,7 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
         optimizer_B, T_max=config["epochs_unfrozen"], eta_min=1e-6,
     )
 
-    stopped_epoch = config["epochs_unfrozen"]
+    stopped_epoch = config["epochs_frozen"] + config["epochs_unfrozen"]
     for i in range(config["epochs_unfrozen"]):
         t0 = time.time()
         tl, ta = train_epoch(model, train_loader, optimizer_B, criterion, device, scaler)
@@ -285,10 +259,6 @@ def run_experiment(name: str, config: dict, device: torch.device) -> dict:
                 "history": history,
             }, checkpoint_path)
             print(f"  * Best saved (val_acc={va:.3f})")
-        if early_stopping.step(va):
-            print(f"  Early stopping at epoch {epoch_num}")
-            stopped_epoch = epoch_num
-            break
 
     # ── Test evaluation ──
     best_ckpt = torch.load(checkpoint_path, map_location=device)
