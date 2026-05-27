@@ -87,13 +87,13 @@ Runs 4 experiments isolating the effect of data augmentation and the frozen pre-
 ### Experiments
 
 | Experiment | Augmentation | Frozen Phase | Epochs |
-|---|---|---|---|
-| `baseline` | ✅ Yes | ✅ Yes (5 + 20) | 25 |
-| `no_augmentation` | ❌ No | ✅ Yes (5 + 20) | 25 |
+|---|---|---|---|---|
+| `baseline` | ✅ Yes | ✅ Yes (5 + 25) | 30 |
+| `no_augmentation` | ❌ No | ✅ Yes (5 + 25) | 30 |
 | `no_frozen_phase` | ✅ Yes | ❌ No (0 + 25) | 25 |
 | `no_aug_no_frozen` | ❌ No | ❌ No (0 + 25) | 25 |
 
-All experiments use the same hyperparameters (batch size 32, AdamW, cosine annealing, early stopping, weighted loss).
+All experiments use the same hyperparameters (batch size 32, AdamW, cosine annealing, weighted loss).
 
 ### Usage
 
@@ -138,7 +138,7 @@ assets/image_classifier/ablation/
 
 **File:** `src/image_to_prompt/training/cross_validation.py`
 
-5-fold stratified cross-validation on the full dataset (train + val + test combined, ~9800 images).
+5-fold stratified cross-validation with a **locked test set**. Train+val are used for the 5 splits; each fold evaluates its best model on the held-out test set. All metrics and charts are aggregated across folds.
 
 ### Configuration
 
@@ -173,15 +173,12 @@ models/cross_validation/
   fold_3/
   fold_4/
   fold_5/
-  cv_results.json                    ← Mean ± std + per-fold results
+  cv_results.json                    ← Mean ± std + per-fold test results
 
 assets/image_classifier/cross_validation/
-  fold_1/
-    confusion_matrix.png
-    per_class_metrics.png
-  ... (per fold)
-  cv_accuracy_boxplot.png            ← Accuracy distribution
-  cv_per_class_f1_mean.png           ← Mean F1 per class with error bars
+  cv_accuracy_boxplot.png            ← Test accuracy per fold + mean ± std
+  aggregated_confusion_matrix.png    ← All 5 folds combined
+  aggregated_per_class_metrics.png   ← Mean F1 per class with error bars
 ```
 
 ---
@@ -298,15 +295,9 @@ assets/image_classifier/
     comparison_per_class_f1.png
     comparison_training_curves.png
   cross_validation/
-    fold_1/
-      confusion_matrix.png
-      per_class_metrics.png
-    fold_2/
-    fold_3/
-    fold_4/
-    fold_5/
     cv_accuracy_boxplot.png
-    cv_per_class_f1_mean.png
+    aggregated_confusion_matrix.png
+    aggregated_per_class_metrics.png
 ```
 
 ---

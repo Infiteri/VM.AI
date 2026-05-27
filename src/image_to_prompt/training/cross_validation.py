@@ -1,8 +1,9 @@
 """
-VM.AI — 5-fold stratified cross-validation for EfficientNet-B4.
+VM.AI — 5-fold stratified cross-validation with locked test set for EfficientNet-B4.
 
-Runs 5 folds on the full dataset (train+val+test combined), reports mean ± std accuracy.
-Generates per-fold charts and aggregate comparison plots.
+Uses train+val for 5-fold CV. Each fold trains on 4/5, validates on 1/5 (early stopping).
+Each fold evaluates its best model on the locked test set.
+All charts and metrics are aggregated across all 5 folds.
 
 Usage:
   uv run python src/image_to_prompt/training/cross_validation.py
@@ -35,14 +36,12 @@ from evaluate_classifier import (
     compute_topk_accuracy,
     get_all_predictions,
     plot_confusion_matrix,
-    plot_per_class_metrics,
     setup_style,
 )
 from train_classifier import (
     DATA_ROOT,
     IMAGENET_MEAN,
     IMAGENET_STD,
-    ImageDataset,
     build_model,
     train_epoch,
     val_epoch,
@@ -83,12 +82,18 @@ val_transforms = transforms.Compose([
 ])
 
 
-def load_full_dataset():
+def load_train_val_dataset() -> pd.DataFrame:
+    """Load train + val only. Test set locked for final evaluation."""
     dfs = []
-    for split in ["train", "val", "test"]:
+    for split in ["train", "val"]:
         df = pd.read_csv(DATA_ROOT / f"{split}.csv", quoting=1)
         dfs.append(df)
     return pd.concat(dfs, ignore_index=True)
+
+
+def load_test_dataset() -> pd.DataFrame:
+    """Load test set. Used only for evaluation, never for training."""
+    return pd.read_csv(DATA_ROOT / "test.csv", quoting=1)
 
 
 class FullImageDataset(Dataset):
@@ -130,8 +135,9 @@ class EarlyStopping:
         return self.should_stop
 
 
-def compute_class_weights(dataset: FullImageDataset, device: torch.device):
+def compute_class_weights(dataset: FullImageDataset, device: torch.device) -> torch.Tensor:
     counts = np.bincount(dataset.labels, minlength=CV_CONFIG["num_classes"])
+    counts = counts.clip(min=1)
     total = counts.sum()
     weights = total / (CV_CONFIG["num_classes"] * counts.astype(float))
     return torch.tensor(weights, dtype=torch.float).to(device)
@@ -140,7 +146,7 @@ def compute_class_weights(dataset: FullImageDataset, device: torch.device):
 def train_fold(fold: int, train_idx: list, val_idx: list, dataset: FullImageDataset, device: torch.device) -> dict:
     print(f"\n{'=' * 60}")
     print(f"Fold {fold}/{CV_CONFIG['n_splits']}")
-    print(f"  Train: {len(train_idx)} | Val: {len(val_idx)}")
+    print(f"  Train: {len(train_idx)} | Val (early stop): {len(val_idx)}")
     print(f"{'=' * 60}\n")
 
     fold_dir = CV_MODEL_DIR / f"fold_{fold}"
@@ -258,44 +264,29 @@ def train_fold(fold: int, train_idx: list, val_idx: list, dataset: FullImageData
         "stopped_epoch": stopped_epoch,
         "history": history,
         "checkpoint_path": checkpoint_path,
-        "val_loader": val_loader,
         "model": model,
         "device": device,
     }
 
 
-def evaluate_fold(result: dict, class_names: list):
-    fold = result["fold"]
-    assets_dir = CV_ASSETS_DIR / f"fold_{fold}"
-    assets_dir.mkdir(parents=True, exist_ok=True)
-
+def evaluate_fold_on_test(result: dict, test_loader: DataLoader, class_names: list) -> tuple:
+    """Evaluate fold's best model on locked test set."""
     model = result["model"]
     device = result["device"]
 
     ckpt = torch.load(result["checkpoint_path"], map_location=device)
     model.load_state_dict(ckpt["model_state_dict"])
 
-    y_true, y_pred, y_scores = get_all_predictions(model, result["val_loader"], device, len(class_names))
-
-    cm = confusion_matrix(y_true, y_pred)
-    plot_confusion_matrix(cm, class_names, assets_dir / "confusion_matrix.png")
-
-    report = classification_report(y_true, y_pred, target_names=class_names, output_dict=True, zero_division=0)
-    per_class = {
-        c: {
-            "precision": report[c]["precision"],
-            "recall": report[c]["recall"],
-            "f1": report[c]["f1-score"],
-        }
-        for c in class_names
-    }
-    plot_per_class_metrics(per_class, class_names, assets_dir / "per_class_metrics.png")
+    y_true, y_pred, y_scores = get_all_predictions(model, test_loader, device, len(class_names))
 
     top1 = compute_topk_accuracy(y_scores, y_true, max_k=1)[0]
-    return top1, per_class
+    print(f"  Fold {result['fold']} test_acc={top1:.4f}")
+
+    return y_true, y_pred, y_scores, top1
 
 
 def plot_cv_boxplot(fold_accs: list, save_path: Path):
+    """Test accuracy per fold with mean ± std."""
     fig, ax = plt.subplots(figsize=(6, 5))
     ax.boxplot(fold_accs, patch_artist=True, boxprops=dict(facecolor="steelblue", alpha=0.7))
     for i, acc in enumerate(fold_accs):
@@ -304,19 +295,27 @@ def plot_cv_boxplot(fold_accs: list, save_path: Path):
     mean_acc = np.mean(fold_accs)
     std_acc = np.std(fold_accs)
     ax.axhline(mean_acc, color="orange", linestyle="--", label=f"Mean: {mean_acc:.3f} ± {std_acc:.3f}")
-    ax.set_ylabel("Accuracy")
-    ax.set_title("Cross-Validation Accuracy Distribution")
+    ax.set_ylabel("Test Accuracy")
+    ax.set_title("Cross-Validation Test Accuracy Distribution")
     ax.set_xticks([])
     ax.set_ylim(min(fold_accs) - 0.02, 1.02)
     ax.legend()
     fig.tight_layout()
     fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
     plt.close(fig)
+    print(f"  CV boxplot saved to {save_path}")
 
 
-def plot_cv_per_class_f1(all_per_class: list, class_names: list, save_path: Path):
-    mean_f1 = []
-    std_f1 = []
+def plot_aggregated_confusion_matrix(all_y_true: list, all_y_pred: list, class_names: list, save_path: Path):
+    """Combined confusion matrix from all 5 folds × test set."""
+    cm = confusion_matrix(all_y_true, all_y_pred)
+    plot_confusion_matrix(cm, class_names, save_path)
+    print(f"  Aggregated confusion matrix saved to {save_path}")
+
+
+def plot_aggregated_per_class_metrics(all_per_class: list, class_names: list, save_path: Path):
+    """Mean F1 per class with std error bars across all folds."""
+    mean_f1, std_f1 = [], []
     for c in class_names:
         f1s = [fold[c]["f1"] for fold in all_per_class]
         mean_f1.append(np.mean(f1s))
@@ -328,11 +327,12 @@ def plot_cv_per_class_f1(all_per_class: list, class_names: list, save_path: Path
     ax.set_xticks(x)
     ax.set_xticklabels(class_names, rotation=45, ha="right")
     ax.set_ylabel("F1 Score")
-    ax.set_title("Mean Per-Class F1 ± Std (5-Fold CV)")
+    ax.set_title("Mean Per-Class F1 ± Std — Aggregated 5-Fold CV (Test Set)")
     ax.set_ylim(0, 1.05)
     fig.tight_layout()
     fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
     plt.close(fig)
+    print(f"  Aggregated per-class F1 saved to {save_path}")
 
 
 def save_cv_results(fold_results: list, fold_accs: list, all_per_class: list, class_names: list):
@@ -341,12 +341,14 @@ def save_cv_results(fold_results: list, fold_accs: list, all_per_class: list, cl
 
     summary = {
         "n_splits": CV_CONFIG["n_splits"],
-        "mean_accuracy": round(mean_acc, 4),
-        "std_accuracy": round(std_acc, 4),
+        "evaluation": "test set (locked)",
+        "mean_test_accuracy": round(mean_acc, 4),
+        "std_test_accuracy": round(std_acc, 4),
         "per_fold": [
             {
                 "fold": r["fold"],
-                "val_acc": round(r["best_val_acc"], 4),
+                "test_acc": round(fold_accs[r["fold"] - 1], 4),
+                "best_val_acc": round(r["best_val_acc"], 4),
                 "stopped_epoch": r["stopped_epoch"],
             }
             for r in fold_results
@@ -361,19 +363,21 @@ def save_cv_results(fold_results: list, fold_accs: list, all_per_class: list, cl
     with open(path, "w") as f:
         json.dump(summary, f, indent=2)
 
-    print("\n" + "=" * 50)
-    print("CROSS-VALIDATION RESULTS")
-    print("=" * 50)
+    print("\n" + "=" * 55)
+    print("CROSS-VALIDATION RESULTS (Test Set)")
+    print("=" * 55)
     for r in fold_results:
-        print(f"  Fold {r['fold']}: val_acc={r['best_val_acc']:.4f} (stopped epoch {r['stopped_epoch']})")
-    print("-" * 50)
-    print(f"  Mean: {mean_acc:.4f} ± {std_acc:.4f}")
-    print("=" * 50)
+        print(f"  Fold {r['fold']}: test_acc={fold_accs[r['fold']-1]:.4f} "
+              f"val_acc={r['best_val_acc']:.4f} "
+              f"(stopped epoch {r['stopped_epoch']})")
+    print("-" * 55)
+    print(f"  Mean test acc: {mean_acc:.4f} ± {std_acc:.4f}")
+    print("=" * 55)
     print(f"\nResults saved to {path}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description="5-fold cross-validation")
+    parser = argparse.ArgumentParser(description="5-fold CV with fixed test set")
     parser.add_argument("--fold", type=int, default=None, help="Run specific fold only (1-5). Default: run all.")
     args = parser.parse_args()
 
@@ -384,14 +388,31 @@ def main():
     CV_MODEL_DIR.mkdir(parents=True, exist_ok=True)
     CV_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 
-    full_df = load_full_dataset()
-    dataset = FullImageDataset(full_df, transform=None)
+    # Load datasets
+    train_val_df = load_train_val_dataset()
+    test_df = load_test_dataset()
+
+    dataset = FullImageDataset(train_val_df, transform=None)
     class_names = dataset.classes
     labels = np.array(dataset.labels)
 
-    print(f"Full dataset: {len(dataset)} images, {len(class_names)} classes")
+    # Build test loader once — reused for every fold
+    test_dataset = FullImageDataset(test_df, transform=val_transforms)
+    test_loader = DataLoader(
+        test_dataset, batch_size=CV_CONFIG["batch_size"],
+        shuffle=False, num_workers=2, pin_memory=True,
+    )
 
-    skf = StratifiedKFold(n_splits=CV_CONFIG["n_splits"], shuffle=True, random_state=CV_CONFIG["seed"])
+    print(f"Train+val: {len(dataset)} images")
+    print(f"Test:      {len(test_dataset)} images (locked)")
+    print(f"Classes:   {class_names}")
+
+    # Stratified K-Fold on train+val
+    skf = StratifiedKFold(
+        n_splits=CV_CONFIG["n_splits"],
+        shuffle=True,
+        random_state=CV_CONFIG["seed"],
+    )
     folds = list(skf.split(np.zeros(len(labels)), labels))
 
     if args.fold:
@@ -401,21 +422,51 @@ def main():
 
     fold_results = []
     fold_accs = []
+    all_y_true = []
+    all_y_pred = []
     all_per_class = []
 
     for fold_idx, (train_idx, val_idx) in folds_to_run:
         fold_num = fold_idx + 1
-        result = train_fold(fold_num, train_idx.tolist(), val_idx.tolist(), dataset, device)
-        top1, per_class = evaluate_fold(result, class_names)
-        fold_accs.append(top1)
-        all_per_class.append(per_class)
-        fold_results.append(result)
-        print(f"  Fold {fold_num} complete — val_acc={top1:.4f}")
 
+        # Train fold (val used for early stopping only)
+        result = train_fold(fold_num, train_idx.tolist(), val_idx.tolist(), dataset, device)
+
+        # Evaluate on locked test set
+        print(f"\nEvaluating fold {fold_num} on test set...")
+        y_true, y_pred, y_scores, top1 = evaluate_fold_on_test(result, test_loader, class_names)
+
+        # Collect aggregated predictions
+        all_y_true.extend(y_true)
+        all_y_pred.extend(y_pred)
+
+        # Per-fold per-class metrics
+        report = classification_report(y_true, y_pred, target_names=class_names, output_dict=True, zero_division=0)
+        per_class = {
+            c: {
+                "precision": report[c]["precision"],
+                "recall": report[c]["recall"],
+                "f1": report[c]["f1-score"],
+            }
+            for c in class_names
+        }
+        all_per_class.append(per_class)
+        fold_accs.append(top1)
+        fold_results.append(result)
+
+    # Aggregated charts (only if all folds ran)
     if len(fold_results) == CV_CONFIG["n_splits"]:
-        print("\nGenerating CV charts...")
+        print("\nGenerating aggregated charts...")
+
         plot_cv_boxplot(fold_accs, CV_ASSETS_DIR / "cv_accuracy_boxplot.png")
-        plot_cv_per_class_f1(all_per_class, class_names, CV_ASSETS_DIR / "cv_per_class_f1_mean.png")
+        plot_aggregated_confusion_matrix(
+            all_y_true, all_y_pred, class_names,
+            CV_ASSETS_DIR / "aggregated_confusion_matrix.png",
+        )
+        plot_aggregated_per_class_metrics(
+            all_per_class, class_names,
+            CV_ASSETS_DIR / "aggregated_per_class_metrics.png",
+        )
 
     save_cv_results(fold_results, fold_accs, all_per_class, class_names)
     print("\nCross-validation complete.")

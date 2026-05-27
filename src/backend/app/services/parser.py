@@ -100,8 +100,8 @@ class Parser:
     _predictor = None
 
     def __init__(self):
-        """Initialize the parser with TaskPlannerPredictor."""
-        self._load_model()
+        """Initialize the parser. Model loads lazily on first use."""
+        pass
 
     def _load_model(self):
         """Load the TaskPlannerPredictor model."""
@@ -112,6 +112,11 @@ class Parser:
             logger.info("Loading TaskPlannerPredictor...")
             Parser._predictor = TaskPlannerPredictor()
             logger.info("Parser model loaded successfully")
+
+    def _ensure_loaded(self):
+        """Ensure model is loaded before use."""
+        if Parser._predictor is None:
+            self._load_model()
 
     @classmethod
     def get_instance(cls) -> "Parser":
@@ -131,6 +136,7 @@ class Parser:
             NlpAddPayload: Parsed task with {value, predicted} fields
             None on error
         """
+        self._ensure_loaded()
         try:
             raw_output = self._predictor.predict_add(prompt)
             return self._convert_to_nlp_add_payload(raw_output)
@@ -154,6 +160,7 @@ class Parser:
             Dict with values only (e.g., {"importance": 0.95})
             None on error or invalid output
         """
+        self._ensure_loaded()
         try:
             task_dict = self._task_payload_to_dict(existing_task)
             raw_output = self._predictor.predict_modify(task_dict, change_prompt)

@@ -4,6 +4,7 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.api import api_router
+from app.core.config import settings
 from app.core.logging_config import setup_logging
 from app.utils.cleanup import run_cleanup_loop
 
@@ -38,6 +39,12 @@ async def startup_event():
     It initializes the background garbage collector.
     """
     logger.info("VM.AI Backend Starting...")
+
+    # Pre-load AI models if lazy loading is disabled
+    if not settings.LAZY_LOADING:
+        from app.services.model_loader import load_all_models
+        load_all_models()
+
     # Start the cleanup loop in the background
     asyncio.create_task(run_cleanup_loop())
 

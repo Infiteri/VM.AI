@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     SCHEDULER_TIMEOUT_SECONDS: int = 12
     SCHEDULER_MAX_DISPLACEMENT_LAYERS: int = 1
+    LAZY_LOADING: bool = True
 
 
     class Config:
