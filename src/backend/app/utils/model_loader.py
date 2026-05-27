@@ -20,4 +20,8 @@ def load_all_models():
     _ = task_matcher.model
     logger.info("  Task matcher model loaded")
 
+    from app.services.img_to_prompt import ImgToPrompt
+    ImgToPrompt.get_instance()
+    logger.info("  Image-to-prompt service loaded")
+
     logger.info("All AI models loaded successfully")

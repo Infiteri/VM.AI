@@ -42,7 +42,7 @@ async def startup_event():
 
     # Pre-load AI models if lazy loading is disabled
     if not settings.LAZY_LOADING:
-        from app.services.model_loader import load_all_models
+        from app.utils.model_loader import load_all_models
         load_all_models()
 
     # Start the cleanup loop in the background
