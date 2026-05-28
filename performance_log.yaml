@@ -1444,3 +1444,76 @@
     recurrence_days: null
   error: null
 
+- timestamp: '2026-05-28T16:31:31.367377'
+  mode: add
+  input: gym at 6am every Monday
+  raw_output: name=gym[EXP] | difficulty=0.33[PRD] | duration=45<extra_id_47> | category=fitness<extra_id_51>
+    | importance=0.42<extra_id_86> | fixed_time=true<extra_id_59> | fixed-start=06:00<extra_id_53>
+    | recurrent=truE<extra_id_96> | recurring=truTruE<extra_id_88> | awaiting<extra_id_31>
+  parsed:
+    name: gym
+    start: null
+    deadline: null
+    difficulty: '0.387'
+    duration: '45'
+    category: fitness
+    location: null
+    importance: '0.994'
+    fixed_time: true
+    fixed_start: 06:00
+    recurrent: true
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-28T16:31:32.360117'
+  mode: add
+  input: finish report by Friday
+  raw_output: name=finish report[EXP] | deadline=Friday[PRD] | difficulty=0.56<extra_id_47>
+    | duration=45<extra_id_51> | category=work<extra_id_59> | importance=0.48<extra_id_31>
+    | fixed_time=false<extra_id_53> | recurrent=fale<extra_id_86>
+  parsed:
+    name: finish report
+    start: null
+    deadline: Friday
+    difficulty: '0.258'
+    duration: '45'
+    category: work
+    location: null
+    importance: '0.990'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-28T16:31:33.225326'
+  mode: add
+  input: hard workout at the gym with John
+  raw_output: name=workout[EXP] | difficulty=0.85[PRD] | duration=60<extra_id_51>
+    | category=fitness<extra_id_59> | importance=0.47<extra_id_47> | fixed_time=false<extra_id_53>
+    | recurrent=fale<extra_id_31>
+  parsed:
+    name: workout
+    start: null
+    deadline: null
+    difficulty: '0.555'
+    duration: '60'
+    category: fitness
+    location: null
+    importance: '1.000'
+    fixed_time: false
+    fixed_start: null
+    recurrent: fale
+    recurrence_days: null
+  error: null
+
+- timestamp: '2026-05-28T16:31:33.555012'
+  mode: modify
+  input: end
+  raw_output: end=false[EXP]
+  parsed:
+    difficulty: '0.160'
+    importance: '0.551'
+    recurrent: false
+  error: null
+

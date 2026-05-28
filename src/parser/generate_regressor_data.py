@@ -94,7 +94,6 @@ TASK_VERB_CATEGORY = {
 TASKS = list(TASK_VERB_CATEGORY.keys())
 
 FRAMES = [
-    # ── Very easy / very low importance ──
     ("{v} {t} quick and easy", 0.0, 0.1, 0.05, 0.18, set()),
     ("{v} {t} easy no effort", 0.0, 0.08, 0.05, 0.15, set()),
     ("{v} {t} takes no time", 0.0, 0.1, 0.05, 0.18, set()),
@@ -102,7 +101,6 @@ FRAMES = [
     ("{v} {t} quick nothing important", 0.02, 0.1, 0.05, 0.15, set()),
     ("{v} {t} barely anything", 0.0, 0.08, 0.05, 0.15, set()),
     ("{v} {t} quick doesn't matter", 0.02, 0.1, 0.02, 0.12, set()),
-    # ── Easy / low importance ──
     ("{v} {t} easy simple", 0.08, 0.2, 0.08, 0.2, set()),
     ("{v} {t} easy no big deal", 0.08, 0.18, 0.08, 0.18, set()),
     ("{v} {t} straightforward", 0.1, 0.22, 0.12, 0.25, set()),
@@ -111,7 +109,6 @@ FRAMES = [
     ("{v} {t} light and simple", 0.05, 0.15, 0.08, 0.2, set()),
     ("{v} {t} quick and simple", 0.05, 0.15, 0.08, 0.2, set()),
     ("easy {t} session", 0.08, 0.18, 0.08, 0.2, set()),
-    # ── Easy / high importance ──
     ("{v} {t} easy but critical", 0.05, 0.15, 0.8, 0.95, set()),
     ("{v} {t} quick but important", 0.05, 0.15, 0.75, 0.9, set()),
     ("{v} {t} easy very important", 0.08, 0.18, 0.8, 0.95, set()),
@@ -126,7 +123,6 @@ FRAMES = [
     ("{v} {t} thirty seconds can't skip", 0.03, 0.12, 0.85, 0.98, set()),
     ("{v} {t} takes no time top priority", 0.03, 0.12, 0.8, 0.95, set()),
     ("{v} {t} barely any effort extremely important", 0.05, 0.15, 0.85, 0.98, set()),
-    # ── Moderate / moderate importance ──
     ("{v} {t} moderate effort", 0.3, 0.5, 0.35, 0.5, set()),
     ("{v} {t} this week", 0.3, 0.5, 0.35, 0.55, set()),
     ("{v} {t} decent amount of work", 0.35, 0.55, 0.3, 0.5, set()),
@@ -135,12 +131,10 @@ FRAMES = [
     ("{v} {t} regular task", 0.3, 0.5, 0.3, 0.5, set()),
     ("{v} {t} standard routine", 0.3, 0.5, 0.3, 0.5, set()),
     ("{v} {t} should take some time", 0.35, 0.55, 0.3, 0.5, set()),
-    # ── Moderate / high importance ──
     ("{v} {t} important moderate effort", 0.3, 0.5, 0.6, 0.8, set()),
     ("{v} {t} important needs focus", 0.35, 0.55, 0.6, 0.8, set()),
     ("{v} {t} decent effort important", 0.3, 0.5, 0.55, 0.75, set()),
     ("{v} {t} medium priority", 0.3, 0.5, 0.5, 0.7, set()),
-    # ── Mid-range / balanced (fleshes out 0.3–0.7 importance zone) ──
     ("{v} {t} worthwhile effort", 0.3, 0.5, 0.5, 0.7, set()),
     ("{v} {t} solid mid level task", 0.35, 0.55, 0.4, 0.6, set()),
     ("{v} {t} fair amount of work", 0.35, 0.55, 0.35, 0.55, set()),
@@ -164,7 +158,6 @@ FRAMES = [
     ("{v} {t} kinda hard kinda matters", 0.45, 0.6, 0.45, 0.6, set()),
     ("{v} {t} decent work reasonable priority", 0.4, 0.55, 0.4, 0.6, set()),
     ("{v} {t} medium difficulty medium stakes", 0.4, 0.6, 0.4, 0.6, set()),
-    # ── Hard / moderate-high importance ──
     ("{v} {t} hard hard", 0.55, 0.75, 0.5, 0.7, set()),
     ("{v} {t} hard needs focus", 0.55, 0.75, 0.55, 0.75, set()),
     ("{v} {t} hard demanding", 0.6, 0.8, 0.55, 0.75, set()),
@@ -172,7 +165,6 @@ FRAMES = [
     ("{v} {t} hard quite important", 0.55, 0.75, 0.6, 0.8, set()),
     ("{v} {t} difficult needs doing", 0.55, 0.75, 0.5, 0.75, set()),
     ("hard {t} session", 0.55, 0.75, 0.5, 0.7, set()),
-    # ── Hard / critical importance ──
     ("{v} {t} hard critical", 0.55, 0.75, 0.85, 0.95, set()),
     ("{v} {t} hard very important", 0.55, 0.75, 0.8, 0.95, set()),
     ("{v} {t} difficult urgent", 0.55, 0.75, 0.8, 0.95, set()),
@@ -180,14 +172,12 @@ FRAMES = [
     ("{v} {t} hard cannot miss", 0.6, 0.8, 0.85, 0.95, set()),
     ("{v} {t} demanding critical", 0.6, 0.8, 0.85, 0.95, set()),
     ("{v} {t} complex very important", 0.6, 0.8, 0.8, 0.95, set()),
-    # ── Extreme / life-or-death ──
     ("{v} {t} extremely hard life or death", 0.8, 0.95, 0.9, 1.0, set()),
     ("{v} {t} brutal intense", 0.8, 0.95, 0.8, 0.95, set()),
     ("{v} {t} extremely complex critical", 0.75, 0.9, 0.85, 0.95, set()),
     ("{v} {t} grueling most important", 0.85, 0.98, 0.85, 0.95, set()),
     ("{v} {t} hardest thing ever very important", 0.85, 0.98, 0.9, 1.0, set()),
     ("{v} {t} extreme critical", 0.8, 0.95, 0.85, 0.95, set()),
-    # ── Hard / low importance (wasted effort) ──
     ("{v} {t} hard nobody cares", 0.6, 0.8, 0.05, 0.18, set()),
     ("{v} {t} difficult pointless", 0.6, 0.8, 0.05, 0.18, set()),
     ("{v} {t} hard doesn't matter", 0.55, 0.75, 0.05, 0.18, set()),
@@ -200,7 +190,6 @@ FRAMES = [
     ("{v} {t} exhausting low stakes", 0.6, 0.78, 0.08, 0.2, set()),
     ("{v} {t} technically hard completely optional", 0.6, 0.8, 0.08, 0.2, set()),
     ("{v} {t} massive effort basically useless", 0.7, 0.88, 0.05, 0.15, set()),
-    # ── Moderate / low importance ──
     ("{v} {t} moderate doesn't matter", 0.3, 0.5, 0.1, 0.28, set()),
     ("{v} {t} no rush", 0.25, 0.5, 0.15, 0.32, set()),
     ("{v} {t} not urgent", 0.25, 0.5, 0.15, 0.32, set()),
@@ -211,12 +200,10 @@ FRAMES = [
     ("{v} {t} can wait", 0.2, 0.45, 0.2, 0.38, set()),
     ("{v} {t} nice to have", 0.2, 0.4, 0.2, 0.38, set()),
     ("{v} {t} if time allows", 0.25, 0.5, 0.2, 0.35, set()),
-    # ── Easy / moderate importance ──
     ("{v} {t} easy should do", 0.08, 0.2, 0.45, 0.65, set()),
     ("{v} {t} simple worth doing", 0.08, 0.2, 0.45, 0.65, set()),
     ("{v} {t} quick but matters", 0.08, 0.18, 0.5, 0.7, set()),
     ("{v} {t} easy moderate important", 0.08, 0.2, 0.5, 0.7, set()),
-    # ── Negation patterns ──
     ("{v} {t} not hard", 0.08, 0.25, 0.2, 0.4, set()),
     ("{v} {t} not difficult", 0.08, 0.25, 0.2, 0.4, set()),
     ("{v} {t} not important", 0.2, 0.4, 0.1, 0.28, set()),
@@ -230,7 +217,6 @@ FRAMES = [
     ("{v} {t} easy low importance", 0.08, 0.2, 0.2, 0.38, set()),
     ("{v} {t} routine low stakes", 0.2, 0.4, 0.2, 0.38, set()),
     ("{v} {t} quick low value", 0.08, 0.2, 0.2, 0.35, set()),
-    # ── Simple statements ──
     ("easy {t}", 0.05, 0.2, 0.1, 0.25, set()),
     ("hard {t}", 0.55, 0.8, 0.4, 0.7, set()),
     ("quick {t}", 0.05, 0.15, 0.15, 0.32, set()),
@@ -245,17 +231,20 @@ FRAMES = [
     ("pointless {t}", 0.2, 0.4, 0.08, 0.2, set()),
     ("optional {t}", 0.2, 0.4, 0.15, 0.32, set()),
     ("mandatory {t}", 0.3, 0.5, 0.85, 0.98, set()),
+    ("{v} {t} tomorrow", 0.2, 0.4, 0.2, 0.4, set()),
+    ("{v} {t} next week", 0.2, 0.4, 0.15, 0.35, set()),
+    ("{v} {t} on Monday", 0.2, 0.4, 0.2, 0.4, set()),
+    ("{v} {t} at 6am", 0.2, 0.4, 0.2, 0.38, set()),
+    ("{v} {t} this evening", 0.2, 0.4, 0.15, 0.35, set()),
+    ("{v} {t} tonight", 0.2, 0.4, 0.2, 0.4, set()),
+    ("{v} {t} by noon", 0.25, 0.45, 0.25, 0.45, set()),
+    ("{v} {t} sometime this week", 0.2, 0.4, 0.15, 0.3, set()),
+    ("{v} {t} in the morning", 0.2, 0.4, 0.2, 0.38, set()),
+    ("{v} {t} before lunch", 0.2, 0.4, 0.2, 0.4, set()),
 ]
 
-# ---------------------------------------------------------------------------
-# Sentence-level modifiers (adds variety without changing meaning)
-# ---------------------------------------------------------------------------
 
-# Reserved for future use (removed — user wants simple direct language)
 
-# ---------------------------------------------------------------------------
-# Hard-coded edge cases
-# ---------------------------------------------------------------------------
 
 EDGE_CASES = [
     ("absolutely impossible", 0.99, 0.95),
@@ -323,7 +312,6 @@ def main():
     entries = []
     attempts = 0
 
-    # Interleave: cycle through quadrants every 4 frames
     quadrant_frames = []
     buckets = [
         (0.0, 0.45, 0.0, 0.45, "lo/lo"),
@@ -332,7 +320,6 @@ def main():
         (0.55, 1.0, 0.55, 1.0, "hi/hi"),
     ]
 
-    # Score each frame by quadrant distance
     def frame_quadrant(dl, dh, il, ih):
         cx = (dl + dh) / 2
         cy = (il + ih) / 2
@@ -349,12 +336,10 @@ def main():
 
     frame_quads = [frame_quadrant(*f[1:5]) for f in FRAMES]
 
-    # Build quadrant-indexed frame lists
     quad_frames = [[] for _ in range(4)]
     for i, q in enumerate(frame_quads):
         quad_frames[q].append(i)
 
-    # Generate with balanced quadrants
     target_per_quad = args.count // 4
     quad_counts = [0, 0, 0, 0]
     cycle = 0
@@ -362,7 +347,6 @@ def main():
     while len(entries) < args.count and attempts < args.count * 8:
         attempts += 1
 
-        # Pick which quadrant to sample from (fill emptiest first)
         if len(entries) < args.count * 0.8:
             qi = cycle % 4
             cycle += 1
@@ -370,7 +354,6 @@ def main():
             qi = min(range(4), key=lambda i: quad_counts[i])
 
         if quad_counts[qi] >= target_per_quad + 10:
-            # This quadrant is full, try any
             qi = random.randint(0, 3)
 
         frame_pool = quad_frames[qi]
@@ -394,7 +377,6 @@ def main():
         if len(sentence.split()) < 3:
             continue
 
-        # Contradiction check
         s_lower = sentence.lower()
         urgent = {"urgent", "asap", "critical", "can't wait", "emergency"}
         low_imp = {
@@ -412,27 +394,22 @@ def main():
         entries.append((sentence, diff, imp))
         quad_counts[qi] += 1
 
-    # Append edge cases
     for text, diff, imp in EDGE_CASES:
         key = text.lower()
         if key not in used:
             used.add(key)
             entries.append((text, diff, imp))
-            # find quadrant
             qi = min(3, max(0, int(diff > 0.5) * 2 + int(imp > 0.5)))
             quad_counts[qi] += 1
 
-    # Shuffle before write so edge cases aren't always at end
     random.shuffle(entries)
 
-    # Write CSV
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["text", "difficulty", "importance"])
         writer.writerows(entries)
 
-    # Stats
     diffs = [e[1] for e in entries]
     imps = [e[2] for e in entries]
     n = len(entries)
