@@ -19,17 +19,30 @@ LOCATIONS = {
 }
 
 DURATION_RANGES = {
-    "work": (30, 120), "health": (20, 60), "personal": (15, 90),
-    "errand": (10, 45), "social": (60, 180), "study": (30, 120),
+    "work": (30, 120),
+    "health": (20, 60),
+    "personal": (15, 90),
+    "errand": (10, 45),
+    "social": (60, 180),
+    "study": (30, 120),
 }
 
 TRAVEL_OVERHEAD = {
-    "home": 0, "office": 15, "gym": 20, "store": 10, "cafe": 10, "outdoor": 25,
+    "home": 0,
+    "office": 15,
+    "gym": 20,
+    "store": 10,
+    "cafe": 10,
+    "outdoor": 25,
 }
 
 CATEGORY_MULTIPLIERS = {
-    "work": 1.08, "health": 1.15, "personal": 0.88,
-    "errand": 0.92, "social": 1.02, "study": 1.05,
+    "work": 1.08,
+    "health": 1.15,
+    "personal": 0.88,
+    "errand": 0.92,
+    "social": 1.02,
+    "study": 1.05,
 }
 
 CORRELATIONS = {
@@ -112,7 +125,9 @@ def main():
 
         if random.random() < 0.50:
             current_hour = random.randint(6, 22)
-            fixed_decimal = random.randint(8, 23) + random.choice([0.0, 0.25, 0.30, 0.5, 0.75])
+            fixed_decimal = random.randint(max(8, current_hour), 23) + random.choice(
+                [0.0, 0.25, 0.30, 0.5, 0.75]
+            )
             if fixed_decimal > 23.75:
                 fixed_decimal = 23.75
             time_diff = round(fixed_decimal - current_hour, 2)
@@ -141,12 +156,34 @@ def main():
             if real_duration < 1.0:
                 real_duration = round(random.uniform(1.0, 3.0), 1)
 
-        entries.append([difficulty, importance, scheduled, category, location, fixed_time, time_diff, real_duration])
+        entries.append(
+            [
+                difficulty,
+                importance,
+                scheduled,
+                category,
+                location,
+                fixed_time,
+                time_diff,
+                real_duration,
+            ]
+        )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["difficulty", "importance", "scheduled_duration", "category", "location", "fixed_time", "time_difference", "real_duration"])
+        w.writerow(
+            [
+                "difficulty",
+                "importance",
+                "scheduled_duration",
+                "category",
+                "location",
+                "fixed_time",
+                "time_difference",
+                "real_duration",
+            ]
+        )
         w.writerows(entries)
 
     durations = [e[7] for e in entries]
@@ -156,14 +193,20 @@ def main():
     print(f"Generated {len(entries)} rows (seed={seed})")
     print(f"Output: {output_path}")
     print(f"  Undoable (real=0): {undoable} ({100 * undoable // len(entries)}%)")
-    print(f"  Real dur nonzero: min={min(nonzero):.1f} max={max(nonzero):.1f} mean={sum(nonzero) / len(nonzero):.1f}")
-    print(f"  Deadline: {sum(1 for e in entries if e[6] != -1)} ({100 * sum(1 for e in entries if e[6] != -1) // len(entries)}%)")
+    print(
+        f"  Real dur nonzero: min={min(nonzero):.1f} max={max(nonzero):.1f} mean={sum(nonzero) / len(nonzero):.1f}"
+    )
+    print(
+        f"  Deadline: {sum(1 for e in entries if e[6] != -1)} ({100 * sum(1 for e in entries if e[6] != -1) // len(entries)}%)"
+    )
     print()
     print("  Samples:")
     for e in random.sample(entries, min(10, len(entries))):
         td = "no" if e[6] == -1 else f"{e[6]:+.1f}h"
         ft = e[5] if e[5] else "  -  "
-        print(f"    diff={e[0]:.2f} imp={e[1]:.2f} dur={e[2]:3d} cat={e[3]:8s} loc={e[4]:7s} td={td:6s}  real={e[7]:.1f} | ft={ft}")
+        print(
+            f"    diff={e[0]:.2f} imp={e[1]:.2f} dur={e[2]:3d} cat={e[3]:8s} loc={e[4]:7s} td={td:6s}  real={e[7]:.1f} | ft={ft}"
+        )
 
 
 if __name__ == "__main__":
