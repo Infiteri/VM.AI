@@ -79,13 +79,13 @@ Early versions used a small dataset and produced poor results (all predictions n
 
 The remaining ~30–40% un-explained variance comes from factors the text alone can't capture: user energy levels, external deadlines, mood, and personal inconsistency over hundreds of labels.
 
-![Difficulty predictions](assets/regressors/difficulty/predictions.png)
+![Difficulty predictions](../assets/regressors/difficulty/predictions.png)
 *Difficulty: predicted vs actual (large dataset)*
 
-![Importance predictions](assets/regressors/importance/predictions.png)
+![Importance predictions](../assets/regressors/importance/predictions.png)
 *Importance: predicted vs actual (large dataset)*
 
-![Bad model example](assets/regressors/bad_model_example.png)
+![Bad model example](../assets/regressors/bad_model_example.png)
 *Before expanding the training dataset — all predictions near the mean*
 
 ### Integration

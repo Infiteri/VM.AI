@@ -108,23 +108,23 @@ A separate RandomForest classifier predicts whether `real_duration = 0` (undoabl
 - **5-fold CV MAE**: consistent within ~2 minutes — no overfitting
 - **Weak areas**: rare categories with few examples, extreme long-tail durations
 
-![Model comparison](assets/regressors/duration/model_comparison.png)
+![Model comparison](../assets/regressors/duration/model_comparison.png)
 *Ridge vs RandomForest vs XGBoost — XGBoost wins on both MAE and R²*
 
-![Feature importance](assets/regressors/duration/feature_importance.png)
+![Feature importance](../assets/regressors/duration/feature_importance.png)
 *Top features: scheduled_duration, difficulty, importance, time_difference*
 
-![Learning curve](assets/regressors/duration/learning_curve.png)
+![Learning curve](../assets/regressors/duration/learning_curve.png)
 *Diminishing returns past ~60% of training data*
 
-![Learning rate sensitivity](assets/regressors/duration/lr_sensitivity.png)
+![Learning rate sensitivity](../assets/regressors/duration/lr_sensitivity.png)
 *U-shaped curve — 0.05 is optimal, 0.01 underfits, 0.2 diverges*
 
 ### Residuals
 
 Residuals are roughly normal centered at 0, with heavier tails for categories with high variance (social, work). Per-category error analysis in the notebook identifies which categories need more training data.
 
-![Residuals](assets/regressors/duration/residuals.png)
+![Residuals](../assets/regressors/duration/residuals.png)
 *Residual distribution centered at 0, heavier tails for high-variance categories*
 
 ### Feature Importance
