@@ -1,6 +1,6 @@
 # VM.AI - Natural Language Task Parser
 
-VM.AI is an AI-driven personal scheduling system that transforms natural language task descriptions into structured, actionable task data. The system uses a combination of rule-based parsing and machine learning to extract task attributes such as category, difficulty, importance, duration, deadline, location, and recurrence patterns.
+VM.AI is an AI-driven personal scheduling system that transforms natural language task descriptions into structured, actionable task data. The system uses a fine-tuned T5-base model for structured parsing, a RidgeCV regressor for difficulty and importance prediction from text embeddings, and a rule-based parser for add mode — together extracting attributes such as category, difficulty, importance, duration, deadline, location, and recurrence patterns.
 
 ## Problem Description
 
@@ -23,7 +23,8 @@ VM.AI/
 │   │   └── tests/      # Backend API tests
 │   └── app/              # React frontend (npm run dev)
 ├── models/
-│   └── finetuned_parser/ # Trained T5 model (after training)
+│   ├── finetuned_parser/ # Trained T5 model (after training)
+│   └── regressors/       # RidgeCV diff/imp + XGBoost duration models
 ├── data/                 # Training datasets
 ├── tests/                # Parser test suite
 ├── scripts/              # Visualization and utility scripts
@@ -118,7 +119,7 @@ The application will be available at: http://localhost:5173
 
 ## Datasets
 
-The model is trained on three datasets:
+The T5 parser is trained on three datasets:
 
 ### 1. Synthetic Dataset (VMAI_SYNTHETIC_Data.yaml)
 
@@ -137,10 +138,15 @@ The model is trained on three datasets:
 - Targeted examples for fields the model struggles with
 - Focused on improving weak areas identified during evaluation
 
-Both datasets are human-written (no public datasets used). All data follows the pipe-format schema with EXP/PRD tags:
+All T5 data follows the pipe-format schema with EXP/PRD tags:
 
 - `[EXP]` - Explicit field (user stated the value directly)
 - `[PRD]` - Predicted field (model inferred the value)
+
+Two additional generated datasets support the ML services:
+
+- **VMAI_REGR_Data.csv** — Task text with difficulty/importance labels, used to train the RidgeCV regressors
+- **VMAI_DURATION_Data.csv** — Tabular features (difficulty, importance, scheduled duration, category, location, deadline) with real_duration labels, used to train the XGBoost duration model
 
 ## Training Pipeline
 
@@ -251,16 +257,9 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 Detailed documentation is available in the `docs/` folder:
 
 | Document | Description |
-|---|---|---|
-| Full_Project_Overview.md | Full project overview and architecture |
-| VM.AI_Backend_Architecture.md | Backend architecture details |
-| Frontend_API_Documentation.md | Frontend API documentation |
-| Database_Schema_Documentation.md | Database schema reference |
-| Parser.md | NLP parser module documentation |
-| Task_Matching_Module_v1.md | Task matching module |
-| Scheduling_Engine_v1.md | Scheduling engine documentation |
-| Enrichment_module_v1.md | Data enrichment module |
-| Stats_Recorder_v1.md | Statistics recording module |
+|---|---|
+| [Parser.md](docs/Parser.md) | NLP parser module — T5 model, RidgeCV regressor, inference pipeline |
+| [Duration.md](docs/Duration.md) | Duration prediction model — XGBoost on tabular features |
 
 ## Library Versions
 
@@ -281,7 +280,7 @@ Key dependencies:
 
 - The model is trained on a limited dataset size
 - Performance may vary for unusual or ambiguous task descriptions
-- Category and difficulty inference is based on keyword patterns
+- Category inference is based on keyword patterns; difficulty and importance are predicted by a RidgeCV regressor
 
 ### Technical Limitations
 
@@ -301,7 +300,7 @@ Key dependencies:
 
 - Predicted fields (PRD) are inferred and may not always be accurate
 - The model should not be used for critical decision-making without human oversight
-- Duration and deadline extraction depends on clear language patterns
+- Duration is predicted by a separate XGBoost model on tabular features outside the parser pipeline
 
 ## Repository Structure
 
