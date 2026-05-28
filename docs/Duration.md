@@ -47,6 +47,15 @@ The generator simulates realistic duration behavior:
 - **Deadline rush** — if deadline has < 100% of scheduled time remaining → duration reduced by 12–25%
 - **Noise** — gaussian noise proportional to scheduled duration, capped at 3.5x scheduled
 
+![Data distributions](assets/regressors/duration/distributions.png)
+*Feature distributions and target (real_duration)*
+
+![Correlation heatmap](assets/regressors/duration/correlation.png)
+*Correlation between numeric features*
+
+![Category and location effects](assets/regressors/duration/cat_loc_effects.png)
+*Mean real_duration by category and location*
+
 ## Feature Pipeline
 
 At training time, `ColumnTransformer` with `SimpleImputer(strategy="constant", fill_value=-1)` handles missing values and `OneHotEncoder` handles categories.
@@ -99,9 +108,24 @@ A separate RandomForest classifier predicts whether `real_duration = 0` (undoabl
 - **5-fold CV MAE**: consistent within ~2 minutes — no overfitting
 - **Weak areas**: rare categories with few examples, extreme long-tail durations
 
+![Model comparison](assets/regressors/duration/model_comparison.png)
+*Ridge vs RandomForest vs XGBoost — XGBoost wins on both MAE and R²*
+
+![Feature importance](assets/regressors/duration/feature_importance.png)
+*Top features: scheduled_duration, difficulty, importance, time_difference*
+
+![Learning curve](assets/regressors/duration/learning_curve.png)
+*Diminishing returns past ~60% of training data*
+
+![Learning rate sensitivity](assets/regressors/duration/lr_sensitivity.png)
+*U-shaped curve — 0.05 is optimal, 0.01 underfits, 0.2 diverges*
+
 ### Residuals
 
 Residuals are roughly normal centered at 0, with heavier tails for categories with high variance (social, work). Per-category error analysis in the notebook identifies which categories need more training data.
+
+![Residuals](assets/regressors/duration/residuals.png)
+*Residual distribution centered at 0, heavier tails for high-variance categories*
 
 ### Feature Importance
 

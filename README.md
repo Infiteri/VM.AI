@@ -242,15 +242,15 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 
 ### Real Dataset
 
-![Real Overview](assets/real_overview.png)
+![Real Overview](assets/parser/real_overview.png)
 
 ### Specific Dataset
 
-![Specific Overview](assets/specific_overview.png)
+![Specific Overview](assets/parser/specific_overview.png)
 
 ### Synthetic Dataset
 
-![Synthetic Overview](assets/synthetic_overview.png)
+![Synthetic Overview](assets/parser/synthetic_overview.png)
 
 ## Documentation
 
