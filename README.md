@@ -254,12 +254,7 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 
 ## Documentation
 
-Detailed documentation is available in the `docs/` folder:
-
-| Document | Description |
-|---|---|
-| [Parser.md](docs/Parser.md) | NLP parser module — T5 model, RidgeCV regressor, inference pipeline |
-| [Duration.md](docs/Duration.md) | Duration prediction model — XGBoost on tabular features |
+Detailed documentation covering all project components is available in the `docs/` folder.
 
 ## Library Versions
 
