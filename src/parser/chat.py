@@ -7,6 +7,7 @@ Written by: Vanea
 """
 
 import json
+import logging
 import os
 import re
 from datetime import datetime
@@ -26,6 +27,8 @@ from schemas import (
     schema_to_pipe,
 )
 from transformers import AutoTokenizer, T5ForConditionalGeneration
+
+_uvicorn_log = logging.getLogger("uvicorn")
 
 LOG_FILE = "performance_log.yaml"
 
@@ -53,18 +56,18 @@ def log_entry(mode: str, sentence: str, raw_output: str, parsed_result: Dict):
 class TaskPlannerPredictor:
     def __init__(self):
         cfg = Config()
-        print("Loading model...")
+        _uvicorn_log.info("Loading T5 model...")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(cfg.output_dir)
         self.model = T5ForConditionalGeneration.from_pretrained(cfg.output_dir)
         self.model.to(self.device)
         self.model.eval()
         self._last_raw_output = ""
-        print(f"OK T5 model ready ({self.device})")
+        _uvicorn_log.info(f"T5 model ready ({self.device})")
 
-        print("Loading regressor...")
+        _uvicorn_log.info("Loading regressor...")
         self.regressor = RegressorPredictor()
-        print("OK Regressor ready")
+        _uvicorn_log.info("Regressor ready")
 
     _TIME_RE = re.compile(
         r"\b(\d{1,2}:\d{2}|\d{1,2}\s*[ap]m|@\s*\d{1,2})\b", re.IGNORECASE

@@ -50,17 +50,23 @@ PROMPT_TEMPLATES = {
 DEFAULT_TEMPLATE = "Occupied time on {day} at {time}"
 
 
+EXIF_DATETIME_TAGS = [36867, 36868, 306]  # DateTimeOriginal, DateTimeDigitized, DateTime
+
+
 def _parse_exif_datetime(image: Image.Image) -> Optional[datetime]:
-    """Parse DateTimeOriginal from EXIF string (YYYY:MM:DD HH:MM:SS) into a datetime object."""
+    """Try multiple EXIF datetime tags, return first found."""
     try:
-        exif_data = image._getexif()
+        exif_data = image.getexif()
         if exif_data is None:
+            logger.info("No EXIF data found in image")
             return None
-        raw_str = exif_data.get(36867)
-        if raw_str is None:
-            return None
-        logger.info(f"EXIF datetime found: {raw_str}")
-        return datetime.strptime(raw_str, "%Y:%m:%d %H:%M:%S")
+        for tag in EXIF_DATETIME_TAGS:
+            raw_str = exif_data.get(tag)
+            if raw_str is not None:
+                logger.info(f"EXIF tag {tag} found: {raw_str}")
+                return datetime.strptime(raw_str, "%Y:%m:%d %H:%M:%S")
+        logger.info(f"No EXIF datetime tag found (tried tags: {EXIF_DATETIME_TAGS})")
+        return None
     except Exception as e:
         logger.warning(f"Failed to parse EXIF datetime: {e}")
         return None
@@ -106,12 +112,13 @@ class ImgToPrompt:
             cls._instance = cls()
         return cls._instance
 
-    def classify(self, image: Image.Image) -> dict:
+    def classify(self, image: Image.Image, file_mtime: Optional[datetime] = None) -> dict:
         """
         Classify an image and generate a task prompt.
 
         Args:
             image: PIL Image (any format, will be converted to RGB).
+            file_mtime: Optional file modification time from upload metadata.
 
         Returns:
             dict with:
@@ -125,17 +132,23 @@ class ImgToPrompt:
         image = image.convert("RGB")
         logger.info(f"Image converted to RGB: {image.size[0]}x{image.size[1]}")
 
-        # Extract EXIF datetime
+        # Extract EXIF datetime (tries multiple tags)
         dt = _parse_exif_datetime(image)
         if dt is not None:
             day = dt.strftime("%A")
             time_str = _round_to_5min(dt)
             logger.info(f"EXIF parsed: day={day}, time={time_str}")
+        elif file_mtime is not None:
+            logger.info(f"No EXIF datetime, using file modification time: {file_mtime}")
+            dt = file_mtime
+            day = dt.strftime("%A")
+            time_str = _round_to_5min(dt)
+            logger.info(f"File mtime parsed: day={day}, time={time_str}")
         else:
             tomorrow = datetime.now() + timedelta(days=1)
             day = "tomorrow"
             time_str = "08:00"
-            logger.info(f"No EXIF datetime, using fallback: {day} at {time_str}")
+            logger.info(f"No EXIF datetime or file mtime, using fallback: {day} at {time_str}")
 
         # Classify via predict.py
         logger.info("Running model prediction...")

@@ -151,7 +151,7 @@ async def parse_from_image(
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file")
 
-    result = img_to_prompt.classify(image)
+    result = img_to_prompt.classify(image, file.last_modified)
     return Response(content=result["prompt"], media_type="text/plain")
 
 
