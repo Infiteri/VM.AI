@@ -12,7 +12,7 @@ Usage:
 
 import io
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
@@ -112,13 +112,12 @@ class ImgToPrompt:
             cls._instance = cls()
         return cls._instance
 
-    def classify(self, image: Image.Image, file_mtime: Optional[datetime] = None) -> dict:
+    def classify(self, image: Image.Image) -> dict:
         """
         Classify an image and generate a task prompt.
 
         Args:
             image: PIL Image (any format, will be converted to RGB).
-            file_mtime: Optional file modification time from upload metadata.
 
         Returns:
             dict with:
@@ -138,17 +137,12 @@ class ImgToPrompt:
             day = dt.strftime("%A")
             time_str = _round_to_5min(dt)
             logger.info(f"EXIF parsed: day={day}, time={time_str}")
-        elif file_mtime is not None:
-            logger.info(f"No EXIF datetime, using file modification time: {file_mtime}")
-            dt = file_mtime
+        else:
+            dt = datetime.now()
+            logger.info(f"No EXIF datetime, using current server time: {dt}")
             day = dt.strftime("%A")
             time_str = _round_to_5min(dt)
-            logger.info(f"File mtime parsed: day={day}, time={time_str}")
-        else:
-            tomorrow = datetime.now() + timedelta(days=1)
-            day = "tomorrow"
-            time_str = "08:00"
-            logger.info(f"No EXIF datetime or file mtime, using fallback: {day} at {time_str}")
+            logger.info(f"Server time parsed: day={day}, time={time_str}")
 
         # Classify via predict.py
         logger.info("Running model prediction...")

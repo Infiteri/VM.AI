@@ -1,6 +1,6 @@
 import io
 
-from fastapi import APIRouter, Depends, Query, status, Path, HTTPException, UploadFile, File, Response
+from fastapi import APIRouter, Depends, Query, status, Path, HTTPException, UploadFile, File
 from PIL import Image
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -151,8 +151,8 @@ async def parse_from_image(
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file")
 
-    result = img_to_prompt.classify(image, file.last_modified)
-    return Response(content=result["prompt"], media_type="text/plain")
+    result = img_to_prompt.classify(image)
+    return {"prompt": result["prompt"]}
 
 
 # ---------------------------------------------------------
