@@ -31,7 +31,7 @@ def setup_logging():
 
     # Console Handler: Shows only WARNING+ to keep terminal clean
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.WARNING)
+    console_handler.setLevel(logging.ERROR)
     console_handler.setFormatter(formatter)
 
     logger.addHandler(file_handler)

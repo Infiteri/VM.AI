@@ -44,6 +44,18 @@ val_transform = transforms.Compose([
 _model_cache: Optional[dict] = None
 
 
+def load_model(model_path: str = _DEFAULT_MODEL_PATH) -> None:
+    """Eagerly load the model checkpoint into the global cache (used by model_loader)."""
+    global _model_cache
+    if _model_cache is not None and _model_cache["path"] == model_path:
+        return
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    _model_cache = {
+        "model": _load_model(model_path, device),
+        "path": model_path,
+    }
+
+
 def _load_model(model_path: str, device: torch.device):
     """Load model checkpoint and return (model, device)."""
     _uvicorn_log.info("Loading image classifier model...")

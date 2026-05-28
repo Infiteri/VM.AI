@@ -112,6 +112,11 @@ class ImgToPrompt:
             cls._instance = cls()
         return cls._instance
 
+    def load(self):
+        """Eagerly load the image classifier model into memory (used by model_loader)."""
+        from predict import load_model as _load_clf
+        _load_clf(settings.CLASSIFIER_MODEL_PATH)
+
     def classify(self, image: Image.Image) -> dict:
         """
         Classify an image and generate a task prompt.

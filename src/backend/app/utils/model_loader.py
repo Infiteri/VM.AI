@@ -16,7 +16,7 @@ def load_all_models():
     _uvicorn_log.info("Pre-loading all AI models at startup...")
 
     from app.services.parser import Parser
-    Parser.get_instance()
+    Parser.get_instance().load()
     _uvicorn_log.info("  Parser model loaded")
 
     from app.services.task_matcher import task_matcher
@@ -24,7 +24,7 @@ def load_all_models():
     _uvicorn_log.info("  Task matcher model loaded")
 
     from app.services.img_to_prompt import ImgToPrompt
-    ImgToPrompt.get_instance()
+    ImgToPrompt.get_instance().load()
     _uvicorn_log.info("  Image-to-prompt service loaded")
 
     _uvicorn_log.info("All AI models loaded successfully")
