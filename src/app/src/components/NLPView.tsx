@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { ArrowUp, ImagePlus } from "lucide-react";
 import { api } from "../services/api";
 import type { Task } from "../types/Task";
 
@@ -13,8 +13,10 @@ export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProp
     const [modeText, setModeText] = useState("Add");
     const [inputText, setInputText] = useState("");
     const [loading, setLoading] = useState(false);
+    const [imageLoading, setImageLoading] = useState(false);
     const [error, setError] = useState("");
     const [parsedResult, setParsedResult] = useState<Task | null>(initialTask ?? null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (mode === "add") setModeText("Add");
@@ -63,6 +65,22 @@ export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProp
         }
     };
 
+    const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImageLoading(true);
+        setError("");
+        try {
+            const result = await api.parseFromImage(file);
+            setInputText(result.prompt);
+        } catch (err: any) {
+            setError(err.message || "Failed to parse image");
+        } finally {
+            setImageLoading(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
     return (
         <div className="flex flex-col items-center justify-between h-full py-24 px-8 bg-main">
             <div className="flex flex-col items-center gap-2">
@@ -92,6 +110,15 @@ export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProp
                 )}
 
                 <div className="relative mt-auto">
+                    {mode === "add" && (
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            ref={fileInputRef}
+                            onChange={handleImageSelect}
+                            className="hidden"
+                        />
+                    )}
                     <input
                         type="text"
                         placeholder="Add a new task"
@@ -99,8 +126,25 @@ export default function NLPView({ mode, initialTask, onParsedTask }: NLPViewProp
                         onChange={(e) => setInputText(e.target.value)}
                         onKeyDown={handleKeyPress}
                         disabled={loading}
-                        className="w-full bg-main border border-white/10 rounded-2xl py-4 px-6 text-main placeholder:text-main/20 outline-none focus:border-main-font/40 transition-colors pr-14"
+                        className={`w-full bg-main border border-white/10 rounded-2xl py-4 pr-14 text-main placeholder:text-main/20 outline-none focus:border-main-font/40 transition-colors ${mode === "add" ? "pl-14" : "px-6"}`}
                     />
+                    {mode === "add" && (
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={imageLoading}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 bg-main-font/10 p-2 rounded-xl hover:bg-main-font/20 active:scale-95 transition-all disabled:opacity-50"
+                        >
+                            {imageLoading ? (
+                                <svg className="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                            ) : (
+                                <ImagePlus size={20} className="text-main-font" />
+                            )}
+                        </button>
+                    )}
                     <button 
                         onClick={handleSubmit}
                         disabled={loading || !inputText.trim()}

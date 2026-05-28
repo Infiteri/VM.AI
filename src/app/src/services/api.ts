@@ -85,6 +85,27 @@ export const api = {
     });
   },
 
+  parseFromImage: async (file: File): Promise<{ prompt: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${BASE_URL}/tasks/parse/from-image`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      let errorMsg = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          errorMsg = typeof errorData.detail === "string"
+            ? errorData.detail : JSON.stringify(errorData.detail);
+        }
+      } catch (e) { /* ignore */ }
+      throw new Error(errorMsg);
+    }
+    return response.json();
+  },
+
   runScheduler: async (): Promise<{
     success: boolean;
     scheduled_count: number;
