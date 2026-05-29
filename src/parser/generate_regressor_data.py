@@ -243,9 +243,6 @@ FRAMES = [
     ("{v} {t} before lunch", 0.2, 0.4, 0.2, 0.4, set()),
 ]
 
-
-
-
 EDGE_CASES = [
     ("absolutely impossible", 0.99, 0.95),
     ("literally takes 5 seconds", 0.01, 0.15),

@@ -47,3 +47,4 @@ dist-ssr
 !data/image_to_prompt/.gitkeep
 evaulation_contest/
 notebooks/temp.ipynb
+performance_log.yaml

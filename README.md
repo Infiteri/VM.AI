@@ -10,6 +10,40 @@ Beyond NLP, the system also supports image-based task classification (EfficientN
 
 This aligns with ONIA competition requirements by providing a practical solution that uses AI to solve a real-world problem in task planning and time management.
 
+## Problem Actuality
+
+Time management and task planning are universal challenges. Studies consistently show that professionals lose a significant portion of their workweek to scheduling, coordination, and low-value organizational tasks — time that could be spent on meaningful, productive work.
+
+| Statistic | Source |
+|---|---|
+| **4.4 hours/week** per person spent on scheduling activities (proposing times, checking availability, rescheduling, follow-ups) | [SkipUp / Doodle State of Meetings 2019, Reclaim.ai 2023](https://blog.skipup.ai/scheduling-salary-cost-of-manual-meeting-coordination/) |
+| **61%** of the workday is spent on "work about work" — searching for information, checking messages, duplicating effort — leaving only **24%** for skilled, mission-critical tasks | [Asana Anatomy of Work Report](https://asana.com/resources/anatomy-of-work) |
+| **$588 billion/year** lost by U.S. companies due to workplace interruptions and task-switching | [Hubstaff / Reuters](https://hubstaff.com/blog/time-management-statistics/) |
+| **82%** of people lack an effective time management system; **51%** of the workday is spent on low-to-no-value tasks | [Hubstaff / Zippia](https://hubstaff.com/blog/time-management-statistics/) |
+| **581 hours/person/year** lost to distractions — equivalent to **28%** of total working hours, costing **~$34,448/employee/year** | [The Economist Intelligence Unit](https://impact.economist.com/new-globalisation/in-search-of-lost-focus-2020/downloads/EIU_Dropbox_focus_executive_summary.pdf) |
+| **47%** of college students cite time management as their top academic challenge; **80%** procrastinate regularly | [Kahoot! Study Habits Snapshot 2024](https://kahoot.com/press/2024/10/29/study-habits-snapshot-2024/) |
+| **73%** of Moldovan employees consider time management a daily challenge; **68%** procrastinate, losing an average of **1.5 hours/day** | [aboutmoldova.md 2025–2026](https://aboutmoldova.md/ro/view_articles_post.php?id=2802) |
+| **52%** of Moldovan employees do not plan their day; only **34%** use any digital organization tool | [aboutmoldova.md](https://aboutmoldova.md/ro/view_articles_post.php?id=2393) |
+
+The cumulative cost is staggering. A professional spending 4.4 hours per week on manual scheduling loses roughly **229 hours per year** — nearly **6 full workweeks** — to coordination overhead alone. For an organization of 50 people, this translates to hundreds of thousands of dollars in lost productivity annually.
+
+### What VM.AI Solves
+
+VM.AI addresses this problem by **automating the entire task intake and scheduling pipeline**:
+
+- **From natural language to structured schedule in one step** — users describe tasks in plain language ("gym every Monday at 6am", "finish report by Friday") and the system parses them into organized, calendar-ready entries.
+- **No more manual data entry** — category, difficulty, importance, duration, deadline, location, and recurrence are all inferred automatically by 4 ML models working together.
+- **Image-based task input** — snap a photo of a whiteboard, flyer, or document and the system classifies it into a task category.
+- **Behavior-adaptive scheduling** — the system learns from user patterns over time, improving predictions for duration and priority.
+
+### Measurable Impact
+
+Based on existing studies and our internal benchmarks:
+
+- **Target:** Reduce task intake time by **50–70%** compared to manual calendar entry (e.g., typing into Google Calendar or a todo app).
+- **Target:** Eliminate **4+ hours/week** of scheduling overhead per user by replacing back-and-forth coordination with a single natural language input.
+- **Target:** Improve schedule adherence through accurate duration predictions and personalized difficulty/importance scoring.
+
 ## Team
 
 - Golban Ion
@@ -70,16 +104,19 @@ This downloads the trained T5 model to `models/finetuned_parser/`.
 ### Step 2: Configure Database
 
 1. Create a PostgreSQL database:
+
    ```sql
    CREATE DATABASE vmai_db;
    ```
 
 2. Navigate to backend directory:
+
    ```bash
    cd src/backend
    ```
 
 3. Copy the example environment file:
+
    ```bash
    copy .env.example .env    # Windows
    # cp .env.example .env    # Linux/Mac
@@ -170,6 +207,7 @@ python src/parser/train.py --mode [MODE]
 ```
 
 Available modes:
+
 - `both` - Mix of add and modify samples (recommended)
 - `synthetic` - Only synthetic data
 - `real` - Only real human examples
@@ -187,6 +225,7 @@ python src/parser/chat.py
 ```
 
 Commands:
+
 - `add: <task description>` - Parse a new task
 - `modify` - Modify the last added task
 - `end` - Exit
@@ -267,6 +306,7 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 ## Documentation
 
 Detailed documentation covering all project components is available in the `docs/` folder:
+
 - `docs/backend/` — Backend architecture, API documentation, database schema, enrichment module, scheduling engine, stats recorder
 - `docs/image_to_prompt/` — Image classification pipeline, data collection methodology, training configuration
 
