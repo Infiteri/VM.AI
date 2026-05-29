@@ -154,6 +154,14 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
   );
   const [categoryInput, setCategoryInput] = useState("");
 
+  const [durationPopup, setDurationPopup] = useState<{
+    visible: boolean;
+    loading: boolean;
+    predictedDuration?: number;
+    error?: string;
+    undoable?: boolean;
+  }>({ visible: false, loading: false });
+
   const handleFixedToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isFixed = e.target.checked;
     if (isFixed) {
@@ -416,6 +424,7 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
         </div>
       )}
 
+      <div className="flex gap-3 mt-2">
       <button
         onClick={async () => {
           if (!formData.name) {
@@ -478,10 +487,119 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
           }
         }}
         disabled={loading}
-        className="w-full bg-main-font text-background font-bold py-4 rounded-2xl text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-[0.2em] mt-2"
+        className="flex-1 bg-main-font text-background font-bold py-4 rounded-2xl text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-[0.2em]"
       >
         {loading ? "Creating..." : "Submit task"}
       </button>
+
+      <button
+        onClick={async () => {
+          const difficulty = formData.difficulty;
+          const importance = formData.importance;
+          const scheduled_duration = formData.duration;
+          const category = formData.category[0] ?? "";
+          const location = formData.location;
+          let fixed_time = "";
+          let time_difference = -1;
+          if (formData.fixed_start) {
+            const d = new Date(formData.fixed_start);
+            fixed_time = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+            time_difference = (d.getTime() - Date.now()) / (1000 * 60 * 60);
+          }
+          setDurationPopup({ visible: true, loading: true });
+          try {
+            const res = await api.predictDuration({
+              difficulty,
+              importance,
+              scheduled_duration,
+              category,
+              location,
+              fixed_time,
+              time_difference,
+            });
+            const timeRemainingMin = time_difference !== -1 ? time_difference * 60 : null;
+            const predictedTooBig = timeRemainingMin !== null && res.predicted_duration > timeRemainingMin;
+            setDurationPopup({
+              visible: true,
+              loading: false,
+              predictedDuration: res.predicted_duration,
+              undoable: res.predicted_duration === 0 || predictedTooBig,
+            });
+          } catch (err: any) {
+            const msg = err instanceof Error ? err.message : "Unknown error";
+            setDurationPopup({
+              visible: true,
+              loading: false,
+              error: msg,
+            });
+          }
+        }}
+        className="flex-1 border border-white/10 text-main-font/60 font-bold py-4 rounded-2xl text-lg uppercase tracking-[0.2em] hover:border-white/30 hover:text-main-font transition-all"
+      >
+        Verify duration
+      </button>
+      </div>
+
+      {durationPopup.visible && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-slide-in"
+          onClick={() => setDurationPopup({ visible: false, loading: false })}
+        >
+          <div
+            className="bg-3 border border-white/10 rounded-[32px] p-8 shadow-glow max-w-sm w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {durationPopup.loading ? (
+              <p className="text-main-font/60 text-center text-lg">Predicting...</p>
+            ) : durationPopup.error ? (
+              <>
+                <h3 className="text-del text-lg font-semibold mb-2">Error</h3>
+                <p className="text-main-font/80">{durationPopup.error}</p>
+                <p className="text-main-font/40 text-sm mt-3">
+                  The server might not be running.
+                </p>
+                <button
+                  onClick={() => setDurationPopup({ visible: false, loading: false })}
+                  className="mt-5 w-full bg-main-font/10 text-main-font py-2.5 rounded-xl hover:bg-main-font/20 transition-all"
+                >
+                  Close
+                </button>
+              </>
+            ) : durationPopup.undoable ? (
+              <>
+                <h3 className="text-mod text-sm uppercase tracking-widest text-center mb-3 font-semibold">
+                  Undoable
+                </h3>
+                <p className="text-main-font/60 text-center text-sm mt-2">
+                  There isn't enough time to complete this task before its deadline.
+                </p>
+                <button
+                  onClick={() => setDurationPopup({ visible: false, loading: false })}
+                  className="mt-6 w-full bg-main-font/10 text-main-font/60 py-2.5 rounded-xl hover:bg-main-font/20 transition-all"
+                >
+                  Close
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-main-font/60 text-sm uppercase tracking-widest text-center mb-3">
+                  Predicted Duration
+                </h3>
+                <p className="text-main-font text-5xl font-light text-center">
+                  {durationPopup.predictedDuration}
+                  <span className="text-lg text-main-font/40 ml-1">min</span>
+                </p>
+                <button
+                  onClick={() => setDurationPopup({ visible: false, loading: false })}
+                  className="mt-6 w-full bg-main-font/10 text-main-font/60 py-2.5 rounded-xl hover:bg-main-font/20 transition-all"
+                >
+                  Close
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

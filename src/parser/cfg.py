@@ -5,10 +5,13 @@ Loads and manages training config from config.yaml.
 Written by: Vanea
 """
 
+import logging
 import os
 
 import torch
 import yaml
+
+_uvicorn_log = logging.getLogger("uvicorn")
 
 # for colab easier setup, set to "/content/" if running in colab, otherwise keep as "" for local runs
 ROOT = ""
@@ -44,11 +47,11 @@ class Config:
                 val = float(val)
             setattr(self, key, val)
 
-        print(f"Config loaded for mode: {mode}")
-        print(f"  Epochs: {self.num_train_epochs}")
-        print(f"  LR: {self.learning_rate_resume}")
-        print(f"  Batch: {self.per_device_train_batch_size}")
-        print(f"  Grad Acc: {self.gradient_accumulation_steps}")
+        _uvicorn_log.info(f"Config loaded for mode: {mode}")
+        _uvicorn_log.info(f"  Epochs: {self.num_train_epochs}")
+        _uvicorn_log.info(f"  LR: {self.learning_rate_resume}")
+        _uvicorn_log.info(f"  Batch: {self.per_device_train_batch_size}")
+        _uvicorn_log.info(f"  Grad Acc: {self.gradient_accumulation_steps}")
 
     def get_effective_batch_size(self):
         return self.per_device_train_batch_size * self.gradient_accumulation_steps

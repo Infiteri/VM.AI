@@ -19,6 +19,13 @@ Trains an EfficientNet-B4 classifier for 14 activity categories using a two-phas
 | Optimizer | AdamW |
 | Weight decay | 1×10⁻⁴ |
 | Scheduler | CosineAnnealingLR (eta_min=1×10⁻⁶) |
+| Early stopping min_delta | 0.001 |
+| `num_workers` | 2 |
+| `pin_memory` | True (when CUDA) |
+| AMP | `GradScaler()` (when CUDA) |
+| `data_root` | `data/image_to_prompt/final` |
+| `save_path` | `models/efficientnet_b4_classifier/efficientnet_b4_classifier.pth` |
+| `device` | auto (CUDA or CPU) |
 
 ### Two-Phase Strategy
 
@@ -63,7 +70,7 @@ uv run python src/image_to_prompt/training/train_classifier.py
 
 # Resume from checkpoint with custom epoch counts
 uv run python src/image_to_prompt/training/train_classifier.py \
-    --resume models/efficientnet_b4_classifier/checkpoint_epoch_10.pth \
+    --resume models/efficientnet_b4_classifier/efficientnet_b4_classifier.pth \
     --epochs_frozen 3 --epochs_unfrozen 15
 ```
 
@@ -75,6 +82,12 @@ uv run python src/image_to_prompt/training/train_classifier.py \
 | Val/Test | Resize(380) → ToTensor → Normalize |
 
 Normalization: ImageNet mean `[0.485, 0.456, 0.406]`, std `[0.229, 0.224, 0.225]`.
+
+**Note:** When training on CPU the script prints a warning: `WARNING: Training on CPU — expected ~3 hours. Use a GPU for faster training.`
+
+**Note:** `train_classifier.py` automatically runs test evaluation after training using the best saved checkpoint — it is not a separate step. Results are saved to `training_history.json`.
+
+The best model (by `val_acc`) is always saved to the **same** file (`efficientnet_b4_classifier.pth`), overwriting on each improvement. There are no epoch-specific checkpoints.
 
 ---
 
@@ -88,10 +101,10 @@ Runs 4 experiments isolating the effect of data augmentation and the frozen pre-
 
 | Experiment | Augmentation | Frozen Phase | Epochs |
 |---|---|---|---|---|
-| `baseline` | ✅ Yes | ✅ Yes (5 + 25) | 30 |
-| `no_augmentation` | ❌ No | ✅ Yes (5 + 25) | 30 |
-| `no_frozen_phase` | ✅ Yes | ❌ No (0 + 25) | 25 |
-| `no_aug_no_frozen` | ❌ No | ❌ No (0 + 25) | 25 |
+| `baseline` | Yes | Yes (5 + 25) | 30 |
+| `no_augmentation` | No | Yes (5 + 25) | 30 |
+| `no_frozen_phase` | Yes | No (0 + 25) | 25 |
+| `no_aug_no_frozen` | No | No (0 + 25) | 25 |
 
 All experiments use the same hyperparameters (batch size 32, AdamW, cosine annealing, weighted loss).
 
@@ -107,6 +120,13 @@ uv run python src/image_to_prompt/training/ablation_study.py --experiment no_aug
 uv run python src/image_to_prompt/training/ablation_study.py --experiment no_frozen_phase
 uv run python src/image_to_prompt/training/ablation_study.py --experiment no_aug_no_frozen
 ```
+
+### Key Differences from Full Training
+
+- **No early stopping** — all experiments run full epoch counts
+- **No resume capability** — each experiment starts from scratch
+- **`no_frozen_phase` unfreezes the entire backbone** (`model.blocks`), not just `blocks[-2:]`
+- Comparison charts only generated when all 4 experiments run together
 
 ### Output
 
@@ -132,6 +152,15 @@ assets/image_classifier/ablation/
   comparison_training_curves.png
 ```
 
+![Top-K comparison across experiments](../../assets/image_classifier/ablation/comparison_topk.png)
+*All 4 ablation experiments compared*
+
+![Per-class F1 comparison](../../assets/image_classifier/ablation/comparison_per_class_f1.png)
+*F1 per class for each experiment*
+
+![Training curves comparison](../../assets/image_classifier/ablation/comparison_training_curves.png)
+*Train/val loss and accuracy for each experiment*
+
 ---
 
 ## Cross-Validation
@@ -149,8 +178,11 @@ assets/image_classifier/ablation/
 | Seed | 42 |
 | Batch size | 32 |
 | Epochs | 5 frozen + 25 unfrozen |
-| Early stopping | Patience 7 |
-| Class weights | Recomputed per fold from training indices |
+| Early stopping | Patience 7, min_delta 0.001 |
+| Class weights | Recomputed per fold from training indices (dynamic via `np.bincount()`) |
+| `num_workers` | 2 |
+| `pin_memory` | True (when CUDA) |
+| AMP | `GradScaler()` (when CUDA) |
 
 ### Usage
 
@@ -180,6 +212,15 @@ assets/image_classifier/cross_validation/
   aggregated_confusion_matrix.png    ← All 5 folds combined
   aggregated_per_class_metrics.png   ← Mean F1 per class with error bars
 ```
+
+![CV accuracy boxplot](../../assets/image_classifier/cross_validation/cv_accuracy_boxplot.png)
+*Test accuracy distribution across 5 folds (green=best, red=worst, orange dashed=mean)*
+
+![Aggregated confusion matrix](../../assets/image_classifier/cross_validation/aggregated_confusion_matrix.png)
+*All 5 folds combined*
+
+![Aggregated per-class metrics](../../assets/image_classifier/cross_validation/aggregated_per_class_metrics.png)
+*Mean F1 per class with error bars*
 
 ---
 
@@ -212,6 +253,15 @@ uv run python src/image_to_prompt/evaluation/evaluate_classifier.py --checkpoint
 
 Actual test metrics are saved to `models/efficientnet_b4_classifier/evaluation_report.json`. See `evaluate_classifier.py` for the full metric computation logic.
 
+![Confusion matrix](../../assets/image_classifier/confusion_matrix.png)
+*Predicted vs actual classes on the test set*
+
+![Per-class metrics](../../assets/image_classifier/per_class_metrics.png)
+*Precision, recall, and F1 per category*
+
+![Top-K accuracy](../../assets/image_classifier/topk_accuracy.png)
+*Accuracy at each K from 1 to 14*
+
 ### Output
 
 ```
@@ -238,7 +288,7 @@ Uploads the `.pth` file, evaluation report, chart images, and auto-generates a m
 uv run python src/image_to_prompt/evaluation/push_model_to_hf.py
 ```
 
-Requires `HF_TOKEN` and `HF_MODEL_REPO_ID` in `.env` (token optional for public repos).
+Requires `HF_TOKEN` and `HF_MODEL_REPO_ID` in `.env` (token **required** — raises `KeyError` if missing). `HF_MODEL_REPO_PRIVATE` defaults to `"true"` in code (`.env.example` uses `"false"`).
 
 ### Pull
 

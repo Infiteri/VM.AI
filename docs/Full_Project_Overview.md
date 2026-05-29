@@ -12,7 +12,7 @@ The system learns from user's task completion patterns to make intelligent predi
 
 ---
 
-## 2. The 5-Stage Pipeline
+## 2. The 7-Stage Pipeline
 
 ### Stage 1: NLP Parser
 - **Input:** Natural language text (e.g., "finish chemistry homework before Friday")
@@ -58,13 +58,14 @@ The system learns from user's task completion patterns to make intelligent predi
   5. Stable scoring with displacement handling
 - **Scoring Formula:**
   ```
-  score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference + urgency_boost
+  score = BASE_SLOT_SCORE + location_boost + free_slot_boost + time_score_boost + urgency_boost + continuity_boost - overlap_penalty
   ```
 - **Key Parameters:**
+  - BASE_SLOT_SCORE=1.0 (baseline for all slots)
   - TOP_N_CANDIDATES=400 (score all candidate slots)
   - FREE_SLOT_BOOST=0.5 (free slots bubble to top)
   - MAX_LAYER=1 (1-layer displacement max)
-  - VALUE_THRESHOLD=0.25 (25% value threshold)
+  - VALUE_THRESHOLD=1.25 (new task must be 25% more valuable to displace)
 - **Output:** Writes to `provisional_schedule` + `schedule_changes`
 
 ### Stage 5: Stats Recorder
@@ -72,11 +73,22 @@ The system learns from user's task completion patterns to make intelligent predi
 - **Two Denominators:**
   - Plan averages → `records` (updated on commit)
   - Delta averages → `completed_count` (updated on rating)
-- **Radial Decay:**
-  ```
-  boost = base × (1 - blocks × 0.25)
-  ```
-- **Weekly Normalization:** `×0.99` to prevent saturation
+- **Time Score Decay:**
+  - All time scores multiplied by `×0.99` every 24 hours via background cleanup loop
+  - Values below `0.1` threshold are zeroed out
+  - Prevents stale preference scores from accumulating
+
+### Stage 6: Image-to-Prompt
+- **Input:** Base64-encoded image
+- **Process:** EfficientNet-B4 image classification → activity detection → prompt generation
+- **Output:** Task prompt string (e.g., "Finish chemistry homework")
+- **Endpoint:** `POST /tasks/parse/from-image`
+
+### Stage 7: Duration Prediction
+- **Input:** Task attributes (difficulty, importance, scheduled_duration, category, location, fixed_time, time_difference)
+- **Process:** XGBoost regressor prediction
+- **Output:** Predicted duration in minutes
+- **Endpoint:** `POST /tasks/predict-duration`
 
 ---
 
@@ -88,7 +100,9 @@ All core services follow a class-based pattern:
 - **ScheduleEngine** - Scheduling with ALL slots scoring, displacement handling
 - **TaskMatchingService** - Embedding-based task association
 - **StatsRecorderService** - Two-denominator statistics updates
-- **Hybrid schedule_batch** - Accepts optional task_ids or uses unscheduled queue
+- **DurationService** - XGBoost-based duration prediction
+- **ImgToPrompt** - EfficientNet-B4 image classification
+- **Schedule batch** - Schedules all tasks from the unscheduled queue (FIFO) with time score updates
 
 ### 3.2 Draft System
 - **Purpose:** Safe task creation via Chat/AI without polluting the main database
@@ -161,20 +175,20 @@ All core services follow a class-based pattern:
 7. Frontend shows modified task
 ```
 
-### 4.4 Schedule Batch (Hybrid Queue/Task IDs)
+### 4.4 Schedule Batch (Queue-based)
 ```
-1. Frontend calls POST /schedule/batch (optional: task_ids list)
-2. If task_ids provided: fetch specific tasks
-3. If no task_ids: fetch from unscheduled_queue
-4. ScheduleEngine.process_batch():
+1. Frontend calls POST /schedule/batch (no parameters)
+2. Backend fetches all tasks from unscheduled_queue (FIFO order)
+3. ScheduleEngine.schedule_batch():
    a. Build free slot inventory
    b. For each task:
-      - Get candidate slots (start_time window)
+      - Get candidate slots (time window constraint solving)
       - Score ALL slots (TOP_N_CANDIDATES=400)
       - Place in highest-scoring slot
       - Handle displacement if needed (MAX_LAYER=1)
-5. Save to provisional_schedule
-6. Record schedule_changes
+      - On success: update time score (+1.0 boost)
+4. Save to provisional_schedule
+5. Record schedule_changes
 ```
 
 ---
@@ -186,15 +200,19 @@ All core services follow a class-based pattern:
 |--------|----------|------|----------|
 | POST | `/tasks` | `TaskCreateRequest` | `TaskResponse` |
 | GET | `/tasks/{id}` | - | `TaskDetailResponse` |
-| DELETE | `/tasks/{id}` | - | `SuccessResponse` |
+| POST | `/tasks/{id}/update` | `TaskUpdateRequest` | `TaskResponse` |
+| DELETE | `/tasks/{id}` | - | (204 No Content) |
+| GET | `/tasks/unscheduled` | - | `UnscheduledResponse` |
 | POST | `/tasks/parse/add` | `ParseAddRequest` | `ParseAddResponse` |
 | POST | `/tasks/parse/modify` | `ParseModifyRequest` | `ParseModifyResponse` |
+| POST | `/tasks/parse/from-image` | `ImageParseRequest` | `ImageParseResponse` |
+| POST | `/tasks/predict-duration` | `DurationPredictRequest` | `DurationPredictResponse` |
 
 ### Schedule
 | Method | Endpoint | Body | Response |
 |--------|----------|------|----------|
 | GET | `/schedule` | - | `ScheduleResponse` |
-| POST | `/schedule/batch` | `BatchScheduleRequest` (optional: task_ids) | `BatchScheduleResponse` |
+| POST | `/schedule/batch` | - | `BatchScheduleResponse` |
 
 ### Provisional
 | Method | Endpoint | Body | Response |
@@ -231,6 +249,8 @@ All core services follow a class-based pattern:
 | Migrations | Alembic |
 | Validation | Pydantic v2 |
 | NLP Model | T5-base (fine-tuned) |
+| Image Classifier | EfficientNet-B4 |
+| Duration Predictor | XGBoost regressor |
 | Embeddings | MiniLM |
 | Date Parsing | dateparser |
 
@@ -244,8 +264,10 @@ All core services follow a class-based pattern:
 | Database Models | Complete |
 | Task Matching | Complete |
 | NLP Parser | Complete |
+| Image Classifier | Complete (ImgToPrompt, EfficientNet-B4) |
 | Enrichment | Complete (EnrichmentService class) |
 | Scheduler | Complete (ScheduleEngine, ALL slots scored) |
+| Duration Predictor | Complete (DurationService, XGBoost) |
 | Stats Recorder | Complete (StatsRecorderService class) |
 
 ---
@@ -254,30 +276,31 @@ All core services follow a class-based pattern:
 
 ### 9.1 ScheduleEngine Scoring
 ```
-score = base_value + free_boost - stability_penalty + location_boost + overlap_penalty + time_preference + urgency_boost
+score = BASE_SLOT_SCORE + location_boost + free_slot_boost + time_score_boost + urgency_boost + continuity_boost - overlap_penalty
 ```
 
 Where:
-- **base_value** = task.importance × urgency (normalized)
-- **free_boost** = FREE_SLOT_BOOST (0.5) if slot is free
-- **stability_penalty** = 0.15 × layer_displaced (1-layer max)
-- **location_boost** = 0.3 × location_match (preferred location)
-- **overlap_penalty** = -999 if overlaps (impossible)
-- **time_preference** = 0.1 × time_match (preferred time blocks)
-- **urgency_boost** = (1 - position_ratio) × 0.2 (near deadline)
+- **BASE_SLOT_SCORE** = 1.0 (baseline for all slots)
+- **location_boost** = 0.0 – 0.25 (LOCATION_BASE_BOOST × continuity_count; max when same location both before and after)
+- **free_slot_boost** = 0.5 (FREE_SLOT_BOOST) if slot has no overlapping tasks, else 0
+- **time_score_boost** = -0.3 – +0.3 (TIME_SCORE_AMPLIFIER × score/10; from task or category time preferences)
+- **urgency_boost** = 0 – 0.21 (URGENCY_AMPLIFIER × urgency_value × (1 - position_ratio); higher for slots closer to now)
+- **continuity_boost** = 0, 0.05, or 0.1 (CONTINUITY_BASE_BOOST based on gap: 0.05 for 15min, 0.1 for 30min, 0.05 for 45min)
+- **overlap_penalty** = 0.15 per overlapping task (OVERLAP_BASE_PENALTY × overlap_count)
 
 ### 9.2 Displacement Handling
-- Only if displaced task importance × (1 - VALUE_THRESHOLD) >= new task importance
+- Only if `new_task.value > existing_task.value × VALUE_THRESHOLD (1.25)` — new task must be 25% more valuable
 - MAX_LAYER=1 prevents cascade rescheduling
-- Displaced tasks return to unscheduled_queue
+- Displaced tasks are rescheduled via `_try_reschedule_task()` at layer+1; if rescheduling fails, the original task is not placed
 
-### 9.3 Hybrid Batch Schedule
+### 9.3 Queue-Based Batch Schedule
 ```python
-def process_batch(self, db: Session, task_ids: list[str] | None = None) -> BatchScheduleResponse:
-    if task_ids:
-        tasks = self._fetch_specific_tasks(db, task_ids)
-    else:
-        tasks = self._fetch_queue_tasks(db)
+def schedule_batch(self, db: Session) -> BatchSchedulingResult:
+    tasks = db.query(UnscheduledTask).order_by(UnscheduledTask.created_at).all()
+    for entry in tasks:
+        result = self.schedule_single(entry.task, db)
+        if result.success:
+            stats_recorder.update_time_score(db, entry.task.id, result.slot_start, boost=1.0)
 ```
 
 ---

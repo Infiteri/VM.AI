@@ -85,6 +85,27 @@ export const api = {
     });
   },
 
+  parseFromImage: async (file: File): Promise<{ prompt: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await fetch(`${BASE_URL}/tasks/parse/from-image`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      let errorMsg = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          errorMsg = typeof errorData.detail === "string"
+            ? errorData.detail : JSON.stringify(errorData.detail);
+        }
+      } catch (e) { /* ignore */ }
+      throw new Error(errorMsg);
+    }
+    return response.json();
+  },
+
   runScheduler: async (): Promise<{
     success: boolean;
     scheduled_count: number;
@@ -121,6 +142,21 @@ export const api = {
   commitProvisional: async (): Promise<{ success: boolean; committed_count: number; message: string; transaction_time_ms: number }> => {
     return fetchAPI("/provisional/commit", {
       method: "POST",
+    });
+  },
+
+  predictDuration: async (params: {
+    difficulty: number;
+    importance: number;
+    scheduled_duration: number;
+    category: string;
+    location: string;
+    fixed_time?: string;
+    time_difference?: number;
+  }): Promise<{ predicted_duration: number }> => {
+    return fetchAPI("/tasks/predict-duration", {
+      method: "POST",
+      body: JSON.stringify(params),
     });
   },
 

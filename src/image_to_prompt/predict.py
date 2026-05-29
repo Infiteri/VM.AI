@@ -7,6 +7,7 @@ Usage:
     # => {"label": "cooking", "probability": 0.97, "results": {...}}
 """
 
+import logging
 import sys
 from pathlib import Path
 from typing import Optional
@@ -17,6 +18,11 @@ from torchvision import transforms
 
 sys.path.insert(0, str(Path(__file__).parent / "training"))
 from train_classifier import build_model
+
+_uvicorn_log = logging.getLogger("uvicorn")
+
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+_DEFAULT_MODEL_PATH = str(_PROJECT_ROOT / "models" / "efficientnet_b4_classifier" / "efficientnet_b4_classifier.pth")
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -38,19 +44,33 @@ val_transform = transforms.Compose([
 _model_cache: Optional[dict] = None
 
 
+def load_model(model_path: str = _DEFAULT_MODEL_PATH) -> None:
+    """Eagerly load the model checkpoint into the global cache (used by model_loader)."""
+    global _model_cache
+    if _model_cache is not None and _model_cache["path"] == model_path:
+        return
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    _model_cache = {
+        "model": _load_model(model_path, device),
+        "path": model_path,
+    }
+
+
 def _load_model(model_path: str, device: torch.device):
     """Load model checkpoint and return (model, device)."""
+    _uvicorn_log.info("Loading image classifier model...")
     model = build_model(NUM_CLASSES).to(device)
-    state = torch.load(model_path, map_location=device)
+    state = torch.load(model_path, map_location=device, weights_only=False)
     if "model_state_dict" in state:
         model.load_state_dict(state["model_state_dict"])
     else:
         model.load_state_dict(state)
     model.eval()
+    _uvicorn_log.info("Image classifier model loaded")
     return model
 
 
-def predict(image: Image.Image, model_path: str = "models/efficientnet_b4_classifier/efficientnet_b4_classifier.pth") -> dict:
+def predict(image: Image.Image, model_path: str = _DEFAULT_MODEL_PATH) -> dict:
     """
     Predict activity class from a PIL image.
 

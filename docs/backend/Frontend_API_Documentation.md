@@ -19,12 +19,14 @@ All datetime values use **naive ISO 8601 format** (no timezone info):
 ```
 **Do NOT include** `Z`, `+03:00`, or any timezone suffix.
 
-### All Endpoints (13 Total)
+### All Endpoints (15 Total)
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | POST | `/tasks/parse/add` | Parse NLP to draft |
 | POST | `/tasks/parse/modify` | Parse modification prompt |
+| POST | `/tasks/parse/from-image` | Parse image to task prompt |
+| POST | `/tasks/predict-duration` | Predict task duration |
 | POST | `/tasks` | Create task (manual or from draft) |
 | POST | `/tasks/{id}/update` | Update existing task |
 | DELETE | `/tasks/{id}` | Delete task |
@@ -54,11 +56,11 @@ class TaskPayload(BaseModel):
     name: str                                    # Must be non-empty
     start: Optional[datetime] = None              # Required if fixed_time=False
     deadline: Optional[datetime] = None           # Required if fixed_time=False
-    difficulty: float                         # 0.0 - 1.0
+    difficulty: float                         # > 0.0 - 1.0
     duration: int                          # 1 - 1439 minutes
     category: List[str]                    # At least one required
     location: str                             # Required
-    importance: float                    # 0.0 - 1.0
+    importance: float                    # > 0.0 - 1.0
     fixed_time: bool = False
     fixed_start: Optional[datetime] = None   # Required if fixed_time=True
 ```
@@ -184,9 +186,9 @@ class TaskPayload(BaseModel):
 **Validation Rules:**
 - If `fixed_time=True`: `start` and `deadline` must be null, `fixed_start` required
 - If `fixed_time=False`: `start` and `deadline` required, `fixed_start` must be null
-- `difficulty`: 0.0 - 1.0
+- `difficulty`: > 0.0 - 1.0
 - `duration`: 1 - 1439
-- `importance`: 0.0 - 1.0
+- `importance`: > 0.0 - 1.0
 
 ---
 
@@ -293,7 +295,7 @@ class TaskPayload(BaseModel):
 **Query Parameters:**
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| limit | int | No | Max tasks to return (default: 50) |
+| limit | int | No | Max tasks to return (default: none, returns all) |
 
 **Response (UnscheduledResponse):**
 ```json
@@ -483,6 +485,63 @@ class TaskPayload(BaseModel):
 ```
 
 **Schema:** `ProvisionalCommitResponse`
+
+---
+
+### 3.14 POST /tasks/parse/from-image — Parse Image to Task Prompt
+
+**Purpose:** Upload an image and classify the activity using EfficientNet-B4, returning a task prompt string.
+
+**Request:**
+```json
+{
+    "image": "<base64-encoded image data>"
+}
+```
+
+**Response (ImageParseResponse):**
+```json
+{
+    "success": true,
+    "prompt": "Finish chemistry homework"
+}
+```
+
+**Schema:** `ImageParseRequest` → `ImageParseResponse`
+
+---
+
+### 3.15 POST /tasks/predict-duration — Predict Task Duration
+
+**Purpose:** Predict task duration from task attributes using the XGBoost duration predictor.
+
+**Request:**
+```json
+{
+    "difficulty": 0.7,
+    "importance": 0.6,
+    "scheduled_duration": 90,
+    "category": "study",
+    "location": "Library",
+    "fixed_time": false,
+    "time_difference": 120
+}
+```
+
+**Response (DurationPredictResponse):**
+```json
+{
+    "predicted_duration": 60
+}
+```
+
+**Schema:** `DurationPredictRequest` → `DurationPredictResponse`
+
+**Validation:**
+- `difficulty`: > 0.0 - 1.0
+- `importance`: > 0.0 - 1.0
+- `scheduled_duration`: 1 - 1439
+- `time_difference`: minutes until deadline (non-negative)
 
 ---
 

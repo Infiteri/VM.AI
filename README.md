@@ -1,10 +1,12 @@
-# VM.AI - Natural Language Task Parser
+# VM.AI — AI-Powered Personal Scheduling System
 
-VM.AI is an AI-driven personal scheduling system that transforms natural language task descriptions into structured, actionable task data. The system uses a fine-tuned T5-base model for structured parsing, a RidgeCV regressor for difficulty and importance prediction from text embeddings, and a rule-based parser for add mode — together extracting attributes such as category, difficulty, importance, duration, deadline, location, and recurrence patterns.
+VM.AI is an AI-driven personal scheduling system that transforms natural language and image inputs into optimized, behavior-aware calendar schedules. The system uses a 7-stage pipeline: NLP Parser (T5-base), Image Classifier (EfficientNet-B4), Task Matching (MiniLM), Enrichment (statistics-based overwrites), Scheduling Engine (stable incremental), Duration Predictor (XGBoost), and Stats Recorder (behavioral learning) — together extracting and predicting attributes such as category, difficulty, importance, duration, deadline, location, and recurrence patterns.
 
 ## Problem Description
 
 The project addresses the challenge of converting free-form natural language input into structured task schemas. Users can describe tasks in plain language (e.g., "gym every Monday at 6am", "finish report by Friday"), and the system parses this input into organized data that can be used for scheduling and task management.
+
+Beyond NLP, the system also supports image-based task classification (EfficientNet-B4) and XGBoost-based duration prediction, enabling richer input modalities and more accurate scheduling estimates.
 
 This aligns with ONIA competition requirements by providing a practical solution that uses AI to solve a real-world problem in task planning and time management.
 
@@ -20,7 +22,15 @@ VM.AI/
 ├── src/
 │   ├── parser/           # NLP parser module (training + inference)
 │   ├── backend/          # FastAPI backend
-│   │   └── tests/      # Backend API tests
+│   │   ├── app/
+│   │   │   ├── api/v1/endpoints/  # REST endpoints (tasks, schedule, provisional, stats, duration)
+│   │   │   ├── models/            # SQLAlchemy ORM models
+│   │   │   ├── schemas/           # Pydantic request/response schemas
+│   │   │   ├── services/          # Business logic (parser, matching, enrichment, scheduler, stats, duration, img_to_prompt)
+│   │   │   ├── utils/             # Model loader, cleanup loop, task persistence, normalization
+│   │   │   ├── core/              # Config, database, logging
+│   │   │   └── main.py            # FastAPI entrypoint
+│   │   └── tests/                 # Backend API tests
 │   └── app/              # React frontend (npm run dev)
 ├── models/
 │   ├── finetuned_parser/ # Trained T5 model (after training)
@@ -28,7 +38,9 @@ VM.AI/
 ├── data/                 # Training datasets
 ├── tests/                # Parser test suite
 ├── scripts/              # Visualization and utility scripts
-├── docs/                 # Detailed documentation
+├── docs/
+│   ├── backend/          # Backend architecture, API, DB schema, enrichment, scheduling, stats docs
+│   └── image_to_prompt/  # Image classification pipeline, data collection, training docs
 ├── assets/               # Generated charts and visualizations
 └── package.json          # Frontend dependencies
 ```
@@ -254,7 +266,9 @@ Generated visualizations are saved to `scripts/output/<dataset>/` and can be cop
 
 ## Documentation
 
-Detailed documentation covering all project components is available in the `docs/` folder.
+Detailed documentation covering all project components is available in the `docs/` folder:
+- `docs/backend/` — Backend architecture, API documentation, database schema, enrichment module, scheduling engine, stats recorder
+- `docs/image_to_prompt/` — Image classification pipeline, data collection methodology, training configuration
 
 ## Library Versions
 
@@ -275,12 +289,12 @@ Key dependencies:
 
 - The model is trained on a limited dataset size
 - Performance may vary for unusual or ambiguous task descriptions
-- Category inference is based on keyword patterns; difficulty and importance are predicted by a RidgeCV regressor
+- Category inference uses task matching (MiniLM cosine similarity) with enrichment fallback; difficulty and importance are predicted through statistics-based overwrites from matched tasks
 
 ### Technical Limitations
 
 - The T5-base model has token limits that may affect complex inputs
-- Rule-based parsers handle common patterns, edge cases may fail
+- The image classifier (EfficientNet-B4) and duration predictor (XGBoost) depend on training data quality
 - Time zone handling is not explicitly implemented
 
 ### Ethical Considerations

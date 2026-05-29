@@ -87,8 +87,8 @@ The VM.AI database consists of five logical groups: **Core Tables** (task storag
 ├─────────────────────────────┐  ┌───────────────────────────────────────────┐
 │     tasks_statistics        │  │         category_statistics               │
 │                             │  │                                           │
-│ • id (UUID, PK)             │  │ • id (INTEGER, PK)                        │
-│ • task_name (TEXT, UNIQUE)  │  │ • category_name (TEXT, UNIQUE)            │
+│ • id (UUID, PK)             │  │ • id (UUID, PK)                           │
+│ • task_name (TEXT, UNIQUE)  │  │ • category_id (UUID, UNIQUE)               │
 │ • task_name_vector (FLOAT[])│  │ • avg_duration (JSONB)                  │
 │ • avg_duration (JSONB)       │  │ • avg_duration_delta (JSONB)             │
 │ • avg_duration_delta (JSONB) │  │ • avg_difficulty (FLOAT)                │
@@ -171,8 +171,10 @@ Records only `insert` and `move` operations applied to transform Main → Provis
 | Field | Type | Description |
 |-------|------|-------------|
 | id | UUID | Primary key |
-| task_id | UUID | FK → `tasks.id` ON DELETE CASCADE |
+| provisional_schedule_slot_id | UUID | FK → `provisional_schedule.id` ON DELETE CASCADE |
 | change_type | TEXT | `'insert'` or `'move'` |
+| old_slot_start | DATETIME | Nullable. Previous slot start for moves |
+| old_slot_end | DATETIME | Nullable. Previous slot end for moves |
 | new_slot_start | DATETIME | For insert/move operations |
 | new_slot_end | DATETIME | For insert/move operations |
 | created_at | TIMESTAMP | When change was recorded |
@@ -297,7 +299,6 @@ Pre-seeded with: `study`, `fitness`, `work`, `personal`.
 |-------|------|-------------|
 | id | UUID | Primary key. Inherited from BaseModel. |
 | category_id | UUID | FK → `categories.id`. Unique constraint. |
-| category_name | TEXT | Category label. Unique. |
 | avg_duration | JSONB | Keyed by difficulty bucket with counts: `{"0.0": {"count": 5, "avg": 30}, "0.5": {"count": 3, "avg": 45}}` |
 | avg_duration_delta | JSONB | Same structure as avg_duration |
 | avg_difficulty | FLOAT | Single value per category. |
@@ -325,7 +326,7 @@ Tracks location usage per category.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| statistics_id | INTEGER | FK → `category_statistics.id`. Part of PK. |
+| statistics_id | UUID | FK → `category_statistics.id`. Part of PK. |
 | location_id | UUID | FK → `locations.id`. Part of PK. |
 | count | INTEGER | Number of times this location was used |
 

@@ -118,6 +118,10 @@ class Parser:
         if Parser._predictor is None:
             self._load_model()
 
+    def load(self):
+        """Eagerly load the T5 model into memory (used by model_loader)."""
+        self._ensure_loaded()
+
     @classmethod
     def get_instance(cls) -> "Parser":
         """Get singleton instance of Parser."""

@@ -197,7 +197,7 @@ schedule_engine = ScheduleEngine()
 |--------|---------|
 | `_schedule_fixed_task(task, db)` | Handle fixed-time tasks |
 | `_schedule_flexible_task(task, db)` | Handle flexible tasks |
-| `_get_time_windows(task, db)` | Build viable time windows |
+| `_get_time_windows(task, db, exclude_ranges, fixed_slots)` | Build viable time windows |
 | `_subtract_fixed_tasks(windows, db)` | Remove fixed task times |
 | `_subtract_dead_zones(windows)` | Remove dead zones |
 | `_generate_slots(windows, duration)` | Create 15-min slots |
@@ -543,6 +543,7 @@ slot = CandidateSlot(
 class SchedulingResult:
     success: bool
     task_id: Optional[UUID]
+    slot_id: Optional[UUID]
     slot_start: Optional[datetime]
     slot_end: Optional[datetime]
     displaced_tasks: List[UUID]
@@ -570,6 +571,7 @@ class SchedulingResult:
 class BatchSchedulingResult:
     scheduled_count: int
     failed_count: int
+    unscheduled_remaining: List[UUID]
     results: List[SchedulingResult]
     execution_time_ms: int
 ```
@@ -1417,14 +1419,8 @@ change_type = "move" if existing else "insert"
 @router.post("/schedule/batch")
 def schedule_batch(
     db: Session = Depends(get_db),
-    timeout: int = 12,
-    task_ids: List[UUID] = None
 ):
-    return schedule_engine.schedule_batch(
-        db=db,
-        timeout=timeout,
-        task_ids=task_ids
-    )
+    return schedule_engine.schedule_batch(db)
 ```
 
 ### 17.2 Response Format
