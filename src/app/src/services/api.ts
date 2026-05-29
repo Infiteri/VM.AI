@@ -145,6 +145,21 @@ export const api = {
     });
   },
 
+  predictDuration: async (params: {
+    difficulty: number;
+    importance: number;
+    scheduled_duration: number;
+    category: string;
+    location: string;
+    fixed_time?: string;
+    time_difference?: number;
+  }): Promise<{ predicted_duration: number }> => {
+    return fetchAPI("/tasks/predict-duration", {
+      method: "POST",
+      body: JSON.stringify(params),
+    });
+  },
+
   rateTask: async (id: string, completed: boolean, actualDuration?: number, actualDifficulty?: number): Promise<{
     success: boolean;
     task_id: string;

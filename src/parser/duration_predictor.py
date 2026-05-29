@@ -22,6 +22,17 @@ class DurationPredictor:
             info = json.load(f)
         self.categories = info["categories"]
 
+    @staticmethod
+    def _is_undoable(time_diff: float, scheduled_duration: int) -> bool:
+        if time_diff == -1:
+            return False
+        time_minutes = time_diff * 60
+        if time_minutes <= 0:
+            return True
+        if time_minutes < scheduled_duration * 0.4:
+            return True
+        return False
+
     def predict(
         self,
         difficulty: float,
@@ -32,6 +43,9 @@ class DurationPredictor:
         fixed_time: str = "",
         time_difference: float = -1,
     ) -> int:
+        if self._is_undoable(time_difference, scheduled_duration):
+            return 0
+
         num = np.array(
             [[difficulty, importance, scheduled_duration, time_difference]],
             dtype=np.float64,

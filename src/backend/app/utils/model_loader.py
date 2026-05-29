@@ -31,4 +31,8 @@ def load_all_models():
     ImgToPrompt.get_instance().load()
     _uvicorn_log.info("  Image-to-prompt service loaded")
 
+    from app.services.duration import duration_service
+    duration_service.load()
+    _uvicorn_log.info("  Duration predictor loaded")
+
     _uvicorn_log.info("All AI models loaded successfully")
