@@ -28,10 +28,10 @@ Four sub-handlers:
 - **`kaggle`** — downloads a dataset and samples up to N images per subfolder (e.g. gym exercises, 32 per folder).
 - **`kaggle_csv`** — downloads a dataset, reads a CSV, filters to rows matching a label (e.g. `"running"`), copies matching image files.
 - **`kaggle_subfolder`** — downloads a dataset and uses a specific subfolder path (e.g. `HAR/train/running`).
-- **`kaggle_csv_multi`** (via `kaggle_csv` with `filter_values`) — same as CSV but matches multiple labels at once.
+- **`kaggle_csv_multi`** not implemented — use `kaggle_csv` with `filter_values` instead.
 
 ### Pixabay API (`requests`)
-Searches Pixabay (CC0 license, ML-safe) with category-specific keywords. `per_page=200`, paginated up to 500 images per keyword. Always downloads `largeImageURL` (1280px) with fallback to 960px. Rate-limit handled via `X-RateLimit-Remaining` header (pauses 60s if < 5 remaining).
+Searches Pixabay (CC0 license, ML-safe) with category-specific keywords. `per_page=200`, paginated up to 500 images per keyword. Filters: `orientation=horizontal`, `image_type=photo`, `safesearch=true`, `min_width=380`, `min_height=380`. Always downloads `largeImageURL` (1280px) with fallback to 960px. Rate-limit handled via `X-RateLimit-Remaining` header (pauses 60s if < 5 remaining, inter-page delay 0.5s, download timeout 10s).
 
 ## The 14 Categories
 
@@ -89,7 +89,7 @@ uv run python src/image_to_prompt/data_collection/raw/prepare_data.py
 Three phases:
 - **Phase 0** — Deletes `selected/` if exists, recreates it, copies `raw/<category>/...` → `selected/<category>/...`
 - **Phase 1** — Flattens `selected/<category>/<source>/filename.ext` → `selected/<category>/<source>_filename.ext`, removes source subdirs
-- **Phase 2** — Per-image validation: opens & verifies, converts non-JPG to JPG, removes images < 180×180, deduplicates across all categories (keeps first occurrence)
+- **Phase 2** — Per-image validation: opens & verifies, converts non-JPG to JPG (quality=95), removes images < 180×180. **Exact SHA256 dedup** across all categories (keeps first occurrence alphabetically). Random seed 42 for reproducibility.
 
 ### 4. Additional Downloads (Optional)
 
@@ -98,7 +98,7 @@ uv run python src/image_to_prompt/data_collection/selected/download_new.py
 uv run python src/image_to_prompt/data_collection/selected/unpack_new.py
 ```
 
-Downloads additional Pixabay images into `selected/<category>/new/` with per-image validation, then moves them to the parent folder with a `new_` prefix.
+Downloads additional Pixabay images into `selected/<category>/new/` with per-image validation, then moves them to the parent folder with a `new_` prefix. Only `cleaning` and `shopping` categories have download configs. Uses a `+50` per-keyword buffer to compensate for images that fail validation (seed=42).
 
 ### 5. Deduplicate Selected
 
@@ -114,7 +114,7 @@ Removes near-duplicate images within each category using perceptual hashing (`im
 uv run python src/image_to_prompt/data_collection/selected/convert_selected_jpg.py
 ```
 
-Ensures every image in `selected/` is a valid JPEG. Already-JPEG files are skipped.
+Ensures every image in `selected/` is a valid JPEG (quality=95). Already-JPEG files are verified and skipped if valid, re-encoded if corrupted.
 
 ### 7. Split into Train/Val/Test
 
@@ -140,13 +140,18 @@ uv run python src/image_to_prompt/data_collection/final/analyze_dataset.py
 
 Runs 4 checks: class balance (chart), perceptual duplicates, ResNet18 outliers (copied to `outliers/`), and brightness distribution. Writes `analysis_report.json`.
 
+Undocumented thresholds: class balance LOW alert `< 700`, HIGH alert `> 1200`, balance ratio target `≥ 0.70`, brightness deviation threshold `> 20` from global average. Chart DPI=150, `dark_background` style.
+
+![Class balance distribution](../../assets/image_classifier/class_balance.png)
+*Image count per category from the analysis report*
+
 Optionally, detect outliers in `selected/`:
 
 ```bash
 uv run python src/image_to_prompt/data_collection/selected/outliers_selected.py
 ```
 
-Copies flagged outliers to `selected/outliers/<category>/` (ResNet18 + IsolationForest, 5% contamination).
+Copies flagged outliers to `selected/outliers/<category>/` (ResNet18 + IsolationForest, 5% contamination, random_state=42). Categories with fewer than 10 images are silently skipped.
 
 ### 10. Push to Hugging Face Hub
 
