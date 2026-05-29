@@ -25,7 +25,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "requests>=2.32.5",
     "rich>=14.3.3",
-    "scikit-learn>=1.8.0",
+    "scikit-learn==1.6.1",
     "sentence-transformers>=3.0.0",
     "scipy>=1.17.1",
     "seaborn>=0.13.2",
@@ -38,6 +38,7 @@ dependencies = [
     "timm>=1.0.27",
     "torchmetrics>=1.9.0",
     "xgboost>=3.2.0",
+    "fastapi[standard]>=0.135.3",
 ]
 
 [[tool.uv.index]]

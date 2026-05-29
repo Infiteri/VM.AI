@@ -5,6 +5,10 @@ when LAZY_LOADING is disabled.
 
 import logging
 
+from transformers import logging as hf_logging
+
+hf_logging.set_verbosity_error()
+
 from app.core.logging_config import setup_logging
 
 logger = setup_logging()

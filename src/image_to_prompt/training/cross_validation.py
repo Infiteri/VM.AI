@@ -286,20 +286,55 @@ def evaluate_fold_on_test(result: dict, test_loader: DataLoader, class_names: li
 
 
 def plot_cv_boxplot(fold_accs: list, save_path: Path):
-    """Test accuracy per fold with mean ± std."""
-    fig, ax = plt.subplots(figsize=(6, 5))
-    ax.boxplot(fold_accs, patch_artist=True, boxprops=dict(facecolor="steelblue", alpha=0.7))
-    for i, acc in enumerate(fold_accs):
-        ax.scatter(1, acc, color="white", zorder=5)
-        ax.annotate(f"Fold {i+1}: {acc:.3f}", xy=(1, acc), xytext=(1.15, acc), fontsize=9, color="#c9d1d9")
+    """Test accuracy per fold as a bar chart with mean ± std band."""
     mean_acc = np.mean(fold_accs)
     std_acc = np.std(fold_accs)
-    ax.axhline(mean_acc, color="orange", linestyle="--", label=f"Mean: {mean_acc:.3f} ± {std_acc:.3f}")
-    ax.set_ylabel("Test Accuracy")
-    ax.set_title("Cross-Validation Test Accuracy Distribution")
-    ax.set_xticks([])
-    ax.set_ylim(min(fold_accs) - 0.02, 1.02)
-    ax.legend()
+    n_folds = len(fold_accs)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    x = np.arange(1, n_folds + 1)
+    colors = ["steelblue"] * n_folds
+    best_idx = int(np.argmax(fold_accs))
+    worst_idx = int(np.argmin(fold_accs))
+    colors[best_idx] = "#2ea043"
+    colors[worst_idx] = "#f85149"
+
+    bars = ax.bar(x, fold_accs, color=colors, alpha=0.85, width=0.5, zorder=3)
+
+    for i, (bar, acc) in enumerate(zip(bars, fold_accs)):
+        label = f"{acc:.4f}"
+        if i == best_idx:
+            label += " ▲"
+        elif i == worst_idx:
+            label += " ▼"
+        ax.text(bar.get_x() + bar.get_width() / 2, acc + 0.0002, label,
+                ha="center", va="bottom", fontsize=10, fontweight="bold")
+
+    ax.axhline(mean_acc, color="orange", linestyle="--", linewidth=1.5,
+               label=f"Mean: {mean_acc:.4f} ± {std_acc:.4f}", zorder=4)
+    ax.axhspan(mean_acc - std_acc, mean_acc + std_acc,
+               alpha=0.15, color="orange", label="±1 std", zorder=2)
+
+    y_margin = max((max(fold_accs) - min(fold_accs)) * 3, 0.005)
+    ax.set_ylim(min(fold_accs) - y_margin, max(fold_accs) + y_margin * 2)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.4, zorder=1)
+    ax.set_axisbelow(True)
+    ax.set_xticks(x)
+    ax.set_xticklabels([f"Fold {i}" for i in x], fontsize=11)
+    ax.set_ylabel("Test Accuracy", fontsize=12)
+    ax.set_title("Cross-Validation Test Accuracy per Fold", fontsize=14, pad=15)
+
+    from matplotlib.patches import Patch
+    ax.legend(handles=[
+        Patch(facecolor="#2ea043", alpha=0.85, label="Best fold"),
+        Patch(facecolor="#f85149", alpha=0.85, label="Worst fold"),
+        Patch(facecolor="steelblue", alpha=0.85, label="Other folds"),
+        plt.Line2D([0], [0], color="orange", linestyle="--",
+                    label=f"Mean: {mean_acc:.4f} ± {std_acc:.4f}"),
+        plt.Rectangle((0, 0), 1, 1, fc="orange", alpha=0.15, label="±1 std"),
+    ], fontsize=9, loc="lower right")
+
     fig.tight_layout()
     fig.savefig(str(save_path), dpi=150, bbox_inches="tight")
     plt.close(fig)
