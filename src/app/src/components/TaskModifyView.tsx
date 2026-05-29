@@ -416,6 +416,7 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
         </div>
       )}
 
+      <div className="flex gap-3 mt-2">
       <button
         onClick={async () => {
           if (!formData.name) {
@@ -478,10 +479,40 @@ export default function TaskModifyView({ task, onUpdate, openMode = "add", taskI
           }
         }}
         disabled={loading}
-        className="w-full bg-main-font text-background font-bold py-4 rounded-2xl text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-[0.2em] mt-2"
+        className="flex-1 bg-main-font text-background font-bold py-4 rounded-2xl text-lg hover:opacity-90 active:scale-[0.98] transition-all shadow-xl uppercase tracking-[0.2em]"
       >
         {loading ? "Creating..." : "Submit task"}
       </button>
+
+      <button
+        onClick={() => {
+          const difficulty = formData.difficulty;
+          const importance = formData.importance;
+          const scheduled_duration = formData.duration;
+          const category = formData.category[0] ?? "";
+          const location = formData.location;
+          let fixed_time = "";
+          let time_difference = -1;
+          if (formData.fixed_start) {
+            const d = new Date(formData.fixed_start);
+            fixed_time = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+            time_difference = (d.getTime() - Date.now()) / (1000 * 60 * 60);
+          }
+          console.log("=== Task Verification ===", {
+            difficulty,
+            importance,
+            scheduled_duration,
+            category,
+            location,
+            fixed_time,
+            time_difference,
+          });
+        }}
+        className="flex-1 border border-white/10 text-main-font/60 font-bold py-4 rounded-2xl text-lg uppercase tracking-[0.2em] hover:border-white/30 hover:text-main-font transition-all"
+      >
+        Verify duration
+      </button>
+      </div>
     </div>
   );
 }
