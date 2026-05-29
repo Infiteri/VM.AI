@@ -96,10 +96,6 @@ Learning rate sensitivity shows a U-shaped curve: 0.01 underfits, 0.2 diverges, 
 
 Learning curve shows diminishing returns past ~60% of training data — the dataset size is adequate.
 
-### Undoable Classification
-
-A separate RandomForest classifier predicts whether `real_duration = 0` (undoable). This is a binary classification problem, not regression. Accuracy ~95%+, with precision/recall reported per category.
-
 ## Performance
 
 - **Test MAE**: ~15–25 minutes (varies by category)
@@ -177,4 +173,4 @@ python src/parser/generate_tabular_data.py --count 5000 --seed 42
 
 ## Training Notebook
 
-See `notebooks/VM_AI_Duration_notebook.ipynb` for the full training pipeline: EDA (distributions, correlations), preprocessing (one-hot, impute), model comparison (Ridge/RF/XGBoost), GridSearchCV tuning, learning rate sensitivity, learning curve, residuals with per-category error, undoable classification, feature importance, 5-fold cross-validation, and export.
+See `notebooks/VM_AI_Duration_notebook.ipynb` for the full training pipeline: EDA (distributions, correlations), preprocessing (one-hot, impute), model comparison (Ridge/RF/XGBoost), GridSearchCV tuning, learning rate sensitivity, learning curve, residuals with per-category error, feature importance, 5-fold cross-validation, and export.

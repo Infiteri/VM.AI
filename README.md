@@ -38,7 +38,7 @@ VM.AI addresses this problem by **automating the entire task intake and scheduli
 
 ### Measurable Impact
 
-Based on existing studies and our internal benchmarks:
+Based on existing studies:
 
 - **Target:** Reduce task intake time by **50–70%** compared to manual calendar entry (e.g., typing into Google Calendar or a todo app).
 - **Target:** Eliminate **4+ hours/week** of scheduling overhead per user by replacing back-and-forth coordination with a single natural language input.
