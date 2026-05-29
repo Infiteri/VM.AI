@@ -132,21 +132,25 @@ category_statistics_locations[category_id][location_id].count += 1
 
 ---
 
-## 7. Radial Decay
+## 7. Time Score Decay
 
-Time preferences decay over time blocks to adapt to schedule changes:
+Time preferences decay over time to prevent stale scores:
 
 ```python
-def apply_radial_decay(time_scores: dict, blocks: int) -> dict:
-    decay_factor = 0.25
-    for time_slot, score in time_scores.items():
-        time_scores[time_slot] = score * (1 - blocks * decay_factor)
-    return time_scores
+# In background cleanup loop (cleanup.py), runs every 24h:
+TIME_SCORE_DECAY_FACTOR = 0.99
+TIME_SCORE_MIN_THRESHOLD = 0.1
+
+for task_stats in all_task_statistics:
+    if task_stats.task_time_scores:
+        for time_slot, score in task_stats.task_time_scores.items():
+            score *= TIME_SCORE_DECAY_FACTOR
+            if score < TIME_SCORE_MIN_THRESHOLD:
+                score = 0.0
+            task_stats.task_time_scores[time_slot] = score
 ```
 
-Applied when:
-- Task is scheduled in a time slot it previously had high preference for
-- Task is dislocated from preferred time slot
+Decay is applied globally every 24 hours — all time scores are multiplied by 0.99, and values below 0.1 are zeroed out.
 
 ---
 
@@ -177,12 +181,16 @@ Applied when:
 
 ### Time Score Updates
 
-The `update_time_score()` method automatically adjusts time preferences when a task is rated:
+The `update_time_score()` method automatically adjusts time preferences in multiple scenarios:
 
-| Completion Status | Boost Value |
-|-------------------|-------------|
-| Completed | `+0.5` |
-| Uncompleted | `-0.5` |
+| Trigger | Boost Value | Context |
+|---------|-------------|---------|
+| Task rated — completed | `+0.5` | User completed the task on time |
+| Task rated — uncompleted | `-0.5` | User failed to complete the task |
+| Task updated from main_schedule | `-1.0` | Task removed from schedule |
+| Task updated from provisional | `-2.0` | Task removed from provisional |
+| Batch scheduling | `+1.0` | Task successfully scheduled |
+| Provisional commit | `+2.0` | Task moved from provisional to main |
 
 Time scores are clamped to `[-10.0, 10.0]` with step size `0.25`.
 
@@ -205,7 +213,7 @@ Time scores are clamped to `[-10.0, 10.0]` with step size `0.25`.
 | **Denominators** | records (plan), completed_count (delta) |
 | **Triggers** | Task commit, Task rating |
 | **Location Tracking** | Via junction tables |
-| **Radial Decay** | Applied on dislocation |
+| **Time Score Decay** | Applied globally (x0.99 every 24h) |
 
 ---
 

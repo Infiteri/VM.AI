@@ -10,7 +10,7 @@
 | Constraint | Why It Exists | Impact on Architecture |
 |------------|---------------|------------------------|
 | **v3.0 Database Schema** | State derived from table presence. No `status` field. Draft pattern. | Eliminates state-sync bugs. Requires strict cascade rules. |
-| **v3.0 API Contracts** | 13 endpoints, strict validation, `draft_id` for commit flow. | Guarantees frontend-backend parity. |
+| **v3.0 API Contracts** | 15 endpoints, strict validation, `draft_id` for commit flow. | Guarantees frontend-backend parity. |
 | **Stable Incremental Scheduler** | Prevents schedule thrashing. | 12s timeout, 1-layer displacement, 25% value threshold. |
 | **Synchronous Stats Recorder** | Eliminates race conditions. | Runs in same DB transaction. |
 | **Atomic Commits** | Prevents blank calendar. | Single PostgreSQL transaction. |
@@ -57,15 +57,16 @@
 ```
 src/backend/
 ├── app/
-│   ├── main.py                    # FastAPI app, CORS, routers
+│   ├── main.py                    # FastAPI app, CORS, routers, lazy loading, health check, cleanup loop
 │   ├── core/
 │   │   ├── config.py             # Settings
 │   │   ├── database.py          # SQLAlchemy engine, session
 │   │   └── logging_config.py   # Logging
 │   ├── api/v1/endpoints/
-│   │   ├── tasks.py            # Task CRUD + NLP parsing
+│   │   ├── tasks.py            # Task CRUD + NLP parsing + image parsing
 │   │   ├── schedule.py         # Schedule fetching + batch
 │   │   ├── provisional.py     # Provisional management
+│   │   ├── duration.py         # Duration prediction
 │   │   └── stats.py            # Task rating
 │   ├── models/
 │   │   ├── task.py            # tasks table
@@ -84,12 +85,21 @@ src/backend/
 │   │   ├── enrichment.py # TaskPayloadComputed, refs
 │   │   ├── nlp.py        # NlpAddPayload, NlpPayloadField
 │   │   ├── task_matcher.py # MatchResult
+│   │   ├── duration.py    # DurationPredictRequest, DurationPredictResponse
 │   │   └── shared.py     # SuccessResponse
-│   └── services/
-│       ├── task_matcher.py   # MiniLM embeddings
-│       ├── enrichment.py    # Date resolution, overwrites
-│       ├── schedule_engine.py # Stable incremental scheduler
-│       └── stats_recorder.py # Two-denominator statistics
+│   ├── services/
+│   │   ├── task_matcher.py   # MiniLM embeddings
+│   │   ├── enrichment.py    # Date resolution, overwrites
+│   │   ├── schedule_engine.py # Stable incremental scheduler
+│   │   ├── stats_recorder.py # Two-denominator statistics
+│   │   ├── parser.py        # T5 NLP parser
+│   │   ├── duration.py      # Duration predictor (XGBoost)
+│   │   └── img_to_prompt.py # EfficientNet-B4 image classifier
+│   ├── utils/
+│   │   ├── model_loader.py   # Pre-loads all AI models
+│   │   ├── cleanup.py        # Background cleanup loop (drafts, decay)
+│   │   ├── task_saver.py     # ORM persistence for tasks
+│   │   └── task_normalizer.py# Normalize task payloads
 ├── alembic/                   # Migrations
 ├── logs/                     # backend.log
 └── pyproject.toml           # Dependencies
@@ -155,13 +165,15 @@ src/backend/
 
 ---
 
-## 6. API Endpoints (13 Total)
+## 6. API Endpoints (15 Total)
 
 ### Tasks Endpoints
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | POST | `/tasks/parse/add` | Parse NLP to draft |
 | POST | `/tasks/parse/modify` | Parse NLP to modify |
+| POST | `/tasks/parse/from-image` | Parse image to task prompt |
+| POST | `/tasks/predict-duration` | Predict task duration |
 | POST | `/tasks` | Create task |
 | POST | `/tasks/{id}/update` | Update task |
 | DELETE | `/tasks/{id}` | Delete task |

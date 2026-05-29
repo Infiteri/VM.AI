@@ -124,11 +124,9 @@ For each field where `predicted: true`, the system checks:
 ```
 1. If task_statistics exists AND records >= 3:
    → Use task_statistics data
-2. Else if task_statistics exists but records < 3:
-   → Use available task_statistics data (for fields that exist)
-3. Loop through categories (by priority):
+2. Loop through categories (by priority):
    → Use first category with data for that field
-4. If nothing found:
+3. If nothing found:
    → Keep predicted value (log warning)
 ```
 
@@ -281,7 +279,7 @@ def predict_nlp_add(
     # Step 5: Save to draft
     draft_id = self._draft_save(db, enriched_task, match_result)
     
-    return parsed_task, draft_id
+    return output_schema, draft_id
 ```
 
 ### 6.2 commit_from_draft()
