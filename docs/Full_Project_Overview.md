@@ -305,4 +305,38 @@ def schedule_batch(self, db: Session) -> BatchSchedulingResult:
 
 ---
 
+---
+
+## 10. Ethics and Impact
+
+### 10.1 Privacy & Data Storage
+- Task data is stored in PostgreSQL (single-user demo, no user_id fields)
+- Data is NOT encrypted at rest — known demo limitation
+- No telemetry, analytics, tracking, or third-party data sharing
+- No personal or confidential data is included in the repository
+
+### 10.2 Bias & Fairness
+- The T5 parser was fine-tuned on English template data only
+- Performance may degrade for non-English input, slang, dialect, or creative phrasing
+- The XGBoost regressor was trained on ~1000 labeled examples from a single user — predictions reflect that user's labeling patterns and may not generalize
+- No systematic bias analysis has been performed — this is a known limitation
+
+### 10.3 Known Risks
+- Duration predictions have MAE ≈ 10 minutes — do not rely on them for critical scheduling
+- The scheduler has known limitations with overnight tasks (naive datetime, no timezone)
+- All ML predictions are estimates; users should verify before committing
+- The system is a demo/prototype, not a production scheduling tool
+
+### 10.4 Responsible Use
+- Always review scheduled tasks before accepting automated changes
+- Report unexpected behavior via GitHub Issues
+- This is an assistive tool — final scheduling decisions remain with the user
+
+### 10.5 Transparency
+- Known bugs are documented in `src/backend/logs/`
+- Model limitations are discussed in this section
+- No deliberate manipulation of results
+
+---
+
 *Document prepared for ONIA 2026.*

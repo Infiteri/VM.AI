@@ -12,7 +12,7 @@ Usage:
 
 import io
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -77,7 +77,8 @@ def _round_to_5min(dt: datetime) -> str:
     minutes = dt.minute
     rounded = round(minutes / 5) * 5
     if rounded == 60:
-        dt = dt.replace(hour=dt.hour + 1, minute=0)
+        dt = dt + timedelta(hours=1)
+        dt = dt.replace(minute=0)
     else:
         dt = dt.replace(minute=rounded)
     result = dt.strftime("%H:%M")

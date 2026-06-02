@@ -493,11 +493,22 @@ class ScheduleEngine:
         
         current = task_start.replace(hour=0, minute=0, second=0, microsecond=0)
         end = task_deadline.replace(hour=0, minute=0, second=0, microsecond=0)
+        is_first_day = True
         
         while current <= end:
             date_str = current.strftime("%Y-%m-%d")
-            start_dt = datetime.strptime(f"{date_str} 00:00", "%Y-%m-%d %H:%M")
-            end_dt = datetime.strptime(f"{date_str} 23:59", "%Y-%m-%d %H:%M")
+            
+            if is_first_day:
+                start_dt = task_start
+                is_first_day = False
+            else:
+                start_dt = datetime.strptime(f"{date_str} 00:00", "%Y-%m-%d %H:%M")
+            
+            if current.date() == task_deadline.date():
+                end_dt = task_deadline
+            else:
+                end_dt = datetime.strptime(f"{date_str} 23:59", "%Y-%m-%d %H:%M")
+            
             windows[date_str] = [TimeWindow(date=date_str, start_dt=start_dt, end_dt=end_dt)]
             current += timedelta(days=1)
         

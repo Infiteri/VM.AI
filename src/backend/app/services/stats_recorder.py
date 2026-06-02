@@ -86,11 +86,9 @@ class StatsRecorder:
         current_records = stats.records or 0
         current_difficulty = stats.avg_difficulty or 0.0
 
-        # Update avg_difficulty: round((avg * records + new) / (records + 1), 2)
-        new_difficulty = round(
-            (current_difficulty * current_records + task.difficulty) / (current_records + 1),
-            2
-        )
+        # EMA for avg_difficulty: smooth transition from cumulative to rolling window
+        alpha = 1.0 / min(current_records + 1, self.RECORDS_NR_TRACK)
+        new_difficulty = round((1 - alpha) * current_difficulty + alpha * task.difficulty, 2)
         stats.avg_difficulty = new_difficulty
 
         # Update duration bucket
@@ -100,29 +98,20 @@ class StatsRecorder:
         if bucket not in avg_duration:
             avg_duration[bucket] = {"count": 0, "avg": 0}
 
-        current_count = avg_duration[bucket].get("count", 0)
-        current_avg = avg_duration[bucket].get("avg", 0)
+        bucket_count = avg_duration[bucket].get("count", 0)
+        bucket_avg = avg_duration[bucket].get("avg", 0)
 
-        # Handle RECORDS_NR_TRACK limit: if at limit, calculate effect of oldest record
-        if current_records >= self.RECORDS_NR_TRACK:
-            # Estimate: remove oldest record contribution (assume average)
-            # New avg = (current_avg * count - avg_removed) / (count - 1)
-            # For simplicity, we just add new and keep tracking
-            pass
-
-        # Update bucket
-        new_avg_duration = round(
-            (current_avg * current_count + task.duration) / (current_count + 1),
-            2
-        )
+        # EMA for duration bucket
+        bucket_alpha = 1.0 / min(bucket_count + 1, self.RECORDS_NR_TRACK)
+        new_bucket_avg = round((1 - bucket_alpha) * bucket_avg + bucket_alpha * task.duration, 2)
         avg_duration[bucket] = {
-            "count": current_count + 1,
-            "avg": int(new_avg_duration)
+            "count": min(bucket_count + 1, self.RECORDS_NR_TRACK),
+            "avg": int(new_bucket_avg)
         }
         stats.avg_duration = avg_duration
 
-        # Increment records
-        stats.records = current_records + 1
+        # Increment records (capped)
+        stats.records = min(current_records + 1, self.RECORDS_NR_TRACK)
 
         logger.info(f"[STATS] Final: {stats}")
 
@@ -142,12 +131,12 @@ class StatsRecorder:
         ).first()
 
         if loc_record:
-            loc_record.count += 1
+            loc_record.count = loc_record.count * 9 // 10 + 10
         else:
             loc_record = TaskStatisticsLocation(
                 statistics_id=stats.id,
                 location_id=task.location_id,
-                count=1,
+                count=10,
             )
             db.add(loc_record)
 
@@ -176,11 +165,9 @@ class StatsRecorder:
             current_records = cat_stats.records or 0
             current_difficulty = cat_stats.avg_difficulty or 0.0
 
-            # Update avg_difficulty
-            new_difficulty = round(
-                (current_difficulty * current_records + task.difficulty) / (current_records + 1),
-                2
-            )
+            # EMA for avg_difficulty
+            alpha = 1.0 / min(current_records + 1, self.RECORDS_NR_TRACK)
+            new_difficulty = round((1 - alpha) * current_difficulty + alpha * task.difficulty, 2)
             cat_stats.avg_difficulty = new_difficulty
 
             # Update duration bucket
@@ -190,21 +177,20 @@ class StatsRecorder:
             if bucket not in avg_duration:
                 avg_duration[bucket] = {"count": 0, "avg": 0}
 
-            current_count = avg_duration[bucket].get("count", 0)
-            current_avg = avg_duration[bucket].get("avg", 0)
+            bucket_count = avg_duration[bucket].get("count", 0)
+            bucket_avg = avg_duration[bucket].get("avg", 0)
 
-            new_avg_duration = round(
-                (current_avg * current_count + task.duration) / (current_count + 1),
-                2
-            )
+            # EMA for duration bucket
+            bucket_alpha = 1.0 / min(bucket_count + 1, self.RECORDS_NR_TRACK)
+            new_bucket_avg = round((1 - bucket_alpha) * bucket_avg + bucket_alpha * task.duration, 2)
             avg_duration[bucket] = {
-                "count": current_count + 1,
-                "avg": int(new_avg_duration)
+                "count": min(bucket_count + 1, self.RECORDS_NR_TRACK),
+                "avg": int(new_bucket_avg)
             }
             cat_stats.avg_duration = avg_duration
 
-            # Increment records
-            cat_stats.records = current_records + 1
+            # Increment records (capped)
+            cat_stats.records = min(current_records + 1, self.RECORDS_NR_TRACK)
 
             logger.info(f"[CAT_STATS] Final: {cat_stats}")
 
@@ -232,12 +218,12 @@ class StatsRecorder:
             ).first()
 
             if loc_record:
-                loc_record.count += 1
+                loc_record.count = loc_record.count * 9 // 10 + 10
             else:
                 loc_record = CategoryStatisticsLocation(
                     statistics_id=cat_stats.id,
                     location_id=task.location_id,
-                    count=1,
+                    count=10,
                 )
                 db.add(loc_record)
 

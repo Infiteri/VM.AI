@@ -586,6 +586,8 @@ class EnrichmentService:
         value, _ = self._extract_field(nlp_payload["category"])
         if isinstance(value, list):
             return value
+        if isinstance(value, str):
+            return [value]
         return []
 
     def _get_task_stats(self, db: Session, stats_id: UUID) -> Optional[dict]:
@@ -1033,11 +1035,12 @@ class EnrichmentService:
             if deadline_value is None:
                 # If 23:59 - start >= 7 hours, use today's 23:59
                 # Otherwise use tomorrow's 23:59
-                hours_diff = (datetime(2026, 1, 1, 23, 59) - datetime(2026, 1, 1, 9, 0)).seconds / 3600
+                today_2359 = start_time.replace(hour=23, minute=59, second=59)
+                hours_diff = (today_2359 - start_time).total_seconds() / 3600
                 if hours_diff >= 7:
-                    deadline = start_time.replace(hour=23, minute=59, second=0, microsecond=0)
+                    deadline = today_2359
                 else:
-                    deadline = (start_time + timedelta(days=1)).replace(hour=23, minute=59, second=0, microsecond=0)
+                    deadline = today_2359 + timedelta(days=1)
                 result["deadline"] = {"value": deadline, "predicted": True}
                 logger.warning("Validation: deadline set based on start time (was None)")
 
@@ -1243,11 +1246,12 @@ class EnrichmentService:
                 start_for_deadline = now
 
             if result.get("deadline") is None:
-                hours_diff = (datetime(2026, 1, 1, 23, 59) - datetime(2026, 1, 1, 9, 0)).seconds / 3600
+                today_2359 = start_for_deadline.replace(hour=23, minute=59, second=59)
+                hours_diff = (today_2359 - start_for_deadline).total_seconds() / 3600
                 if hours_diff >= 7:
-                    deadline = start_for_deadline.replace(hour=23, minute=59, second=0, microsecond=0)
+                    deadline = today_2359
                 else:
-                    deadline = (start_for_deadline + timedelta(days=1)).replace(hour=23, minute=59, second=0, microsecond=0)
+                    deadline = today_2359 + timedelta(days=1)
                 result["deadline"] = deadline
                 logger.warning("Validation: deadline set based on start time (was None)")
 
@@ -1407,7 +1411,7 @@ class EnrichmentService:
                     result["start"] = now
                     deadline_dt = now.replace(hour=23, minute=59, second=0, microsecond=0)
                     start_time = start if isinstance(start, datetime) else now
-                    hours_diff = (deadline_dt - start_time).seconds / 3600
+                    hours_diff = (deadline_dt - start_time).total_seconds() / 3600
                     if hours_diff < 7:
                         deadline_dt = deadline_dt + timedelta(days=1)
                     result["deadline"] = deadline_dt
@@ -1425,7 +1429,7 @@ class EnrichmentService:
                 start_time = result.get("start", now)
                 if not isinstance(start_time, datetime):
                     start_time = now
-                hours_diff = (deadline_dt - start_time).seconds / 3600
+                hours_diff = (deadline_dt - start_time).total_seconds() / 3600
                 if hours_diff < 7:
                     deadline_dt = deadline_dt + timedelta(days=1)
                 result["deadline"] = deadline_dt
