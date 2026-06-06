@@ -305,6 +305,9 @@ class EnrichmentService:
         if hasattr(existing_task, 'model_dump'):
             existing_task = existing_task.model_dump()
 
+        # Strip noop fixed_time before date parsing (preserve existing temporal state)
+        changed_fields = self._strip_noop_fixed_time(changed_fields)
+
         # Pre-process fixed_start before date parsing (combine start+fixed_start strings)
         changed_fields = self._pre_process_fixed_start(changed_fields)
 
@@ -1509,6 +1512,36 @@ class EnrichmentService:
             logger.warning("Validation: importance set to 0.5 (was None)")
 
         return result
+
+    # ================================================================
+    # HELPER: STRIP NOOP FIXED TIME
+    # ================================================================
+
+    def _strip_noop_fixed_time(self, changed_fields: dict) -> dict:
+        """
+        Remove fixed_time: False if no start/deadline is being changed.
+
+        When the parser emits fixed_time: False without touching start or
+        deadline, it's a no-op — not an intent to change temporal state.
+        Stripping it preserves the existing task's fixed_time value.
+
+        Rules:
+            - fixed_time is False and start not in changed_fields
+              and deadline not in changed_fields
+              -> remove fixed_time
+            - Otherwise: no change
+        """
+        if (
+            changed_fields.get("fixed_time") is False
+            and "start" not in changed_fields
+            and "deadline" not in changed_fields
+        ):
+            result = {k: v for k, v in changed_fields.items() if k != "fixed_time"}
+            logger.info(
+                f"Stripped fixed_time=False (no start/deadline in changed_fields)"
+            )
+            return result
+        return changed_fields
 
     # ================================================================
     # HELPER: PRE-PROCESS FIXED START
