@@ -123,6 +123,9 @@ class EnrichmentService:
             value, _ = self._extract_field(entry)
             flat_payload[field] = value
 
+        # Pre-process fixed_start before date parsing (combine start+fixed_start strings)
+        flat_payload = self._pre_process_fixed_start(flat_payload)
+
         # Parse ALL date fields regardless of fixed_time
         parsed_task = self._date_parse(flat_payload, fixed_time=False)
 
@@ -301,6 +304,9 @@ class EnrichmentService:
         # ============================================================================
         if hasattr(existing_task, 'model_dump'):
             existing_task = existing_task.model_dump()
+
+        # Pre-process fixed_start before date parsing (combine start+fixed_start strings)
+        changed_fields = self._pre_process_fixed_start(changed_fields)
 
         # Parse dates from raw NLP output first
         parsed_changed = self._date_parse(changed_fields)
@@ -1501,6 +1507,45 @@ class EnrichmentService:
         if result.get("importance") is None:
             result["importance"] = 0.5
             logger.warning("Validation: importance set to 0.5 (was None)")
+
+        return result
+
+    # ================================================================
+    # HELPER: PRE-PROCESS FIXED START
+    # ================================================================
+
+    def _pre_process_fixed_start(self, task: dict) -> dict:
+        """
+        Combine start string + fixed_start string before date parsing.
+
+        When fixed_time=True and both start and fixed_start are string values
+        (but deadline is null), the two strings are concatenated so that
+        parsedatetime can resolve them together to a single datetime.
+
+        Rules:
+            - fixed_time=True, fixed_start is str, start is str, deadline is null
+              -> fixed_start = f"{start} {fixed_start}", start = None
+            - Otherwise: no change
+
+        Input:
+            task: flat dict (raw string values, before date parsing)
+
+        Returns:
+            task: flat dict with combined fixed_start if applicable
+        """
+        result = task.copy()
+
+        if (
+            result.get("fixed_time") is True
+            and isinstance(result.get("fixed_start"), str) and result["fixed_start"]
+            and isinstance(result.get("start"), str) and result["start"]
+            and (result.get("deadline") is None or result.get("deadline") == "")
+        ):
+            result["fixed_start"] = f"{result['start']} {result['fixed_start']}"
+            result["start"] = None
+            logger.info(
+                f"Pre-process fixed_start: combined start + fixed_start -> '{result['fixed_start']}'"
+            )
 
         return result
 
