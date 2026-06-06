@@ -455,7 +455,7 @@ class EnrichmentService:
         deadline_for_importance = fixed_start if fixed_start else deadline
 
         # Process each field
-        fields_to_overwrite = ["difficulty", "duration", "importance", "location"]
+        fields_to_overwrite = ["difficulty", "duration", "location"]
 
         for field in fields_to_overwrite:
             if field not in nlp_payload:
